@@ -2133,15 +2133,18 @@
             container.innerHTML = html;
         }
 
+        function formatSaveTimestamp(timestamp) {
+            const parsed = timestamp instanceof Date ? timestamp : parseTimestamp(timestamp) || new Date();
+            return parsed.toLocaleString('fr-FR', {
+                dateStyle: 'short',
+                timeStyle: 'medium'
+            });
+        }
+
         function showSaveStatus(message, type = 'success', timestamp = null) {
             const status = document.getElementById('saveStatus');
             if (status) {
-                const saveTime = timestamp instanceof Date ? timestamp : new Date();
-                const timeStr = saveTime.toLocaleTimeString('fr-FR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
+                const timeStr = formatSaveTimestamp(timestamp);
                 status.textContent = `${message} - ${timeStr}`;
                 status.style.color = type === 'error' ? '#dc3545' : '#28a745';
             }
