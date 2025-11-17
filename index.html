@@ -2044,6 +2044,7 @@
         // Variables globales
         let rowCounters = {};
         let rgDatabase = {};
+        let columnSuggestions = {};
         let currentPreviewData = null;
         let currentTabForPreview = null;
         let searchResults = [];
@@ -2883,6 +2884,10 @@ return;
                         setupNomRGAutoCompletion(input, row, tabName);
                     }
 
+                    attachColumnAutocomplete(input, column);
+
+                    attachColumnAutocomplete(input, column);
+
                     input.addEventListener('input', () => {
                         validateInputInRealTime(input, column, tabName);
                         saveAllData();
@@ -2968,6 +2973,8 @@ return;
                     } else if (column === 'Nom de RG') {
                         setupNomRGAutoCompletion(input, row, tabName);
                     }
+
+                    attachColumnAutocomplete(input, column);
 
                     input.addEventListener('input', () => {
                         validateInputInRealTime(input, column, tabName);
@@ -3388,9 +3395,10 @@ return;
             if (!match) return;
 
             const nomInput = getNomRGInput(row, tabName);
-            if (nomInput && (!nomInput.value || nomInput.dataset.autoFilled === 'true')) {
+            if (nomInput) {
                 nomInput.value = rgDatabase[match]?.nom || '';
                 nomInput.dataset.autoFilled = 'true';
+                addColumnSuggestion('Nom de RG', nomInput.value);
             }
         }
 
@@ -3401,9 +3409,10 @@ return;
             if (!matchCode) return;
 
             const rgInput = getRGInput(row, tabName);
-            if (rgInput && (!rgInput.value || rgInput.dataset.autoFilled === 'true')) {
+            if (rgInput) {
                 rgInput.value = matchCode;
                 rgInput.dataset.autoFilled = 'true';
+                addColumnSuggestion(tabName === 'baserg' ? 'Code RG' : 'RG', rgInput.value);
             }
         }
 
@@ -3422,6 +3431,94 @@ return;
                 input.dataset.autoFilled = 'false';
                 autoFillRGFromName(input.value, row, tabName);
             });
+        }
+
+        function getColumnListId(column) {
+            return `suggest-${column.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+        }
+
+        function ensureColumnSuggestionList(column) {
+            const listId = getColumnListId(column);
+            let datalist = document.getElementById(listId);
+
+            if (!datalist) {
+                datalist = document.createElement('datalist');
+                datalist.id = listId;
+                document.body.appendChild(datalist);
+            }
+
+            return datalist;
+        }
+
+        function addColumnSuggestion(column, value) {
+            if (!value || !column) return;
+
+            const cleanedValue = value.trim();
+            if (!cleanedValue) return;
+
+            if (!columnSuggestions[column]) {
+                columnSuggestions[column] = new Set();
+            }
+
+            const suggestions = columnSuggestions[column];
+            if (suggestions.has(cleanedValue)) return;
+
+            suggestions.add(cleanedValue);
+
+            const datalist = ensureColumnSuggestionList(column);
+            const option = document.createElement('option');
+            option.value = cleanedValue;
+            datalist.appendChild(option);
+        }
+
+        function refreshColumnSuggestionLists() {
+            Object.entries(columnSuggestions).forEach(([column, values]) => {
+                const datalist = ensureColumnSuggestionList(column);
+                datalist.innerHTML = '';
+
+                values.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    datalist.appendChild(option);
+                });
+            });
+        }
+
+        function rebuildColumnSuggestions() {
+            columnSuggestions = {};
+
+            Object.keys(tabConfigs).forEach(tabName => {
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                const rows = tbody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input');
+                    inputs.forEach((input, index) => {
+                        const column = tabConfigs[tabName]?.columns[index];
+
+                        if (!column || column === 'RG' || column === 'Code RG' || column === 'Nom de RG') return;
+
+                        addColumnSuggestion(column, input.value);
+                    });
+                });
+            });
+
+            refreshColumnSuggestionLists();
+        }
+
+        function attachColumnAutocomplete(input, column) {
+            if (!column || column === 'RG' || column === 'Code RG' || column === 'Nom de RG') return;
+
+            const datalistId = getColumnListId(column);
+            ensureColumnSuggestionList(column);
+            input.setAttribute('list', datalistId);
+
+            if (input.value) {
+                addColumnSuggestion(column, input.value);
+            }
+
+            input.addEventListener('input', () => addColumnSuggestion(column, input.value));
         }
 
         function buildRGDatabase() {
@@ -5121,6 +5218,8 @@ return;
         function applyLoadedState(data) {
             if (!data) return;
 
+            columnSuggestions = {};
+
             // Réinitialiser les tableaux avant rechargement
             Object.keys(tabConfigs).forEach(tabName => {
                 const tbody = document.getElementById(`${tabName}TableBody`);
@@ -5187,6 +5286,7 @@ return;
             updateTasksStats();
             updateSavedSearchesDisplay();
             updateRecentActivity();
+            rebuildColumnSuggestions();
             saveAllData();
         }
 
