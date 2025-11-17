@@ -26,6 +26,7 @@
             padding: 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             border-bottom: 3px solid #667eea;
+            position: relative;
         }
 
         .header h1 {
@@ -62,6 +63,39 @@
             font-size: 12px;
             color: #333;
             backdrop-filter: blur(5px);
+        }
+
+        .ambient-player {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.65);
+            padding: 8px 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            font-size: 11px;
+            color: #445;
+            backdrop-filter: blur(6px);
+        }
+
+        .ambient-player label {
+            font-weight: 700;
+            font-size: 11px;
+            color: #546;
+            letter-spacing: 0.2px;
+        }
+
+        .ambient-player select {
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 11px;
+            background: rgba(255,255,255,0.9);
+            color: #334;
+            min-width: 180px;
         }
 
         .tabs-container {
@@ -954,6 +988,15 @@
 </head>
 <body>
     <div class="header">
+        <div class="ambient-player" aria-label="Sélecteur de musique d'ambiance Minecraft">
+            <label for="ambientSelector">Ambiance douce</label>
+            <select id="ambientSelector">
+                <option value="">🔇 Silence</option>
+                <option value="sweden">🌿 Sweden (doux)</option>
+                <option value="aria">🌙 Aria (calme)</option>
+                <option value="clairiere">🍃 Clairière (brise)</option>
+            </select>
+        </div>
         <div class="save-status" id="saveStatus">💾 Auto-sauvegarde activée</div>
         <h1>Suivi Mise en Qualité - SNCF PROJECT <span class="project-martine">M.A.R.T.I.N.E V17</span></h1>
         <div class="controls" style="justify-content: center; margin-top: 15px;">
@@ -2266,14 +2309,15 @@
         let chartInstances = {};
         let activityLog = [];
         let audioContext = null;
-        let pianoMelodyIndex = 0;
+        let ambientLoopTimer = null;
+        let currentAmbientTrack = null;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
             rowCounters[tabName] = 0;
         });
 
-        // 🎵 AUDIO PIANO POUR LES ACTIONS
+        // 🎵 LECTEUR AMBIANCE DOUCE
         function getAudioContext() {
             if (!window.AudioContext && !window.webkitAudioContext) return null;
 
@@ -2288,11 +2332,35 @@
             return audioContext;
         }
 
-        const pianoMelody = [
-            'Eb4', 'F4', 'G4', 'Bb4', 'G4', 'F4', 'Eb4', 'F4',
-            'G4', 'F4', 'Eb4', 'Bb3', 'C4', 'Eb4', 'F4', 'G4',
-            'F4', 'Eb4', 'F4', 'G4', 'F4', 'Eb4', 'D4', 'C4'
-        ];
+        const ambientTracks = {
+            sweden: {
+                label: 'Sweden (doux)',
+                tempo: 58,
+                voices: [
+                    { type: 'triangle', gain: 0.05, notes: [['E4', 4], ['G4', 4], ['B3', 4], ['C4', 4]] },
+                    { type: 'sine', gain: 0.035, notes: [['B3', 6], ['A3', 6], ['G3', 6], ['A3', 6]] },
+                    { type: 'square', gain: 0.02, notes: [['E3', 8], ['E3', 8], ['E3', 8], ['E3', 8]] }
+                ]
+            },
+            aria: {
+                label: 'Aria (calme)',
+                tempo: 64,
+                voices: [
+                    { type: 'sine', gain: 0.045, notes: [['D4', 4], ['F#4', 4], ['A4', 4], ['G4', 4]] },
+                    { type: 'triangle', gain: 0.03, notes: [['A3', 8], ['B3', 8], ['A3', 8], ['F#3', 8]] },
+                    { type: 'sine', gain: 0.018, notes: [['D3', 16], ['D3', 16]] }
+                ]
+            },
+            clairiere: {
+                label: 'Clairière (brise)',
+                tempo: 70,
+                voices: [
+                    { type: 'triangle', gain: 0.04, notes: [['C4', 4], ['E4', 4], ['G4', 4], ['A4', 4]] },
+                    { type: 'sine', gain: 0.025, notes: [['G3', 8], ['E3', 8], ['C3', 8], ['E3', 8]] },
+                    { type: 'sawtooth', gain: 0.012, notes: [['C5', 16], ['B4', 16]] }
+                ]
+            }
+        };
 
         function noteToFrequency(note) {
             const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -2303,62 +2371,76 @@
             return 440 * Math.pow(2, (midi - 69) / 12);
         }
 
-        function playPianoNote() {
+        function scheduleAmbientPattern(track, startTime) {
+            const ctx = getAudioContext();
+            if (!ctx) return 0;
+
+            const secondsPerBeat = 60 / track.tempo;
+            let longest = 0;
+
+            track.voices.forEach(voice => {
+                let cursor = startTime;
+                voice.notes.forEach(([note, beats]) => {
+                    const osc = ctx.createOscillator();
+                    osc.type = voice.type;
+                    osc.frequency.setValueAtTime(noteToFrequency(note), cursor);
+
+                    const gain = ctx.createGain();
+                    const attack = 0.25 * secondsPerBeat;
+                    const release = 0.6 * secondsPerBeat;
+                    gain.gain.setValueAtTime(0.0001, cursor);
+                    gain.gain.linearRampToValueAtTime(voice.gain, cursor + attack);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, cursor + beats * secondsPerBeat + release);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(cursor);
+                    osc.stop(cursor + beats * secondsPerBeat + release);
+
+                    cursor += beats * secondsPerBeat;
+                    const segmentLength = cursor - startTime + release;
+                    if (segmentLength > longest) longest = segmentLength;
+                });
+            });
+
+            return longest;
+        }
+
+        function stopAmbientMusic() {
+            if (ambientLoopTimer) {
+                clearInterval(ambientLoopTimer);
+                ambientLoopTimer = null;
+            }
+            currentAmbientTrack = null;
+        }
+
+        function playAmbientMusic(key) {
+            const track = ambientTracks[key];
+            if (!track) return;
+
+            stopAmbientMusic();
+
             const ctx = getAudioContext();
             if (!ctx) return;
 
-            const now = ctx.currentTime;
-            const note = pianoMelody[pianoMelodyIndex % pianoMelody.length];
-            pianoMelodyIndex++;
-
-            const baseFreq = noteToFrequency(note);
-            const harmonicFreq = baseFreq * Math.pow(2, 12 / 12);
-
-            const mainOsc = ctx.createOscillator();
-            mainOsc.type = 'sine';
-            mainOsc.frequency.setValueAtTime(baseFreq, now);
-
-            const sparkleOsc = ctx.createOscillator();
-            sparkleOsc.type = 'triangle';
-            sparkleOsc.frequency.setValueAtTime(harmonicFreq, now);
-
-            const gain = ctx.createGain();
-            gain.gain.setValueAtTime(0.0001, now);
-            gain.gain.exponentialRampToValueAtTime(0.08, now + 0.04);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
-
-            const filter = ctx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(1600, now);
-            filter.Q.setValueAtTime(0.7, now);
-
-            const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-            if (pan) {
-                const panValue = (Math.sin(now * 2) + Math.random() * 0.4 - 0.2) * 0.4;
-                pan.pan.setValueAtTime(panValue, now);
-            }
-
-            mainOsc.connect(filter);
-            sparkleOsc.connect(filter);
-            filter.connect(gain);
-            if (pan) {
-                gain.connect(pan);
-                pan.connect(ctx.destination);
-            } else {
-                gain.connect(ctx.destination);
-            }
-
-            mainOsc.start(now);
-            sparkleOsc.start(now + 0.015);
-            mainOsc.stop(now + 1.25);
-            sparkleOsc.stop(now + 1.1);
+            currentAmbientTrack = key;
+            const loopDuration = scheduleAmbientPattern(track, ctx.currentTime + 0.05);
+            ambientLoopTimer = setInterval(() => {
+                scheduleAmbientPattern(track, ctx.currentTime);
+            }, Math.max(2000, loopDuration * 1000));
         }
 
-        function setupActionSounds() {
-            document.addEventListener('click', event => {
-                const target = event.target.closest('.btn, .tab, .file-drop-zone, .close-preview');
-                if (target) {
-                    playPianoNote();
+        function setupAmbientSelector() {
+            const selector = document.getElementById('ambientSelector');
+            if (!selector) return;
+
+            selector.addEventListener('change', event => {
+                const choice = event.target.value;
+                if (choice) {
+                    playAmbientMusic(choice);
+                } else {
+                    stopAmbientMusic();
                 }
             });
         }
@@ -2374,8 +2456,6 @@
                 </div>
             `;
             document.body.appendChild(notification);
-
-            playPianoNote();
 
             setTimeout(() => notification.classList.add('show'), 100);
             setTimeout(() => {
@@ -6257,7 +6337,7 @@ return;
                 });
 
                 setupFileDropZones();
-                setupActionSounds();
+                setupAmbientSelector();
                 updateStatsDashboard();
 
                 showNotification('🚀 MARTINE v17.0 - Tous onglets fonctionnels', 'success');
