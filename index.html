@@ -2213,11 +2213,99 @@
         let autoSaveInterval = null;
         let chartInstances = {};
         let activityLog = [];
+        let audioContext = null;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
             rowCounters[tabName] = 0;
         });
+
+        // 🎵 AUDIO DOUX POUR LES ACTIONS
+        function getAudioContext() {
+            if (!window.AudioContext && !window.webkitAudioContext) return null;
+
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            return audioContext;
+        }
+
+        function playLofiTone(type = 'info') {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+
+            const now = ctx.currentTime;
+            const gain = ctx.createGain();
+            const filter = ctx.createBiquadFilter();
+
+            const palettes = {
+                success: [
+                    { base: 520, interval: 6, wave: 'sine' },
+                    { base: 480, interval: 9, wave: 'sine' }
+                ],
+                error: [
+                    { base: 210, interval: -5, wave: 'sine' },
+                    { base: 240, interval: -7, wave: 'triangle' }
+                ],
+                warning: [
+                    { base: 340, interval: 3, wave: 'sine' },
+                    { base: 380, interval: 2, wave: 'triangle' }
+                ],
+                info: [
+                    { base: 410, interval: 5, wave: 'sine' },
+                    { base: 440, interval: 7, wave: 'triangle' }
+                ],
+                click: [
+                    { base: 280, interval: 4, wave: 'sine' },
+                    { base: 320, interval: 5, wave: 'triangle' }
+                ]
+            };
+
+            const palette = palettes[type] || palettes.info;
+            const choice = palette[Math.floor(Math.random() * palette.length)];
+            const harmonicFreq = choice.base * Math.pow(2, choice.interval / 12);
+
+            const createOsc = (freq, detune = 0) => {
+                const osc = ctx.createOscillator();
+                osc.type = choice.wave;
+                osc.frequency.setValueAtTime(freq + detune, now);
+                return osc;
+            };
+
+            const oscA = createOsc(choice.base, Math.random() * 6 - 3);
+            const oscB = createOsc(harmonicFreq, Math.random() * 4 - 2);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(950, now);
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(0.04, now + 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+
+            oscA.connect(filter);
+            oscB.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+
+            oscA.start(now);
+            oscB.start(now + 0.02);
+            oscA.stop(now + 0.52);
+            oscB.stop(now + 0.54);
+        }
+
+        function setupActionSounds() {
+            document.addEventListener('click', event => {
+                const target = event.target.closest('.btn, .tab, .file-drop-zone, .close-preview');
+                if (target) {
+                    playLofiTone('click');
+                }
+            });
+        }
 
         // 🔧 FONCTIONS UTILITAIRES COMPLÈTES
         function showNotification(message, type = 'success') {
@@ -2230,7 +2318,9 @@
                 </div>
             `;
             document.body.appendChild(notification);
-            
+
+            playLofiTone(type);
+
             setTimeout(() => notification.classList.add('show'), 100);
             setTimeout(() => {
                 notification.classList.remove('show');
@@ -5773,14 +5863,15 @@ return;
                 refreshRGSuggestions();
 
                 autoSaveInterval = setInterval(saveAllData, 60000); // Toutes les minutes
-                
+
                 window.addEventListener('beforeunload', () => {
                     saveAllData();
                 });
-                
+
                 setupFileDropZones();
+                setupActionSounds();
                 updateStatsDashboard();
-                
+
                 showNotification('🚀 MARTINE v17.0 - Tous onglets fonctionnels', 'success');
                 showSaveStatus('💾 Application prête - Auto-sauvegarde activée');
                 logActivity('Application MARTINE v17.0 initialisée', 'success');
