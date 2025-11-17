@@ -1815,6 +1815,7 @@
                             <option value="autremodif">🔧 Autre modification</option>
                             <option value="modifsurface">📐 Modification surface</option>
                             <option value="verifbaux">✅ Vérification baux</option>
+                            <option value="baserg">🗂️ Base RG</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -2132,14 +2133,14 @@
             container.innerHTML = html;
         }
 
-        function showSaveStatus(message, type = 'success') {
+        function showSaveStatus(message, type = 'success', timestamp = null) {
             const status = document.getElementById('saveStatus');
             if (status) {
-                const now = new Date();
-                const timeStr = now.toLocaleTimeString('fr-FR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    second: '2-digit' 
+                const saveTime = timestamp instanceof Date ? timestamp : new Date();
+                const timeStr = saveTime.toLocaleTimeString('fr-FR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
                 });
                 status.textContent = `${message} - ${timeStr}`;
                 status.style.color = type === 'error' ? '#dc3545' : '#28a745';
@@ -2156,6 +2157,12 @@
 
         function getTabIcon(tabName) {
             return tabConfigs[tabName]?.icon || '📄';
+        }
+
+        function parseTimestamp(value) {
+            if (!value) return null;
+            const date = value instanceof Date ? value : new Date(value);
+            return isNaN(date.getTime()) ? null : date;
         }
 
         // 🔧 GESTION DES ONGLETS
@@ -3799,8 +3806,8 @@ return;
                 
                 searchResults = [];
                 
-                const tabsToSearch = searchParams.tab ? [searchParams.tab] : 
-                    Object.keys(tabConfigs).filter(t => t !== 'baserg');
+                const tabsToSearch = searchParams.tab ? [searchParams.tab] :
+                    Object.keys(tabConfigs);
                 
                 tabsToSearch.forEach(tabName => {
                     const tbody = document.getElementById(`${tabName}TableBody`);
@@ -4821,17 +4828,24 @@ return;
         function loadAllData() {
             try {
                 const savedData = localStorage.getItem('martine_v17_data');
-                if (!savedData) return;
-                
+                if (!savedData) return null;
+
                 const data = JSON.parse(savedData);
-                
+
+                const lastSavedTime = parseTimestamp(data.timestamp);
+
                 if (data.rowCounters) rowCounters = data.rowCounters;
                 if (data.rgDatabase) rgDatabase = data.rgDatabase;
                 if (data.pendingTasks) pendingTasks = data.pendingTasks;
                 if (data.completedTasks) completedTasks = data.completedTasks;
                 if (data.savedSearches) savedSearches = data.savedSearches;
-                if (data.activityLog) activityLog = data.activityLog;
-                
+                if (data.activityLog) {
+                    activityLog = data.activityLog.map(entry => ({
+                        ...entry,
+                        timestamp: parseTimestamp(entry.timestamp) || new Date()
+                    }));
+                }
+
                 if (data.tabsData) {
                     Object.keys(data.tabsData).forEach(tabName => {
                         const tabData = data.tabsData[tabName];
@@ -4849,8 +4863,10 @@ return;
                 updateTasksStats();
                 updateSavedSearchesDisplay();
                 updateRecentActivity();
-                
+
                 showNotification('💾 Données restaurées avec succès');
+
+                return lastSavedTime;
                 
             } catch (error) {
                 console.error('Erreur chargement:', error);
@@ -4928,7 +4944,7 @@ return;
                     showNotification('❌ Veuillez sélectionner un fichier JSON de sauvegarde', 'error');
                     return;
                 }
-                
+
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     try {
@@ -4954,36 +4970,43 @@ return;
                         if (data.pendingTasks) pendingTasks = data.pendingTasks;
                         if (data.completedTasks) completedTasks = data.completedTasks;
                         if (data.savedSearches) savedSearches = data.savedSearches;
-                        if (data.activityLog) activityLog = data.activityLog;
+                        if (data.activityLog) {
+                            activityLog = data.activityLog.map(entry => ({
+                                ...entry,
+                                timestamp: parseTimestamp(entry.timestamp) || new Date()
+                            }));
+                        }
                         
                         if (data.tabsData) {
                             Object.keys(data.tabsData).forEach(tabName => {
                                 const tabData = data.tabsData[tabName];
                                 if (!tabData || tabData.length === 0) return;
-                                
+
                                 tabData.forEach(rowData => {
                                     addRowWithData(tabName, rowData);
                                 });
-                                
+
                                 updateStats(tabName);
                             });
                         }
-                        
+
                         updatePendingTasksDisplay();
                         updateTasksStats();
                         updateSavedSearchesDisplay();
                         updateRecentActivity();
+                        const importedTimestamp = parseTimestamp(data.timestamp) || new Date();
+                        showSaveStatus('💾 Sauvegarde restaurée', 'success', importedTimestamp);
                         saveAllData();
-                        
+
                         showNotification(`✅ Sauvegarde importée avec succès (v${data.version})`);
                         logActivity('Sauvegarde complète importée', 'success');
-                        
+
                     } catch (parseError) {
                         console.error('Erreur parsing JSON:', parseError);
                         showNotification('❌ Erreur lors de la lecture du fichier de sauvegarde', 'error');
                     }
                 };
-                
+
                 reader.readAsText(file);
                 fileInput.value = '';
                 
@@ -4994,9 +5017,9 @@ return;
         }
 
         // 🗑️ NETTOYAGE
-        function clearAll(tabName, confirm = true) {
+        function clearAll(tabName, promptUser = true) {
             try {
-                if (confirm && !window.confirm(`Êtes-vous sûr de vouloir effacer toutes les données de l'onglet ${getTabDisplayName(tabName)} ?`)) {
+                if (promptUser && !window.confirm(`Êtes-vous sûr de vouloir effacer toutes les données de l'onglet ${getTabDisplayName(tabName)} ?`)) {
                     return;
                 }
                 
@@ -5007,10 +5030,8 @@ return;
                     updateStats(tabName);
                     saveAllData();
                     
-                    if (confirm) {
-                        showNotification(`🗑️ Toutes les données de ${getTabDisplayName(tabName)} ont été effacées`);
-                        logActivity(`Données effacées dans ${getTabDisplayName(tabName)}`, 'warning');
-                    }
+                    showNotification(`🗑️ Toutes les données de ${getTabDisplayName(tabName)} ont été effacées`);
+                    logActivity(`Données effacées dans ${getTabDisplayName(tabName)}`, 'warning');
                 }
             } catch (error) {
                 console.error('Erreur effacement:', error);
@@ -5021,21 +5042,29 @@ return;
         // 🔧 INITIALISATION COMPLÈTE
         function initializeApp() {
             try {
-                loadAllData();
-                
+                const lastSavedTime = loadAllData();
+
                 autoSaveInterval = setInterval(saveAllData, 60000); // Toutes les minutes
-                
+
+                if (!lastSavedTime) {
+                    saveAllData();
+                }
+
                 window.addEventListener('beforeunload', () => {
                     saveAllData();
                 });
                 
                 setupFileDropZones();
                 updateStatsDashboard();
-                
+
                 showNotification('🚀 MARTINE v17.0 - Tous onglets fonctionnels', 'success');
-                showSaveStatus('💾 Application prête - Auto-sauvegarde activée');
+                if (lastSavedTime instanceof Date) {
+                    showSaveStatus('💾 Sauvegarde restaurée', 'success', lastSavedTime);
+                } else {
+                    showSaveStatus('💾 Application prête - Auto-sauvegarde activée');
+                }
                 logActivity('Application MARTINE v17.0 initialisée', 'success');
-                
+
             } catch (error) {
                 console.error('Erreur initialisation:', error);
                 showNotification('❌ Erreur lors de l\'initialisation', 'error');
