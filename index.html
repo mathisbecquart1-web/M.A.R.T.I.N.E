@@ -2240,34 +2240,62 @@
             if (!ctx) return;
 
             const now = ctx.currentTime;
-            const oscillator = ctx.createOscillator();
             const gain = ctx.createGain();
             const filter = ctx.createBiquadFilter();
 
-            const frequencies = {
-                success: 540,
-                error: 210,
-                warning: 360,
-                info: 430,
-                click: 300
+            const palettes = {
+                success: [
+                    { base: 520, interval: 6, wave: 'sine' },
+                    { base: 480, interval: 9, wave: 'sine' }
+                ],
+                error: [
+                    { base: 210, interval: -5, wave: 'sine' },
+                    { base: 240, interval: -7, wave: 'triangle' }
+                ],
+                warning: [
+                    { base: 340, interval: 3, wave: 'sine' },
+                    { base: 380, interval: 2, wave: 'triangle' }
+                ],
+                info: [
+                    { base: 410, interval: 5, wave: 'sine' },
+                    { base: 440, interval: 7, wave: 'triangle' }
+                ],
+                click: [
+                    { base: 280, interval: 4, wave: 'sine' },
+                    { base: 320, interval: 5, wave: 'triangle' }
+                ]
             };
 
-            oscillator.type = 'triangle';
-            oscillator.frequency.setValueAtTime(frequencies[type] || frequencies.info, now);
+            const palette = palettes[type] || palettes.info;
+            const choice = palette[Math.floor(Math.random() * palette.length)];
+            const harmonicFreq = choice.base * Math.pow(2, choice.interval / 12);
+
+            const createOsc = (freq, detune = 0) => {
+                const osc = ctx.createOscillator();
+                osc.type = choice.wave;
+                osc.frequency.setValueAtTime(freq + detune, now);
+                return osc;
+            };
+
+            const oscA = createOsc(choice.base, Math.random() * 6 - 3);
+            const oscB = createOsc(harmonicFreq, Math.random() * 4 - 2);
 
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(1200, now);
+            filter.frequency.setValueAtTime(950, now);
 
             gain.gain.setValueAtTime(0.0001, now);
-            gain.gain.exponentialRampToValueAtTime(0.08, now + 0.04);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+            gain.gain.exponentialRampToValueAtTime(0.04, now + 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
 
-            oscillator.connect(filter);
+            oscA.connect(filter);
+            oscB.connect(filter);
             filter.connect(gain);
             gain.connect(ctx.destination);
 
-            oscillator.start(now);
-            oscillator.stop(now + 0.42);
+            oscA.start(now);
+            oscB.start(now + 0.02);
+            oscA.stop(now + 0.52);
+            oscB.stop(now + 0.54);
         }
 
         function setupActionSounds() {
