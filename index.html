@@ -1793,12 +1793,23 @@
             </div>
 
             <!-- TABLEAU DES TÂCHES EN ATTENTE -->
-            <div class="table-container" style="margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h4>📦 Lot de tâches à créer</h4>
-                    <button class="btn btn-success" id="createBatchTasksBtn" onclick="saveBatchAsPending()" disabled>
-                        🚀 Créer toutes les tâches du lot
-                    </button>
+                <div class="table-container" style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                    <div>
+                        <h4 style="margin-bottom: 6px;">📦 Lot de tâches à créer</h4>
+                        <div id="activeBatchLabel" style="font-size: 13px; color: #555;">Aucun lot sélectionné</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <input id="batchNameInput" type="text" placeholder="Nom du lot" style="padding: 8px 10px; border-radius: 6px; border: 1px solid #ddd; min-width: 180px;">
+                        <button class="btn btn-secondary" onclick="createTaskBatch()">➕ Nouveau lot</button>
+                        <select id="batchSelector" onchange="selectTaskBatch(this.value)" style="padding: 8px 10px; border-radius: 6px; border: 1px solid #ddd; min-width: 180px;">
+                            <option value="">Sélectionner un lot...</option>
+                        </select>
+                        <button class="btn btn-danger" onclick="deleteActiveBatch()" style="background: #f44336; border-color: #f44336;">🗑️ Supprimer le lot</button>
+                        <button class="btn btn-success" id="createBatchTasksBtn" onclick="saveBatchAsPending()" disabled>
+                            🚀 Créer toutes les tâches du lot
+                        </button>
+                    </div>
                 </div>
                 <table>
                     <thead>
@@ -2238,6 +2249,8 @@
         let searchResults = [];
         let pendingTasks = [];
         let taskDrafts = [];
+        let taskBatches = [];
+        let activeBatchId = null;
         let completedTasks = [];
         let savedSearches = [];
         let autoSaveInterval = null;
@@ -4934,6 +4947,7 @@ return;
                 const transferBtn = document.getElementById('transferTaskBtn');
                 const pendingBtn = document.getElementById('pendingTaskBtn');
                 const batchBtn = document.getElementById('batchTaskBtn');
+                const hasActiveBatch = Boolean(getActiveBatch());
 
                 if (!targetTab) {
                     fieldsContainer.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">Sélectionnez un onglet pour voir les champs disponibles</p>';
@@ -4965,8 +4979,8 @@ return;
 
                 transferBtn.disabled = false;
                 pendingBtn.disabled = false;
-                batchBtn.disabled = false;
-                
+                batchBtn.disabled = !hasActiveBatch;
+
             } catch (error) {
                 console.error('Erreur mise à jour champs tâche:', error);
             }
@@ -5039,10 +5053,123 @@ return;
             }
         }
 
+        function getActiveBatch() {
+            return taskBatches.find(batch => batch.id === activeBatchId) || null;
+        }
+
+        function createTaskBatch() {
+            try {
+                const nameInput = document.getElementById('batchNameInput');
+                const batchName = (nameInput?.value || '').trim() || `Lot ${taskBatches.length + 1}`;
+
+                const newBatch = {
+                    id: generateUniqueId(),
+                    name: batchName,
+                    tasks: [],
+                    createdAt: new Date()
+                };
+
+                taskBatches.push(newBatch);
+                activeBatchId = newBatch.id;
+                taskDrafts = newBatch.tasks;
+
+                updateBatchSelectors();
+                updateTaskBatchDisplay();
+                saveAllData();
+
+                if (nameInput) nameInput.value = '';
+
+                showNotification(`📦 Lot "${batchName}" créé`);
+                logActivity(`Nouveau lot de tâches créé (${batchName})`, 'success');
+            } catch (error) {
+                console.error('Erreur création lot:', error);
+                showNotification('❌ Erreur lors de la création du lot', 'error');
+            }
+        }
+
+        function selectTaskBatch(batchId) {
+            activeBatchId = batchId || null;
+            const activeBatch = getActiveBatch();
+            taskDrafts = activeBatch ? activeBatch.tasks : [];
+            updateTaskBatchDisplay();
+            updateTaskFields();
+            saveAllData();
+        }
+
+        function updateBatchSelectors() {
+            const selector = document.getElementById('batchSelector');
+            if (!selector) return;
+
+            selector.innerHTML = '<option value="">Sélectionner un lot...</option>';
+
+            taskBatches.forEach(batch => {
+                const option = document.createElement('option');
+                option.value = batch.id;
+                option.textContent = `${batch.name} (${batch.tasks.length} tâche(s))`;
+                if (batch.id === activeBatchId) {
+                    option.selected = true;
+                }
+                selector.appendChild(option);
+            });
+
+            const createBtn = document.getElementById('createBatchTasksBtn');
+            if (createBtn) {
+                createBtn.disabled = !getActiveBatch() || getActiveBatch().tasks.length === 0;
+            }
+
+            const batchBtn = document.getElementById('batchTaskBtn');
+            if (batchBtn) {
+                const targetTab = document.getElementById('taskTargetTab').value;
+                batchBtn.disabled = !targetTab || !getActiveBatch();
+            }
+
+            const label = document.getElementById('activeBatchLabel');
+            if (label) {
+                if (!getActiveBatch()) {
+                    label.textContent = 'Aucun lot sélectionné';
+                } else {
+                    const batch = getActiveBatch();
+                    label.textContent = `Lot actif : ${batch.name} (${batch.tasks.length} tâche(s))`;
+                }
+            }
+        }
+
+        function deleteActiveBatch() {
+            try {
+                const batch = getActiveBatch();
+                if (!batch) {
+                    showNotification('ℹ️ Aucun lot à supprimer', 'info');
+                    return;
+                }
+
+                if (!confirm(`Supprimer le lot "${batch.name}" et ses tâches ?`)) return;
+
+                taskBatches = taskBatches.filter(b => b.id !== batch.id);
+                activeBatchId = taskBatches[0]?.id || null;
+                taskDrafts = getActiveBatch() ? getActiveBatch().tasks : [];
+
+                updateBatchSelectors();
+                updateTaskBatchDisplay();
+                saveAllData();
+
+                showNotification('🗑️ Lot supprimé');
+                logActivity(`Lot supprimé (${batch.name})`, 'warning');
+            } catch (error) {
+                console.error('Erreur suppression lot:', error);
+                showNotification('❌ Erreur lors de la suppression du lot', 'error');
+            }
+        }
+
         function addTaskToBatch() {
             try {
                 const targetTab = document.getElementById('taskTargetTab').value;
                 if (!targetTab) return;
+
+                const activeBatch = getActiveBatch();
+                if (!activeBatch) {
+                    showNotification('⚠️ Créez ou sélectionnez un lot avant d\'ajouter des tâches', 'warning');
+                    return;
+                }
 
                 const columns = tabConfigs[targetTab]?.columns || [];
                 const taskData = {};
@@ -5062,7 +5189,8 @@ return;
                     summary: generateTaskSummary(taskData)
                 };
 
-                taskDrafts.push(task);
+                activeBatch.tasks.push(task);
+                taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
                 saveAllData();
 
@@ -5160,17 +5288,31 @@ return;
 
                 tbody.innerHTML = '';
 
-                if (taskDrafts.length === 0) {
+                const activeBatch = getActiveBatch();
+
+                if (!activeBatch) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 30px; color: #666;">➕ Créez ou sélectionnez un lot pour commencer.</td>
+                        </tr>
+                    `;
+                    createBtn.disabled = true;
+                    updateBatchSelectors();
+                    return;
+                }
+
+                if (activeBatch.tasks.length === 0) {
                     tbody.innerHTML = `
                         <tr>
                             <td colspan="5" style="text-align: center; padding: 30px; color: #666;">➕ Ajoutez des tâches pour constituer un lot.</td>
                         </tr>
                     `;
                     createBtn.disabled = true;
+                    updateBatchSelectors();
                     return;
                 }
 
-                taskDrafts.forEach((task, index) => {
+                activeBatch.tasks.forEach((task, index) => {
                     const row = document.createElement('tr');
                     const createdDate = task.createdAt.toLocaleDateString('fr-FR');
 
@@ -5188,6 +5330,7 @@ return;
                 });
 
                 createBtn.disabled = false;
+                updateBatchSelectors();
             } catch (error) {
                 console.error('Erreur mise à jour lot tâches:', error);
             }
@@ -5195,7 +5338,11 @@ return;
 
         function deleteTaskDraft(taskId) {
             try {
-                taskDrafts = taskDrafts.filter(task => task.id !== taskId);
+                const activeBatch = getActiveBatch();
+                if (!activeBatch) return;
+
+                activeBatch.tasks = activeBatch.tasks.filter(task => task.id !== taskId);
+                taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
                 saveAllData();
             } catch (error) {
@@ -5206,18 +5353,20 @@ return;
 
         function saveBatchAsPending() {
             try {
-                if (taskDrafts.length === 0) return;
+                const activeBatch = getActiveBatch();
+                if (!activeBatch || activeBatch.tasks.length === 0) return;
 
-                const addedCount = taskDrafts.length;
+                const addedCount = activeBatch.tasks.length;
 
-                taskDrafts.forEach(task => {
+                activeBatch.tasks.forEach(task => {
                     pendingTasks.push({
                         ...task,
                         createdAt: task.createdAt || new Date()
                     });
                 });
 
-                taskDrafts = [];
+                activeBatch.tasks = [];
+                taskDrafts = activeBatch.tasks;
 
                 updateTaskBatchDisplay();
                 updatePendingTasksDisplay();
@@ -5727,6 +5876,8 @@ return;
                     rgDatabase: rgDatabase,
                     pendingTasks: pendingTasks,
                     taskDrafts: taskDrafts,
+                    taskBatches: taskBatches,
+                    activeBatchId: activeBatchId,
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
                     activityLog: activityLog,
@@ -5802,6 +5953,8 @@ return;
                     rgDatabase: rgDatabase,
                     pendingTasks: pendingTasks,
                     taskDrafts: taskDrafts,
+                    taskBatches: taskBatches,
+                    activeBatchId: activeBatchId,
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
                     activityLog: activityLog,
@@ -5940,10 +6093,33 @@ return;
                 completedAt: reviveDate(task.completedAt)
             }));
 
-            taskDrafts = (data.taskDrafts || []).map(task => ({
-                ...task,
-                createdAt: reviveDate(task.createdAt) || new Date()
+            taskBatches = (data.taskBatches || []).map(batch => ({
+                ...batch,
+                createdAt: reviveDate(batch.createdAt) || new Date(),
+                tasks: (batch.tasks || []).map(task => ({
+                    ...task,
+                    createdAt: reviveDate(task.createdAt) || new Date(),
+                    completedAt: reviveDate(task.completedAt)
+                }))
             }));
+
+            // Compatibilité avec l'ancien format taskDrafts
+            if (taskBatches.length === 0 && Array.isArray(data.taskDrafts) && data.taskDrafts.length > 0) {
+                const migratedBatch = {
+                    id: generateUniqueId(),
+                    name: 'Lot importé',
+                    tasks: data.taskDrafts.map(task => ({
+                        ...task,
+                        createdAt: reviveDate(task.createdAt) || new Date(),
+                        completedAt: reviveDate(task.completedAt)
+                    })),
+                    createdAt: new Date()
+                };
+                taskBatches.push(migratedBatch);
+            }
+
+            activeBatchId = data.activeBatchId || (taskBatches[0]?.id || null);
+            taskDrafts = getActiveBatch() ? getActiveBatch().tasks : [];
 
             completedTasks = (data.completedTasks || []).map(task => ({
                 ...task,
@@ -5978,6 +6154,7 @@ return;
 
             updatePendingTasksDisplay();
             updateTaskBatchDisplay();
+            updateBatchSelectors();
             updateTasksStats();
             updateSavedSearchesDisplay();
             updateRecentActivity();
@@ -6124,7 +6301,10 @@ return;
         window.updateTaskFields = updateTaskFields;
         window.transferTask = transferTask;
         window.saveTaskAsPending = saveTaskAsPending;
+        window.createTaskBatch = createTaskBatch;
+        window.selectTaskBatch = selectTaskBatch;
         window.addTaskToBatch = addTaskToBatch;
+        window.deleteActiveBatch = deleteActiveBatch;
         window.saveBatchAsPending = saveBatchAsPending;
         window.deleteTaskDraft = deleteTaskDraft;
         window.clearTaskForm = clearTaskForm;
