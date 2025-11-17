@@ -1989,7 +1989,7 @@
                 icon: '✅'
             },
             baserg: {
-                columns: ['Code RG', 'Nom de RG'],
+                columns: ['Code RG', 'Nom de RG', 'Utilisations', 'Dernière utilisation'],
                 displayName: 'Base RG',
                 icon: '🗂️'
             }
@@ -2861,14 +2861,18 @@ return;
                     input.className = 'editable';
                     input.type = getInputType(column);
                     input.placeholder = `Saisir ${column.toLowerCase()}...`;
-                    
+
                     // Événements spéciaux
                     if (tabName === 'modifsurface' && (column === 'Surface Avant' || column === 'Surface Après')) {
                         input.addEventListener('input', () => calculateSurfaceDifference(row));
                     }
-                    
+
                     if (tabName === 'baserg' && column === 'Code RG') {
                         input.addEventListener('input', () => updateRGDatabase());
+                    } else if (tabName === 'baserg' && (column === 'Utilisations' || column === 'Dernière utilisation')) {
+                        input.readOnly = true;
+                        input.value = column === 'Utilisations' ? '0' : '';
+                        input.style.backgroundColor = '#f8f9fa';
                     }
                     
                     input.addEventListener('input', () => {
@@ -2926,7 +2930,7 @@ return;
                     input.className = 'editable';
                     input.type = getInputType(column);
                     input.value = data[index] || '';
-                    
+
                     // Calculs spécifiques
                     if (tabName === 'modifsurface' && column === 'Différence') {
                         const surfaceAvant = parseFloat(data[columns.indexOf('Surface Avant')] || 0);
@@ -2935,9 +2939,15 @@ return;
                         input.readOnly = true;
                         input.style.backgroundColor = '#f8f9fa';
                     }
-                    
+
                     if (tabName === 'baserg' && column === 'Code RG') {
                         input.addEventListener('input', () => updateRGDatabase());
+                    } else if (tabName === 'baserg' && (column === 'Utilisations' || column === 'Dernière utilisation')) {
+                        input.readOnly = true;
+                        input.style.backgroundColor = '#f8f9fa';
+                        if (column === 'Utilisations') {
+                            input.value = data[index] || '0';
+                        }
                     }
                     
                     // Événements
@@ -3180,56 +3190,72 @@ return;
             try {
                 const tbody = document.getElementById('basergTableBody');
                 if (!tbody) return;
-                
+
                 const rows = tbody.querySelectorAll('tr');
                 const total = rows.length;
                 let used = 0;
-                
-                // Compter les utilisations
+
+                // Compter les utilisations et dates d'utilisation
                 const usageCounts = {};
-                
+                const tabUsageDates = {};
+
                 ['creation', 'modification', 'verifbaux'].forEach(tabName => {
                     const tabBody = document.getElementById(`${tabName}TableBody`);
                     if (!tabBody) return;
-                    
+
                     const tabRows = tabBody.querySelectorAll('tr');
                     tabRows.forEach(row => {
                         const inputs = row.querySelectorAll('input');
                         const rgIndex = tabConfigs[tabName].columns.indexOf('RG');
+                        const dateIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
+
                         if (rgIndex >= 0 && inputs[rgIndex]) {
                             const rgValue = inputs[rgIndex].value.trim();
                             if (rgValue) {
                                 usageCounts[rgValue] = (usageCounts[rgValue] || 0) + 1;
+
+                                if (dateIndex >= 0 && inputs[dateIndex] && inputs[dateIndex].value) {
+                                    const usageDate = reviveDate(inputs[dateIndex].value);
+                                    if (usageDate && (!tabUsageDates[rgValue] || tabUsageDates[rgValue] < usageDate)) {
+                                        tabUsageDates[rgValue] = usageDate;
+                                    }
+                                }
                             }
                         }
                     });
                 });
-                
+
                 // Mettre à jour l'affichage
                 rows.forEach(row => {
                     const inputs = row.querySelectorAll('input');
                     const codeRG = inputs[0] ? inputs[0].value : '';
                     const usageCount = usageCounts[codeRG] || 0;
-                    
+
                     if (usageCount > 0) {
                         used++;
                     }
-                    
-                    // Mettre à jour la colonne Utilisations
+
                     if (inputs[2]) {
                         inputs[2].value = usageCount;
                         inputs[2].readOnly = true;
                         inputs[2].style.backgroundColor = '#f8f9fa';
                     }
+
+                    if (inputs[3]) {
+                        const lastUse = tabUsageDates[codeRG];
+                        inputs[3].value = lastUse ? lastUse.toISOString().split('T')[0] : '';
+                        inputs[3].readOnly = true;
+                        inputs[3].style.backgroundColor = '#f8f9fa';
+                    }
                 });
-                
+
                 const usageRate = total > 0 ? Math.round((used / total) * 100) : 0;
-                
+
                 document.getElementById('basergTotalRows').textContent = total;
                 document.getElementById('basergUsedRows').textContent = used;
                 document.getElementById('basergUnusedRows').textContent = total - used;
                 document.getElementById('basergUsageRate').textContent = usageRate + '%';
-                
+
             } catch (error) {
                 console.error('Erreur stats usage RG:', error);
             }
@@ -4822,36 +4848,26 @@ return;
             try {
                 const savedData = localStorage.getItem('martine_v17_data');
                 if (!savedData) return;
-                
-                const data = JSON.parse(savedData);
-                
-                if (data.rowCounters) rowCounters = data.rowCounters;
-                if (data.rgDatabase) rgDatabase = data.rgDatabase;
-                if (data.pendingTasks) pendingTasks = data.pendingTasks;
-                if (data.completedTasks) completedTasks = data.completedTasks;
-                if (data.savedSearches) savedSearches = data.savedSearches;
-                if (data.activityLog) activityLog = data.activityLog;
-                
-                if (data.tabsData) {
-                    Object.keys(data.tabsData).forEach(tabName => {
-                        const tabData = data.tabsData[tabName];
-                        if (!tabData || tabData.length === 0) return;
-                        
-                        tabData.forEach(rowData => {
-                            addRowWithData(tabName, rowData);
-                        });
-                        
-                        updateStats(tabName);
-                    });
+
+                let data;
+                try {
+                    data = JSON.parse(savedData);
+                } catch (parseError) {
+                    console.error('Sauvegarde corrompue, suppression...', parseError);
+                    localStorage.removeItem('martine_v17_data');
+                    showNotification('⚠️ Sauvegarde corrompue supprimée. Nouvelle session propre.', 'warning');
+                    return;
                 }
-                
-                updatePendingTasksDisplay();
-                updateTasksStats();
-                updateSavedSearchesDisplay();
-                updateRecentActivity();
-                
+
+                if (!data || typeof data !== 'object') {
+                    showNotification('⚠️ Format de sauvegarde invalide. Données ignorées.', 'warning');
+                    return;
+                }
+
+                applyLoadedState(data);
+
                 showNotification('💾 Données restaurées avec succès');
-                
+
             } catch (error) {
                 console.error('Erreur chargement:', error);
                 showNotification('❌ Erreur lors du chargement des données', 'error');
@@ -4947,33 +4963,8 @@ return;
                         Object.keys(tabConfigs).forEach(tabName => {
                             clearAll(tabName, false);
                         });
-                        
-                        // Charger les nouvelles données
-                        if (data.rowCounters) rowCounters = data.rowCounters;
-                        if (data.rgDatabase) rgDatabase = data.rgDatabase;
-                        if (data.pendingTasks) pendingTasks = data.pendingTasks;
-                        if (data.completedTasks) completedTasks = data.completedTasks;
-                        if (data.savedSearches) savedSearches = data.savedSearches;
-                        if (data.activityLog) activityLog = data.activityLog;
-                        
-                        if (data.tabsData) {
-                            Object.keys(data.tabsData).forEach(tabName => {
-                                const tabData = data.tabsData[tabName];
-                                if (!tabData || tabData.length === 0) return;
-                                
-                                tabData.forEach(rowData => {
-                                    addRowWithData(tabName, rowData);
-                                });
-                                
-                                updateStats(tabName);
-                            });
-                        }
-                        
-                        updatePendingTasksDisplay();
-                        updateTasksStats();
-                        updateSavedSearchesDisplay();
-                        updateRecentActivity();
-                        saveAllData();
+
+                        applyLoadedState(data);
                         
                         showNotification(`✅ Sauvegarde importée avec succès (v${data.version})`);
                         logActivity('Sauvegarde complète importée', 'success');
@@ -4991,6 +4982,83 @@ return;
                 console.error('Erreur import sauvegarde:', error);
                 showNotification('❌ Erreur lors de l\'import de sauvegarde', 'error');
             }
+        }
+
+        function applyLoadedState(data) {
+            if (!data) return;
+
+            // Réinitialiser les tableaux avant rechargement
+            Object.keys(tabConfigs).forEach(tabName => {
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (tbody) {
+                    tbody.innerHTML = '';
+                }
+            });
+
+            // Réinitialiser les compteurs pour éviter les décalages
+            rowCounters = Object.keys(tabConfigs).reduce((acc, tab) => {
+                acc[tab] = 0;
+                return acc;
+            }, {});
+
+            if (data.rowCounters) {
+                Object.keys(data.rowCounters).forEach(tabName => {
+                    if (typeof data.rowCounters[tabName] === 'number') {
+                        rowCounters[tabName] = 0; // sera recalculé lors du chargement
+                    }
+                });
+            }
+
+            rgDatabase = data.rgDatabase || {};
+
+            pendingTasks = (data.pendingTasks || []).map(task => ({
+                ...task,
+                createdAt: reviveDate(task.createdAt) || new Date(),
+                completedAt: reviveDate(task.completedAt)
+            }));
+
+            completedTasks = (data.completedTasks || []).map(task => ({
+                ...task,
+                createdAt: reviveDate(task.createdAt) || new Date(),
+                completedAt: reviveDate(task.completedAt) || new Date(),
+                status: task.status || 'completed'
+            }));
+
+            savedSearches = (data.savedSearches || []).map(search => ({
+                ...search,
+                createdAt: reviveDate(search.createdAt) || new Date()
+            }));
+
+            activityLog = (data.activityLog || []).map(entry => ({
+                ...entry,
+                timestamp: reviveDate(entry.timestamp) || new Date()
+            }));
+
+            if (data.tabsData) {
+                Object.keys(data.tabsData).forEach(tabName => {
+                    const tabData = data.tabsData[tabName];
+                    if (!tabData || tabData.length === 0) return;
+
+                    rowCounters[tabName] = 0;
+                    tabData.forEach(rowData => {
+                        addRowWithData(tabName, rowData);
+                    });
+
+                    updateStats(tabName);
+                });
+            }
+
+            updatePendingTasksDisplay();
+            updateTasksStats();
+            updateSavedSearchesDisplay();
+            updateRecentActivity();
+            saveAllData();
+        }
+
+        function reviveDate(value) {
+            if (!value) return null;
+            const date = new Date(value);
+            return isNaN(date.getTime()) ? null : date;
         }
 
         // 🗑️ NETTOYAGE
