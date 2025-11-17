@@ -2872,6 +2872,8 @@ return;
 
                     if (tabName === 'baserg' && column === 'Code RG') {
                         input.addEventListener('input', () => updateRGDatabase());
+                    } else if (tabName === 'baserg' && column === 'Nom de RG') {
+                        input.addEventListener('input', () => updateRGDatabase());
                     } else if (tabName === 'baserg' && (column === 'Utilisations' || column === 'Dernière utilisation')) {
                         input.readOnly = true;
                         input.value = column === 'Utilisations' ? '0' : '';
@@ -2905,15 +2907,18 @@ return;
                 deleteBtn.onclick = () => deleteRow(row, tabName);
                 actionCell.appendChild(deleteBtn);
                 row.appendChild(actionCell);
-                
+
                 tbody.appendChild(row);
-                
+
                 const firstInput = row.querySelector('input');
                 if (firstInput) {
                     firstInput.focus();
                 }
-                
+
                 updateStats(tabName);
+                if (tabName === 'baserg') {
+                    updateRGDatabase();
+                }
                 logActivity(`Nouvelle ligne ajoutée dans ${getTabDisplayName(tabName)}`, 'info');
                 
             } catch (error) {
@@ -2954,6 +2959,8 @@ return;
                     }
 
                     if (tabName === 'baserg' && column === 'Code RG') {
+                        input.addEventListener('input', () => updateRGDatabase());
+                    } else if (tabName === 'baserg' && column === 'Nom de RG') {
                         input.addEventListener('input', () => updateRGDatabase());
                     } else if (tabName === 'baserg' && (column === 'Utilisations' || column === 'Dernière utilisation')) {
                         input.readOnly = true;
@@ -2998,7 +3005,11 @@ return;
                 row.appendChild(actionCell);
                 
                 tbody.appendChild(row);
-                
+
+                if (tabName === 'baserg') {
+                    updateRGDatabase();
+                }
+
             } catch (error) {
                 console.error('Erreur ajout ligne avec données:', error);
                 showNotification('❌ Erreur lors de l\'ajout de ligne avec données', 'error');
