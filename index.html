@@ -1506,8 +1506,10 @@
             </div>
         </div>
 
-        <!-- ONGLET BASE RG -->
+            <!-- ONGLET BASE RG -->
         <div id="baserg" class="tab-content">
+            <datalist id="rgDatalist"></datalist>
+            <datalist id="rgNomDatalist"></datalist>
             <!-- IMPORT/EXPORT -->
             <div class="import-export-section">
                 <h4>🗂️ Gestion de la Base RG - Référentiel des Codes</h4>
@@ -2874,7 +2876,13 @@ return;
                         input.value = column === 'Utilisations' ? '0' : '';
                         input.style.backgroundColor = '#f8f9fa';
                     }
-                    
+
+                    if (column === 'RG' || column === 'Code RG') {
+                        setupRGAutoCompletion(input, row, tabName);
+                    } else if (column === 'Nom de RG') {
+                        setupNomRGAutoCompletion(input, row, tabName);
+                    }
+
                     input.addEventListener('input', () => {
                         validateInputInRealTime(input, column, tabName);
                         saveAllData();
@@ -2954,7 +2962,13 @@ return;
                     if (tabName === 'modifsurface' && (column === 'Surface Avant' || column === 'Surface Après')) {
                         input.addEventListener('input', () => calculateSurfaceDifference(row));
                     }
-                    
+
+                    if (column === 'RG' || column === 'Code RG') {
+                        setupRGAutoCompletion(input, row, tabName);
+                    } else if (column === 'Nom de RG') {
+                        setupNomRGAutoCompletion(input, row, tabName);
+                    }
+
                     input.addEventListener('input', () => {
                         validateInputInRealTime(input, column, tabName);
                         saveAllData();
@@ -3265,7 +3279,7 @@ return;
             try {
                 const tbody = document.getElementById('basergTableBody');
                 if (!tbody) return;
-                
+
                 rgDatabase = {};
                 const rows = tbody.querySelectorAll('tr');
                 
@@ -3282,12 +3296,132 @@ return;
                         };
                     }
                 });
-                
+
                 updateRGUsageStats();
-                
+                refreshRGSuggestions();
+
             } catch (error) {
                 console.error('Erreur mise à jour base RG:', error);
             }
+        }
+
+        function ensureRGSuggestionLists() {
+            let codeList = document.getElementById('rgDatalist');
+            if (!codeList) {
+                codeList = document.createElement('datalist');
+                codeList.id = 'rgDatalist';
+                document.body.appendChild(codeList);
+            }
+
+            let nameList = document.getElementById('rgNomDatalist');
+            if (!nameList) {
+                nameList = document.createElement('datalist');
+                nameList.id = 'rgNomDatalist';
+                document.body.appendChild(nameList);
+            }
+        }
+
+        function refreshRGSuggestions() {
+            ensureRGSuggestionLists();
+
+            const codeList = document.getElementById('rgDatalist');
+            const nameList = document.getElementById('rgNomDatalist');
+
+            codeList.innerHTML = '';
+            nameList.innerHTML = '';
+
+            Object.entries(rgDatabase).forEach(([code, data]) => {
+                const option = document.createElement('option');
+                option.value = code;
+                option.label = data.nom || '';
+                codeList.appendChild(option);
+
+                if (data.nom) {
+                    const nameOption = document.createElement('option');
+                    nameOption.value = data.nom;
+                    nameOption.label = code;
+                    nameList.appendChild(nameOption);
+                }
+            });
+        }
+
+        function findBestRGMatch(value) {
+            const normalized = (value || '').trim();
+            if (!normalized) return null;
+            if (rgDatabase[normalized]) return normalized;
+            return Object.keys(rgDatabase).find(code => code.startsWith(normalized)) || null;
+        }
+
+        function findBestRGNameMatch(value) {
+            const normalized = (value || '').trim().toLowerCase();
+            if (!normalized) return null;
+
+            let match = Object.entries(rgDatabase).find(([, data]) => (data.nom || '').toLowerCase() === normalized);
+            if (match) return match[0];
+
+            match = Object.entries(rgDatabase).find(([, data]) => (data.nom || '').toLowerCase().startsWith(normalized));
+            return match ? match[0] : null;
+        }
+
+        function getNomRGInput(row, tabName) {
+            const columns = tabConfigs[tabName]?.columns || [];
+            const nomIndex = columns.indexOf('Nom de RG');
+            if (nomIndex < 0) return null;
+
+            const inputs = row.querySelectorAll('input');
+            return inputs[nomIndex] || null;
+        }
+
+        function getRGInput(row, tabName) {
+            const columns = tabConfigs[tabName]?.columns || [];
+            const rgIndex = columns.indexOf('RG');
+            if (rgIndex < 0) return null;
+
+            const inputs = row.querySelectorAll('input');
+            return inputs[rgIndex] || null;
+        }
+
+        function autoFillNomFromRG(rgValue, row, tabName) {
+            if (Object.keys(rgDatabase).length === 0) return;
+
+            const match = findBestRGMatch(rgValue);
+            if (!match) return;
+
+            const nomInput = getNomRGInput(row, tabName);
+            if (nomInput && (!nomInput.value || nomInput.dataset.autoFilled === 'true')) {
+                nomInput.value = rgDatabase[match]?.nom || '';
+                nomInput.dataset.autoFilled = 'true';
+            }
+        }
+
+        function autoFillRGFromName(nomValue, row, tabName) {
+            if (Object.keys(rgDatabase).length === 0) return;
+
+            const matchCode = findBestRGNameMatch(nomValue);
+            if (!matchCode) return;
+
+            const rgInput = getRGInput(row, tabName);
+            if (rgInput && (!rgInput.value || rgInput.dataset.autoFilled === 'true')) {
+                rgInput.value = matchCode;
+                rgInput.dataset.autoFilled = 'true';
+            }
+        }
+
+        function setupRGAutoCompletion(input, row, tabName) {
+            input.setAttribute('list', 'rgDatalist');
+
+            const syncNom = () => autoFillNomFromRG(input.value, row, tabName);
+            input.addEventListener('input', syncNom);
+            input.addEventListener('change', syncNom);
+        }
+
+        function setupNomRGAutoCompletion(input, row, tabName) {
+            input.setAttribute('list', 'rgNomDatalist');
+
+            input.addEventListener('input', () => {
+                input.dataset.autoFilled = 'false';
+                autoFillRGFromName(input.value, row, tabName);
+            });
         }
 
         function buildRGDatabase() {
@@ -5010,6 +5144,7 @@ return;
             }
 
             rgDatabase = data.rgDatabase || {};
+            refreshRGSuggestions();
 
             pendingTasks = (data.pendingTasks || []).map(task => ({
                 ...task,
@@ -5090,7 +5225,8 @@ return;
         function initializeApp() {
             try {
                 loadAllData();
-                
+                refreshRGSuggestions();
+
                 autoSaveInterval = setInterval(saveAllData, 60000); // Toutes les minutes
                 
                 window.addEventListener('beforeunload', () => {
