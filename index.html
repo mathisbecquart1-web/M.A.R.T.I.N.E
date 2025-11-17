@@ -1608,6 +1608,7 @@
                             <th style="width: 150px;">Nom du Bâtiment</th>
                             <th style="width: 100px;">Région</th>
                             <th style="width: 200px;">Commentaire</th>
+                            <th style="width: 100px;">Traité</th>
                             <th style="width: 50px;">Action</th>
                         </tr>
                     </thead>
@@ -1617,14 +1618,17 @@
             </div>
 
             <!-- STATISTIQUES SPÉCIALISÉES -->
-            <div class="stats">
-                <div class="stats-item">📊 Total: <span id="verifbauxTotalRows">0</span></div>
-                <div class="stats-item" style="color: #28a745;">✅ OK: <span id="verifbauxOKRows">0</span></div>
-                <div class="stats-item" style="color: #dc3545;">❌ NOK: <span id="verifbauxNOKRows">0</span></div>
-                <div class="stats-item" style="color: #ffc107;">⏳ En cours: <span id="verifbauxEnCoursRows">0</span></div>
-                <div class="stats-item">📈 Taux de validation: <span id="verifbauxValidationRate">0%</span></div>
+                <div class="stats">
+                    <div class="stats-item">📊 Total: <span id="verifbauxTotalRows">0</span></div>
+                    <div class="stats-item" style="color: #28a745;">✅ OK: <span id="verifbauxOKRows">0</span></div>
+                    <div class="stats-item" style="color: #dc3545;">❌ NOK: <span id="verifbauxNOKRows">0</span></div>
+                    <div class="stats-item" style="color: #ffc107;">⏳ En cours: <span id="verifbauxEnCoursRows">0</span></div>
+                    <div class="stats-item">✅ Traités: <span id="verifbauxProcessedRows">0</span></div>
+                    <div class="stats-item">⏳ En attente: <span id="verifbauxPendingRows">0</span></div>
+                    <div class="stats-item">📈 Taux de validation: <span id="verifbauxValidationRate">0%</span></div>
+                    <div class="stats-item">📈 Taux de traitement: <span id="verifbauxCompletionRate">0%</span></div>
+                </div>
             </div>
-        </div>
 
             <!-- ONGLET BASE RG -->
         <div id="baserg" class="tab-content">
@@ -2185,7 +2189,7 @@
                 icon: '📐'
             },
             verifbaux: {
-                columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'État', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire'],
+                columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'État', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Traité'],
                 displayName: 'Vérification baux',
                 icon: '✅'
             },
@@ -2222,6 +2226,11 @@
                 values: ['OK', 'NOK', 'EN COURS'],
                 message: 'État doit être OK, NOK ou EN COURS',
                 type: 'strict'
+            },
+            'Traité': {
+                values: ['OUI', 'NON'],
+                message: 'Traité doit être Oui ou Non',
+                type: 'flexible'
             },
             '-': {
                 pattern: /^\d+\.?\d*$/,
@@ -3141,6 +3150,24 @@ return;
         }
 
         function createEditableField(column, tabName, value = '') {
+            if (column === 'Traité') {
+                const select = document.createElement('select');
+                select.className = 'editable';
+
+                ['','Oui','Non'].forEach(optionValue => {
+                    const option = document.createElement('option');
+                    option.value = optionValue;
+                    option.textContent = optionValue;
+                    select.appendChild(option);
+                });
+
+                const normalized = (value || '').toString().trim().toLowerCase();
+                if (normalized === 'oui' || normalized === 'non') {
+                    select.value = normalized.charAt(0).toUpperCase() + normalized.slice(1);
+                }
+
+                return select;
+            }
             const inputType = getInputType(column);
             const field = inputType === 'text' ? document.createElement('textarea') : document.createElement('input');
 
@@ -3375,7 +3402,7 @@ return;
 
         function calculateSurfaceDifference(row) {
             try {
-                const inputs = row.querySelectorAll('input, textarea');
+                const inputs = row.querySelectorAll('input, textarea, select');
                 const columns = tabConfigs['modifsurface'].columns;
                 
                 const surfaceAvantIndex = columns.indexOf('-');
@@ -3446,31 +3473,45 @@ return;
                 
                 if (tabName === 'verifbaux') {
                     let ok = 0, nok = 0, enCours = 0;
-                    
+                    let treated = 0;
+
                     rows.forEach(row => {
-                        const inputs = row.querySelectorAll('input, textarea');
+                        const inputs = row.querySelectorAll('input, textarea, select');
                         const etatIndex = tabConfigs[tabName].columns.indexOf('État');
+                        const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
                         const etatInput = inputs[etatIndex];
+                        const traiteInput = inputs[traiteIndex];
                         const etat = etatInput ? etatInput.value.toUpperCase() : '';
-                        
+                        const traite = traiteInput ? traiteInput.value.toLowerCase() : '';
+
                         if (etat === 'OK') ok++;
                         else if (etat === 'NOK') nok++;
                         else if (etat === 'EN COURS') enCours++;
+
+                        if (traite === 'oui') {
+                            treated++;
+                        }
                     });
-                    
+
+                    const pendingRows = Math.max(total - treated, 0);
+
                     document.getElementById(`${tabName}TotalRows`).textContent = total;
                     document.getElementById(`${tabName}OKRows`).textContent = ok;
                     document.getElementById(`${tabName}NOKRows`).textContent = nok;
                     document.getElementById(`${tabName}EnCoursRows`).textContent = enCours;
-                    
                     const validationRate = total > 0 ? Math.round(((ok + nok) / total) * 100) : 0;
                     document.getElementById(`${tabName}ValidationRate`).textContent = validationRate + '%';
-                    
+                    document.getElementById(`${tabName}ProcessedRows`).textContent = treated;
+                    document.getElementById(`${tabName}PendingRows`).textContent = pendingRows;
+
+                    const completionRate = total > 0 ? Math.round((treated / total) * 100) : 0;
+                    document.getElementById(`${tabName}CompletionRate`).textContent = completionRate + '%';
+
                 } else if (tabName === 'modifsurface') {
                     let totalDifference = 0;
                     
                     rows.forEach(row => {
-                        const inputs = row.querySelectorAll('input, textarea');
+                        const inputs = row.querySelectorAll('input, textarea, select');
                         const dateTraitementIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
                         const differenceIndex = tabConfigs[tabName].columns.indexOf('Différence');
                         
@@ -3498,7 +3539,7 @@ return;
                     updateRGUsageStats();
                 } else {
                     rows.forEach(row => {
-                        const inputs = row.querySelectorAll('input, textarea');
+                        const inputs = row.querySelectorAll('input, textarea, select');
                         const hasData = Array.from(inputs).some(input => input.value.trim() !== '');
                         
                         if (hasData) {
@@ -3550,7 +3591,7 @@ return;
 
                     const tabRows = tabBody.querySelectorAll('tr');
                     tabRows.forEach(row => {
-                        const inputs = row.querySelectorAll('input, textarea');
+                        const inputs = row.querySelectorAll('input, textarea, select');
                         const rgIndex = tabConfigs[tabName].columns.indexOf('RG');
                         const dateIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
 
@@ -3572,7 +3613,7 @@ return;
 
                 // Mettre à jour l'affichage
                 rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea');
+                    const inputs = row.querySelectorAll('input, textarea, select');
                     const codeRG = inputs[0] ? inputs[0].value : '';
                     const usageCount = usageCounts[codeRG] || 0;
 
@@ -3623,11 +3664,17 @@ return;
                 let processed = 0;
 
                 rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea');
-                    const dateTraitementIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
-                    const dateTraitement = inputs[dateTraitementIndex] ? inputs[dateTraitementIndex].value : '';
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const traiteIndex = tabName === 'verifbaux'
+                        ? tabConfigs[tabName].columns.indexOf('Traité')
+                        : tabConfigs[tabName].columns.indexOf('Date Traitement');
 
-                    if (dateTraitement) {
+                    const traiteValue = inputs[traiteIndex] ? inputs[traiteIndex].value : '';
+                    const isProcessed = tabName === 'verifbaux'
+                        ? traiteValue.trim().toLowerCase() === 'oui'
+                        : !!traiteValue;
+
+                    if (isProcessed) {
                         processed++;
                     }
                 });
@@ -3668,7 +3715,7 @@ return;
                 const utbatMap = {};
 
                 rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea');
+                    const inputs = row.querySelectorAll('input, textarea, select');
                     const utbat = inputs[utbatIndex] ? inputs[utbatIndex].value.trim() : '';
                     const rgValue = inputs[rgIndex] ? inputs[rgIndex].value.trim() : '';
 
@@ -3821,7 +3868,7 @@ return;
                 const rows = tbody.querySelectorAll('tr');
                 
                 rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea');
+                    const inputs = row.querySelectorAll('input, textarea, select');
                     const codeRG = inputs[0] ? inputs[0].value.trim() : '';
                     const nomRG = inputs[1] ? inputs[1].value.trim() : '';
                     
@@ -3905,7 +3952,7 @@ return;
             const nomIndex = columns.indexOf('Nom de RG');
             if (nomIndex < 0) return null;
 
-            const inputs = row.querySelectorAll('input, textarea');
+            const inputs = row.querySelectorAll('input, textarea, select');
             return inputs[nomIndex] || null;
         }
 
@@ -3914,7 +3961,7 @@ return;
             const rgIndex = columns.indexOf('RG');
             if (rgIndex < 0) return null;
 
-            const inputs = row.querySelectorAll('input, textarea');
+            const inputs = row.querySelectorAll('input, textarea, select');
             return inputs[rgIndex] || null;
         }
 
@@ -4023,7 +4070,7 @@ return;
 
                 const rows = tbody.querySelectorAll('tr');
                 rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea');
+                    const inputs = row.querySelectorAll('input, textarea, select');
                     inputs.forEach((input, index) => {
                         const column = tabConfigs[tabName]?.columns[index];
 
@@ -4146,7 +4193,7 @@ return;
                     const rows = tbody.querySelectorAll('tr');
 
                     rows.forEach(row => {
-                        const inputs = row.querySelectorAll('input, textarea');
+                        const inputs = row.querySelectorAll('input, textarea, select');
                         inputs.forEach(input => {
                             if (input.classList.contains('has-error')) {
                                 counts.errors++;
@@ -4339,7 +4386,7 @@ return;
                 
                 const rows = tbody.querySelectorAll('tr');
                 rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea');
+                    const inputs = row.querySelectorAll('input, textarea, select');
                     const etatIndex = tabConfigs['verifbaux'].columns.indexOf('État');
                     const etatInput = inputs[etatIndex];
                     const etat = etatInput ? etatInput.value.toUpperCase() : '';
@@ -4395,7 +4442,7 @@ return;
                 const labels = [];
                 
                 rows.forEach((row, index) => {
-                    const inputs = row.querySelectorAll('input, textarea');
+                    const inputs = row.querySelectorAll('input, textarea, select');
                     const differenceIndex = tabConfigs['modifsurface'].columns.indexOf('Différence');
                     const difference = inputs[differenceIndex] ? parseFloat(inputs[differenceIndex].value) || 0 : 0;
                     
@@ -4454,7 +4501,7 @@ return;
                 
                 rows.forEach(row => {
                     let showRow = true;
-                    const inputs = row.querySelectorAll('input, textarea');
+                    const inputs = row.querySelectorAll('input, textarea, select');
                     
                     Object.keys(filters).forEach(filterName => {
                         const filterValue = filters[filterName].toLowerCase();
@@ -4571,7 +4618,7 @@ return;
                     const columns = tabConfigs[tabName]?.columns || [];
                     
                     rows.forEach((row, rowIndex) => {
-                        const inputs = row.querySelectorAll('input, textarea');
+                        const inputs = row.querySelectorAll('input, textarea, select');
                         let matchFound = false;
                         const rowData = [];
                         
@@ -5562,7 +5609,7 @@ return;
                 let errors = 0;
                 
                 rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea');
+                    const inputs = row.querySelectorAll('input, textarea, select');
                     const etatIndex = tabConfigs['verifbaux'].columns.indexOf('État');
                     const etatInput = inputs[etatIndex];
                     
@@ -5602,7 +5649,7 @@ return;
                 let marked = 0;
                 
                 rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea');
+                    const inputs = row.querySelectorAll('input, textarea, select');
                     const etatIndex = tabConfigs['verifbaux'].columns.indexOf('État');
                     const etatInput = inputs[etatIndex];
                     
@@ -5649,7 +5696,7 @@ return;
                     
                     if (rgIndex >= 0) {
                         rows.forEach((row, rowIndex) => {
-                            const inputs = row.querySelectorAll('input, textarea');
+                            const inputs = row.querySelectorAll('input, textarea, select');
                             const rgInput = inputs[rgIndex];
                             
                             if (rgInput && rgInput.value) {
@@ -5711,7 +5758,7 @@ return;
                 const wsData = [columns];
                 
                 rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea');
+                    const inputs = row.querySelectorAll('input, textarea, select');
                     const rowData = [];
                     inputs.forEach(input => {
                         rowData.push(input.value || '');
@@ -5764,7 +5811,7 @@ return;
                     const wsData = [columns];
                     
                     rows.forEach(row => {
-                        const inputs = row.querySelectorAll('input, textarea');
+                        const inputs = row.querySelectorAll('input, textarea, select');
                         const rowData = [];
                         inputs.forEach(input => {
                             rowData.push(input.value || '');
@@ -5892,7 +5939,7 @@ return;
                     const tabData = [];
                     
                     rows.forEach(row => {
-                        const inputs = row.querySelectorAll('input, textarea');
+                        const inputs = row.querySelectorAll('input, textarea, select');
                         const rowData = [];
                         inputs.forEach(input => {
                             rowData.push(input.value || '');
@@ -5969,7 +6016,7 @@ return;
                     const tabData = [];
                     
                     rows.forEach(row => {
-                        const inputs = row.querySelectorAll('input, textarea');
+                        const inputs = row.querySelectorAll('input, textarea, select');
                         const rowData = [];
                         inputs.forEach(input => {
                             rowData.push(input.value || '');
