@@ -380,6 +380,107 @@
             color: #28a745;
         }
 
+        /* 🎨 STATISTIQUES LUDIQUES */
+        .stats-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 0 30px 20px;
+        }
+
+        .fun-badge {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: #2c3e50;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-chip-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: stretch;
+        }
+
+        .stat-chip {
+            background: rgba(255,255,255,0.85);
+            border: 2px dashed rgba(102, 126, 234, 0.25);
+            border-radius: 12px;
+            padding: 12px 14px;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .stat-chip-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .stat-chip-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-top: 2px;
+        }
+
+        .stat-chip-subtext {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .accent-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.12), rgba(118, 75, 162, 0.12));
+            border: 1px solid rgba(102, 126, 234, 0.25);
+        }
+
+        .rg-change-list {
+            margin-top: 12px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .rg-change-item {
+            background: rgba(255,255,255,0.85);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        .rg-change-item strong {
+            color: #2c3e50;
+        }
+
+        .rg-change-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .rg-change-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
         /* 📊 TABLEAU DE PRÉVISUALISATION */
         .preview-table-container {
             flex: 1;
@@ -1695,6 +1796,28 @@
 
         <!-- ONGLET STATISTIQUES -->
         <div id="statistiques" class="tab-content">
+            <div class="stats-actions">
+                <div class="fun-badge">🎉 Stats ludiques activées</div>
+                <div class="stat-chip-row">
+                    <div class="stat-chip">
+                        <div class="stat-chip-label">Progression globale</div>
+                        <div class="stat-chip-value" id="chipOverallRate">0%</div>
+                        <div class="stat-chip-subtext" id="chipOverallSummary">Aucune donnée pour le moment</div>
+                    </div>
+                    <div class="stat-chip">
+                        <div class="stat-chip-label">UT-BAT sous surveillance</div>
+                        <div class="stat-chip-value" id="chipRgMultiCount">0</div>
+                        <div class="stat-chip-subtext" id="chipRgDetails">Aucun doublon détecté</div>
+                    </div>
+                    <div class="stat-chip">
+                        <div class="stat-chip-label">Alertes qualité</div>
+                        <div class="stat-chip-value" id="chipQualityAlerts">0</div>
+                        <div class="stat-chip-subtext" id="chipQualitySummary">Pas d'alerte à signaler</div>
+                    </div>
+                </div>
+                <button class="btn btn-excel" onclick="exportStatsReport()">📤 Exporter toutes les statistiques</button>
+            </div>
+
             <!-- VUE D'ENSEMBLE -->
             <div class="stats-dashboard">
                 <div class="stats-card">
@@ -1737,6 +1860,26 @@
                         <div style="color: #666; text-align: center; padding: 20px;">
                             Chargement des activités récentes...
                         </div>
+                    </div>
+                </div>
+
+                <div class="stats-card accent-card">
+                    <h3>🌀 Changements de RG surveillés</h3>
+                    <div id="rgChangeMood" class="stat-chip-subtext" style="margin-bottom: 10px;">Analyse en cours...</div>
+                    <div class="stat-chip-row" style="margin-bottom: 10px;">
+                        <div class="stat-chip">
+                            <div class="stat-chip-label">UT-BAT suivis</div>
+                            <div class="stat-chip-value" id="rgChangeUTBATCount">0</div>
+                            <div class="stat-chip-subtext">Présents dans les modifications RG</div>
+                        </div>
+                        <div class="stat-chip">
+                            <div class="stat-chip-label">Changements multiples</div>
+                            <div class="stat-chip-value" id="rgChangeMultiCount">0</div>
+                            <div class="stat-chip-subtext">UT-BAT modifiés plusieurs fois</div>
+                        </div>
+                    </div>
+                    <div class="rg-change-list" id="rgChangeDetails">
+                        <div style="color: #666;">Aucun UT-BAT avec modifications répétées pour le moment.</div>
                     </div>
                 </div>
             </div>
@@ -3290,6 +3433,212 @@ return;
             }
         }
 
+        function getTabStatistics() {
+            const perTab = [];
+            let totalGeneral = 0;
+            let traitesGeneral = 0;
+            let attenteGeneral = 0;
+
+            Object.keys(tabConfigs).forEach(tabName => {
+                if (tabName === 'baserg') return;
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                const rows = tbody.querySelectorAll('tr');
+                const total = rows.length;
+                let processed = 0;
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input');
+                    const dateTraitementIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
+                    const dateTraitement = inputs[dateTraitementIndex] ? inputs[dateTraitementIndex].value : '';
+
+                    if (dateTraitement) {
+                        processed++;
+                    }
+                });
+
+                const pending = total - processed;
+                const rate = total > 0 ? Math.round((processed / total) * 100) : 0;
+
+                totalGeneral += total;
+                traitesGeneral += processed;
+                attenteGeneral += pending;
+
+                perTab.push({ tabName, total, processed, pending, rate });
+            });
+
+            const tauxGeneral = totalGeneral > 0 ? Math.round((traitesGeneral / totalGeneral) * 100) : 0;
+
+            return {
+                general: {
+                    total: totalGeneral,
+                    traites: traitesGeneral,
+                    attente: attenteGeneral,
+                    taux: tauxGeneral
+                },
+                perTab
+            };
+        }
+
+        function getRGChangeInsights() {
+            try {
+                const tbody = document.getElementById('modificationTableBody');
+                const defaultInsights = { totalEntries: 0, utbatCount: 0, multiCount: 0, topChanges: [] };
+
+                if (!tbody) return defaultInsights;
+
+                const utbatIndex = tabConfigs['modification'].columns.indexOf('UT-BAT');
+                const rgIndex = tabConfigs['modification'].columns.indexOf('RG');
+                const rows = tbody.querySelectorAll('tr');
+                const utbatMap = {};
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input');
+                    const utbat = inputs[utbatIndex] ? inputs[utbatIndex].value.trim() : '';
+                    const rgValue = inputs[rgIndex] ? inputs[rgIndex].value.trim() : '';
+
+                    if (!utbat) return;
+
+                    if (!utbatMap[utbat]) {
+                        utbatMap[utbat] = { count: 0, rgs: new Set() };
+                    }
+
+                    utbatMap[utbat].count++;
+                    if (rgValue) {
+                        utbatMap[utbat].rgs.add(rgValue);
+                    }
+                });
+
+                const multiChanges = Object.entries(utbatMap).filter(([, value]) => value.count > 1 || value.rgs.size > 1);
+                const topChanges = multiChanges
+                    .map(([utbat, value]) => ({
+                        utbat,
+                        occurrences: value.count,
+                        variations: value.rgs.size
+                    }))
+                    .sort((a, b) => (b.occurrences - a.occurrences) || (b.variations - a.variations))
+                    .slice(0, 5);
+
+                return {
+                    totalEntries: rows.length,
+                    utbatCount: Object.keys(utbatMap).length,
+                    multiCount: multiChanges.length,
+                    topChanges
+                };
+            } catch (error) {
+                console.error('Erreur calcul insights RG:', error);
+                return { totalEntries: 0, utbatCount: 0, multiCount: 0, topChanges: [] };
+            }
+        }
+
+        function updateRGChangeWidget(insights) {
+            try {
+                const data = insights || getRGChangeInsights();
+                const utbatElement = document.getElementById('rgChangeUTBATCount');
+                const multiElement = document.getElementById('rgChangeMultiCount');
+                const moodElement = document.getElementById('rgChangeMood');
+                const listContainer = document.getElementById('rgChangeDetails');
+
+                if (utbatElement) utbatElement.textContent = data.utbatCount;
+                if (multiElement) multiElement.textContent = data.multiCount;
+
+                if (moodElement) {
+                    if (data.multiCount === 0) {
+                        moodElement.textContent = 'Tout est stable, aucun doublon détecté 🎯';
+                    } else if (data.multiCount < 3) {
+                        moodElement.textContent = 'Quelques UT-BAT nécessitent une double vérification 👀';
+                    } else {
+                        moodElement.textContent = 'Beaucoup de rotations RG sur les mêmes UT-BAT ⚠️';
+                    }
+                }
+
+                if (!listContainer) return;
+
+                listContainer.innerHTML = '';
+
+                if (data.topChanges.length === 0) {
+                    listContainer.innerHTML = '<div style="color: #666;">Aucun UT-BAT avec modifications répétées pour le moment.</div>';
+                    return;
+                }
+
+                data.topChanges.forEach(change => {
+                    const item = document.createElement('div');
+                    item.className = 'rg-change-item';
+                    item.innerHTML = `
+                        <div>
+                            <strong>${change.utbat}</strong>
+                            <div class="stat-chip-subtext">RG changés plusieurs fois</div>
+                        </div>
+                        <div class="rg-change-meta">
+                            <span>🔁 ${change.occurrences} passages</span>
+                            <span>🎭 ${change.variations} RG distincts</span>
+                        </div>
+                    `;
+                    listContainer.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Erreur mise à jour suivi changements RG:', error);
+            }
+        }
+
+        function updateStatChips(generalStats, rgInsights, qualityCounts) {
+            try {
+                const overallRateElement = document.getElementById('chipOverallRate');
+                const overallSummaryElement = document.getElementById('chipOverallSummary');
+                const rgMultiElement = document.getElementById('chipRgMultiCount');
+                const rgDetailsElement = document.getElementById('chipRgDetails');
+                const qualityAlertsElement = document.getElementById('chipQualityAlerts');
+                const qualitySummaryElement = document.getElementById('chipQualitySummary');
+
+                const rate = generalStats?.taux ?? 0;
+                const total = generalStats?.total ?? 0;
+
+                if (overallRateElement) {
+                    overallRateElement.textContent = `${rate}%`;
+                }
+
+                if (overallSummaryElement) {
+                    overallSummaryElement.textContent = total > 0
+                        ? `${generalStats.traites} traités sur ${total} entrées`
+                        : 'Aucune donnée pour le moment';
+                }
+
+                if (rgMultiElement) {
+                    rgMultiElement.textContent = rgInsights?.multiCount ?? 0;
+                }
+
+                if (rgDetailsElement) {
+                    const utbatInfo = rgInsights?.utbatCount || 0;
+                    const detailTop = rgInsights?.topChanges?.[0];
+                    rgDetailsElement.textContent = rgInsights && rgInsights.multiCount > 0
+                        ? `${detailTop?.utbat || 'UT-BAT'} surveillé (${utbatInfo} UT-BAT touchés)`
+                        : 'Aucun doublon détecté';
+                }
+
+                if (qualityAlertsElement) {
+                    const alerts = (qualityCounts?.errors || 0) + (qualityCounts?.warnings || 0);
+                    qualityAlertsElement.textContent = alerts;
+                }
+
+                if (qualitySummaryElement) {
+                    if (!qualityCounts) {
+                        qualitySummaryElement.textContent = 'Pas d\'alerte à signaler';
+                    } else {
+                        const { errors = 0, warnings = 0 } = qualityCounts;
+                        if (errors === 0 && warnings === 0) {
+                            qualitySummaryElement.textContent = 'Pas d\'alerte à signaler';
+                        } else {
+                            qualitySummaryElement.textContent = `${errors} erreur(s) / ${warnings} avertissement(s)`;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur mise à jour des pastilles ludiques:', error);
+            }
+        }
+
         function updateRGDatabase() {
             try {
                 const tbody = document.getElementById('basergTableBody');
@@ -3542,90 +3891,54 @@ return;
 
         function updateStatsDashboard() {
             try {
-                let totalGeneral = 0;
-                let traitesGeneral = 0;
-                let attenteGeneral = 0;
-                
-                Object.keys(tabConfigs).forEach(tabName => {
-                    if (tabName === 'baserg') return;
-                    
-                    const tbody = document.getElementById(`${tabName}TableBody`);
-                    if (!tbody) return;
-                    
-                    const rows = tbody.querySelectorAll('tr');
-                    totalGeneral += rows.length;
-                    
-                    rows.forEach(row => {
-                        const inputs = row.querySelectorAll('input');
-                        const dateTraitementIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
-                        const dateTraitement = inputs[dateTraitementIndex] ? inputs[dateTraitementIndex].value : '';
-                        
-                        if (dateTraitement) {
-                            traitesGeneral++;
-                        } else {
-                            attenteGeneral++;
-                        }
-                    });
-                });
-                
-                const tauxGeneral = totalGeneral > 0 ? Math.round((traitesGeneral / totalGeneral) * 100) : 0;
-                
-                document.getElementById('totalGeneral').textContent = totalGeneral;
-                document.getElementById('traitesGeneral').textContent = traitesGeneral;
-                document.getElementById('attenteGeneral').textContent = attenteGeneral;
-                document.getElementById('tauxGeneral').textContent = tauxGeneral + '%';
-                document.getElementById('progressGeneral').style.width = tauxGeneral + '%';
-                
-                updateIndividualStats();
-                updateQualityStatus();
+                const statsData = getTabStatistics();
+                const qualityCounts = getQualityCounts();
+                const rgInsights = getRGChangeInsights();
+
+                document.getElementById('totalGeneral').textContent = statsData.general.total;
+                document.getElementById('traitesGeneral').textContent = statsData.general.traites;
+                document.getElementById('attenteGeneral').textContent = statsData.general.attente;
+                document.getElementById('tauxGeneral').textContent = statsData.general.taux + '%';
+                document.getElementById('progressGeneral').style.width = statsData.general.taux + '%';
+
+                updateIndividualStats(statsData.perTab);
+                updateQualityStatus(qualityCounts);
+                updateRGChangeWidget(rgInsights);
+                updateStatChips(statsData.general, rgInsights, qualityCounts);
                 updateCharts();
-                
+
             } catch (error) {
                 console.error('Erreur mise à jour dashboard statistiques:', error);
             }
         }
 
-        function updateIndividualStats() {
+        function updateIndividualStats(perTabStats) {
             try {
                 const individualStatsContainer = document.getElementById('individualStats');
                 if (!individualStatsContainer) return;
-                
+
                 individualStatsContainer.innerHTML = '';
-                
-                Object.keys(tabConfigs).forEach(tabName => {
-                    if (tabName === 'baserg') return;
-                    
-                    const tbody = document.getElementById(`${tabName}TableBody`);
-                    if (!tbody) return;
-                    
-                    const rows = tbody.querySelectorAll('tr');
-                    const total = rows.length;
-                    let processed = 0;
-                    
-                    rows.forEach(row => {
-                        const inputs = row.querySelectorAll('input');
-                        const dateTraitementIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
-                        const dateTraitement = inputs[dateTraitementIndex] ? inputs[dateTraitementIndex].value : '';
-                        if (dateTraitement) processed++;
-                    });
-                    
-                    const rate = total > 0 ? Math.round((processed / total) * 100) : 0;
-                    
+
+                const statsToDisplay = perTabStats || getTabStatistics().perTab;
+
+                statsToDisplay.forEach(stat => {
+                    const rate = stat.total > 0 ? Math.round((stat.processed / stat.total) * 100) : 0;
+
                     const card = document.createElement('div');
                     card.className = 'stats-card';
                     card.innerHTML = `
-                        <h3>${getTabIcon(tabName)} ${getTabDisplayName(tabName)}</h3>
+                        <h3>${getTabIcon(stat.tabName)} ${getTabDisplayName(stat.tabName)}</h3>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                             <div style="text-align: center;">
-                                <div class="preview-stat-number">${total}</div>
+                                <div class="preview-stat-number">${stat.total}</div>
                                 <div class="preview-stat-label">Total</div>
                             </div>
                             <div style="text-align: center;">
-                                <div class="preview-stat-number success">${processed}</div>
+                                <div class="preview-stat-number success">${stat.processed}</div>
                                 <div class="preview-stat-label">Traités</div>
                             </div>
                             <div style="text-align: center;">
-                                <div class="preview-stat-number warning">${total - processed}</div>
+                                <div class="preview-stat-number warning">${stat.pending}</div>
                                 <div class="preview-stat-label">En attente</div>
                             </div>
                         </div>
@@ -3645,58 +3958,65 @@ return;
             }
         }
 
-        function updateQualityStatus() {
+        function getQualityCounts() {
+            const counts = { errors: 0, warnings: 0 };
+
             try {
-                const container = document.getElementById('qualityStatus');
-                if (!container) return;
-                
-                let totalErrors = 0;
-                let totalWarnings = 0;
-                let totalEntries = 0;
-                
                 Object.keys(tabConfigs).forEach(tabName => {
                     if (tabName === 'baserg') return;
-                    
+
                     const tbody = document.getElementById(`${tabName}TableBody`);
                     if (!tbody) return;
-                    
+
                     const rows = tbody.querySelectorAll('tr');
-                    totalEntries += rows.length;
-                    
+
                     rows.forEach(row => {
                         const inputs = row.querySelectorAll('input');
-                        inputs.forEach((input, index) => {
+                        inputs.forEach(input => {
                             if (input.classList.contains('has-error')) {
-                                totalErrors++;
+                                counts.errors++;
                             } else if (input.classList.contains('has-warning')) {
-                                totalWarnings++;
+                                counts.warnings++;
                             }
                         });
                     });
                 });
-                
+            } catch (error) {
+                console.error('Erreur comptage qualité:', error);
+            }
+
+            return counts;
+        }
+
+        function updateQualityStatus(counts) {
+            try {
+                const container = document.getElementById('qualityStatus');
+                if (!container) return;
+
+                const { errors = 0, warnings = 0 } = counts || getQualityCounts();
+
                 let status, icon, color;
-                
-                if (totalErrors === 0 && totalWarnings === 0) {
+
+                if (errors === 0 && warnings === 0) {
                     status = 'Vos données sont cohérentes !';
                     icon = '✅';
                     color = '#28a745';
-                } else if (totalErrors > 0) {
-                    status = `${totalErrors} erreur(s) détectée(s)`;
+                } else if (errors > 0) {
+                    status = `${errors} erreur(s) détectée(s)`;
                     icon = '❌';
                     color = '#dc3545';
                 } else {
-                    status = `${totalWarnings} avertissement(s)`;
+                    status = `${warnings} avertissement(s)`;
                     icon = '⚠️';
                     color = '#ffc107';
                 }
-                
+
                 container.innerHTML = `
                     <div style="font-size: 48px; margin-bottom: 15px;">${icon}</div>
                     <div style="font-size: 18px; font-weight: 600; color: ${color};">${status}</div>
                     <div style="color: #666; margin-top: 10px;">Dernière vérification: ${new Date().toLocaleTimeString('fr-FR')}</div>
                 `;
-                
+
             } catch (error) {
                 console.error('Erreur mise à jour qualité:', error);
             }
@@ -5046,6 +5366,73 @@ return;
             }
         }
 
+        function exportStatsReport() {
+            try {
+                if (!window.XLSX) {
+                    showNotification('❌ Bibliothèque Excel non disponible', 'error');
+                    return;
+                }
+
+                const statsData = getTabStatistics();
+                const qualityCounts = getQualityCounts();
+                const rgInsights = getRGChangeInsights();
+
+                const wb = XLSX.utils.book_new();
+
+                const summaryData = [
+                    ['Métrique', 'Valeur'],
+                    ['Total entrées', statsData.general.total],
+                    ['Traitées', statsData.general.traites],
+                    ['En attente', statsData.general.attente],
+                    ['Taux global', `${statsData.general.taux}%`],
+                    ['UT-BAT surveillés', rgInsights.utbatCount],
+                    ['Changements multiples', rgInsights.multiCount],
+                    ['Erreurs qualité', qualityCounts.errors],
+                    ['Avertissements qualité', qualityCounts.warnings],
+                    ['Export généré le', new Date().toLocaleString('fr-FR')]
+                ];
+
+                const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+                XLSX.utils.book_append_sheet(wb, summarySheet, 'Synthèse');
+
+                const perTabData = [['Onglet', 'Total', 'Traités', 'En attente', 'Taux']];
+                statsData.perTab.forEach(stat => {
+                    perTabData.push([
+                        getTabDisplayName(stat.tabName),
+                        stat.total,
+                        stat.processed,
+                        stat.pending,
+                        `${stat.rate}%`
+                    ]);
+                });
+
+                const perTabSheet = XLSX.utils.aoa_to_sheet(perTabData);
+                XLSX.utils.book_append_sheet(wb, perTabSheet, 'Par onglet');
+
+                const rgData = [['UT-BAT', 'Occurrences', 'Variations RG']];
+                if (rgInsights.topChanges.length === 0) {
+                    rgData.push(['Aucun doublon détecté', '', '']);
+                } else {
+                    rgInsights.topChanges.forEach(change => {
+                        rgData.push([change.utbat, change.occurrences, change.variations]);
+                    });
+                }
+
+                const rgSheet = XLSX.utils.aoa_to_sheet(rgData);
+                XLSX.utils.book_append_sheet(wb, rgSheet, 'Changements RG');
+
+                const fileName = `MARTINE_Stats_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+
+                showNotification(`📊 Rapport statistiques exporté: ${fileName}`);
+                logActivity('Export du rapport statistiques', 'success');
+
+            } catch (error) {
+                console.error('Erreur export rapport statistiques:', error);
+                showNotification('❌ Erreur lors de l\'export du rapport', 'error');
+            }
+        }
+
         // 💾 SAUVEGARDE ET RESTAURATION COMPLÈTE
         function saveAllData() {
             try {
@@ -5419,6 +5806,7 @@ return;
         window.deleteRow = deleteRow;
         window.exportToExcel = exportToExcel;
         window.exportAllToExcel = exportAllToExcel;
+        window.exportStatsReport = exportStatsReport;
         window.clearAll = clearAll;
         window.triggerFileInput = triggerFileInput;
         window.handleFileImport = handleFileImport;
