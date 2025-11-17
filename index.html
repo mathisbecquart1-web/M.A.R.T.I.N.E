@@ -2213,11 +2213,71 @@
         let autoSaveInterval = null;
         let chartInstances = {};
         let activityLog = [];
+        let audioContext = null;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
             rowCounters[tabName] = 0;
         });
+
+        // 🎵 AUDIO DOUX POUR LES ACTIONS
+        function getAudioContext() {
+            if (!window.AudioContext && !window.webkitAudioContext) return null;
+
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            return audioContext;
+        }
+
+        function playLofiTone(type = 'info') {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+
+            const now = ctx.currentTime;
+            const oscillator = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const filter = ctx.createBiquadFilter();
+
+            const frequencies = {
+                success: 540,
+                error: 210,
+                warning: 360,
+                info: 430,
+                click: 300
+            };
+
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(frequencies[type] || frequencies.info, now);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1200, now);
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(0.08, now + 0.04);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+
+            oscillator.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+
+            oscillator.start(now);
+            oscillator.stop(now + 0.42);
+        }
+
+        function setupActionSounds() {
+            document.addEventListener('click', event => {
+                const target = event.target.closest('.btn, .tab, .file-drop-zone, .close-preview');
+                if (target) {
+                    playLofiTone('click');
+                }
+            });
+        }
 
         // 🔧 FONCTIONS UTILITAIRES COMPLÈTES
         function showNotification(message, type = 'success') {
@@ -2230,7 +2290,9 @@
                 </div>
             `;
             document.body.appendChild(notification);
-            
+
+            playLofiTone(type);
+
             setTimeout(() => notification.classList.add('show'), 100);
             setTimeout(() => {
                 notification.classList.remove('show');
@@ -5773,14 +5835,15 @@ return;
                 refreshRGSuggestions();
 
                 autoSaveInterval = setInterval(saveAllData, 60000); // Toutes les minutes
-                
+
                 window.addEventListener('beforeunload', () => {
                     saveAllData();
                 });
-                
+
                 setupFileDropZones();
+                setupActionSounds();
                 updateStatsDashboard();
-                
+
                 showNotification('🚀 MARTINE v17.0 - Tous onglets fonctionnels', 'success');
                 showSaveStatus('💾 Application prête - Auto-sauvegarde activée');
                 logActivity('Application MARTINE v17.0 initialisée', 'success');
