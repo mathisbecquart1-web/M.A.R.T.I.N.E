@@ -2266,13 +2266,14 @@
         let chartInstances = {};
         let activityLog = [];
         let audioContext = null;
+        let pianoMelodyIndex = 0;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
             rowCounters[tabName] = 0;
         });
 
-        // 🎵 AUDIO DOUX POUR LES ACTIONS
+        // 🎵 AUDIO PIANO POUR LES ACTIONS
         function getAudioContext() {
             if (!window.AudioContext && !window.webkitAudioContext) return null;
 
@@ -2287,74 +2288,77 @@
             return audioContext;
         }
 
-        function playLofiTone(type = 'info') {
+        const pianoMelody = [
+            'Eb4', 'F4', 'G4', 'Bb4', 'G4', 'F4', 'Eb4', 'F4',
+            'G4', 'F4', 'Eb4', 'Bb3', 'C4', 'Eb4', 'F4', 'G4',
+            'F4', 'Eb4', 'F4', 'G4', 'F4', 'Eb4', 'D4', 'C4'
+        ];
+
+        function noteToFrequency(note) {
+            const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const match = note.match(/([A-G]#?)(\d)/);
+            if (!match) return 440;
+            const [, name, octave] = match;
+            const midi = notes.indexOf(name) + (parseInt(octave, 10) + 1) * 12;
+            return 440 * Math.pow(2, (midi - 69) / 12);
+        }
+
+        function playPianoNote() {
             const ctx = getAudioContext();
             if (!ctx) return;
 
             const now = ctx.currentTime;
+            const note = pianoMelody[pianoMelodyIndex % pianoMelody.length];
+            pianoMelodyIndex++;
+
+            const baseFreq = noteToFrequency(note);
+            const harmonicFreq = baseFreq * Math.pow(2, 12 / 12);
+
+            const mainOsc = ctx.createOscillator();
+            mainOsc.type = 'sine';
+            mainOsc.frequency.setValueAtTime(baseFreq, now);
+
+            const sparkleOsc = ctx.createOscillator();
+            sparkleOsc.type = 'triangle';
+            sparkleOsc.frequency.setValueAtTime(harmonicFreq, now);
+
             const gain = ctx.createGain();
-            const filter = ctx.createBiquadFilter();
-
-            const palettes = {
-                success: [
-                    { base: 520, interval: 6, wave: 'sine' },
-                    { base: 480, interval: 9, wave: 'sine' }
-                ],
-                error: [
-                    { base: 210, interval: -5, wave: 'sine' },
-                    { base: 240, interval: -7, wave: 'triangle' }
-                ],
-                warning: [
-                    { base: 340, interval: 3, wave: 'sine' },
-                    { base: 380, interval: 2, wave: 'triangle' }
-                ],
-                info: [
-                    { base: 410, interval: 5, wave: 'sine' },
-                    { base: 440, interval: 7, wave: 'triangle' }
-                ],
-                click: [
-                    { base: 280, interval: 4, wave: 'sine' },
-                    { base: 320, interval: 5, wave: 'triangle' }
-                ]
-            };
-
-            const palette = palettes[type] || palettes.info;
-            const choice = palette[Math.floor(Math.random() * palette.length)];
-            const harmonicFreq = choice.base * Math.pow(2, choice.interval / 12);
-
-            const createOsc = (freq, detune = 0) => {
-                const osc = ctx.createOscillator();
-                osc.type = choice.wave;
-                osc.frequency.setValueAtTime(freq + detune, now);
-                return osc;
-            };
-
-            const oscA = createOsc(choice.base, Math.random() * 6 - 3);
-            const oscB = createOsc(harmonicFreq, Math.random() * 4 - 2);
-
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(950, now);
-
             gain.gain.setValueAtTime(0.0001, now);
-            gain.gain.exponentialRampToValueAtTime(0.04, now + 0.06);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+            gain.gain.exponentialRampToValueAtTime(0.08, now + 0.04);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
 
-            oscA.connect(filter);
-            oscB.connect(filter);
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1600, now);
+            filter.Q.setValueAtTime(0.7, now);
+
+            const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+            if (pan) {
+                const panValue = (Math.sin(now * 2) + Math.random() * 0.4 - 0.2) * 0.4;
+                pan.pan.setValueAtTime(panValue, now);
+            }
+
+            mainOsc.connect(filter);
+            sparkleOsc.connect(filter);
             filter.connect(gain);
-            gain.connect(ctx.destination);
+            if (pan) {
+                gain.connect(pan);
+                pan.connect(ctx.destination);
+            } else {
+                gain.connect(ctx.destination);
+            }
 
-            oscA.start(now);
-            oscB.start(now + 0.02);
-            oscA.stop(now + 0.52);
-            oscB.stop(now + 0.54);
+            mainOsc.start(now);
+            sparkleOsc.start(now + 0.015);
+            mainOsc.stop(now + 1.25);
+            sparkleOsc.stop(now + 1.1);
         }
 
         function setupActionSounds() {
             document.addEventListener('click', event => {
                 const target = event.target.closest('.btn, .tab, .file-drop-zone, .close-preview');
                 if (target) {
-                    playLofiTone('click');
+                    playPianoNote();
                 }
             });
         }
@@ -2371,7 +2375,7 @@
             `;
             document.body.appendChild(notification);
 
-            playLofiTone(type);
+            playPianoNote();
 
             setTimeout(() => notification.classList.add('show'), 100);
             setTimeout(() => {
