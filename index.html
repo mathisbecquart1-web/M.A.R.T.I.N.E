@@ -835,7 +835,7 @@
 <body>
     <div class="header">
         <div class="save-status" id="saveStatus">💾 Auto-sauvegarde activée</div>
-        <h1>Suivi Mise en Qualité - SNCF PROJECT <span class="project-martine">M.A.R.T.I.N.E v17.0</span></h1>
+        <h1>Suivi Mise en Qualité - SNCF PROJECT <span class="project-martine">M.A.R.T.I.N.E V17</span></h1>
         <div class="controls" style="justify-content: center; margin-top: 15px;">
             <button class="btn btn-excel" onclick="exportAllToExcel()">📊 Export Global Excel</button>
             <button class="btn btn-primary" onclick="exportCompleteBackup()">📤 Télécharger Sauvegarde</button>
@@ -1846,11 +1846,8 @@
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label>Sensible à la casse</label>
-                            <select id="searchCaseSensitive">
-                                <option value="false">Non</option>
-                                <option value="true">Oui</option>
-                            </select>
+                            <label>Numéro de bail (avancé)</label>
+                            <input type="text" id="advancedSearchBail" placeholder="Filtrer par numéro de bail...">
                         </div>
                         <div class="filter-group">
                             <label>Statut des données</label>
@@ -4059,6 +4056,7 @@ return;
                     rg: document.getElementById('searchRG').value.toLowerCase(),
                     utbat: document.getElementById('searchUTBAT').value.toLowerCase(),
                     bail: document.getElementById('searchBail').value.toLowerCase(),
+                    advancedBail: (document.getElementById('advancedSearchBail')?.value || '').toLowerCase(),
                     dateFrom: document.getElementById('searchDateFrom').value,
                     dateTo: document.getElementById('searchDateTo').value,
                     tab: document.getElementById('searchTab').value,
@@ -4090,6 +4088,7 @@ return;
                             if (searchParams.rg && (columns[inputIndex] === 'RG' || columns[inputIndex] === 'Code RG') && value.includes(searchParams.rg)) matchFound = true;
                             if (searchParams.utbat && columns[inputIndex] === 'UT-BAT' && value.includes(searchParams.utbat)) matchFound = true;
                             if (searchParams.bail && columns[inputIndex].includes('Bail') && value.includes(searchParams.bail)) matchFound = true;
+                            if (searchParams.advancedBail && columns[inputIndex].includes('Bail') && value.includes(searchParams.advancedBail)) matchFound = true;
                             if (searchParams.keyword && value.includes(searchParams.keyword)) matchFound = true;
                             
                             if (searchParams.dateFrom || searchParams.dateTo) {
@@ -4158,6 +4157,7 @@ return;
                 if (searchParams.rg) criteria.push(`RG: ${searchParams.rg}`);
                 if (searchParams.utbat) criteria.push(`UT-BAT: ${searchParams.utbat}`);
                 if (searchParams.bail) criteria.push(`Bail: ${searchParams.bail}`);
+                if (searchParams.advancedBail) criteria.push(`Bail (avancé): ${searchParams.advancedBail}`);
                 if (searchParams.keyword) criteria.push(`Mot-clé: ${searchParams.keyword}`);
                 searchCriteriaElement.textContent = criteria.length > 0 ? criteria.join(', ') : 'Tous';
                 
@@ -4257,6 +4257,8 @@ return;
                 document.getElementById('searchRG').value = '';
                 document.getElementById('searchUTBAT').value = '';
                 document.getElementById('searchBail').value = '';
+                const advancedBailInput = document.getElementById('advancedSearchBail');
+                if (advancedBailInput) advancedBailInput.value = '';
                 document.getElementById('searchDateFrom').value = '';
                 document.getElementById('searchDateTo').value = '';
                 document.getElementById('searchTab').value = '';
@@ -4288,6 +4290,7 @@ return;
                     rg: document.getElementById('searchRG').value,
                     utbat: document.getElementById('searchUTBAT').value,
                     bail: document.getElementById('searchBail').value,
+                    advancedBail: document.getElementById('advancedSearchBail')?.value || '',
                     dateFrom: document.getElementById('searchDateFrom').value,
                     dateTo: document.getElementById('searchDateTo').value,
                     tab: document.getElementById('searchTab').value,
@@ -4361,6 +4364,8 @@ return;
                 document.getElementById('searchRG').value = search.params.rg || '';
                 document.getElementById('searchUTBAT').value = search.params.utbat || '';
                 document.getElementById('searchBail').value = search.params.bail || '';
+                const advancedBailInput = document.getElementById('advancedSearchBail');
+                if (advancedBailInput) advancedBailInput.value = search.params.advancedBail || '';
                 document.getElementById('searchDateFrom').value = search.params.dateFrom || '';
                 document.getElementById('searchDateTo').value = search.params.dateTo || '';
                 document.getElementById('searchTab').value = search.params.tab || '';
