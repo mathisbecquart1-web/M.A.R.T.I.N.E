@@ -583,10 +583,10 @@
             background: rgba(255,255,255,0.85);
             border: 1px solid rgba(0,0,0,0.05);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 12px 14px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.04);
         }
 
@@ -608,6 +608,82 @@
             padding: 4px 8px;
             border-radius: 20px;
             background: rgba(102, 126, 234, 0.1);
+        }
+
+        .rg-change-header {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .rg-change-toggle {
+            border: 1px solid rgba(0,0,0,0.06);
+            background: #fff;
+            border-radius: 8px;
+            padding: 6px 8px;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+        .rg-change-toggle:hover {
+            background: #f4f5ff;
+            transform: translateY(-1px);
+        }
+
+        .rg-change-title {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .rg-change-title strong {
+            font-size: 15px;
+        }
+
+        .rg-change-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .rg-change-preview {
+            color: #4a5568;
+            font-size: 13px;
+            background: #f7f9ff;
+            border: 1px dashed #e2e7ff;
+            padding: 8px 10px;
+            border-radius: 8px;
+        }
+
+        .rg-change-body {
+            border-top: 1px solid #eef2ff;
+            padding-top: 8px;
+            display: none;
+        }
+
+        .rg-line-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .rg-line-row {
+            padding: 6px 8px;
+            border: 1px solid #eef2ff;
+            border-radius: 8px;
+            background: #fff;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .rg-line-row strong {
+            color: #2c3e50;
         }
 
         /* 📊 TABLEAU DE PRÉVISUALISATION */
@@ -2954,17 +3030,11 @@
             fileInput.value = '';
 
             try {
-                if (typeof fileInput.showPicker === 'function') {
-                    fileInput.showPicker();
-                } else {
-                    fileInput.click();
-                }
-            } catch (error) {
                 fileInput.click();
             } finally {
                 setTimeout(() => {
                     fileDialogLock = false;
-                }, 350);
+                }, 800);
             }
         }
 
@@ -4451,8 +4521,7 @@ return;
                 });
 
                 const topChanges = multiChanges
-                    .sort((a, b) => (b.occurrences - a.occurrences) || (b.variations - a.variations))
-                    .slice(0, 5);
+                    .sort((a, b) => (b.occurrences - a.occurrences) || (b.variations - a.variations));
 
                 rgChangeRegistry = detailMap;
 
@@ -4506,62 +4575,88 @@ return;
                 exportAllBtn.onclick = () => exportRGChanges();
                 listContainer.appendChild(exportAllBtn);
 
+
                 data.topChanges.forEach(change => {
                     const item = document.createElement('div');
                     item.className = 'rg-change-item';
                     const details = rgChangeRegistry[change.utbat] || [];
-                    const linesPreview = details.slice(0, 3).map(line => {
+
+                    const previewLines = details.slice(0, 2).map(line => {
                         const parts = [`L${line.rowIndex + 1}`];
                         if (line.ga) parts.push(`GA ${line.ga}`);
                         parts.push(line.bail ? `Bail ${line.bail}` : 'Bail manquant');
-                        return `<small style="color:#555;">${parts.join(' • ')}${line.rg ? ` • RG ${line.rg}` : ''}</small>`;
-                    }).join('<br>');
+                        return `${parts.join(' • ')}${line.rg ? ` • RG ${line.rg}` : ''}`;
+                    }).join(' | ');
 
-                    const fullDetails = document.createElement('div');
-                    fullDetails.style.marginTop = '8px';
-                    fullDetails.style.display = 'none';
-                    fullDetails.innerHTML = details.length === 0
-                        ? '<div style="color:#666;">Aucun détail disponible</div>'
-                        : details.map(line => {
-                            const parts = [`L${line.rowIndex + 1}`];
-                            if (line.ga) parts.push(`GA ${line.ga}`);
-                            parts.push(line.bail ? `Bail ${line.bail}` : 'Bail manquant');
-                            if (line.rg) parts.push(`RG ${line.rg}`);
-                            return `<div style="padding:4px 0; border-top:1px dashed #eef2ff;">${parts.join(' • ')}</div>`;
-                        }).join('');
+                    const header = document.createElement('div');
+                    header.className = 'rg-change-header';
 
                     const toggleBtn = document.createElement('button');
-                    toggleBtn.className = 'btn btn-secondary btn-compact';
-                    toggleBtn.textContent = '▸ Détails complets';
-                    toggleBtn.style.marginTop = '6px';
-                    toggleBtn.onclick = () => {
+                    toggleBtn.className = 'rg-change-toggle';
+                    toggleBtn.textContent = '▸';
+
+                    const title = document.createElement('div');
+                    title.className = 'rg-change-title';
+                    title.innerHTML = `
+                        <strong>UT-BAT ${change.utbat}</strong>
+                        <div class="rg-change-meta">
+                            <span>🔁 ${change.occurrences} passages</span>
+                            <span>🎭 ${change.variations} RG distincts</span>
+                            <span>🏷️ Bail ${change.bail || 'non renseigné'}</span>
+                        </div>
+                    `;
+
+                    const actions = document.createElement('div');
+                    actions.className = 'rg-change-actions';
+
+                    const btnVoir = document.createElement('button');
+                    btnVoir.className = 'btn btn-secondary btn-compact';
+                    btnVoir.textContent = '🔎 Voir les lignes';
+                    btnVoir.onclick = () => focusRGChange(change.utbat);
+
+                    const btnDismiss = document.createElement('button');
+                    btnDismiss.className = 'btn btn-warning btn-compact';
+                    btnDismiss.textContent = '🗂️ Retirer le doublon';
+                    btnDismiss.onclick = () => dismissRGChange(change.utbat);
+
+                    const btnExport = document.createElement('button');
+                    btnExport.className = 'btn btn-excel btn-compact';
+                    btnExport.textContent = '📑 Export';
+                    btnExport.onclick = () => exportRGChange(change.utbat);
+
+                    actions.append(btnVoir, btnDismiss, btnExport);
+
+                    header.append(toggleBtn, title, actions);
+
+                    const preview = document.createElement('div');
+                    preview.className = 'rg-change-preview';
+                    preview.innerHTML = `<strong>${details.length}</strong> ligne(s) concernées${previewLines ? ` • ${previewLines}` : ''}`;
+
+                    const fullDetails = document.createElement('div');
+                    fullDetails.className = 'rg-change-body';
+                    fullDetails.innerHTML = details.length === 0
+                        ? '<div style="color:#666;">Aucun détail disponible</div>'
+                        : `<div class="rg-line-list">${details.map(line => {
+                            const parts = [`<strong>L${line.rowIndex + 1}</strong>`];
+                            if (line.ga) parts.push(`<span>GA ${line.ga}</span>`);
+                            parts.push(`<span>${line.bail ? `Bail ${line.bail}` : 'Bail manquant'}</span>`);
+                            if (line.rg) parts.push(`<span>RG ${line.rg}</span>`);
+                            return `<div class=\"rg-line-row\">${parts.join(' • ')}<\/div>`;
+                        }).join('')}</div>`;
+
+                    const toggleDetails = () => {
                         const expanded = fullDetails.style.display === 'block';
                         fullDetails.style.display = expanded ? 'none' : 'block';
-                        toggleBtn.textContent = expanded ? '▸ Détails complets' : '▾ Masquer les détails';
+                        toggleBtn.textContent = expanded ? '▸' : '▾';
                     };
 
-                    item.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; gap:6px; align-items:center; flex-wrap:wrap;">
-                            <div>
-                                <div style="font-weight: 700;">UT-BAT ${change.utbat}</div>
-                                <div class="rg-change-meta">
-                                    <span>🔁 ${change.occurrences} passages</span>
-                                    <span>🎭 ${change.variations} RG distincts</span>
-                                    <span>🏷️ Bail ${change.bail || 'non renseigné'}</span>
-                                </div>
-                            </div>
-                            <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
-                                <button class="btn btn-secondary btn-compact" onclick="focusRGChange('${change.utbat}')">🔎 Voir les lignes</button>
-                                <button class="btn btn-warning btn-compact" onclick="dismissRGChange('${change.utbat}')">🗂️ Retirer le doublon</button>
-                                <button class="btn btn-excel btn-compact" onclick="exportRGChange('${change.utbat}')">📑 Export</button>
-                            </div>
-                        </div>
-                        ${linesPreview ? `<div style="margin-top:6px;">${linesPreview}</div>` : ''}
-                    `;
-                    item.appendChild(toggleBtn);
-                    item.appendChild(fullDetails);
+                    toggleBtn.onclick = toggleDetails;
+                    preview.onclick = toggleDetails;
+
+                    item.append(header, preview, fullDetails);
                     listContainer.appendChild(item);
                 });
+
             } catch (error) {
                 console.error('Erreur mise à jour suivi changements RG:', error);
             }
