@@ -4497,31 +4497,66 @@ return;
 
         function focusRGChange(utbat) {
             try {
-                const lines = rgChangeRegistry[utbat] || [];
+                const lines = (rgChangeRegistry[utbat] || []).slice();
                 if (lines.length === 0) {
                     showNotification('ℹ️ Aucune ligne repérée pour cet UT-BAT');
                     return;
                 }
 
-                const targetLine = lines[0];
-                switchTab(targetLine.tabName || 'modification');
+                const sortedLines = lines.sort((a, b) => a.rowIndex - b.rowIndex);
+                const preparedResults = [];
+                const startTime = performance.now();
 
-                requestAnimationFrame(() => {
-                    const tbody = document.getElementById(`${targetLine.tabName}TableBody`);
+                sortedLines.forEach(line => {
+                    const tbody = document.getElementById(`${line.tabName}TableBody`);
                     if (!tbody) return;
 
                     const rows = tbody.querySelectorAll('tr');
-                    const row = rows[targetLine.rowIndex];
+                    const row = rows[line.rowIndex];
                     if (!row) return;
 
-                    row.classList.add('pending-highlight');
-                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    const focusable = row.querySelector('input, textarea, select');
-                    if (focusable) focusable.focus();
-                    setTimeout(() => row.classList.remove('pending-highlight'), 2000);
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const rowData = Array.from(inputs).map(input => input.value);
+
+                    preparedResults.push({
+                        tabName: line.tabName,
+                        tabDisplayName: getTabDisplayName(line.tabName),
+                        rowIndex: line.rowIndex,
+                        data: rowData,
+                        columns: tabConfigs[line.tabName]?.columns || []
+                    });
                 });
+
+                if (preparedResults.length === 0) {
+                    showNotification('ℹ️ Impossible de charger les lignes concernées');
+                    return;
+                }
+
+                const searchParams = {
+                    ga: '',
+                    rg: '',
+                    utbat: utbat.toLowerCase(),
+                    bail: '',
+                    advancedBail: '',
+                    dateFrom: '',
+                    dateTo: '',
+                    tab: sortedLines[0].tabName || 'modification',
+                    keyword: 'changement rg surveillé'
+                };
+
+                searchResults = preparedResults;
+                const searchTime = Math.round(performance.now() - startTime);
+                displaySearchResults(searchTime, searchParams);
+
+                const resultsContainer = document.getElementById('searchResults');
+                if (resultsContainer) {
+                    resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+
+                showNotification(`🔎 ${preparedResults.length} ligne(s) pour UT-BAT ${utbat}`);
             } catch (error) {
                 console.error('Erreur navigation changement RG:', error);
+                showNotification('❌ Erreur lors de la navigation', 'error');
             }
         }
 
