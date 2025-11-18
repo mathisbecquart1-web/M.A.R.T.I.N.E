@@ -3188,6 +3188,7 @@
                     currentPreviewData = await processImportData(jsonData, tabName);
                     currentTabForPreview = tabName;
 
+                    notifyImportDuplicates(currentPreviewData, tabName);
                     showPreview(tabName);
                     showNotification(`✅ Fichier "${file.name}" analysé avec succès`, 'success');
 
@@ -3249,6 +3250,7 @@
                 currentPreviewData = await processImportData(parsedData, tabName);
                 currentTabForPreview = tabName;
 
+                notifyImportDuplicates(currentPreviewData, tabName);
                 togglePasteArea(tabName);
                 showPreview(tabName);
                 showNotification(`✅ ${parsedData.length} ligne(s) analysée(s)`, 'success');
@@ -3274,7 +3276,9 @@
                             errors: 0,
                             warnings: 0,
                             total: 0
-                        }
+                        },
+                        utDuplicateCount: 0,
+                        utDuplicateCodes: []
                     };
 
                     if (rawData.length === 0) {
@@ -3343,6 +3347,47 @@
                             currentIndex = end;
                             setTimeout(processBatch, 0);
                         } else {
+                            if (tabName === 'baseut') {
+                                const codeIndex = processedData.headers.findIndex(h => h.toLowerCase().includes('code'));
+                                if (codeIndex !== -1) {
+                                    const utOccurrences = {};
+
+                                    processedData.rows.forEach(row => {
+                                        const normalized = normalizeUTValue(row.data[codeIndex]);
+                                        if (!normalized) return;
+                                        if (!utOccurrences[normalized]) {
+                                            utOccurrences[normalized] = [];
+                                        }
+                                        utOccurrences[normalized].push(row);
+                                    });
+
+                                    Object.entries(utOccurrences)
+                                        .filter(([, rows]) => rows.length > 1)
+                                        .forEach(([code, rows]) => {
+                                            processedData.utDuplicateCodes.push(code);
+                                            processedData.utDuplicateCount += rows.length;
+
+                                            rows.forEach(row => {
+                                                const currentValidation = row.validations[codeIndex];
+
+                                                if (currentValidation?.status === 'valid') {
+                                                    processedData.validationResults.valid--;
+                                                    processedData.validationResults.warnings++;
+                                                }
+
+                                                if (currentValidation?.status !== 'error') {
+                                                    row.validations[codeIndex] = {
+                                                        status: 'warning',
+                                                        message: 'Code UT en double dans l\'import',
+                                                        originalValue: row.data[codeIndex]
+                                                    };
+                                                    row.hasWarnings = true;
+                                                }
+                                            });
+                                        });
+                                }
+                            }
+
                             resolve(processedData);
                         }
                     };
@@ -3355,6 +3400,19 @@
                     reject(error);
                 }
             });
+        }
+
+        function notifyImportDuplicates(previewData, tabName) {
+            if (tabName !== 'baseut' || !previewData) return;
+
+            const duplicateRows = previewData.utDuplicateCount || 0;
+            const duplicateCodes = previewData.utDuplicateCodes?.length || 0;
+
+            if (duplicateRows > 0) {
+                const message = `⚠️ ${duplicateCodes} code(s) UT apparaissent en double (${duplicateRows} ligne(s)). ` +
+                    'Merci de retirer les doublons avant de valider l\'import.';
+                showNotification(message, 'warning');
+            }
         }
 
         function detectHeaders(firstRow, expectedColumns) {
