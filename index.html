@@ -1059,6 +1059,7 @@
             <button class="btn btn-primary" onclick="exportCompleteBackup()">📤 Télécharger Sauvegarde</button>
             <button class="btn btn-primary" onclick="importCompleteBackup()">📥 Importer Sauvegarde</button>
             <input type="file" id="backupFileInput" accept="application/json" style="display: none;" onchange="handleBackupImport()">
+            <button class="btn btn-primary" onclick="expandAllTextFields()">🪄 Afficher tout le texte</button>
         </div>
     </div>
 
@@ -1083,8 +1084,8 @@
                 <h4>🔍 Filtres avancés</h4>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>GA</label>
-                        <input type="text" id="filterCreationGA" placeholder="Filtrer par GA..." oninput="filterTable('creation')">
+                        <label>Numéro de bail</label>
+                        <input type="text" id="filterCreationBail" placeholder="Filtrer par numéro de bail..." oninput="filterTable('creation')">
                     </div>
                     <div class="filter-group">
                         <label>Date de</label>
@@ -1191,8 +1192,8 @@
                 <h4>🔍 Filtres avancés</h4>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>GA</label>
-                        <input type="text" id="filterModificationGA" placeholder="Filtrer par GA..." oninput="filterTable('modification')">
+                        <label>Numéro de bail</label>
+                        <input type="text" id="filterModificationBail" placeholder="Filtrer par numéro de bail..." oninput="filterTable('modification')">
                     </div>
                     <div class="filter-group">
                         <label>Date de</label>
@@ -1299,8 +1300,8 @@
                 <h4>🔍 Filtres avancés</h4>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>GA</label>
-                        <input type="text" id="filterResiliationGA" placeholder="Filtrer par GA..." oninput="filterTable('resiliation')">
+                        <label>Numéro de bail</label>
+                        <input type="text" id="filterResiliationBail" placeholder="Filtrer par numéro de bail..." oninput="filterTable('resiliation')">
                     </div>
                     <div class="filter-group">
                         <label>Date de</label>
@@ -1405,8 +1406,8 @@
                 <h4>🔍 Filtres avancés</h4>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>GA</label>
-                        <input type="text" id="filterAutremodifGA" placeholder="Filtrer par GA..." oninput="filterTable('autremodif')">
+                        <label>Numéro de bail</label>
+                        <input type="text" id="filterAutremodifBail" placeholder="Filtrer par numéro de bail..." oninput="filterTable('autremodif')">
                     </div>
                     <div class="filter-group">
                         <label>Date de</label>
@@ -1512,8 +1513,8 @@
                 <h4>🔍 Filtres avancés</h4>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>GA</label>
-                        <input type="text" id="filterModifsurfaceGA" placeholder="Filtrer par GA..." oninput="filterTable('modifsurface')">
+                        <label>Numéro de bail</label>
+                        <input type="text" id="filterModifsurfaceBail" placeholder="Filtrer par numéro de bail..." oninput="filterTable('modifsurface')">
                     </div>
                     <div class="filter-group">
                         <label>Date de</label>
@@ -3244,6 +3245,16 @@ return;
             }
         }
 
+        function expandAllTextFields() {
+            try {
+                const textAreas = document.querySelectorAll('textarea.editable-textarea');
+                textAreas.forEach(autoResizeField);
+                showNotification('🪄 Les champs texte ont été ajustés pour tout afficher');
+            } catch (error) {
+                console.error('Erreur ajustement champs texte:', error);
+            }
+        }
+
         function createEditableField(column, tabName, value = '') {
             if (column === 'Traité') {
                 const select = document.createElement('select');
@@ -3353,6 +3364,8 @@ return;
             deleteBtn.onclick = () => deleteRow(row, tabName);
             actionCell.appendChild(deleteBtn);
             row.appendChild(actionCell);
+
+            applyIntelligentRGFill(row, tabName);
 
             return row;
         }
@@ -3949,6 +3962,7 @@ return;
 
                 updateRGUsageStats();
                 refreshRGSuggestions();
+                applyIntelligentRGFillAll();
 
             } catch (error) {
                 console.error('Erreur mise à jour base RG:', error);
@@ -4073,6 +4087,32 @@ return;
             input.addEventListener('input', () => {
                 input.dataset.autoFilled = 'false';
                 autoFillRGFromName(input.value, row, tabName);
+            });
+        }
+
+        function applyIntelligentRGFill(row, tabName) {
+            if (tabName === 'baserg') return;
+
+            const rgInput = getRGInput(row, tabName);
+            const nomInput = getNomRGInput(row, tabName);
+
+            if (rgInput && rgInput.value && nomInput && !nomInput.value) {
+                autoFillNomFromRG(rgInput.value, row, tabName);
+            }
+
+            if (nomInput && nomInput.value && rgInput && !rgInput.value) {
+                autoFillRGFromName(nomInput.value, row, tabName);
+            }
+        }
+
+        function applyIntelligentRGFillAll() {
+            Object.keys(tabConfigs).forEach(tabName => {
+                if (tabName === 'baserg') return;
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                tbody.querySelectorAll('tr').forEach(row => applyIntelligentRGFill(row, tabName));
             });
         }
 
@@ -6525,6 +6565,8 @@ function updateTabsChart() {
                     updateStats(tabName);
                 });
             }
+
+            applyIntelligentRGFillAll();
 
             updatePendingTasksDisplay();
             updateTaskBatchDisplay();
