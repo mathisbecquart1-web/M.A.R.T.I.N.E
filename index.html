@@ -860,6 +860,36 @@
             border: 1px solid rgba(102, 126, 234, 0.2);
         }
 
+        .stats-item.pending-expand {
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+        }
+
+        .stats-item.pending-expand:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.2);
+        }
+
+        .stats-item.pending-expand .stat-actions {
+            display: none;
+            margin-top: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .stats-item.pending-expand.open .stat-actions {
+            display: flex;
+        }
+
+        .stats-item .stat-hint {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #444;
+        }
+
         /* 📊 DASHBOARD STATISTIQUES */
         .stats-dashboard {
             display: grid;
@@ -1196,11 +1226,14 @@
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="creationTotalRows">0</span></div>
                 <div class="stats-item">✅ Traités: <span id="creationProcessedRows">0</span></div>
-                <div class="stats-item">⏳ En attente: <span id="creationPendingRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'creation')">
+                    <div class="stat-main">⏳ En attente: <span id="creationPendingRows">0</span></div>
+                    <span class="stat-hint">Cliquer pour ouvrir la prochaine ligne en attente</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('creation');">📍 Aller aux en attente</button>
+                    </div>
+                </div>
                 <div class="stats-item">📈 Taux: <span id="creationCompletionRate">0%</span></div>
-            </div>
-            <div class="stats-actions" style="margin-top: 10px;">
-                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('creation')">⏩ Aller à la prochaine en attente</button>
             </div>
         </div>
 
@@ -1307,11 +1340,14 @@
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="modificationTotalRows">0</span></div>
                 <div class="stats-item">✅ Traités: <span id="modificationProcessedRows">0</span></div>
-                <div class="stats-item">⏳ En attente: <span id="modificationPendingRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'modification')">
+                    <div class="stat-main">⏳ En attente: <span id="modificationPendingRows">0</span></div>
+                    <span class="stat-hint">Déplier pour sauter à la prochaine ligne en attente</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('modification');">📍 Aller aux en attente</button>
+                    </div>
+                </div>
                 <div class="stats-item">📈 Taux: <span id="modificationCompletionRate">0%</span></div>
-            </div>
-            <div class="stats-actions" style="margin-top: 10px;">
-                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('modification')">⏩ Aller à la prochaine en attente</button>
             </div>
         </div>
 
@@ -1416,11 +1452,14 @@
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="resiliationTotalRows">0</span></div>
                 <div class="stats-item">✅ Traités: <span id="resiliationProcessedRows">0</span></div>
-                <div class="stats-item">⏳ En attente: <span id="resiliationPendingRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'resiliation')">
+                    <div class="stat-main">⏳ En attente: <span id="resiliationPendingRows">0</span></div>
+                    <span class="stat-hint">Cliquer pour accéder à la prochaine fiche en attente</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('resiliation');">📍 Aller aux en attente</button>
+                    </div>
+                </div>
                 <div class="stats-item">📈 Taux: <span id="resiliationCompletionRate">0%</span></div>
-            </div>
-            <div class="stats-actions" style="margin-top: 10px;">
-                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('resiliation')">⏩ Aller à la prochaine en attente</button>
             </div>
         </div>
 
@@ -1526,11 +1565,14 @@
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="autremodifTotalRows">0</span></div>
                 <div class="stats-item">✅ Traités: <span id="autremodifProcessedRows">0</span></div>
-                <div class="stats-item">⏳ En attente: <span id="autremodifPendingRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'autremodif')">
+                    <div class="stat-main">⏳ En attente: <span id="autremodifPendingRows">0</span></div>
+                    <span class="stat-hint">Afficher la prochaine ligne en attente d'un clic</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('autremodif');">📍 Aller aux en attente</button>
+                    </div>
+                </div>
                 <div class="stats-item">📈 Taux: <span id="autremodifCompletionRate">0%</span></div>
-            </div>
-            <div class="stats-actions" style="margin-top: 10px;">
-                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('autremodif')">⏩ Aller à la prochaine en attente</button>
             </div>
         </div>
 
@@ -1635,12 +1677,15 @@
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="modifsurfaceTotalRows">0</span></div>
                 <div class="stats-item">✅ Traités: <span id="modifsurfaceProcessedRows">0</span></div>
-                <div class="stats-item">⏳ En attente: <span id="modifsurfacePendingRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'modifsurface')">
+                    <div class="stat-main">⏳ En attente: <span id="modifsurfacePendingRows">0</span></div>
+                    <span class="stat-hint">Déplier pour naviguer vers la prochaine surface en attente</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('modifsurface');">📍 Aller aux en attente</button>
+                    </div>
+                </div>
                 <div class="stats-item">📈 Surface totale modifiée: <span id="modifsurfaceTotalDifference">0 m²</span></div>
                 <div class="stats-item">📈 Taux: <span id="modifsurfaceCompletionRate">0%</span></div>
-            </div>
-            <div class="stats-actions" style="margin-top: 10px;">
-                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('modifsurface')">⏩ Aller à la prochaine en attente</button>
             </div>
         </div>
 
@@ -1754,12 +1799,15 @@
                     <div class="stats-item" style="color: #dc3545;">❌ NOK: <span id="verifbauxNOKRows">0</span></div>
                     <div class="stats-item" style="color: #ffc107;">⏳ En cours: <span id="verifbauxEnCoursRows">0</span></div>
                     <div class="stats-item">✅ Traités: <span id="verifbauxProcessedRows">0</span></div>
-                    <div class="stats-item">⏳ En attente: <span id="verifbauxPendingRows">0</span></div>
+                    <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'verifbaux')">
+                        <div class="stat-main">⏳ En attente: <span id="verifbauxPendingRows">0</span></div>
+                        <span class="stat-hint">Déplier pour retrouver la prochaine vérification à traiter</span>
+                        <div class="stat-actions">
+                            <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('verifbaux');">📍 Aller aux en attente</button>
+                        </div>
+                    </div>
                     <div class="stats-item">📈 Taux de validation: <span id="verifbauxValidationRate">0%</span></div>
                     <div class="stats-item">📈 Taux de traitement: <span id="verifbauxCompletionRate">0%</span></div>
-                </div>
-                <div class="stats-actions" style="margin-top: 10px;">
-                    <button class="btn btn-secondary btn-compact" onclick="goToNextPending('verifbaux')">⏩ Aller à la prochaine en attente</button>
                 </div>
             </div>
 
@@ -3736,6 +3784,34 @@ return;
             }
         }
 
+        function togglePendingStat(element, tabName) {
+            try {
+                const alreadyOpen = element.classList.contains('open');
+                document.querySelectorAll('.stats-item.pending-expand.open').forEach(item => {
+                    if (item !== element) item.classList.remove('open');
+                });
+
+                element.classList.toggle('open', !alreadyOpen);
+
+                if (!alreadyOpen) {
+                    const hint = element.querySelector('.stat-hint');
+                    if (hint) {
+                        hint.textContent = `Cliquer sur "Aller aux en attente" pour ouvrir ${getTabDisplayName(tabName)}`;
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'ouverture des stats en attente:', error);
+            }
+        }
+
+        document.addEventListener('click', (event) => {
+            const target = event.target;
+            const isStat = target.closest('.stats-item.pending-expand');
+            if (!isStat) {
+                document.querySelectorAll('.stats-item.pending-expand.open').forEach(item => item.classList.remove('open'));
+            }
+        });
+
         function updateRGUsageStats() {
             try {
                 const tbody = document.getElementById('basergTableBody');
@@ -4025,8 +4101,13 @@ return;
 
         function normalizeRGValue(value) {
             if (value === null || value === undefined) return '';
-            const cleaned = value.toString().replace(/\D/g, '').trim();
-            return cleaned.replace(/^0+(?=\d)/, '');
+            const cleaned = value
+                .toString()
+                .trim()
+                .toUpperCase()
+                .replace(/[\s_\-]+/g, '');
+
+            return cleaned.replace(/^0+(?=[A-Z0-9])/, '');
         }
 
         function updateRGDatabase() {
@@ -4111,8 +4192,12 @@ return;
             if (displayMatch) return displayMatch[0];
 
             const startsWithMatch = Object.keys(rgDatabase)
-                .find(code => code.startsWith(normalized) || normalized.startsWith(code));
+                .find(code => normalizeRGValue(code).startsWith(normalized) || normalized.startsWith(normalizeRGValue(code)));
             if (startsWithMatch) return startsWithMatch;
+
+            const partialMatch = Object.entries(rgDatabase)
+                .find(([code, data]) => normalizeRGValue(code).includes(normalized) || normalizeRGValue(data.codeAffiche || '').includes(normalized));
+            if (partialMatch) return partialMatch[0];
 
             return Object.keys(rgDatabase).find(code => normalizeRGValue(code) === normalized) || null;
         }
