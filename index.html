@@ -2781,6 +2781,7 @@
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button class="btn btn-warning" onclick="fixAllErrors()">🔧 Corriger automatiquement</button>
                     <button class="btn btn-secondary" onclick="applyPreviewSmartSuggestions()">💡 Propositions intelligentes (UT/RG)</button>
+                    <button class="btn btn-secondary" onclick="sortPreviewAndDeduplicate()">↕️ Trier / dédoublonner</button>
                     <button class="btn btn-info" onclick="removePreviewDuplicates()">🧹 Enlever les doublons</button>
                     <button class="btn btn-danger" onclick="removeErrorRows()">🗑️ Supprimer lignes en erreur</button>
                 </div>
@@ -3911,35 +3912,44 @@
             }
         }
 
+        function getPreviewCodeInfo() {
+            if (!currentPreviewData) return null;
+
+            const headers = currentPreviewData.headers.map(h => (h || '').toString().toLowerCase());
+            let codeIndex = -1;
+            let normalizer = (value) => (value || '').toString().trim();
+            let label = 'entrées';
+
+            if (currentTabForPreview === 'baseut') {
+                codeIndex = headers.findIndex(h => h.includes('code') && h.includes('ut'));
+                normalizer = normalizeUTValue;
+                label = 'codes UT';
+            } else if (currentTabForPreview === 'baserg') {
+                codeIndex = headers.findIndex(h => h.includes('code') && h.includes('rg'));
+                if (codeIndex === -1) {
+                    codeIndex = headers.findIndex(h => h === 'rg');
+                }
+                normalizer = normalizeRGValue;
+                label = 'codes RG';
+            } else {
+                showNotification('ℹ️ Le tri et la suppression des doublons sont disponibles pour les imports RG et UT.', 'info');
+                return null;
+            }
+
+            if (codeIndex === -1) {
+                showNotification('❌ Impossible d’identifier la colonne code pour détecter les doublons', 'error');
+                return null;
+            }
+
+            return { codeIndex, normalizer, label };
+        }
+
         function removePreviewDuplicates() {
             try {
-                if (!currentPreviewData) return;
+                const codeInfo = getPreviewCodeInfo();
+                if (!codeInfo) return;
 
-                const headers = currentPreviewData.headers.map(h => (h || '').toString().toLowerCase());
-                let codeIndex = -1;
-                let normalizer = (value) => (value || '').toString().trim();
-                let label = 'entrées';
-
-                if (currentTabForPreview === 'baseut') {
-                    codeIndex = headers.findIndex(h => h.includes('code') && h.includes('ut'));
-                    normalizer = normalizeUTValue;
-                    label = 'codes UT';
-                } else if (currentTabForPreview === 'baserg') {
-                    codeIndex = headers.findIndex(h => h.includes('code') && h.includes('rg'));
-                    if (codeIndex === -1) {
-                        codeIndex = headers.findIndex(h => h === 'rg');
-                    }
-                    normalizer = normalizeRGValue;
-                    label = 'codes RG';
-                } else {
-                    showNotification('ℹ️ Le retrait des doublons est disponible pour les imports RG et UT.', 'info');
-                    return;
-                }
-
-                if (codeIndex === -1) {
-                    showNotification('❌ Impossible d’identifier la colonne code pour détecter les doublons', 'error');
-                    return;
-                }
+                const { codeIndex, normalizer, label } = codeInfo;
 
                 const seen = new Set();
                 const filteredRows = [];
@@ -3973,6 +3983,64 @@
             } catch (error) {
                 console.error('Erreur suppression doublons:', error);
                 showNotification('❌ Erreur lors du nettoyage des doublons', 'error');
+            }
+        }
+
+        function sortPreviewAndDeduplicate() {
+            try {
+                const codeInfo = getPreviewCodeInfo();
+                if (!codeInfo) return;
+
+                const { codeIndex, normalizer, label } = codeInfo;
+
+                const sortableRows = currentPreviewData.rows.map((row, idx) => ({
+                    row,
+                    idx,
+                    key: normalizer(row.data[codeIndex]),
+                    raw: (row.data[codeIndex] || '').toString().trim()
+                }));
+
+                sortableRows.sort((a, b) => {
+                    if (a.key && b.key) {
+                        if (a.key === b.key) return a.idx - b.idx;
+                        return a.key.localeCompare(b.key, 'fr', { sensitivity: 'base' });
+                    }
+                    if (a.key) return -1;
+                    if (b.key) return 1;
+                    return a.idx - b.idx;
+                });
+
+                const seen = new Set();
+                const deduped = [];
+                let removed = 0;
+
+                sortableRows.forEach(item => {
+                    if (!item.key) {
+                        deduped.push(item);
+                        return;
+                    }
+
+                    if (seen.has(item.key)) {
+                        removed++;
+                        return;
+                    }
+
+                    seen.add(item.key);
+                    deduped.push(item);
+                });
+
+                currentPreviewData.rows = deduped.map(item => item.row);
+                updatePreviewStats();
+                showPreview(currentTabForPreview);
+
+                const message = removed > 0
+                    ? `↕️ Tableau trié et ${removed} doublon(s) ${label} supprimé(s)`
+                    : '↕️ Tableau trié (aucun doublon supplémentaire trouvé)';
+                showNotification(message, removed > 0 ? 'success' : 'info');
+
+            } catch (error) {
+                console.error('Erreur tri/dédoublonnage:', error);
+                showNotification('❌ Erreur lors du tri ou du nettoyage des doublons', 'error');
             }
         }
 
@@ -6455,7 +6523,7 @@ function updateTabsChart() {
                 ];
                 
                 Object.keys(tabConfigs).forEach((tabName, index) => {
-                    if (tabName === 'baserg') return;
+                    if (tabName === 'baserg' || tabName === 'baseut') return;
                     
                     const tbody = document.getElementById(`${tabName}TableBody`);
                     if (tbody) {
@@ -8351,6 +8419,43 @@ function updateTabsChart() {
                     .map(style => style.innerHTML)
                     .join('\n');
 
+                const interactivityScript = `
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.stats-card.collapsible .collapsible-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const card = header.closest('.stats-card');
+            if (card) card.classList.toggle('collapsed');
+        });
+    });
+
+    document.querySelectorAll('.stats-item.pending-expand').forEach(item => {
+        item.addEventListener('click', (event) => {
+            const wasOpen = item.classList.contains('open');
+            document.querySelectorAll('.stats-item.pending-expand.open').forEach(el => {
+                if (el !== item) el.classList.remove('open');
+            });
+            item.classList.toggle('open', !wasOpen);
+            event.stopPropagation();
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('.stats-item.pending-expand')) {
+            document.querySelectorAll('.stats-item.pending-expand.open').forEach(el => el.classList.remove('open'));
+        }
+    });
+
+    document.querySelectorAll('.rg-change-toggle').forEach(toggle => {
+        toggle.addEventListener('click', (event) => {
+            const card = toggle.closest('.rg-change-card');
+            if (card) card.classList.toggle('collapsed');
+            event.stopPropagation();
+        });
+    });
+});
+</script>`;
+
                 const exportHtml = `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -8365,6 +8470,7 @@ function updateTabsChart() {
             Généré le ${new Date().toLocaleString('fr-FR')}
         </div>
         ${clone.innerHTML}
+        ${interactivityScript}
     </div>
 </body>
 </html>`;
