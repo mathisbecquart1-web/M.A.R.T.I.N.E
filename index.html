@@ -2476,22 +2476,27 @@
                 </div>
 
                 <div class="stats-card accent-card">
-                    <h3>🌀 Changements de RG surveillés</h3>
-                    <div id="rgChangeMood" class="stat-chip-subtext" style="margin-bottom: 10px;">Analyse en cours...</div>
-                    <div class="stat-chip-row" style="margin-bottom: 10px;">
-                        <div class="stat-chip">
-                            <div class="stat-chip-label">UT-BAT suivis</div>
-                            <div class="stat-chip-value" id="rgChangeUTBATCount">0</div>
-                            <div class="stat-chip-subtext">Présents dans les modifications RG</div>
-                        </div>
-                        <div class="stat-chip">
-                            <div class="stat-chip-label">Changements multiples</div>
-                            <div class="stat-chip-value" id="rgChangeMultiCount">0</div>
-                            <div class="stat-chip-subtext">UT-BAT modifiés plusieurs fois</div>
-                        </div>
+                    <div class="card-title-row">
+                        <h3>🌀 Changements de RG surveillés</h3>
+                        <button id="rgChangeToggleBtn" class="btn btn-secondary btn-compact" onclick="toggleRGChangePanel()">▾ Détails</button>
                     </div>
-                    <div class="rg-change-list" id="rgChangeDetails">
-                        <div style="color: #666;">Aucun UT-BAT avec modifications répétées pour le moment.</div>
+                    <div id="rgChangePanel">
+                        <div id="rgChangeMood" class="stat-chip-subtext" style="margin-bottom: 10px;">Analyse en cours...</div>
+                        <div class="stat-chip-row" style="margin-bottom: 10px;">
+                            <div class="stat-chip">
+                                <div class="stat-chip-label">UT-BAT suivis</div>
+                                <div class="stat-chip-value" id="rgChangeUTBATCount">0</div>
+                                <div class="stat-chip-subtext">Présents dans les modifications RG</div>
+                            </div>
+                            <div class="stat-chip">
+                                <div class="stat-chip-label">Changements multiples</div>
+                                <div class="stat-chip-value" id="rgChangeMultiCount">0</div>
+                                <div class="stat-chip-subtext">UT-BAT modifiés plusieurs fois</div>
+                            </div>
+                        </div>
+                        <div class="rg-change-list" id="rgChangeDetails">
+                            <div style="color: #666;">Aucun UT-BAT avec modifications répétées pour le moment.</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2820,6 +2825,7 @@
         let activityLog = [];
         let activityDetailsExpanded = false;
         let qualityAlertsExpanded = false;
+        let rgChangePanelExpanded = true;
         let rgChangeRegistry = {};
         let dismissedRGChanges = new Set();
         let fileDialogLock = false;
@@ -2928,6 +2934,22 @@
         function toggleActivityDetails() {
             activityDetailsExpanded = !activityDetailsExpanded;
             updateRecentActivity();
+        }
+
+        function toggleRGChangePanel() {
+            try {
+                rgChangePanelExpanded = !rgChangePanelExpanded;
+                const panel = document.getElementById('rgChangePanel');
+                const toggle = document.getElementById('rgChangeToggleBtn');
+                if (panel) {
+                    panel.style.display = rgChangePanelExpanded ? 'block' : 'none';
+                }
+                if (toggle) {
+                    toggle.textContent = `${rgChangePanelExpanded ? '▾' : '▸'} Détails`;
+                }
+            } catch (error) {
+                console.error('Erreur bascule panneau changements RG:', error);
+            }
         }
 
         function showSaveStatus(message, type = 'success') {
@@ -4545,9 +4567,19 @@ return;
                 const multiElement = document.getElementById('rgChangeMultiCount');
                 const moodElement = document.getElementById('rgChangeMood');
                 const listContainer = document.getElementById('rgChangeDetails');
+                const panel = document.getElementById('rgChangePanel');
+                const toggle = document.getElementById('rgChangeToggleBtn');
 
                 if (utbatElement) utbatElement.textContent = data.utbatCount;
                 if (multiElement) multiElement.textContent = data.multiCount;
+
+                if (panel) {
+                    panel.style.display = rgChangePanelExpanded ? 'block' : 'none';
+                }
+
+                if (toggle) {
+                    toggle.textContent = `${rgChangePanelExpanded ? '▾' : '▸'} Détails`;
+                }
 
                 if (moodElement) {
                     if (data.multiCount === 0) {
@@ -4761,7 +4793,10 @@ return;
                     return;
                 }
 
-                const lines = rgChangeRegistry[utbat] || [];
+                const normalized = (utbat || '').trim().toUpperCase();
+                const latestDetails = getRGChangeInsights().details || {};
+                const lines = (latestDetails[normalized] || rgChangeRegistry[normalized] || []).slice().sort((a, b) => a.rowIndex - b.rowIndex);
+
                 if (lines.length === 0) {
                     showNotification('ℹ️ Aucun détail à exporter pour cet UT-BAT');
                     return;
@@ -4777,10 +4812,10 @@ return;
 
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.json_to_sheet(rows);
-                XLSX.utils.book_append_sheet(wb, ws, `UTBAT_${utbat}`.substring(0, 31));
-                const fileName = `Changements_RG_${utbat}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.utils.book_append_sheet(wb, ws, `UTBAT_${normalized}`.substring(0, 31));
+                const fileName = `Changements_RG_${normalized}_${new Date().toISOString().split('T')[0]}.xlsx`;
                 XLSX.writeFile(wb, fileName);
-                showNotification(`📤 Export des changements RG pour ${utbat}`);
+                showNotification(`📤 Export des changements RG pour ${normalized}`);
             } catch (error) {
                 console.error('Erreur export changement RG:', error);
                 showNotification('❌ Erreur export changement RG', 'error');
@@ -4794,7 +4829,8 @@ return;
                     return;
                 }
 
-                const entries = Object.entries(rgChangeRegistry || {});
+                const details = getRGChangeInsights().details || {};
+                const entries = Object.entries(details);
                 if (entries.length === 0) {
                     showNotification('ℹ️ Aucun changement RG surveillé à exporter');
                     return;
@@ -4803,7 +4839,8 @@ return;
                 const wb = XLSX.utils.book_new();
 
                 entries.forEach(([utbat, lines]) => {
-                    const rows = lines.map(line => ({
+                    const ordered = (lines || []).slice().sort((a, b) => a.rowIndex - b.rowIndex);
+                    const rows = ordered.map(line => ({
                         "UT-BAT": line.utbat,
                         "Ligne": line.rowIndex + 1,
                         "GA": line.ga || '',
