@@ -1440,7 +1440,7 @@
         <button class="tab" onclick="switchTab('autremodif')">🔧 Autre modification</button>
         <button class="tab" onclick="switchTab('modifsurface')">📐 Modification surface</button>
         <button class="tab" onclick="switchTab('verifbaux')">✅ Vérification baux</button>
-        <button class="tab" onclick="switchTab('baserg')">🗂️ Base RG</button>
+        <button class="tab" onclick="switchTab('baserg')">🗂️ Base RG & UT</button>
         <button class="tab" onclick="switchTab('taches')">📝 Tâches à faire</button>
         <button class="tab" onclick="switchTab('statistiques')">📊 Statistiques</button>
         <button class="tab" onclick="switchTab('recherche')">🔍 Recherche</button>
@@ -2159,16 +2159,18 @@
                 </div>
             </div>
 
-            <!-- ONGLET BASE RG -->
+            <!-- ONGLET BASE RG & UT -->
         <div id="baserg" class="tab-content">
             <datalist id="rgDatalist"></datalist>
             <datalist id="rgNomDatalist"></datalist>
+            <datalist id="utDatalist"></datalist>
+            <datalist id="utNomDatalist"></datalist>
             <!-- IMPORT/EXPORT -->
             <div class="import-export-section">
-                <h4>🗂️ Gestion de la Base RG - Référentiel des Codes</h4>
+                <h4>🗂️ Gestion de la Base RG & UT - Référentiels</h4>
                 <div class="import-methods">
                     <div class="import-method">
-                        <h5>📁 Import fichier Excel</h5>
+                        <h5>📁 Import fichier RG</h5>
                         <p>Import de la base de référence des codes RG avec validation et détection des doublons.</p>
                         <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputBaserg" accept=".xlsx,.xls,.csv" onchange="handleFileImport('baserg', this)">
@@ -2179,17 +2181,41 @@
                     </div>
 
                     <div class="import-method">
+                        <h5>📁 Import fichier UT</h5>
+                        <p>Import de la base UT (code UT et nom UT) pour alimenter les remplissages intelligents.</p>
+                        <div class="file-drop-zone">
+                            <input type="file" class="file-input-hidden" id="fileInputBaseut" accept=".xlsx,.xls,.csv" onchange="handleFileImport('baseut', this)">
+                            <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📂</div>
+                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
+                            <div style="color: #666; font-size: 14px;">Deux colonnes : Code UT | Nom UT</div>
+                        </div>
+                    </div>
+
+                    <div class="import-method">
                         <h5>📋 Copier-Coller Excel</h5>
-                        <p>Mise à jour rapide de la base RG par copier-coller avec validation automatique.</p>
-                        <button class="btn btn-primary" onclick="togglePasteArea('baserg')">📋 Ouvrir zone de collage</button>
-                        
+                        <p>Mise à jour rapide des bases RG ou UT par copier-coller avec validation automatique.</p>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="togglePasteArea('baserg')">📋 Zone de collage RG</button>
+                            <button class="btn btn-secondary" onclick="togglePasteArea('baseut')">📋 Zone de collage UT</button>
+                        </div>
+
                         <div class="paste-area" id="pasteAreaBaserg">
                             <h5 style="margin-bottom: 15px; color: #2c3e50;">📋 Zone de collage Base RG</h5>
-                            <textarea class="paste-textarea" id="pasteTextareaBaserg" 
+                            <textarea class="paste-textarea" id="pasteTextareaBaserg"
                                       placeholder="Collez vos codes RG et leurs noms ici (format: Code | Nom)..."></textarea>
                             <div style="display: flex; gap: 10px;">
                                 <button class="btn btn-primary" onclick="analyzePastedData('baserg')">🔍 Analyser et prévisualiser</button>
                                 <button class="btn btn-danger" onclick="togglePasteArea('baserg')">❌ Annuler</button>
+                            </div>
+                        </div>
+
+                        <div class="paste-area" id="pasteAreaBaseut">
+                            <h5 style="margin-bottom: 15px; color: #2c3e50;">📋 Zone de collage Base UT</h5>
+                            <textarea class="paste-textarea" id="pasteTextareaBaseut"
+                                      placeholder="Collez vos codes UT et noms d'UT ici (format: Code UT | Nom UT)..."></textarea>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-primary" onclick="analyzePastedData('baseut')">🔍 Analyser et prévisualiser</button>
+                                <button class="btn btn-danger" onclick="togglePasteArea('baseut')">❌ Annuler</button>
                             </div>
                         </div>
                     </div>
@@ -2219,13 +2245,39 @@
                 </div>
             </div>
 
+            <div class="filters-section">
+                <h4>🔍 Recherche dans la Base UT</h4>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Code UT</label>
+                        <input type="text" id="filterBaseutCode" placeholder="Rechercher par code..." oninput="filterTable('baseut')">
+                    </div>
+                    <div class="filter-group">
+                        <label>Nom UT</label>
+                        <input type="text" id="filterBaseutNom" placeholder="Rechercher par nom..." oninput="filterTable('baseut')">
+                    </div>
+                    <div class="filter-group">
+                        <label>Statut d'utilisation</label>
+                        <select id="filterBaseutUsage" onchange="filterTable('baseut')">
+                            <option value="">Tous</option>
+                            <option value="utilise">Utilisé</option>
+                            <option value="inutilise">Non utilisé</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('baserg')">➕ Ajouter code RG</button>
+                <button class="btn btn-primary" onclick="addRow('baseut')">➕ Ajouter code UT</button>
                 <button class="btn btn-excel" onclick="exportToExcel('baserg')">📊 Exporter Base RG</button>
+                <button class="btn btn-excel" onclick="exportToExcel('baseut')">📊 Exporter Base UT</button>
                 <button class="btn btn-warning" onclick="validateAllRGCodes()">🔍 Vérifier codes RG dans tous les onglets</button>
                 <button class="btn btn-success" onclick="buildRGDatabase()">🔄 Reconstruire index RG</button>
+                <button class="btn btn-success" onclick="buildUTDatabase()">🔄 Reconstruire index UT</button>
                 <button class="btn btn-danger" onclick="clearAll('baserg')">🗑️ Effacer tout</button>
+                <button class="btn btn-danger" onclick="clearAll('baseut')">🗑️ Effacer Base UT</button>
             </div>
 
             <!-- TABLEAU BASE RG -->
@@ -2252,6 +2304,32 @@
                 <div class="stats-item">✅ Utilisés: <span id="basergUsedRows">0</span></div>
                 <div class="stats-item">⚠️ Non utilisés: <span id="basergUnusedRows">0</span></div>
                 <div class="stats-item">🔍 Taux d'utilisation: <span id="basergUsageRate">0%</span></div>
+            </div>
+
+            <!-- TABLEAU BASE UT -->
+            <div class="table-container">
+                <table id="baseutTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th style="width: 150px;">Code UT</th>
+                            <th style="width: 400px;">Nom UT</th>
+                            <th style="width: 100px;">Utilisations</th>
+                            <th style="width: 120px;">Dernière utilisation</th>
+                            <th style="width: 50px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="baseutTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- STATISTIQUES BASE UT -->
+            <div class="stats">
+                <div class="stats-item">📊 Total codes UT: <span id="baseutTotalRows">0</span></div>
+                <div class="stats-item">✅ Utilisés: <span id="baseutUsedRows">0</span></div>
+                <div class="stats-item">⚠️ Non utilisés: <span id="baseutUnusedRows">0</span></div>
+                <div class="stats-item">🔍 Taux d'utilisation: <span id="baseutUsageRate">0%</span></div>
             </div>
         </div>
 
@@ -2753,7 +2831,12 @@
             },
             baserg: {
                 columns: ['Code RG', 'Nom de RG', 'Utilisations', 'Dernière utilisation'],
-                displayName: 'Base RG',
+                displayName: 'Base RG & UT',
+                icon: '🗂️'
+            },
+            baseut: {
+                columns: ['Code UT', 'Nom UT', 'Utilisations', 'Dernière utilisation'],
+                displayName: 'Base UT',
                 icon: '🗂️'
             }
         };
@@ -2774,6 +2857,11 @@
                 pattern: /^\d+$/,
                 message: 'RG doit contenir uniquement des chiffres',
                 type: 'strict'
+            },
+            'Code UT': {
+                pattern: /^[A-Za-z0-9]+$/,
+                message: 'Code UT doit contenir des lettres ou chiffres',
+                type: 'flexible'
             },
          'Numéro Bail': {
                 pattern: /^\d{6}$/,
@@ -2810,6 +2898,7 @@
         // Variables globales
         let rowCounters = {};
         let rgDatabase = {};
+        let utDatabase = {};
         let columnSuggestions = {};
         let currentPreviewData = null;
         let currentTabForPreview = null;
@@ -2999,6 +3088,7 @@
                     updateStatsDashboard();
                 } else if (tabName === 'baserg') {
                     updateRGUsageStats();
+                    updateUTUsageStats();
                 } else if (tabName === 'taches') {
                     updateTasksStats();
                 } else if (tabName !== 'recherche') {
@@ -3287,6 +3377,22 @@
             return matchScore >= Math.min(2, firstRow.length * 0.3);
         }
 
+        function deriveInitialsFromName(rawValue) {
+            const parts = (rawValue || '')
+                .replace(/[^a-zA-Z\s'-]/g, ' ')
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean);
+
+            if (parts.length === 0) return '';
+            if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+
+            const lastWord = parts[parts.length - 1].charAt(0);
+            const firstWord = parts[0].charAt(0);
+
+            return `${lastWord}${firstWord}`.toUpperCase();
+        }
+
         function cleanCellValue(value, columnName) {
             if (!value && value !== 0) return '';
             
@@ -3319,7 +3425,8 @@
             } else if (columnName && (columnName.toLowerCase().includes('surface'))) {
                 cleanValue = cleanValue.replace(',', '.');
             } else if (columnName && (columnName.toLowerCase().includes('ga'))) {
-                cleanValue = cleanValue.toUpperCase();
+                const derived = cleanValue.length !== 2 ? deriveInitialsFromName(cleanValue) : '';
+                cleanValue = (cleanValue.length === 2 ? cleanValue : derived || cleanValue).toUpperCase();
             } else if (columnName && (columnName.toLowerCase().includes('état') || columnName.toLowerCase().includes('etat'))) {
                 cleanValue = cleanValue.toUpperCase();
                 if (cleanValue === 'ENCOURS' || cleanValue === 'EN_COURS') {
@@ -3342,12 +3449,17 @@
             const normalizedValue = value.toString().trim();
             const upperValue = normalizedValue.toUpperCase();
 
+            const allowedGAPhrases = ['TERTIAIRE', 'FERROVIAIRE', 'INDUSTRIELLE'];
             const rule = validationRules[columnName];
             if (rule) {
                 if (rule.pattern && value) {
                     if (!rule.pattern.test(value)) {
-                        validation.status = rule.type === 'flexible' ? 'warning' : 'error';
-                        validation.message = rule.message;
+                        if (columnName === 'GA' && allowedGAPhrases.includes(upperValue)) {
+                            validation.status = 'valid';
+                        } else {
+                            validation.status = rule.type === 'flexible' ? 'warning' : 'error';
+                            validation.message = rule.message;
+                        }
                     }
                 } else if (rule.values && value) {
                     const target = rule.values.map(v => v.toUpperCase());
@@ -3589,7 +3701,10 @@
                             let fixedValue = cellValue;
                             
                             if (columnName === 'GA' && cellValue.length !== 2) {
-                                if (cellValue.length > 2) {
+                                const derived = deriveInitialsFromName(cellValue);
+                                if (derived) {
+                                    fixedValue = derived;
+                                } else if (cellValue.length > 2) {
                                     fixedValue = cellValue.substring(0, 2).toUpperCase();
                                 } else if (cellValue.length === 1) {
                                     fixedValue = cellValue.toUpperCase() + 'X';
@@ -3835,7 +3950,17 @@ return;
                     input.addEventListener('input', () => updateRGDatabase());
                 } else if (tabName === 'baserg' && column === 'Nom de RG') {
                     input.addEventListener('input', () => updateRGDatabase());
+                } else if (tabName === 'baseut' && column === 'Code UT') {
+                    input.addEventListener('input', () => updateUTDatabase());
+                } else if (tabName === 'baseut' && column === 'Nom UT') {
+                    input.addEventListener('input', () => updateUTDatabase());
                 } else if (tabName === 'baserg' && (column === 'Utilisations' || column === 'Dernière utilisation')) {
+                    input.readOnly = true;
+                    input.style.backgroundColor = '#f8f9fa';
+                    if (column === 'Utilisations') {
+                        input.value = data[index] || '0';
+                    }
+                } else if (tabName === 'baseut' && (column === 'Utilisations' || column === 'Dernière utilisation')) {
                     input.readOnly = true;
                     input.style.backgroundColor = '#f8f9fa';
                     if (column === 'Utilisations') {
@@ -3851,6 +3976,9 @@ return;
                     setupRGAutoCompletion(input, row, tabName);
                 } else if (column === 'Nom de RG') {
                     setupNomRGAutoCompletion(input, row, tabName);
+                } else if (column === 'UT-BAT') {
+                    input.setAttribute('list', 'utDatalist');
+                    input.addEventListener('blur', () => autoFillNomFromUT(input.value, input, { commit: true }));
                 }
 
                 attachColumnAutocomplete(input, column);
@@ -3881,6 +4009,7 @@ return;
             row.appendChild(actionCell);
 
             applyIntelligentRGFill(row, tabName);
+            applyIntelligentUTFill(row, tabName);
 
             return row;
         }
@@ -3901,6 +4030,8 @@ return;
                 updateStats(tabName);
                 if (tabName === 'baserg') {
                     updateRGDatabase();
+                } else if (tabName === 'baseut') {
+                    updateUTDatabase();
                 }
                 logActivity(`Nouvelle ligne ajoutée dans ${getTabDisplayName(tabName)}`, 'info');
 
@@ -3935,9 +4066,13 @@ return;
                     updateStats(tabName);
                     if (tabName === 'baserg') {
                         updateRGDatabase();
+                    } else if (tabName === 'baseut') {
+                        updateUTDatabase();
                     }
                 } else if (tabName === 'baserg' && !skipValidation) {
                     updateRGDatabase();
+                } else if (tabName === 'baseut' && !skipValidation) {
+                    updateUTDatabase();
                 }
 
                 if (!skipLog) {
@@ -4057,6 +4192,8 @@ return;
         // 📊 STATISTIQUES COMPLÈTES
         function updateStats(tabName) {
             try {
+                if (tabName === 'baserg') { updateRGUsageStats(); return; }
+                if (tabName === 'baseut') { updateUTUsageStats(); return; }
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) return;
                 
@@ -4408,6 +4545,78 @@ return;
             }
         }
 
+        function updateUTUsageStats() {
+            try {
+                const tbody = document.getElementById('baseutTableBody');
+                if (!tbody) return;
+
+                const rows = tbody.querySelectorAll('tr');
+                const total = rows.length;
+                let used = 0;
+
+                const usageCounts = {};
+                const usageDates = {};
+
+                Object.keys(tabConfigs)
+                    .filter(tab => tab !== 'baserg' && tab !== 'baseut')
+                    .forEach(tabName => {
+                        const tabBody = document.getElementById(`${tabName}TableBody`);
+                        if (!tabBody) return;
+
+                        const tabRows = tabBody.querySelectorAll('tr');
+                        tabRows.forEach(row => {
+                            const inputs = row.querySelectorAll('input, textarea, select');
+                            const utIndex = tabConfigs[tabName].columns.indexOf('UT-BAT');
+                            const dateIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
+
+                            if (utIndex >= 0 && inputs[utIndex]) {
+                                const utValue = normalizeUTValue(inputs[utIndex].value);
+                                if (utValue) {
+                                    usageCounts[utValue] = (usageCounts[utValue] || 0) + 1;
+
+                                    if (dateIndex >= 0 && inputs[dateIndex] && inputs[dateIndex].value) {
+                                        const usageDate = reviveDate(inputs[dateIndex].value);
+                                        if (usageDate && (!usageDates[utValue] || usageDates[utValue] < usageDate)) {
+                                            usageDates[utValue] = usageDate;
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const codeIndex = 0;
+                    const usageIndex = 2;
+                    const dateIndex = 3;
+                    const code = inputs[codeIndex] ? normalizeUTValue(inputs[codeIndex].value) : '';
+
+                    if (code && usageCounts[code]) {
+                        used++;
+                        if (inputs[usageIndex]) inputs[usageIndex].value = usageCounts[code] || 0;
+                        if (inputs[dateIndex] && usageDates[code]) inputs[dateIndex].value = new Date(usageDates[code]).toISOString().split('T')[0];
+                        if (inputs[usageIndex]) inputs[usageIndex].readOnly = true;
+                        if (inputs[usageIndex]) inputs[usageIndex].style.backgroundColor = '#f8f9fa';
+                        if (inputs[dateIndex]) inputs[dateIndex].readOnly = true;
+                        if (inputs[dateIndex]) inputs[dateIndex].style.backgroundColor = '#f8f9fa';
+                    } else {
+                        if (inputs[usageIndex]) inputs[usageIndex].value = inputs[usageIndex].value || '0';
+                    }
+                });
+
+                const usageRate = total > 0 ? Math.round((used / total) * 100) : 0;
+
+                document.getElementById('baseutTotalRows').textContent = total;
+                document.getElementById('baseutUsedRows').textContent = used;
+                document.getElementById('baseutUnusedRows').textContent = total - used;
+                document.getElementById('baseutUsageRate').textContent = usageRate + '%';
+
+            } catch (error) {
+                console.error('Erreur stats usage UT:', error);
+            }
+        }
+
         function getTabStatistics() {
             const perTab = [];
             let totalGeneral = 0;
@@ -4415,7 +4624,7 @@ return;
             let attenteGeneral = 0;
 
             Object.keys(tabConfigs).forEach(tabName => {
-                if (tabName === 'baserg') return;
+                if (tabName === 'baserg' || tabName === 'baseut') return;
 
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) return;
@@ -4972,6 +5181,15 @@ return;
             return cleaned.replace(/^0+(?=[A-Z0-9])/, '');
         }
 
+        function normalizeUTValue(value) {
+            if (value === null || value === undefined) return '';
+            return value
+                .toString()
+                .trim()
+                .toUpperCase()
+                .replace(/[\s_\-]+/g, '');
+        }
+
         function updateRGDatabase() {
             try {
                 const tbody = document.getElementById('basergTableBody');
@@ -5005,6 +5223,39 @@ return;
             }
         }
 
+        function updateUTDatabase() {
+            try {
+                const tbody = document.getElementById('baseutTableBody');
+                if (!tbody) return;
+
+                utDatabase = {};
+                const rows = tbody.querySelectorAll('tr');
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const codeUT = inputs[0] ? inputs[0].value.trim() : '';
+                    const normalizedCode = normalizeUTValue(codeUT);
+                    const nomUT = inputs[1] ? inputs[1].value.trim() : '';
+
+                    if (normalizedCode) {
+                        utDatabase[normalizedCode] = {
+                            codeAffiche: codeUT || normalizedCode,
+                            nom: nomUT,
+                            utilisations: 0,
+                            derniereUtilisation: null
+                        };
+                    }
+                });
+
+                updateUTUsageStats();
+                refreshUTSuggestions();
+                applyIntelligentUTFillAll();
+
+            } catch (error) {
+                console.error('Erreur mise à jour base UT:', error);
+            }
+        }
+
         function ensureRGSuggestionLists() {
             let codeList = document.getElementById('rgDatalist');
             if (!codeList) {
@@ -5021,6 +5272,22 @@ return;
             }
         }
 
+        function ensureUTSuggestionLists() {
+            let codeList = document.getElementById('utDatalist');
+            if (!codeList) {
+                codeList = document.createElement('datalist');
+                codeList.id = 'utDatalist';
+                document.body.appendChild(codeList);
+            }
+
+            let nameList = document.getElementById('utNomDatalist');
+            if (!nameList) {
+                nameList = document.createElement('datalist');
+                nameList.id = 'utNomDatalist';
+                document.body.appendChild(nameList);
+            }
+        }
+
         function refreshRGSuggestions() {
             ensureRGSuggestionLists();
 
@@ -5031,6 +5298,30 @@ return;
             nameList.innerHTML = '';
 
             Object.entries(rgDatabase).forEach(([code, data]) => {
+                const option = document.createElement('option');
+                option.value = data.codeAffiche || code;
+                option.label = data.nom || '';
+                codeList.appendChild(option);
+
+                if (data.nom) {
+                    const nameOption = document.createElement('option');
+                    nameOption.value = data.nom;
+                    nameOption.label = code;
+                    nameList.appendChild(nameOption);
+                }
+            });
+        }
+
+        function refreshUTSuggestions() {
+            ensureUTSuggestionLists();
+
+            const codeList = document.getElementById('utDatalist');
+            const nameList = document.getElementById('utNomDatalist');
+
+            codeList.innerHTML = '';
+            nameList.innerHTML = '';
+
+            Object.entries(utDatabase).forEach(([code, data]) => {
                 const option = document.createElement('option');
                 option.value = data.codeAffiche || code;
                 option.label = data.nom || '';
@@ -5064,6 +5355,25 @@ return;
             return Object.keys(rgDatabase).find(code => normalizeRGValue(code) === normalized) || null;
         }
 
+        function findBestUTMatch(value) {
+            const normalized = normalizeUTValue(value || '');
+            if (!normalized) return null;
+            if (utDatabase[normalized]) return normalized;
+
+            const displayMatch = Object.entries(utDatabase).find(([, data]) => normalizeUTValue(data.codeAffiche) === normalized);
+            if (displayMatch) return displayMatch[0];
+
+            const startsWithMatch = Object.keys(utDatabase)
+                .find(code => normalizeUTValue(code).startsWith(normalized) || normalized.startsWith(normalizeUTValue(code)));
+            if (startsWithMatch) return startsWithMatch;
+
+            const partialMatch = Object.entries(utDatabase)
+                .find(([code, data]) => normalizeUTValue(code).includes(normalized) || normalizeUTValue(data.codeAffiche || '').includes(normalized));
+            if (partialMatch) return partialMatch[0];
+
+            return Object.keys(utDatabase).find(code => normalizeUTValue(code) === normalized) || null;
+        }
+
         function findBestRGNameMatch(value) {
             const normalized = (value || '').trim().toLowerCase();
             if (!normalized) return null;
@@ -5072,6 +5382,17 @@ return;
             if (match) return match[0];
 
             match = Object.entries(rgDatabase).find(([, data]) => (data.nom || '').toLowerCase().startsWith(normalized));
+            return match ? match[0] : null;
+        }
+
+        function findBestUTNameMatch(value) {
+            const normalized = (value || '').trim().toLowerCase();
+            if (!normalized) return null;
+
+            let match = Object.entries(utDatabase).find(([, data]) => (data.nom || '').toLowerCase() === normalized);
+            if (match) return match[0];
+
+            match = Object.entries(utDatabase).find(([, data]) => (data.nom || '').toLowerCase().startsWith(normalized));
             return match ? match[0] : null;
         }
 
@@ -5091,6 +5412,15 @@ return;
 
             const inputs = row.querySelectorAll('input, textarea, select');
             return inputs[rgIndex] || null;
+        }
+
+        function getUTInput(row, tabName) {
+            const columns = tabConfigs[tabName]?.columns || [];
+            const utIndex = columns.indexOf('UT-BAT');
+            if (utIndex < 0) return null;
+
+            const inputs = row.querySelectorAll('input, textarea, select');
+            return inputs[utIndex] || null;
         }
 
         let currentRGSuggestionPanel = null;
@@ -5152,6 +5482,38 @@ return;
             }
 
             return matchCode;
+        }
+
+        function autoFillNomFromUT(utValue, input, options = {}) {
+            if (Object.keys(utDatabase).length === 0) return null;
+
+            const match = findBestUTMatch(utValue);
+            if (!match) return null;
+
+            if (options.commit && input) {
+                input.value = utDatabase[match]?.codeAffiche || match;
+                addColumnSuggestion('UT-BAT', input.value);
+            } else if (input && !input.value && utDatabase[match]?.codeAffiche) {
+                input.placeholder = utDatabase[match].codeAffiche;
+            }
+
+            return match;
+        }
+
+        function autoFillUTFromName(nomValue, input, options = {}) {
+            if (Object.keys(utDatabase).length === 0) return null;
+
+            const match = findBestUTNameMatch(nomValue);
+            if (!match) return null;
+
+            if (options.commit && input) {
+                input.value = utDatabase[match]?.codeAffiche || match;
+                addColumnSuggestion('UT-BAT', input.value);
+            } else if (input && !input.value && utDatabase[match]?.codeAffiche) {
+                input.placeholder = utDatabase[match].codeAffiche;
+            }
+
+            return match;
         }
 
         function getRGSuggestionCandidates(value) {
@@ -5282,12 +5644,40 @@ return;
 
         function applyIntelligentRGFillAll() {
             Object.keys(tabConfigs).forEach(tabName => {
-                if (tabName === 'baserg') return;
+                if (tabName === 'baserg' || tabName === 'baseut') return;
 
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) return;
 
                 tbody.querySelectorAll('tr').forEach(row => applyIntelligentRGFill(row, tabName));
+            });
+        }
+
+        function applyIntelligentUTFill(row, tabName) {
+            if (tabName === 'baserg' || tabName === 'baseut') return;
+
+            const utInput = getUTInput(row, tabName);
+            if (!utInput) return;
+
+            if (utInput.value) {
+                const match = findBestUTMatch(utInput.value) || autoFillUTFromName(utInput.value, utInput, { commit: true });
+                if (match) {
+                    utInput.value = utDatabase[match]?.codeAffiche || match;
+                    addColumnSuggestion('UT-BAT', utInput.value);
+                }
+            } else if (utInput.dataset.nomUt) {
+                autoFillUTFromName(utInput.dataset.nomUt, utInput, { commit: true });
+            }
+        }
+
+        function applyIntelligentUTFillAll() {
+            Object.keys(tabConfigs).forEach(tabName => {
+                if (tabName === 'baserg' || tabName === 'baseut') return;
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                tbody.querySelectorAll('tr').forEach(row => applyIntelligentUTFill(row, tabName));
             });
         }
 
@@ -5416,6 +5806,17 @@ return;
             } catch (error) {
                 console.error('Erreur reconstruction base RG:', error);
                 showNotification('❌ Erreur lors de la reconstruction de l\'index RG', 'error');
+            }
+        }
+
+        function buildUTDatabase() {
+            try {
+                updateUTDatabase();
+                showNotification('🔄 Index UT reconstruit avec succès');
+                logActivity('Reconstruction de l\'index UT', 'success');
+            } catch (error) {
+                console.error('Erreur reconstruction base UT:', error);
+                showNotification('❌ Erreur lors de la reconstruction de l\'index UT', 'error');
             }
         }
 
@@ -5565,7 +5966,7 @@ return;
 
             try {
                 Object.keys(tabConfigs).forEach(tabName => {
-                    if (tabName === 'baserg') return;
+                    if (tabName === 'baserg' || tabName === 'baseut') return;
 
                     const tbody = document.getElementById(`${tabName}TableBody`);
                     if (!tbody) return;
@@ -5595,7 +5996,7 @@ return;
 
             try {
                 Object.keys(tabConfigs).forEach(tabName => {
-                    if (tabName === 'baserg') return;
+                    if (tabName === 'baserg' || tabName === 'baseut') return;
 
                     const tbody = document.getElementById(`${tabName}TableBody`);
                     if (!tbody) return;
@@ -6106,8 +6507,9 @@ function updateTabsChart() {
                 'Etat': 'État',
                 'Region': 'Région',
                 'Type': 'Type Modification',
-                'Code': 'Code RG',
-                'Nom': 'Nom de RG',
+                'Code': tabName === 'baseut' ? 'Code UT' : 'Code RG',
+                'Nom': tabName === 'baseut' ? 'Nom UT' : 'Nom de RG',
+                'Usage': 'Utilisations',
                 'Bail': 'Numéro de Bail',
                 'Lieu': 'Lieu'
             };
@@ -6150,8 +6552,8 @@ function updateTabsChart() {
                 
                 searchResults = [];
                 
-                const tabsToSearch = searchParams.tab ? [searchParams.tab] : 
-                    Object.keys(tabConfigs).filter(t => t !== 'baserg');
+                const tabsToSearch = searchParams.tab ? [searchParams.tab] :
+                    Object.keys(tabConfigs).filter(t => t !== 'baserg' && t !== 'baseut');
                 
                 tabsToSearch.forEach(tabName => {
                     const tbody = document.getElementById(`${tabName}TableBody`);
@@ -8105,6 +8507,7 @@ function updateTabsChart() {
         window.markAllAsOK = markAllAsOK;
         window.validateAllRGCodes = validateAllRGCodes;
         window.buildRGDatabase = buildRGDatabase;
+        window.buildUTDatabase = buildUTDatabase;
         window.recalculateAllSurfaces = recalculateAllSurfaces;
         window.exportCompleteBackup = exportCompleteBackup;
         window.importCompleteBackup = importCompleteBackup;
