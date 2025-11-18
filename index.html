@@ -3972,25 +3972,52 @@
             let normalizer = (value) => (value || '').toString().trim();
             let label = 'entrées';
 
-            if (currentTabForPreview === 'baseut' || (utIndex !== -1 && currentTabForPreview !== 'baserg')) {
-                codeIndex = utIndex;
-                normalizer = normalizeUTValue;
-                label = 'codes UT / UT-BAT';
-            } else if (currentTabForPreview === 'baserg' || rgIndex !== -1) {
-                codeIndex = rgIndex;
-                normalizer = normalizeRGValue;
-                label = 'codes RG';
-            } else {
-                const fallback = analyzeDataForCodes();
-                if (fallback) {
-                    codeIndex = fallback.index;
-                    normalizer = fallback.normalizer;
-                    label = fallback.label;
+            const fallback = () => {
+                const analyzed = analyzeDataForCodes();
+                if (!analyzed) return null;
+                return {
+                    codeIndex: analyzed.index,
+                    normalizer: analyzed.normalizer,
+                    label: analyzed.label
+                };
+            };
+
+            let detected = null;
+
+            if (currentTabForPreview === 'baseut') {
+                if (utIndex !== -1) {
+                    detected = { codeIndex: utIndex, normalizer: normalizeUTValue, label: 'codes UT / UT-BAT' };
                 } else {
-                    showNotification('ℹ️ Aucun code UT ou RG détecté pour trier et dédoublonner cette prévisualisation.', 'info');
-                    return null;
+                    detected = fallback();
                 }
             }
+
+            if (!detected && currentTabForPreview === 'baserg') {
+                if (rgIndex !== -1) {
+                    detected = { codeIndex: rgIndex, normalizer: normalizeRGValue, label: 'codes RG' };
+                } else {
+                    detected = fallback();
+                }
+            }
+
+            if (!detected && utIndex !== -1 && currentTabForPreview !== 'baserg') {
+                detected = { codeIndex: utIndex, normalizer: normalizeUTValue, label: 'codes UT / UT-BAT' };
+            }
+
+            if (!detected && rgIndex !== -1) {
+                detected = { codeIndex: rgIndex, normalizer: normalizeRGValue, label: 'codes RG' };
+            }
+
+            if (!detected) {
+                detected = fallback();
+            }
+
+            if (!detected || detected.codeIndex === -1) {
+                showNotification('❌ Impossible d’identifier la colonne code pour détecter les doublons', 'error');
+                return null;
+            }
+
+            ({ codeIndex, normalizer, label } = detected);
 
             if (codeIndex === -1) {
                 showNotification('❌ Impossible d’identifier la colonne code pour détecter les doublons', 'error');
