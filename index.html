@@ -376,7 +376,7 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            cursor: pointer;
+            pointer-events: none;
             z-index: 1;
         }
 
@@ -583,10 +583,10 @@
             background: rgba(255,255,255,0.85);
             border: 1px solid rgba(0,0,0,0.05);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 12px 14px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.04);
         }
 
@@ -608,6 +608,82 @@
             padding: 4px 8px;
             border-radius: 20px;
             background: rgba(102, 126, 234, 0.1);
+        }
+
+        .rg-change-header {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .rg-change-toggle {
+            border: 1px solid rgba(0,0,0,0.06);
+            background: #fff;
+            border-radius: 8px;
+            padding: 6px 8px;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+        .rg-change-toggle:hover {
+            background: #f4f5ff;
+            transform: translateY(-1px);
+        }
+
+        .rg-change-title {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .rg-change-title strong {
+            font-size: 15px;
+        }
+
+        .rg-change-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .rg-change-preview {
+            color: #4a5568;
+            font-size: 13px;
+            background: #f7f9ff;
+            border: 1px dashed #e2e7ff;
+            padding: 8px 10px;
+            border-radius: 8px;
+        }
+
+        .rg-change-body {
+            border-top: 1px solid #eef2ff;
+            padding-top: 8px;
+            display: none;
+        }
+
+        .rg-line-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .rg-line-row {
+            padding: 6px 8px;
+            border: 1px solid #eef2ff;
+            border-radius: 8px;
+            background: #fff;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .rg-line-row strong {
+            color: #2c3e50;
         }
 
         /* 📊 TABLEAU DE PRÉVISUALISATION */
@@ -1001,6 +1077,29 @@
             background: rgba(102, 126, 234, 0.2);
         }
 
+        .stats-search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .stats-search-row input {
+            flex: 1 1 240px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #dfe3ff;
+            font-size: 14px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .stats-search-row input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+        }
+
         /* 📊 DASHBOARD STATISTIQUES */
         .stats-dashboard {
             display: grid;
@@ -1014,6 +1113,10 @@
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .stats-card.collapsible {
+            padding: 18px;
         }
 
         .stats-card h3 {
@@ -1031,6 +1134,73 @@
             justify-content: space-between;
             gap: 10px;
             margin-bottom: 15px;
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+            padding: 6px 4px;
+        }
+
+        .collapsible-header .header-left {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .collapsible-header .header-texts {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .collapsible-header .header-title {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .collapsible-header .header-subtitle {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .collapsible-header .header-chip {
+            background: rgba(102, 126, 234, 0.12);
+            color: #667eea;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .stats-card.collapsible .stats-card-body {
+            margin-top: 12px;
+        }
+
+        .stats-card.collapsed .stats-card-body {
+            display: none;
+        }
+
+        .stats-card.collapsible .stat-toggle {
+            transform: rotate(0deg);
+        }
+
+        .stats-card.collapsible:not(.collapsed) .stat-toggle {
+            transform: rotate(90deg);
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .stats-empty-search {
+            text-align: center;
+            padding: 18px;
+            background: #f8f9ff;
+            border: 1px dashed #dfe3ff;
+            border-radius: 12px;
+            color: #556;
+            font-weight: 600;
         }
 
         .activity-list {
@@ -1270,7 +1440,7 @@
         <button class="tab" onclick="switchTab('autremodif')">🔧 Autre modification</button>
         <button class="tab" onclick="switchTab('modifsurface')">📐 Modification surface</button>
         <button class="tab" onclick="switchTab('verifbaux')">✅ Vérification baux</button>
-        <button class="tab" onclick="switchTab('baserg')">🗂️ Base RG</button>
+        <button class="tab" onclick="switchTab('baserg')">🗂️ Base RG & UT</button>
         <button class="tab" onclick="switchTab('taches')">📝 Tâches à faire</button>
         <button class="tab" onclick="switchTab('statistiques')">📊 Statistiques</button>
         <button class="tab" onclick="switchTab('recherche')">🔍 Recherche</button>
@@ -1321,7 +1491,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Glissez-déposez votre fichier Excel ou cliquez pour sélectionner. Validation automatique des données selon les règles SNCF.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('creation')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputCreation" accept=".xlsx,.xls,.csv" onchange="handleFileImport('creation', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -1439,7 +1609,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Import de fichiers Excel avec validation des codes RG, GA et numéros de bail.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('modification')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputModification" accept=".xlsx,.xls,.csv" onchange="handleFileImport('modification', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -1557,7 +1727,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Import de données de résiliation avec validation automatique GA et numéros de bail.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('resiliation')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputResiliation" accept=".xlsx,.xls,.csv" onchange="handleFileImport('resiliation', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -1673,7 +1843,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Import de données de modifications diverses avec validation automatique.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('autremodif')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputAutremodif" accept=".xlsx,.xls,.csv" onchange="handleFileImport('autremodif', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -1786,7 +1956,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Import avec calcul automatique des différences de surface. Les différences sont calculées automatiquement (+ - -).</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('modifsurface')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputModifsurface" accept=".xlsx,.xls,.csv" onchange="handleFileImport('modifsurface', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -1908,7 +2078,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Import avec validation stricte des états (OK/NOK/EN COURS) et vérification des codes RG contre la base.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('verifbaux')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputVerifbaux" accept=".xlsx,.xls,.csv" onchange="handleFileImport('verifbaux', this)">
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
                             <div style="color: #666; font-size: 14px;">Validation des états OK/NOK/EN COURS</div>
@@ -1989,18 +2159,20 @@
                 </div>
             </div>
 
-            <!-- ONGLET BASE RG -->
+            <!-- ONGLET BASE RG & UT -->
         <div id="baserg" class="tab-content">
             <datalist id="rgDatalist"></datalist>
             <datalist id="rgNomDatalist"></datalist>
+            <datalist id="utDatalist"></datalist>
+            <datalist id="utNomDatalist"></datalist>
             <!-- IMPORT/EXPORT -->
             <div class="import-export-section">
-                <h4>🗂️ Gestion de la Base RG - Référentiel des Codes</h4>
+                <h4>🗂️ Gestion de la Base RG & UT - Référentiels</h4>
                 <div class="import-methods">
                     <div class="import-method">
-                        <h5>📁 Import fichier Excel</h5>
+                        <h5>📁 Import fichier RG</h5>
                         <p>Import de la base de référence des codes RG avec validation et détection des doublons.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('baserg')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputBaserg" accept=".xlsx,.xls,.csv" onchange="handleFileImport('baserg', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -2009,17 +2181,41 @@
                     </div>
 
                     <div class="import-method">
+                        <h5>📁 Import fichier UT</h5>
+                        <p>Import de la base UT (code UT et nom UT) pour alimenter les remplissages intelligents.</p>
+                        <div class="file-drop-zone">
+                            <input type="file" class="file-input-hidden" id="fileInputBaseut" accept=".xlsx,.xls,.csv" onchange="handleFileImport('baseut', this)">
+                            <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📂</div>
+                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
+                            <div style="color: #666; font-size: 14px;">Deux colonnes : Code UT | Nom UT</div>
+                        </div>
+                    </div>
+
+                    <div class="import-method">
                         <h5>📋 Copier-Coller Excel</h5>
-                        <p>Mise à jour rapide de la base RG par copier-coller avec validation automatique.</p>
-                        <button class="btn btn-primary" onclick="togglePasteArea('baserg')">📋 Ouvrir zone de collage</button>
-                        
+                        <p>Mise à jour rapide des bases RG ou UT par copier-coller avec validation automatique.</p>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="togglePasteArea('baserg')">📋 Zone de collage RG</button>
+                            <button class="btn btn-secondary" onclick="togglePasteArea('baseut')">📋 Zone de collage UT</button>
+                        </div>
+
                         <div class="paste-area" id="pasteAreaBaserg">
                             <h5 style="margin-bottom: 15px; color: #2c3e50;">📋 Zone de collage Base RG</h5>
-                            <textarea class="paste-textarea" id="pasteTextareaBaserg" 
+                            <textarea class="paste-textarea" id="pasteTextareaBaserg"
                                       placeholder="Collez vos codes RG et leurs noms ici (format: Code | Nom)..."></textarea>
                             <div style="display: flex; gap: 10px;">
                                 <button class="btn btn-primary" onclick="analyzePastedData('baserg')">🔍 Analyser et prévisualiser</button>
                                 <button class="btn btn-danger" onclick="togglePasteArea('baserg')">❌ Annuler</button>
+                            </div>
+                        </div>
+
+                        <div class="paste-area" id="pasteAreaBaseut">
+                            <h5 style="margin-bottom: 15px; color: #2c3e50;">📋 Zone de collage Base UT</h5>
+                            <textarea class="paste-textarea" id="pasteTextareaBaseut"
+                                      placeholder="Collez vos codes UT et noms d'UT ici (format: Code UT | Nom UT)..."></textarea>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-primary" onclick="analyzePastedData('baseut')">🔍 Analyser et prévisualiser</button>
+                                <button class="btn btn-danger" onclick="togglePasteArea('baseut')">❌ Annuler</button>
                             </div>
                         </div>
                     </div>
@@ -2049,13 +2245,39 @@
                 </div>
             </div>
 
+            <div class="filters-section">
+                <h4>🔍 Recherche dans la Base UT</h4>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Code UT</label>
+                        <input type="text" id="filterBaseutCode" placeholder="Rechercher par code..." oninput="filterTable('baseut')">
+                    </div>
+                    <div class="filter-group">
+                        <label>Nom UT</label>
+                        <input type="text" id="filterBaseutNom" placeholder="Rechercher par nom..." oninput="filterTable('baseut')">
+                    </div>
+                    <div class="filter-group">
+                        <label>Statut d'utilisation</label>
+                        <select id="filterBaseutUsage" onchange="filterTable('baseut')">
+                            <option value="">Tous</option>
+                            <option value="utilise">Utilisé</option>
+                            <option value="inutilise">Non utilisé</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('baserg')">➕ Ajouter code RG</button>
+                <button class="btn btn-primary" onclick="addRow('baseut')">➕ Ajouter code UT</button>
                 <button class="btn btn-excel" onclick="exportToExcel('baserg')">📊 Exporter Base RG</button>
+                <button class="btn btn-excel" onclick="exportToExcel('baseut')">📊 Exporter Base UT</button>
                 <button class="btn btn-warning" onclick="validateAllRGCodes()">🔍 Vérifier codes RG dans tous les onglets</button>
                 <button class="btn btn-success" onclick="buildRGDatabase()">🔄 Reconstruire index RG</button>
+                <button class="btn btn-success" onclick="buildUTDatabase()">🔄 Reconstruire index UT</button>
                 <button class="btn btn-danger" onclick="clearAll('baserg')">🗑️ Effacer tout</button>
+                <button class="btn btn-danger" onclick="clearAll('baseut')">🗑️ Effacer Base UT</button>
             </div>
 
             <!-- TABLEAU BASE RG -->
@@ -2082,6 +2304,32 @@
                 <div class="stats-item">✅ Utilisés: <span id="basergUsedRows">0</span></div>
                 <div class="stats-item">⚠️ Non utilisés: <span id="basergUnusedRows">0</span></div>
                 <div class="stats-item">🔍 Taux d'utilisation: <span id="basergUsageRate">0%</span></div>
+            </div>
+
+            <!-- TABLEAU BASE UT -->
+            <div class="table-container">
+                <table id="baseutTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th style="width: 150px;">Code UT</th>
+                            <th style="width: 400px;">Nom UT</th>
+                            <th style="width: 100px;">Utilisations</th>
+                            <th style="width: 120px;">Dernière utilisation</th>
+                            <th style="width: 50px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="baseutTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- STATISTIQUES BASE UT -->
+            <div class="stats">
+                <div class="stats-item">📊 Total codes UT: <span id="baseutTotalRows">0</span></div>
+                <div class="stats-item">✅ Utilisés: <span id="baseutUsedRows">0</span></div>
+                <div class="stats-item">⚠️ Non utilisés: <span id="baseutUnusedRows">0</span></div>
+                <div class="stats-item">🔍 Taux d'utilisation: <span id="baseutUsageRate">0%</span></div>
             </div>
         </div>
 
@@ -2226,7 +2474,11 @@
         <!-- ONGLET STATISTIQUES -->
         <div id="statistiques" class="tab-content">
             <div class="stats-actions">
-                <div class="fun-badge">🎉 Stats ludiques activées</div>
+                <div class="fun-badge">Stats ludiques activées</div>
+                <div class="stats-search-row">
+                    <input type="text" id="statsSearch" placeholder="Rechercher un onglet de statistiques..." oninput="filterStatsCards(this.value)">
+                    <button class="btn btn-secondary btn-compact" onclick="filterStatsCards(document.getElementById('statsSearch').value)">🔎 Filtrer</button>
+                </div>
                 <div class="stat-chip-row">
                     <div class="stat-chip">
                         <div class="stat-chip-label">Progression globale</div>
@@ -2244,7 +2496,7 @@
                         <div class="stat-chip-subtext" id="chipQualitySummary">Pas d'alerte à signaler</div>
                     </div>
                 </div>
-                <button class="btn btn-excel" onclick="exportStatsReport()">📤 Exporter toutes les statistiques</button>
+                <button class="btn btn-excel" onclick="exportStatsReport()">📑 Exporter toutes les statistiques</button>
             </div>
 
             <!-- VUE D'ENSEMBLE -->
@@ -2302,22 +2554,27 @@
                 </div>
 
                 <div class="stats-card accent-card">
-                    <h3>🌀 Changements de RG surveillés</h3>
-                    <div id="rgChangeMood" class="stat-chip-subtext" style="margin-bottom: 10px;">Analyse en cours...</div>
-                    <div class="stat-chip-row" style="margin-bottom: 10px;">
-                        <div class="stat-chip">
-                            <div class="stat-chip-label">UT-BAT suivis</div>
-                            <div class="stat-chip-value" id="rgChangeUTBATCount">0</div>
-                            <div class="stat-chip-subtext">Présents dans les modifications RG</div>
-                        </div>
-                        <div class="stat-chip">
-                            <div class="stat-chip-label">Changements multiples</div>
-                            <div class="stat-chip-value" id="rgChangeMultiCount">0</div>
-                            <div class="stat-chip-subtext">UT-BAT modifiés plusieurs fois</div>
-                        </div>
+                    <div class="card-title-row">
+                        <h3>🌀 Changements de RG surveillés</h3>
+                        <button id="rgChangeToggleBtn" class="btn btn-secondary btn-compact" onclick="toggleRGChangePanel()">▾ Détails</button>
                     </div>
-                    <div class="rg-change-list" id="rgChangeDetails">
-                        <div style="color: #666;">Aucun UT-BAT avec modifications répétées pour le moment.</div>
+                    <div id="rgChangePanel">
+                        <div id="rgChangeMood" class="stat-chip-subtext" style="margin-bottom: 10px;">Analyse en cours...</div>
+                        <div class="stat-chip-row" style="margin-bottom: 10px;">
+                            <div class="stat-chip">
+                                <div class="stat-chip-label">UT-BAT suivis</div>
+                                <div class="stat-chip-value" id="rgChangeUTBATCount">0</div>
+                                <div class="stat-chip-subtext">Présents dans les modifications RG</div>
+                            </div>
+                            <div class="stat-chip">
+                                <div class="stat-chip-label">Changements multiples</div>
+                                <div class="stat-chip-value" id="rgChangeMultiCount">0</div>
+                                <div class="stat-chip-subtext">UT-BAT modifiés plusieurs fois</div>
+                            </div>
+                        </div>
+                        <div class="rg-change-list" id="rgChangeDetails">
+                            <div style="color: #666;">Aucun UT-BAT avec modifications répétées pour le moment.</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2325,6 +2582,10 @@
             <!-- STATISTIQUES PAR ONGLET -->
             <div class="stats-dashboard" id="individualStats">
                 <!-- Généré dynamiquement -->
+            </div>
+
+            <div id="statsSearchEmpty" class="stats-empty-search" style="display: none;">
+                🔍 Aucun onglet ne correspond à votre recherche.
             </div>
 
             <!-- GRAPHIQUES -->
@@ -2570,7 +2831,12 @@
             },
             baserg: {
                 columns: ['Code RG', 'Nom de RG', 'Utilisations', 'Dernière utilisation'],
-                displayName: 'Base RG',
+                displayName: 'Base RG & UT',
+                icon: '🗂️'
+            },
+            baseut: {
+                columns: ['Code UT', 'Nom UT', 'Utilisations', 'Dernière utilisation'],
+                displayName: 'Base UT',
                 icon: '🗂️'
             }
         };
@@ -2591,6 +2857,11 @@
                 pattern: /^\d+$/,
                 message: 'RG doit contenir uniquement des chiffres',
                 type: 'strict'
+            },
+            'Code UT': {
+                pattern: /^[A-Za-z0-9]+$/,
+                message: 'Code UT doit contenir des lettres ou chiffres',
+                type: 'flexible'
             },
          'Numéro Bail': {
                 pattern: /^\d{6}$/,
@@ -2627,6 +2898,7 @@
         // Variables globales
         let rowCounters = {};
         let rgDatabase = {};
+        let utDatabase = {};
         let columnSuggestions = {};
         let currentPreviewData = null;
         let currentTabForPreview = null;
@@ -2642,7 +2914,10 @@
         let activityLog = [];
         let activityDetailsExpanded = false;
         let qualityAlertsExpanded = false;
+        let rgChangePanelExpanded = true;
         let rgChangeRegistry = {};
+        let dismissedRGChanges = new Set();
+        let fileDialogLock = false;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -2750,6 +3025,22 @@
             updateRecentActivity();
         }
 
+        function toggleRGChangePanel() {
+            try {
+                rgChangePanelExpanded = !rgChangePanelExpanded;
+                const panel = document.getElementById('rgChangePanel');
+                const toggle = document.getElementById('rgChangeToggleBtn');
+                if (panel) {
+                    panel.style.display = rgChangePanelExpanded ? 'block' : 'none';
+                }
+                if (toggle) {
+                    toggle.textContent = `${rgChangePanelExpanded ? '▾' : '▸'} Détails`;
+                }
+            } catch (error) {
+                console.error('Erreur bascule panneau changements RG:', error);
+            }
+        }
+
         function showSaveStatus(message, type = 'success') {
             const status = document.getElementById('saveStatus');
             if (status) {
@@ -2797,6 +3088,7 @@
                     updateStatsDashboard();
                 } else if (tabName === 'baserg') {
                     updateRGUsageStats();
+                    updateUTUsageStats();
                 } else if (tabName === 'taches') {
                     updateTasksStats();
                 } else if (tabName !== 'recherche') {
@@ -2840,10 +3132,21 @@
         // 🚀 SYSTÈME IMPORT FICHIER CORRIGÉ
         function triggerFileInput(tabName) {
             const fileInput = document.getElementById(`fileInput${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
-            if (fileInput) {
-                // Supprimer les anciens event listeners pour éviter les doublons
-                fileInput.onclick = null;
+            openFilePicker(fileInput);
+        }
+
+        function openFilePicker(fileInput) {
+            if (!fileInput || fileDialogLock) return;
+
+            fileDialogLock = true;
+            fileInput.value = '';
+
+            try {
                 fileInput.click();
+            } finally {
+                setTimeout(() => {
+                    fileDialogLock = false;
+                }, 800);
             }
         }
 
@@ -2885,6 +3188,7 @@
                     currentPreviewData = await processImportData(jsonData, tabName);
                     currentTabForPreview = tabName;
 
+                    notifyImportDuplicates(currentPreviewData, tabName);
                     showPreview(tabName);
                     showNotification(`✅ Fichier "${file.name}" analysé avec succès`, 'success');
 
@@ -2946,6 +3250,7 @@
                 currentPreviewData = await processImportData(parsedData, tabName);
                 currentTabForPreview = tabName;
 
+                notifyImportDuplicates(currentPreviewData, tabName);
                 togglePasteArea(tabName);
                 showPreview(tabName);
                 showNotification(`✅ ${parsedData.length} ligne(s) analysée(s)`, 'success');
@@ -2971,7 +3276,9 @@
                             errors: 0,
                             warnings: 0,
                             total: 0
-                        }
+                        },
+                        utDuplicateCount: 0,
+                        utDuplicateCodes: []
                     };
 
                     if (rawData.length === 0) {
@@ -3040,6 +3347,73 @@
                             currentIndex = end;
                             setTimeout(processBatch, 0);
                         } else {
+                            if (tabName === 'baseut') {
+                                const codeIndex = processedData.headers.findIndex(h => h.toLowerCase().includes('code'));
+                                if (codeIndex !== -1) {
+                                    const utOccurrences = {};
+
+                                    processedData.rows.forEach(row => {
+                                        const normalized = normalizeUTValue(row.data[codeIndex]);
+                                        if (!normalized) return;
+                                        if (!utOccurrences[normalized]) {
+                                            utOccurrences[normalized] = [];
+                                        }
+                                        utOccurrences[normalized].push(row);
+                                    });
+
+                                    const duplicateCodes = [];
+                                    let duplicateRows = 0;
+
+                                    Object.entries(utOccurrences)
+                                        .filter(([, rows]) => rows.length > 1)
+                                        .forEach(([code, rows]) => {
+                                            duplicateCodes.push(code);
+                                            duplicateRows += rows.length;
+                                        });
+
+                                    processedData.utDuplicateCodes = duplicateCodes;
+                                    processedData.utDuplicateCount = duplicateRows;
+
+                                    if (duplicateCodes.length > 0) {
+                                        const duplicatesSet = new Set(duplicateCodes);
+                                        const seenCodes = new Set();
+                                        const filteredRows = [];
+
+                                        processedData.rows.forEach(row => {
+                                            const normalized = normalizeUTValue(row.data[codeIndex]);
+
+                                            if (normalized && duplicatesSet.has(normalized)) {
+                                                if (seenCodes.has(normalized)) {
+                                                    return; // Ignorer les doublons supplémentaires
+                                                }
+
+                                                seenCodes.add(normalized);
+                                                row.validations[codeIndex] = {
+                                                    status: 'warning',
+                                                    message: 'Code UT en double (doublons ignorés, un seul conservé)',
+                                                    originalValue: row.data[codeIndex]
+                                                };
+                                                row.hasWarnings = true;
+                                            }
+
+                                            filteredRows.push(row);
+                                        });
+
+                                        processedData.rows = filteredRows;
+                                        processedData.validationResults = { valid: 0, errors: 0, warnings: 0, total: filteredRows.length };
+
+                                        filteredRows.forEach(row => {
+                                            row.validations.forEach(validation => {
+                                                if (!validation) return;
+                                                if (validation.status === 'valid') processedData.validationResults.valid++;
+                                                if (validation.status === 'warning') processedData.validationResults.warnings++;
+                                                if (validation.status === 'error') processedData.validationResults.errors++;
+                                            });
+                                        });
+                                    }
+                                }
+                            }
+
                             resolve(processedData);
                         }
                     };
@@ -3052,6 +3426,19 @@
                     reject(error);
                 }
             });
+        }
+
+        function notifyImportDuplicates(previewData, tabName) {
+            if (tabName !== 'baseut' || !previewData) return;
+
+            const duplicateRows = previewData.utDuplicateCount || 0;
+            const duplicateCodes = previewData.utDuplicateCodes?.length || 0;
+
+            if (duplicateRows > 0) {
+                const message = `⚠️ ${duplicateCodes} code(s) UT apparaissent en double (${duplicateRows} ligne(s)). ` +
+                    'Les doublons ont été ignorés automatiquement : un seul exemplaire est conservé.';
+                showNotification(message, 'warning');
+            }
         }
 
         function detectHeaders(firstRow, expectedColumns) {
@@ -3072,6 +3459,22 @@
             }, 0);
             
             return matchScore >= Math.min(2, firstRow.length * 0.3);
+        }
+
+        function deriveInitialsFromName(rawValue) {
+            const parts = (rawValue || '')
+                .replace(/[^a-zA-Z\s'-]/g, ' ')
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean);
+
+            if (parts.length === 0) return '';
+            if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+
+            const lastWord = parts[parts.length - 1].charAt(0);
+            const firstWord = parts[0].charAt(0);
+
+            return `${lastWord}${firstWord}`.toUpperCase();
         }
 
         function cleanCellValue(value, columnName) {
@@ -3106,7 +3509,8 @@
             } else if (columnName && (columnName.toLowerCase().includes('surface'))) {
                 cleanValue = cleanValue.replace(',', '.');
             } else if (columnName && (columnName.toLowerCase().includes('ga'))) {
-                cleanValue = cleanValue.toUpperCase();
+                const derived = cleanValue.length !== 2 ? deriveInitialsFromName(cleanValue) : '';
+                cleanValue = (cleanValue.length === 2 ? cleanValue : derived || cleanValue).toUpperCase();
             } else if (columnName && (columnName.toLowerCase().includes('état') || columnName.toLowerCase().includes('etat'))) {
                 cleanValue = cleanValue.toUpperCase();
                 if (cleanValue === 'ENCOURS' || cleanValue === 'EN_COURS') {
@@ -3129,12 +3533,17 @@
             const normalizedValue = value.toString().trim();
             const upperValue = normalizedValue.toUpperCase();
 
+            const allowedGAPhrases = ['TERTIAIRE', 'FERROVIAIRE', 'INDUSTRIELLE'];
             const rule = validationRules[columnName];
             if (rule) {
                 if (rule.pattern && value) {
                     if (!rule.pattern.test(value)) {
-                        validation.status = rule.type === 'flexible' ? 'warning' : 'error';
-                        validation.message = rule.message;
+                        if (columnName === 'GA' && allowedGAPhrases.includes(upperValue)) {
+                            validation.status = 'valid';
+                        } else {
+                            validation.status = rule.type === 'flexible' ? 'warning' : 'error';
+                            validation.message = rule.message;
+                        }
                     }
                 } else if (rule.values && value) {
                     const target = rule.values.map(v => v.toUpperCase());
@@ -3376,7 +3785,10 @@
                             let fixedValue = cellValue;
                             
                             if (columnName === 'GA' && cellValue.length !== 2) {
-                                if (cellValue.length > 2) {
+                                const derived = deriveInitialsFromName(cellValue);
+                                if (derived) {
+                                    fixedValue = derived;
+                                } else if (cellValue.length > 2) {
                                     fixedValue = cellValue.substring(0, 2).toUpperCase();
                                 } else if (cellValue.length === 1) {
                                     fixedValue = cellValue.toUpperCase() + 'X';
@@ -3622,7 +4034,17 @@ return;
                     input.addEventListener('input', () => updateRGDatabase());
                 } else if (tabName === 'baserg' && column === 'Nom de RG') {
                     input.addEventListener('input', () => updateRGDatabase());
+                } else if (tabName === 'baseut' && column === 'Code UT') {
+                    input.addEventListener('input', () => updateUTDatabase());
+                } else if (tabName === 'baseut' && column === 'Nom UT') {
+                    input.addEventListener('input', () => updateUTDatabase());
                 } else if (tabName === 'baserg' && (column === 'Utilisations' || column === 'Dernière utilisation')) {
+                    input.readOnly = true;
+                    input.style.backgroundColor = '#f8f9fa';
+                    if (column === 'Utilisations') {
+                        input.value = data[index] || '0';
+                    }
+                } else if (tabName === 'baseut' && (column === 'Utilisations' || column === 'Dernière utilisation')) {
                     input.readOnly = true;
                     input.style.backgroundColor = '#f8f9fa';
                     if (column === 'Utilisations') {
@@ -3638,6 +4060,9 @@ return;
                     setupRGAutoCompletion(input, row, tabName);
                 } else if (column === 'Nom de RG') {
                     setupNomRGAutoCompletion(input, row, tabName);
+                } else if (column === 'UT-BAT') {
+                    input.setAttribute('list', 'utDatalist');
+                    input.addEventListener('blur', () => autoFillNomFromUT(input.value, input, { commit: true }));
                 }
 
                 attachColumnAutocomplete(input, column);
@@ -3668,6 +4093,7 @@ return;
             row.appendChild(actionCell);
 
             applyIntelligentRGFill(row, tabName);
+            applyIntelligentUTFill(row, tabName);
 
             return row;
         }
@@ -3688,6 +4114,8 @@ return;
                 updateStats(tabName);
                 if (tabName === 'baserg') {
                     updateRGDatabase();
+                } else if (tabName === 'baseut') {
+                    updateUTDatabase();
                 }
                 logActivity(`Nouvelle ligne ajoutée dans ${getTabDisplayName(tabName)}`, 'info');
 
@@ -3722,9 +4150,13 @@ return;
                     updateStats(tabName);
                     if (tabName === 'baserg') {
                         updateRGDatabase();
+                    } else if (tabName === 'baseut') {
+                        updateUTDatabase();
                     }
                 } else if (tabName === 'baserg' && !skipValidation) {
                     updateRGDatabase();
+                } else if (tabName === 'baseut' && !skipValidation) {
+                    updateUTDatabase();
                 }
 
                 if (!skipLog) {
@@ -3844,6 +4276,8 @@ return;
         // 📊 STATISTIQUES COMPLÈTES
         function updateStats(tabName) {
             try {
+                if (tabName === 'baserg') { updateRGUsageStats(); return; }
+                if (tabName === 'baseut') { updateUTUsageStats(); return; }
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) return;
                 
@@ -4195,6 +4629,78 @@ return;
             }
         }
 
+        function updateUTUsageStats() {
+            try {
+                const tbody = document.getElementById('baseutTableBody');
+                if (!tbody) return;
+
+                const rows = tbody.querySelectorAll('tr');
+                const total = rows.length;
+                let used = 0;
+
+                const usageCounts = {};
+                const usageDates = {};
+
+                Object.keys(tabConfigs)
+                    .filter(tab => tab !== 'baserg' && tab !== 'baseut')
+                    .forEach(tabName => {
+                        const tabBody = document.getElementById(`${tabName}TableBody`);
+                        if (!tabBody) return;
+
+                        const tabRows = tabBody.querySelectorAll('tr');
+                        tabRows.forEach(row => {
+                            const inputs = row.querySelectorAll('input, textarea, select');
+                            const utIndex = tabConfigs[tabName].columns.indexOf('UT-BAT');
+                            const dateIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
+
+                            if (utIndex >= 0 && inputs[utIndex]) {
+                                const utValue = normalizeUTValue(inputs[utIndex].value);
+                                if (utValue) {
+                                    usageCounts[utValue] = (usageCounts[utValue] || 0) + 1;
+
+                                    if (dateIndex >= 0 && inputs[dateIndex] && inputs[dateIndex].value) {
+                                        const usageDate = reviveDate(inputs[dateIndex].value);
+                                        if (usageDate && (!usageDates[utValue] || usageDates[utValue] < usageDate)) {
+                                            usageDates[utValue] = usageDate;
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const codeIndex = 0;
+                    const usageIndex = 2;
+                    const dateIndex = 3;
+                    const code = inputs[codeIndex] ? normalizeUTValue(inputs[codeIndex].value) : '';
+
+                    if (code && usageCounts[code]) {
+                        used++;
+                        if (inputs[usageIndex]) inputs[usageIndex].value = usageCounts[code] || 0;
+                        if (inputs[dateIndex] && usageDates[code]) inputs[dateIndex].value = new Date(usageDates[code]).toISOString().split('T')[0];
+                        if (inputs[usageIndex]) inputs[usageIndex].readOnly = true;
+                        if (inputs[usageIndex]) inputs[usageIndex].style.backgroundColor = '#f8f9fa';
+                        if (inputs[dateIndex]) inputs[dateIndex].readOnly = true;
+                        if (inputs[dateIndex]) inputs[dateIndex].style.backgroundColor = '#f8f9fa';
+                    } else {
+                        if (inputs[usageIndex]) inputs[usageIndex].value = inputs[usageIndex].value || '0';
+                    }
+                });
+
+                const usageRate = total > 0 ? Math.round((used / total) * 100) : 0;
+
+                document.getElementById('baseutTotalRows').textContent = total;
+                document.getElementById('baseutUsedRows').textContent = used;
+                document.getElementById('baseutUnusedRows').textContent = total - used;
+                document.getElementById('baseutUsageRate').textContent = usageRate + '%';
+
+            } catch (error) {
+                console.error('Erreur stats usage UT:', error);
+            }
+        }
+
         function getTabStatistics() {
             const perTab = [];
             let totalGeneral = 0;
@@ -4202,7 +4708,7 @@ return;
             let attenteGeneral = 0;
 
             Object.keys(tabConfigs).forEach(tabName => {
-                if (tabName === 'baserg') return;
+                if (tabName === 'baserg' || tabName === 'baseut') return;
 
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) return;
@@ -4263,55 +4769,80 @@ return;
                 const gaIndex = tabConfigs['modification'].columns.indexOf('GA');
                 const rows = tbody.querySelectorAll('tr');
                 const utbatMap = {};
-                const detailMap = {};
+                const linesByUtbat = {};
 
                 rows.forEach((row, rowIndex) => {
                     const inputs = row.querySelectorAll('input, textarea, select');
-                    const utbat = inputs[utbatIndex] ? inputs[utbatIndex].value.trim() : '';
+                    const utbatRaw = inputs[utbatIndex] ? inputs[utbatIndex].value.trim() : '';
+                    const utbat = utbatRaw.toUpperCase();
                     const rgValue = inputs[rgIndex] ? inputs[rgIndex].value.trim() : '';
                     const bailValue = bailIndex >= 0 && inputs[bailIndex] ? inputs[bailIndex].value.trim() : '';
+                    const bailKey = bailValue.trim().toUpperCase();
                     const gaValue = gaIndex >= 0 && inputs[gaIndex] ? inputs[gaIndex].value.trim() : '';
 
-                    if (!utbat) return;
+                    if (!utbat || dismissedRGChanges.has(utbat)) return;
 
                     if (!utbatMap[utbat]) {
-                        utbatMap[utbat] = { count: 0, rgs: new Set() };
+                        utbatMap[utbat] = { bails: {} };
                     }
 
-                    if (!detailMap[utbat]) {
-                        detailMap[utbat] = [];
+                    const bailGroup = bailKey || '__NO_BAIL__';
+                    if (!utbatMap[utbat].bails[bailGroup]) {
+                        utbatMap[utbat].bails[bailGroup] = { count: 0, rgs: new Set(), displayBail: bailValue };
                     }
 
-                    utbatMap[utbat].count++;
+                    utbatMap[utbat].bails[bailGroup].count++;
                     if (rgValue) {
-                        utbatMap[utbat].rgs.add(rgValue);
+                        utbatMap[utbat].bails[bailGroup].rgs.add(rgValue);
                     }
 
-                    detailMap[utbat].push({
+                    if (!linesByUtbat[utbat]) {
+                        linesByUtbat[utbat] = [];
+                    }
+
+                    linesByUtbat[utbat].push({
                         tabName: 'modification',
                         rowIndex,
                         utbat,
+                        utbatDisplay: utbatRaw || utbat,
                         rg: rgValue,
                         bail: bailValue,
+                        bailKey: bailGroup,
                         ga: gaValue
                     });
                 });
 
-                const multiChanges = Object.entries(utbatMap).filter(([, value]) => value.count > 1 || value.rgs.size > 1);
+                const detailMap = {};
+                const multiChanges = [];
+
+                Object.entries(utbatMap).forEach(([utbat, meta]) => {
+                    const bailEntries = Object.entries(meta.bails).filter(([bailKey, stats]) =>
+                        bailKey !== '__NO_BAIL__' && (stats.count > 1 || stats.rgs.size > 1)
+                    );
+
+                    if (bailEntries.length === 0) return;
+
+                    const allowedBails = new Set(bailEntries.map(([bailKey]) => bailKey));
+                    detailMap[utbat] = (linesByUtbat[utbat] || []).filter(line => allowedBails.has(line.bailKey));
+
+                    bailEntries.forEach(([bailKey, stats]) => {
+                        multiChanges.push({
+                            utbat,
+                            bail: stats.displayBail || (bailKey === '__NO_BAIL__' ? 'Bail manquant' : bailKey),
+                            occurrences: stats.count,
+                            variations: stats.rgs.size
+                        });
+                    });
+                });
+
                 const topChanges = multiChanges
-                    .map(([utbat, value]) => ({
-                        utbat,
-                        occurrences: value.count,
-                        variations: value.rgs.size
-                    }))
-                    .sort((a, b) => (b.occurrences - a.occurrences) || (b.variations - a.variations))
-                    .slice(0, 5);
+                    .sort((a, b) => (b.occurrences - a.occurrences) || (b.variations - a.variations));
 
                 rgChangeRegistry = detailMap;
 
                 return {
                     totalEntries: rows.length,
-                    utbatCount: Object.keys(utbatMap).length,
+                    utbatCount: Object.keys(detailMap).length,
                     multiCount: multiChanges.length,
                     topChanges,
                     details: detailMap
@@ -4329,9 +4860,19 @@ return;
                 const multiElement = document.getElementById('rgChangeMultiCount');
                 const moodElement = document.getElementById('rgChangeMood');
                 const listContainer = document.getElementById('rgChangeDetails');
+                const panel = document.getElementById('rgChangePanel');
+                const toggle = document.getElementById('rgChangeToggleBtn');
 
                 if (utbatElement) utbatElement.textContent = data.utbatCount;
                 if (multiElement) multiElement.textContent = data.multiCount;
+
+                if (panel) {
+                    panel.style.display = rgChangePanelExpanded ? 'block' : 'none';
+                }
+
+                if (toggle) {
+                    toggle.textContent = `${rgChangePanelExpanded ? '▾' : '▸'} Détails`;
+                }
 
                 if (moodElement) {
                     if (data.multiCount === 0) {
@@ -4359,35 +4900,88 @@ return;
                 exportAllBtn.onclick = () => exportRGChanges();
                 listContainer.appendChild(exportAllBtn);
 
+
                 data.topChanges.forEach(change => {
                     const item = document.createElement('div');
                     item.className = 'rg-change-item';
                     const details = rgChangeRegistry[change.utbat] || [];
-                    const linesPreview = details.slice(0, 3).map(line => {
+
+                    const previewLines = details.slice(0, 2).map(line => {
                         const parts = [`L${line.rowIndex + 1}`];
                         if (line.ga) parts.push(`GA ${line.ga}`);
-                        if (line.bail) parts.push(`Bail ${line.bail}`);
-                        return `<small style="color:#555;">${parts.join(' • ')}${line.rg ? ` • RG ${line.rg}` : ''}</small>`;
-                    }).join('<br>');
+                        parts.push(line.bail ? `Bail ${line.bail}` : 'Bail manquant');
+                        return `${parts.join(' • ')}${line.rg ? ` • RG ${line.rg}` : ''}`;
+                    }).join(' | ');
 
-                    item.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; gap:6px; align-items:center; flex-wrap:wrap;">
-                            <div>
-                                <div style="font-weight: 700;">UT-BAT ${change.utbat}</div>
-                                <div class="rg-change-meta">
-                                    <span>🔁 ${change.occurrences} passages</span>
-                                    <span>🎭 ${change.variations} RG distincts</span>
-                                </div>
-                            </div>
-                            <div style="display:flex; gap:6px;">
-                                <button class="btn btn-secondary btn-compact" onclick="focusRGChange('${change.utbat}')">🔎 Voir les lignes</button>
-                                <button class="btn btn-excel btn-compact" onclick="exportRGChange('${change.utbat}')">📑 Export</button>
-                            </div>
+                    const header = document.createElement('div');
+                    header.className = 'rg-change-header';
+
+                    const toggleBtn = document.createElement('button');
+                    toggleBtn.className = 'rg-change-toggle';
+                    toggleBtn.textContent = '▸';
+
+                    const title = document.createElement('div');
+                    title.className = 'rg-change-title';
+                    title.innerHTML = `
+                        <strong>UT-BAT ${change.utbat}</strong>
+                        <div class="rg-change-meta">
+                            <span>🔁 ${change.occurrences} passages</span>
+                            <span>🎭 ${change.variations} RG distincts</span>
+                            <span>🏷️ Bail ${change.bail || 'non renseigné'}</span>
                         </div>
-                        ${linesPreview ? `<div style="margin-top:6px;">${linesPreview}</div>` : ''}
                     `;
+
+                    const actions = document.createElement('div');
+                    actions.className = 'rg-change-actions';
+
+                    const btnVoir = document.createElement('button');
+                    btnVoir.className = 'btn btn-secondary btn-compact';
+                    btnVoir.textContent = '🔎 Voir les lignes';
+                    btnVoir.onclick = () => focusRGChange(change.utbat);
+
+                    const btnDismiss = document.createElement('button');
+                    btnDismiss.className = 'btn btn-warning btn-compact';
+                    btnDismiss.textContent = '🗂️ Retirer le doublon';
+                    btnDismiss.onclick = () => dismissRGChange(change.utbat);
+
+                    const btnExport = document.createElement('button');
+                    btnExport.className = 'btn btn-excel btn-compact';
+                    btnExport.textContent = '📑 Export';
+                    btnExport.onclick = () => exportRGChange(change.utbat);
+
+                    actions.append(btnVoir, btnDismiss, btnExport);
+
+                    header.append(toggleBtn, title, actions);
+
+                    const preview = document.createElement('div');
+                    preview.className = 'rg-change-preview';
+                    preview.innerHTML = `<strong>${details.length}</strong> ligne(s) concernées${previewLines ? ` • ${previewLines}` : ''}`;
+
+                    const fullDetails = document.createElement('div');
+                    fullDetails.className = 'rg-change-body';
+                    fullDetails.innerHTML = details.length === 0
+                        ? '<div style="color:#666;">Aucun détail disponible</div>'
+                        : `<div class="rg-line-list">${details.map(line => {
+                            const parts = [`<strong>L${line.rowIndex + 1}</strong>`];
+                            if (line.ga) parts.push(`<span>GA ${line.ga}</span>`);
+                            parts.push(`<span>${line.bail ? `Bail ${line.bail}` : 'Bail manquant'}</span>`);
+                            if (line.rg) parts.push(`<span>RG ${line.rg}</span>`);
+                            return `<div class=\"rg-line-row\">${parts.join(' • ')}<\/div>`;
+                        }).join('')}</div>`;
+
+                    const toggleDetails = () => {
+                        const expanded = fullDetails.style.display === 'block';
+                        fullDetails.style.display = expanded ? 'none' : 'block';
+                        toggleBtn.textContent = expanded ? '▸' : '▾';
+                    };
+
+                    toggleBtn.onclick = toggleDetails;
+                    preview.onclick = toggleDetails;
+
+                    item.append(header, preview, fullDetails);
                     listContainer.appendChild(item);
                 });
+
             } catch (error) {
                 console.error('Erreur mise à jour suivi changements RG:', error);
             }
@@ -4395,32 +4989,126 @@ return;
 
         function focusRGChange(utbat) {
             try {
-                const lines = rgChangeRegistry[utbat] || [];
+                const normalized = (utbat || '').trim().toUpperCase();
+                const lines = (rgChangeRegistry[normalized] || []).slice();
                 if (lines.length === 0) {
                     showNotification('ℹ️ Aucune ligne repérée pour cet UT-BAT');
                     return;
                 }
 
-                const targetLine = lines[0];
-                switchTab(targetLine.tabName || 'modification');
+                // Bascule directement sur l'onglet Recherche pour afficher la liste complète
+                switchTab('recherche');
 
-                requestAnimationFrame(() => {
-                    const tbody = document.getElementById(`${targetLine.tabName}TableBody`);
+                const sortedLines = lines.sort((a, b) => a.rowIndex - b.rowIndex);
+                const preparedResults = [];
+                const startTime = performance.now();
+
+                sortedLines.forEach(line => {
+                    const tbody = document.getElementById(`${line.tabName}TableBody`);
                     if (!tbody) return;
 
                     const rows = tbody.querySelectorAll('tr');
-                    const row = rows[targetLine.rowIndex];
+                    const row = rows[line.rowIndex];
                     if (!row) return;
 
-                    row.classList.add('pending-highlight');
-                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    const focusable = row.querySelector('input, textarea, select');
-                    if (focusable) focusable.focus();
-                    setTimeout(() => row.classList.remove('pending-highlight'), 2000);
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const rowData = Array.from(inputs).map(input => input.value);
+
+                    preparedResults.push({
+                        tabName: line.tabName,
+                        tabDisplayName: getTabDisplayName(line.tabName),
+                        rowIndex: line.rowIndex,
+                        data: rowData,
+                        columns: tabConfigs[line.tabName]?.columns || []
+                    });
                 });
+
+                if (preparedResults.length === 0) {
+                    showNotification('ℹ️ Impossible de charger les lignes concernées');
+                    return;
+                }
+
+                const searchParams = {
+                    ga: '',
+                    rg: '',
+                    utbat: normalized.toLowerCase(),
+                    bail: '',
+                    advancedBail: '',
+                    dateFrom: '',
+                    dateTo: '',
+                    tab: sortedLines[0].tabName || 'modification',
+                    keyword: 'changement rg surveillé'
+                };
+
+                searchResults = preparedResults;
+                const searchTime = Math.round(performance.now() - startTime);
+                displaySearchResults(searchTime, searchParams);
+
+                const resultsContainer = document.getElementById('searchResults');
+                if (resultsContainer) {
+                    resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+
+                showNotification(`🔎 ${preparedResults.length} ligne(s) pour UT-BAT ${normalized}`);
             } catch (error) {
                 console.error('Erreur navigation changement RG:', error);
+                showNotification('❌ Erreur lors de la navigation', 'error');
             }
+        }
+
+        function dismissRGChange(utbat) {
+            try {
+                const normalized = (utbat || '').trim().toUpperCase();
+                if (!normalized) return;
+
+                dismissedRGChanges.add(normalized);
+
+                if (rgChangeRegistry[normalized]) {
+                    delete rgChangeRegistry[normalized];
+                }
+
+                const refreshedInsights = getRGChangeInsights();
+                updateRGChangeWidget(refreshedInsights);
+                updateStatChips(getTabStatistics().general, refreshedInsights, getQualityCounts());
+                saveAllData();
+
+                showNotification(`✅ UT-BAT ${normalized} retiré des doublons après vérification`);
+            } catch (error) {
+                console.error('Erreur suppression doublon RG:', error);
+                showNotification('❌ Impossible de retirer ce doublon', 'error');
+            }
+        }
+
+        function getCompleteRGChangeDetails() {
+            const latestDetails = getRGChangeInsights().details || {};
+            const merged = {};
+
+            const mergeSource = (source) => {
+                Object.entries(source || {}).forEach(([utbat, lines]) => {
+                    const key = (utbat || '').trim().toUpperCase();
+                    if (!key) return;
+                    if (!merged[key]) merged[key] = [];
+                    merged[key].push(...(lines || []));
+                });
+            };
+
+            mergeSource(rgChangeRegistry);
+            mergeSource(latestDetails);
+
+            Object.entries(merged).forEach(([utbat, lines]) => {
+                const seen = new Set();
+                merged[utbat] = (lines || [])
+                    .filter(line => line && typeof line.rowIndex === 'number')
+                    .sort((a, b) => a.rowIndex - b.rowIndex)
+                    .filter(line => {
+                        const key = `${line.tabName || 'modification'}-${line.rowIndex}`;
+                        if (seen.has(key)) return false;
+                        seen.add(key);
+                        return true;
+                    });
+            });
+
+            return merged;
         }
 
         function exportRGChange(utbat) {
@@ -4430,7 +5118,10 @@ return;
                     return;
                 }
 
-                const lines = rgChangeRegistry[utbat] || [];
+                const normalized = (utbat || '').trim().toUpperCase();
+                const detailMap = getCompleteRGChangeDetails();
+                const lines = (detailMap[normalized] || []).slice();
+
                 if (lines.length === 0) {
                     showNotification('ℹ️ Aucun détail à exporter pour cet UT-BAT');
                     return;
@@ -4446,10 +5137,10 @@ return;
 
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.json_to_sheet(rows);
-                XLSX.utils.book_append_sheet(wb, ws, `UTBAT_${utbat}`.substring(0, 31));
-                const fileName = `Changements_RG_${utbat}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.utils.book_append_sheet(wb, ws, `UTBAT_${normalized}`.substring(0, 31));
+                const fileName = `Changements_RG_${normalized}_${new Date().toISOString().split('T')[0]}.xlsx`;
                 XLSX.writeFile(wb, fileName);
-                showNotification(`📤 Export des changements RG pour ${utbat}`);
+                showNotification(`📤 Export des changements RG pour ${normalized} (${rows.length} ligne(s))`);
             } catch (error) {
                 console.error('Erreur export changement RG:', error);
                 showNotification('❌ Erreur export changement RG', 'error');
@@ -4463,16 +5154,19 @@ return;
                     return;
                 }
 
-                const entries = Object.entries(rgChangeRegistry || {});
+                const detailMap = getCompleteRGChangeDetails();
+                const entries = Object.entries(detailMap).filter(([, lines]) => (lines || []).length > 0);
                 if (entries.length === 0) {
                     showNotification('ℹ️ Aucun changement RG surveillé à exporter');
                     return;
                 }
 
                 const wb = XLSX.utils.book_new();
+                const globalRows = [];
 
                 entries.forEach(([utbat, lines]) => {
-                    const rows = lines.map(line => ({
+                    const ordered = (lines || []).slice().sort((a, b) => a.rowIndex - b.rowIndex);
+                    const rows = ordered.map(line => ({
                         "UT-BAT": line.utbat,
                         "Ligne": line.rowIndex + 1,
                         "GA": line.ga || '',
@@ -4480,13 +5174,24 @@ return;
                         "RG": line.rg || ''
                     }));
 
+                    globalRows.push(...rows);
+
                     const ws = XLSX.utils.json_to_sheet(rows);
                     XLSX.utils.book_append_sheet(wb, ws, `UTBAT_${utbat}`.substring(0, 31));
                 });
 
+                const orderedGlobalRows = globalRows.slice().sort((a, b) => {
+                    return (a["UT-BAT"] || '').localeCompare(b["UT-BAT"] || '')
+                        || (a["Numéro de Bail"] || '').localeCompare(b["Numéro de Bail"] || '')
+                        || ((a["Ligne"] || 0) - (b["Ligne"] || 0));
+                });
+
+                const summarySheet = XLSX.utils.json_to_sheet(orderedGlobalRows);
+                XLSX.utils.book_append_sheet(wb, summarySheet, 'Doublons');
+
                 const fileName = `Changements_RG_surveilles_${new Date().toISOString().split('T')[0]}.xlsx`;
                 XLSX.writeFile(wb, fileName);
-                showNotification(`📊 Export des changements RG surveillés généré (${entries.length} UT-BAT)`);
+                showNotification(`📊 Export des changements RG surveillés généré (${entries.length} UT-BAT, ${globalRows.length} ligne(s))`);
             } catch (error) {
                 console.error('Erreur export global changements RG:', error);
                 showNotification('❌ Erreur export global RG', 'error');
@@ -4560,6 +5265,15 @@ return;
             return cleaned.replace(/^0+(?=[A-Z0-9])/, '');
         }
 
+        function normalizeUTValue(value) {
+            if (value === null || value === undefined) return '';
+            return value
+                .toString()
+                .trim()
+                .toUpperCase()
+                .replace(/[\s_\-]+/g, '');
+        }
+
         function updateRGDatabase() {
             try {
                 const tbody = document.getElementById('basergTableBody');
@@ -4593,6 +5307,39 @@ return;
             }
         }
 
+        function updateUTDatabase() {
+            try {
+                const tbody = document.getElementById('baseutTableBody');
+                if (!tbody) return;
+
+                utDatabase = {};
+                const rows = tbody.querySelectorAll('tr');
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const codeUT = inputs[0] ? inputs[0].value.trim() : '';
+                    const normalizedCode = normalizeUTValue(codeUT);
+                    const nomUT = inputs[1] ? inputs[1].value.trim() : '';
+
+                    if (normalizedCode) {
+                        utDatabase[normalizedCode] = {
+                            codeAffiche: codeUT || normalizedCode,
+                            nom: nomUT,
+                            utilisations: 0,
+                            derniereUtilisation: null
+                        };
+                    }
+                });
+
+                updateUTUsageStats();
+                refreshUTSuggestions();
+                applyIntelligentUTFillAll();
+
+            } catch (error) {
+                console.error('Erreur mise à jour base UT:', error);
+            }
+        }
+
         function ensureRGSuggestionLists() {
             let codeList = document.getElementById('rgDatalist');
             if (!codeList) {
@@ -4609,6 +5356,22 @@ return;
             }
         }
 
+        function ensureUTSuggestionLists() {
+            let codeList = document.getElementById('utDatalist');
+            if (!codeList) {
+                codeList = document.createElement('datalist');
+                codeList.id = 'utDatalist';
+                document.body.appendChild(codeList);
+            }
+
+            let nameList = document.getElementById('utNomDatalist');
+            if (!nameList) {
+                nameList = document.createElement('datalist');
+                nameList.id = 'utNomDatalist';
+                document.body.appendChild(nameList);
+            }
+        }
+
         function refreshRGSuggestions() {
             ensureRGSuggestionLists();
 
@@ -4619,6 +5382,30 @@ return;
             nameList.innerHTML = '';
 
             Object.entries(rgDatabase).forEach(([code, data]) => {
+                const option = document.createElement('option');
+                option.value = data.codeAffiche || code;
+                option.label = data.nom || '';
+                codeList.appendChild(option);
+
+                if (data.nom) {
+                    const nameOption = document.createElement('option');
+                    nameOption.value = data.nom;
+                    nameOption.label = code;
+                    nameList.appendChild(nameOption);
+                }
+            });
+        }
+
+        function refreshUTSuggestions() {
+            ensureUTSuggestionLists();
+
+            const codeList = document.getElementById('utDatalist');
+            const nameList = document.getElementById('utNomDatalist');
+
+            codeList.innerHTML = '';
+            nameList.innerHTML = '';
+
+            Object.entries(utDatabase).forEach(([code, data]) => {
                 const option = document.createElement('option');
                 option.value = data.codeAffiche || code;
                 option.label = data.nom || '';
@@ -4652,6 +5439,25 @@ return;
             return Object.keys(rgDatabase).find(code => normalizeRGValue(code) === normalized) || null;
         }
 
+        function findBestUTMatch(value) {
+            const normalized = normalizeUTValue(value || '');
+            if (!normalized) return null;
+            if (utDatabase[normalized]) return normalized;
+
+            const displayMatch = Object.entries(utDatabase).find(([, data]) => normalizeUTValue(data.codeAffiche) === normalized);
+            if (displayMatch) return displayMatch[0];
+
+            const startsWithMatch = Object.keys(utDatabase)
+                .find(code => normalizeUTValue(code).startsWith(normalized) || normalized.startsWith(normalizeUTValue(code)));
+            if (startsWithMatch) return startsWithMatch;
+
+            const partialMatch = Object.entries(utDatabase)
+                .find(([code, data]) => normalizeUTValue(code).includes(normalized) || normalizeUTValue(data.codeAffiche || '').includes(normalized));
+            if (partialMatch) return partialMatch[0];
+
+            return Object.keys(utDatabase).find(code => normalizeUTValue(code) === normalized) || null;
+        }
+
         function findBestRGNameMatch(value) {
             const normalized = (value || '').trim().toLowerCase();
             if (!normalized) return null;
@@ -4660,6 +5466,17 @@ return;
             if (match) return match[0];
 
             match = Object.entries(rgDatabase).find(([, data]) => (data.nom || '').toLowerCase().startsWith(normalized));
+            return match ? match[0] : null;
+        }
+
+        function findBestUTNameMatch(value) {
+            const normalized = (value || '').trim().toLowerCase();
+            if (!normalized) return null;
+
+            let match = Object.entries(utDatabase).find(([, data]) => (data.nom || '').toLowerCase() === normalized);
+            if (match) return match[0];
+
+            match = Object.entries(utDatabase).find(([, data]) => (data.nom || '').toLowerCase().startsWith(normalized));
             return match ? match[0] : null;
         }
 
@@ -4679,6 +5496,15 @@ return;
 
             const inputs = row.querySelectorAll('input, textarea, select');
             return inputs[rgIndex] || null;
+        }
+
+        function getUTInput(row, tabName) {
+            const columns = tabConfigs[tabName]?.columns || [];
+            const utIndex = columns.indexOf('UT-BAT');
+            if (utIndex < 0) return null;
+
+            const inputs = row.querySelectorAll('input, textarea, select');
+            return inputs[utIndex] || null;
         }
 
         let currentRGSuggestionPanel = null;
@@ -4740,6 +5566,38 @@ return;
             }
 
             return matchCode;
+        }
+
+        function autoFillNomFromUT(utValue, input, options = {}) {
+            if (Object.keys(utDatabase).length === 0) return null;
+
+            const match = findBestUTMatch(utValue);
+            if (!match) return null;
+
+            if (options.commit && input) {
+                input.value = utDatabase[match]?.codeAffiche || match;
+                addColumnSuggestion('UT-BAT', input.value);
+            } else if (input && !input.value && utDatabase[match]?.codeAffiche) {
+                input.placeholder = utDatabase[match].codeAffiche;
+            }
+
+            return match;
+        }
+
+        function autoFillUTFromName(nomValue, input, options = {}) {
+            if (Object.keys(utDatabase).length === 0) return null;
+
+            const match = findBestUTNameMatch(nomValue);
+            if (!match) return null;
+
+            if (options.commit && input) {
+                input.value = utDatabase[match]?.codeAffiche || match;
+                addColumnSuggestion('UT-BAT', input.value);
+            } else if (input && !input.value && utDatabase[match]?.codeAffiche) {
+                input.placeholder = utDatabase[match].codeAffiche;
+            }
+
+            return match;
         }
 
         function getRGSuggestionCandidates(value) {
@@ -4870,12 +5728,40 @@ return;
 
         function applyIntelligentRGFillAll() {
             Object.keys(tabConfigs).forEach(tabName => {
-                if (tabName === 'baserg') return;
+                if (tabName === 'baserg' || tabName === 'baseut') return;
 
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) return;
 
                 tbody.querySelectorAll('tr').forEach(row => applyIntelligentRGFill(row, tabName));
+            });
+        }
+
+        function applyIntelligentUTFill(row, tabName) {
+            if (tabName === 'baserg' || tabName === 'baseut') return;
+
+            const utInput = getUTInput(row, tabName);
+            if (!utInput) return;
+
+            if (utInput.value) {
+                const match = findBestUTMatch(utInput.value) || autoFillUTFromName(utInput.value, utInput, { commit: true });
+                if (match) {
+                    utInput.value = utDatabase[match]?.codeAffiche || match;
+                    addColumnSuggestion('UT-BAT', utInput.value);
+                }
+            } else if (utInput.dataset.nomUt) {
+                autoFillUTFromName(utInput.dataset.nomUt, utInput, { commit: true });
+            }
+        }
+
+        function applyIntelligentUTFillAll() {
+            Object.keys(tabConfigs).forEach(tabName => {
+                if (tabName === 'baserg' || tabName === 'baseut') return;
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                tbody.querySelectorAll('tr').forEach(row => applyIntelligentUTFill(row, tabName));
             });
         }
 
@@ -5007,6 +5893,17 @@ return;
             }
         }
 
+        function buildUTDatabase() {
+            try {
+                updateUTDatabase();
+                showNotification('🔄 Index UT reconstruit avec succès');
+                logActivity('Reconstruction de l\'index UT', 'success');
+            } catch (error) {
+                console.error('Erreur reconstruction base UT:', error);
+                showNotification('❌ Erreur lors de la reconstruction de l\'index UT', 'error');
+            }
+        }
+
         function updateStatsDashboard() {
             try {
                 const statsData = getTabStatistics();
@@ -5025,8 +5922,44 @@ return;
                 updateStatChips(statsData.general, rgInsights, qualityCounts);
                 updateCharts();
 
+                filterStatsCards(document.getElementById('statsSearch')?.value || '');
+
             } catch (error) {
                 console.error('Erreur mise à jour dashboard statistiques:', error);
+            }
+        }
+
+        function toggleStatsCard(headerElement) {
+            const card = headerElement.closest('.stats-card');
+            if (!card) return;
+
+            const body = card.querySelector('.stats-card-body');
+            const isCollapsed = card.classList.toggle('collapsed');
+
+            if (body) {
+                body.style.display = isCollapsed ? 'none' : 'block';
+            }
+        }
+
+        function filterStatsCards(searchTerm = '') {
+            const individualStatsContainer = document.getElementById('individualStats');
+            const emptyState = document.getElementById('statsSearchEmpty');
+            if (!individualStatsContainer) return;
+
+            const normalizedTerm = searchTerm.trim().toLowerCase();
+            let visibleCount = 0;
+
+            individualStatsContainer.querySelectorAll('.stats-card').forEach(card => {
+                const tabName = (card.dataset.tabName || '').toLowerCase();
+                const displayName = (card.dataset.displayName || '').toLowerCase();
+                const matches = !normalizedTerm || tabName.includes(normalizedTerm) || displayName.includes(normalizedTerm);
+
+                card.style.display = matches ? '' : 'none';
+                if (matches) visibleCount++;
+            });
+
+            if (emptyState) {
+                emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
             }
         }
 
@@ -5042,53 +5975,70 @@ return;
                 statsToDisplay.forEach(stat => {
                     const rate = stat.total > 0 ? Math.round((stat.processed / stat.total) * 100) : 0;
                     const pendingRows = collectPendingRows(stat.tabName).slice(0, 4);
+                    const displayName = getTabDisplayName(stat.tabName);
+                    const subtitle = `${stat.total} total • ${stat.pending} en attente`;
 
                     const card = document.createElement('div');
-                    card.className = 'stats-card';
+                    card.className = 'stats-card collapsible collapsed';
+                    card.dataset.tabName = stat.tabName;
+                    card.dataset.displayName = displayName;
                     card.innerHTML = `
-                        <h3>${getTabIcon(stat.tabName)} ${getTabDisplayName(stat.tabName)}</h3>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                            <div style="text-align: center;">
-                                <div class="preview-stat-number">${stat.total}</div>
-                                <div class="preview-stat-label">Total</div>
+                        <div class="collapsible-header" onclick="toggleStatsCard(this)">
+                            <div class="header-left">
+                                <span class="stat-toggle" aria-hidden="true">▸</span>
+                                <div class="header-texts">
+                                    <div class="header-title">${getTabIcon(stat.tabName)} ${displayName}</div>
+                                    <div class="header-subtitle">${subtitle}</div>
+                                </div>
                             </div>
-                            <div style="text-align: center;">
-                                <div class="preview-stat-number success">${stat.processed}</div>
-                                <div class="preview-stat-label">Traités</div>
-                            </div>
-                            <div style="text-align: center;">
-                                <div class="preview-stat-number warning">${stat.pending}</div>
-                                <div class="preview-stat-label">En attente</div>
-                            </div>
+                            <div class="header-chip">${rate}%</div>
                         </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${rate}%"></div>
-                        </div>
-                        <div style="text-align: center; margin-top: 10px; font-weight: 600; color: #667eea;">
-                            ${rate}% complété
-                        </div>
-                        <div style="margin-top: 12px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-                                <span style="font-weight: 600; color: #444;">En attente</span>
-                                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('${stat.tabName}')">
-                                    📍 Ouvrir la prochaine
-                                </button>
+                        <div class="stats-card-body">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                <div style="text-align: center;">
+                                    <div class="preview-stat-number">${stat.total}</div>
+                                    <div class="preview-stat-label">Total</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div class="preview-stat-number success">${stat.processed}</div>
+                                    <div class="preview-stat-label">Traités</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div class="preview-stat-number warning">${stat.pending}</div>
+                                    <div class="preview-stat-label">En attente</div>
+                                </div>
                             </div>
-                            <div style="margin-top: 6px; display: grid; gap: 6px;">
-                                ${pendingRows.length === 0
-                                    ? '<div style="color: #777; font-size: 12px;">Aucune ligne en attente</div>'
-                                    : pendingRows.map(row => `
-                                        <div class="pending-link" onclick="focusPendingRow('${stat.tabName}', ${row.index});">
-                                            <span>${row.title}</span>
-                                            <small>${row.subtitle}</small>
-                                        </div>
-                                    `).join('')}
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${rate}%"></div>
+                            </div>
+                            <div style="text-align: center; margin-top: 10px; font-weight: 600; color: #667eea;">
+                                ${rate}% complété
+                            </div>
+                            <div style="margin-top: 12px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                                    <span style="font-weight: 600; color: #444;">En attente</span>
+                                    <button class="btn btn-secondary btn-compact" onclick="goToNextPending('${stat.tabName}')">
+                                        📍 Ouvrir la prochaine
+                                    </button>
+                                </div>
+                                <div style="margin-top: 6px; display: grid; gap: 6px;">
+                                    ${pendingRows.length === 0
+                                        ? '<div style="color: #777; font-size: 12px;">Aucune ligne en attente</div>'
+                                        : pendingRows.map(row => `
+                                            <div class="pending-link" onclick="focusPendingRow('${stat.tabName}', ${row.index});">
+                                                <span>${row.title}</span>
+                                                <small>${row.subtitle}</small>
+                                            </div>
+                                        `).join('')}
+                                </div>
                             </div>
                         </div>
                     `;
 
                     individualStatsContainer.appendChild(card);
                 });
+
+                filterStatsCards(document.getElementById('statsSearch')?.value || '');
 
             } catch (error) {
                 console.error('Erreur mise à jour statistiques individuelles:', error);
@@ -5100,7 +6050,7 @@ return;
 
             try {
                 Object.keys(tabConfigs).forEach(tabName => {
-                    if (tabName === 'baserg') return;
+                    if (tabName === 'baserg' || tabName === 'baseut') return;
 
                     const tbody = document.getElementById(`${tabName}TableBody`);
                     if (!tbody) return;
@@ -5130,7 +6080,7 @@ return;
 
             try {
                 Object.keys(tabConfigs).forEach(tabName => {
-                    if (tabName === 'baserg') return;
+                    if (tabName === 'baserg' || tabName === 'baseut') return;
 
                     const tbody = document.getElementById(`${tabName}TableBody`);
                     if (!tbody) return;
@@ -5641,8 +6591,9 @@ function updateTabsChart() {
                 'Etat': 'État',
                 'Region': 'Région',
                 'Type': 'Type Modification',
-                'Code': 'Code RG',
-                'Nom': 'Nom de RG',
+                'Code': tabName === 'baseut' ? 'Code UT' : 'Code RG',
+                'Nom': tabName === 'baseut' ? 'Nom UT' : 'Nom de RG',
+                'Usage': 'Utilisations',
                 'Bail': 'Numéro de Bail',
                 'Lieu': 'Lieu'
             };
@@ -5685,8 +6636,8 @@ function updateTabsChart() {
                 
                 searchResults = [];
                 
-                const tabsToSearch = searchParams.tab ? [searchParams.tab] : 
-                    Object.keys(tabConfigs).filter(t => t !== 'baserg');
+                const tabsToSearch = searchParams.tab ? [searchParams.tab] :
+                    Object.keys(tabConfigs).filter(t => t !== 'baserg' && t !== 'baseut');
                 
                 tabsToSearch.forEach(tabName => {
                     const tbody = document.getElementById(`${tabName}TableBody`);
@@ -6479,6 +7430,8 @@ function updateTabsChart() {
                         <td style="font-size: 13px;">${task.summary}</td>
                         <td>${createdDate}</td>
                         <td>
+                            <button class="btn btn-success" style="padding: 4px 8px; font-size: 11px; margin-right: 4px;" onclick="createTaskFromBatch('${task.id}')">🚀 Créer</button>
+                            <button class="btn btn-warning" style="padding: 4px 8px; font-size: 11px; margin-right: 4px;" onclick="editBatchTask('${task.id}')">✏️ Modifier</button>
                             <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteTaskDraft('${task.id}')">🗑️ Supprimer</button>
                         </td>
                     `;
@@ -6505,6 +7458,81 @@ function updateTabsChart() {
             } catch (error) {
                 console.error('Erreur suppression tâche du lot:', error);
                 showNotification('❌ Erreur lors de la suppression du lot', 'error');
+            }
+        }
+
+        function editBatchTask(taskId) {
+            try {
+                const activeBatch = getActiveBatch();
+                if (!activeBatch) {
+                    showNotification('ℹ️ Sélectionnez un lot avant de modifier une tâche', 'info');
+                    return;
+                }
+
+                const task = activeBatch.tasks.find(t => t.id === taskId);
+                if (!task) return;
+
+                document.getElementById('taskTargetTab').value = task.targetTab;
+                updateTaskFields();
+
+                setTimeout(() => {
+                    const columns = tabConfigs[task.targetTab]?.columns || [];
+                    columns.forEach((column, index) => {
+                        const input = document.getElementById(`taskField_${index}`);
+                        if (input && task.data[column]) {
+                            input.value = task.data[column];
+                        }
+                    });
+                }, 80);
+
+                activeBatch.tasks = activeBatch.tasks.filter(t => t.id !== taskId);
+                taskDrafts = activeBatch.tasks;
+                updateTaskBatchDisplay();
+                saveAllData();
+
+                showNotification('✏️ Tâche du lot chargée pour modification');
+            } catch (error) {
+                console.error('Erreur modification tâche du lot:', error);
+                showNotification('❌ Erreur lors de la modification de la tâche du lot', 'error');
+            }
+        }
+
+        function createTaskFromBatch(taskId) {
+            try {
+                const activeBatch = getActiveBatch();
+                if (!activeBatch) {
+                    showNotification('ℹ️ Sélectionnez un lot avant de créer la tâche', 'info');
+                    return;
+                }
+
+                const task = activeBatch.tasks.find(t => t.id === taskId);
+                if (!task) return;
+
+                const columns = tabConfigs[task.targetTab]?.columns || [];
+                const taskDataArray = columns.map(column => task.data[column] || '');
+
+                addRowWithData(task.targetTab, taskDataArray);
+                updateStats(task.targetTab);
+
+                completedTasks.push({
+                    ...task,
+                    completedAt: new Date(),
+                    status: 'completed_from_batch',
+                    sourceBatch: activeBatch.name
+                });
+
+                activeBatch.tasks = activeBatch.tasks.filter(t => t.id !== taskId);
+                taskDrafts = activeBatch.tasks;
+
+                updateTaskBatchDisplay();
+                updateTasksStats();
+                saveAllData();
+
+                showNotification(`🚀 Tâche créée depuis le lot vers ${task.targetTabName}`);
+                logActivity(`Tâche du lot exécutée (${task.targetTabName})`, 'success');
+            } catch (error) {
+                console.error('Erreur création tâche depuis lot:', error);
+                showNotification('❌ Erreur lors de la création de la tâche du lot', 'error');
             }
         }
 
@@ -7089,140 +8117,69 @@ function updateTabsChart() {
 
         function exportStatsReport() {
             try {
-                if (!window.XLSX) {
-                    showNotification('❌ Bibliothèque Excel non disponible', 'error');
+                updateCharts();
+
+                const statsContainer = document.getElementById('statistiques');
+                if (!statsContainer) {
+                    showNotification('❌ Onglet statistiques introuvable', 'error');
                     return;
                 }
 
-                updateCharts();
-                const statsData = getTabStatistics();
-                const qualityCounts = getQualityCounts();
-                const rgInsights = getRGChangeInsights();
-                const chartSnapshots = getChartsSnapshot();
+                const clone = statsContainer.cloneNode(true);
+                const originalCanvases = statsContainer.querySelectorAll('canvas');
+                const clonedCanvases = clone.querySelectorAll('canvas');
 
-                const wb = XLSX.utils.book_new();
-
-                const summaryData = [
-                    ['Métrique', 'Valeur'],
-                    ['Total entrées', statsData.general.total],
-                    ['Traitées', statsData.general.traites],
-                    ['En attente', statsData.general.attente],
-                    ['Taux global', `${statsData.general.taux}%`],
-                    ['UT-BAT surveillés', rgInsights.utbatCount],
-                    ['Changements multiples', rgInsights.multiCount],
-                    ['Erreurs qualité', qualityCounts.errors],
-                    ['Avertissements qualité', qualityCounts.warnings],
-                    ['Export généré le', new Date().toLocaleString('fr-FR')]
-                ];
-
-                const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-                XLSX.utils.book_append_sheet(wb, summarySheet, 'Synthèse');
-
-                const perTabData = [['Onglet', 'Total', 'Traités', 'En attente', 'Taux']];
-                statsData.perTab.forEach(stat => {
-                    perTabData.push([
-                        getTabDisplayName(stat.tabName),
-                        stat.total,
-                        stat.processed,
-                        stat.pending,
-                        `${stat.rate}%`
-                    ]);
+                originalCanvases.forEach((canvas, index) => {
+                    const clonedCanvas = clonedCanvases[index];
+                    try {
+                        const img = document.createElement('img');
+                        img.src = canvas.toDataURL('image/png');
+                        img.alt = canvas.getAttribute('aria-label') || 'Graphique statistiques';
+                        img.style.width = '100%';
+                        img.style.maxWidth = '100%';
+                        img.style.display = 'block';
+                        img.style.margin = '10px auto';
+                        clonedCanvas.replaceWith(img);
+                    } catch (e) {
+                        console.error('Conversion du graphique en image échouée', e);
+                    }
                 });
 
-                const perTabSheet = XLSX.utils.aoa_to_sheet(perTabData);
-                XLSX.utils.book_append_sheet(wb, perTabSheet, 'Par onglet');
+                const styleBlocks = Array.from(document.querySelectorAll('style'))
+                    .map(style => style.innerHTML)
+                    .join('\n');
 
-                const rgData = [['UT-BAT', 'Occurrences', 'Variations RG']];
-                if (rgInsights.topChanges.length === 0) {
-                    rgData.push(['Aucun doublon détecté', '', '']);
-                } else {
-                    rgInsights.topChanges.forEach(change => {
-                        rgData.push([change.utbat, change.occurrences, change.variations]);
-                    });
-                }
+                const exportHtml = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Export Statistiques MARTINE</title>
+    <style>${styleBlocks}</style>
+</head>
+<body style="background: white;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 20px;">
+        <h1 style="margin-bottom: 20px; color: #2c3e50;">Export de l'onglet Statistiques</h1>
+        <div style="margin-bottom: 12px; color: #555; font-size: 13px;">
+            Généré le ${new Date().toLocaleString('fr-FR')}
+        </div>
+        ${clone.innerHTML}
+    </div>
+</body>
+</html>`;
 
-                const rgSheet = XLSX.utils.aoa_to_sheet(rgData);
-                XLSX.utils.book_append_sheet(wb, rgSheet, 'Changements RG');
+                const blob = new Blob([exportHtml], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const fileName = `MARTINE_Statistiques_${new Date().toISOString().split('T')[0]}.html`;
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
 
-                const rgDetailData = [['UT-BAT', 'Ligne', 'GA', 'Numéro de Bail', 'RG']];
-                const rgDetailEntries = Object.entries(rgInsights.details || {});
-                if (rgDetailEntries.length === 0) {
-                    rgDetailData.push(['Aucun détail disponible', '', '', '', '']);
-                } else {
-                    rgDetailEntries.forEach(([utbat, lines]) => {
-                        lines.forEach(line => {
-                            rgDetailData.push([
-                                utbat,
-                                line.rowIndex + 1,
-                                line.ga || '',
-                                line.bail || '',
-                                line.rg || ''
-                            ]);
-                        });
-                    });
-                }
-
-                const rgDetailSheet = XLSX.utils.aoa_to_sheet(rgDetailData);
-                XLSX.utils.book_append_sheet(wb, rgDetailSheet, 'RG surveillés');
-
-                const pendingData = [['Onglet', 'Ligne', 'GA', 'Numéro de Bail', 'RG']];
-                Object.keys(tabConfigs).forEach(tabName => {
-                    if (tabName === 'baserg') return;
-                    const pendingRows = collectPendingRows(tabName);
-                    if (pendingRows.length === 0) return;
-                    pendingRows.forEach(row => {
-                        pendingData.push([
-                            getTabDisplayName(tabName),
-                            row.index + 1,
-                            row.ga || '',
-                            row.bail || '',
-                            row.rg || ''
-                        ]);
-                    });
-                });
-
-                const pendingSheet = XLSX.utils.aoa_to_sheet(pendingData.length > 1 ? pendingData : [['Aucune ligne en attente']]);
-                XLSX.utils.book_append_sheet(wb, pendingSheet, 'En attente');
-
-                const qualityIssues = getQualityIssues();
-                const qualityData = [['Onglet', 'Ligne', 'Colonne', 'Gravité', 'Valeur', 'Message']];
-                if (qualityIssues.length === 0) {
-                    qualityData.push(['Aucune alerte', '', '', '', '', '']);
-                } else {
-                    qualityIssues.forEach(issue => {
-                        qualityData.push([
-                            getTabDisplayName(issue.tabName),
-                            issue.rowIndex + 1,
-                            issue.columnName,
-                            issue.severity,
-                            issue.value || '',
-                            issue.message || ''
-                        ]);
-                    });
-                }
-                const qualitySheet = XLSX.utils.aoa_to_sheet(qualityData);
-                XLSX.utils.book_append_sheet(wb, qualitySheet, 'Alertes qualité');
-
-                if (chartSnapshots.length > 0) {
-                    const chartData = [];
-                    chartSnapshots.forEach((snapshot, index) => {
-                        chartData.push([snapshot.title]);
-                        chartData.push(snapshot.headers);
-                        snapshot.rows.forEach(row => chartData.push(row));
-                        if (index < chartSnapshots.length - 1) {
-                            chartData.push(['']);
-                        }
-                    });
-
-                    const chartSheet = XLSX.utils.aoa_to_sheet(chartData);
-                    XLSX.utils.book_append_sheet(wb, chartSheet, 'Graphiques');
-                }
-
-                const fileName = `MARTINE_Stats_${new Date().toISOString().split('T')[0]}.xlsx`;
-                XLSX.writeFile(wb, fileName);
-
-                showNotification(`📊 Rapport statistiques exporté: ${fileName}`);
-                logActivity('Export du rapport statistiques', 'success');
+                showNotification(`📑 Export statistiques prêt: ${fileName}`);
+                logActivity('Export HTML de l\'onglet statistiques', 'success');
 
             } catch (error) {
                 console.error('Erreur export rapport statistiques:', error);
@@ -7252,6 +8209,7 @@ function updateTabsChart() {
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
                     activityLog: activityLog,
+                    dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
                 
@@ -7329,6 +8287,7 @@ function updateTabsChart() {
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
                     activityLog: activityLog,
+                    dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
                 
@@ -7456,6 +8415,7 @@ function updateTabsChart() {
             }
 
             rgDatabase = data.rgDatabase || {};
+            dismissedRGChanges = new Set(data.dismissedRGChanges || []);
             refreshRGSuggestions();
 
             pendingTasks = (data.pendingTasks || []).map(task => ({
@@ -7630,17 +8590,22 @@ function updateTabsChart() {
                     newDropZone.addEventListener('drop', (e) => {
                         e.preventDefault();
                         newDropZone.classList.remove('dragover');
-                        
+
                         const files = e.dataTransfer.files;
                         if (files.length > 0) {
                             newFileInput.files = files;
                             handleFileImport(tabName, newFileInput);
                         }
                     });
-                    
+
+                    newFileInput.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        newFileInput.value = '';
+                    });
+
                     newDropZone.addEventListener('click', (e) => {
                         if (e.target === newDropZone || e.target.closest('.file-drop-zone') === newDropZone) {
-                            newFileInput.click();
+                            openFilePicker(newFileInput);
                         }
                     });
                 });
@@ -7703,6 +8668,7 @@ function updateTabsChart() {
         window.markAllAsOK = markAllAsOK;
         window.validateAllRGCodes = validateAllRGCodes;
         window.buildRGDatabase = buildRGDatabase;
+        window.buildUTDatabase = buildUTDatabase;
         window.recalculateAllSurfaces = recalculateAllSurfaces;
         window.exportCompleteBackup = exportCompleteBackup;
         window.importCompleteBackup = importCompleteBackup;
