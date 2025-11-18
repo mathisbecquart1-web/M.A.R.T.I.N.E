@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MARTINE v17.0 - Version Complète SNCF</title>
+    <title>MARTINE - Version Complète SNCF</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -2084,6 +2084,7 @@
                         <button class="btn btn-success" id="createBatchTasksBtn" onclick="saveBatchAsPending()" disabled>
                             🚀 Créer toutes les tâches du lot
                         </button>
+                        <button class="btn btn-excel" onclick="exportActiveBatch()">📤 Exporter ce lot</button>
                     </div>
                 </div>
                 <table>
@@ -2538,6 +2539,7 @@
         let chartInstances = {};
         let activityLog = [];
         let qualityAlertsExpanded = false;
+        let rgChangeRegistry = {};
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -2992,9 +2994,12 @@
                 message: '',
                 originalValue: value
             };
-            
+
             if (!columnName || !value) return validation;
-            
+
+            const normalizedValue = value.toString().trim();
+            const upperValue = normalizedValue.toUpperCase();
+
             const rule = validationRules[columnName];
             if (rule) {
                 if (rule.pattern && value) {
@@ -3003,7 +3008,8 @@
                         validation.message = rule.message;
                     }
                 } else if (rule.values && value) {
-                    if (!rule.values.includes(value)) {
+                    const target = rule.values.map(v => v.toUpperCase());
+                    if (!target.includes(upperValue)) {
                         validation.status = rule.type === 'flexible' ? 'warning' : 'error';
                         validation.message = rule.message;
                     }
@@ -3849,13 +3855,16 @@ return;
             const columns = tabConfigs[tabName]?.columns || [];
             const rows = Array.from(tbody.querySelectorAll('tr'));
 
+            const bailIndexPrimary = columns.indexOf('Numéro de Bail');
+            const bailIndexFallback = columns.indexOf('Numéro Bail');
+
             return rows
                 .map((row, index) => {
                     if (!isRowPending(row, tabName)) return null;
 
                     const inputs = row.querySelectorAll('input, textarea, select');
                     const gaIndex = columns.indexOf('GA');
-                    const bailIndex = columns.indexOf('Numéro de Bail');
+                    const bailIndex = bailIndexPrimary >= 0 ? bailIndexPrimary : bailIndexFallback;
                     const rgIndex = columns.indexOf('RG');
 
                     const ga = gaIndex >= 0 && inputs[gaIndex] ? inputs[gaIndex].value : '';
@@ -3869,7 +3878,10 @@ return;
                     return {
                         index,
                         title: titleParts.join(' • '),
-                        subtitle: rg ? `RG ${rg}` : 'Cliquez pour ouvrir'
+                        subtitle: rg ? `RG ${rg}` : 'Cliquez pour ouvrir',
+                        ga,
+                        bail,
+                        rg
                     };
                 })
                 .filter(Boolean);
@@ -4112,19 +4124,24 @@ return;
         function getRGChangeInsights() {
             try {
                 const tbody = document.getElementById('modificationTableBody');
-                const defaultInsights = { totalEntries: 0, utbatCount: 0, multiCount: 0, topChanges: [] };
+                const defaultInsights = { totalEntries: 0, utbatCount: 0, multiCount: 0, topChanges: [], details: {} };
 
                 if (!tbody) return defaultInsights;
 
                 const utbatIndex = tabConfigs['modification'].columns.indexOf('UT-BAT');
                 const rgIndex = tabConfigs['modification'].columns.indexOf('RG');
+                const bailIndex = tabConfigs['modification'].columns.indexOf('Numéro de Bail');
+                const gaIndex = tabConfigs['modification'].columns.indexOf('GA');
                 const rows = tbody.querySelectorAll('tr');
                 const utbatMap = {};
+                const detailMap = {};
 
-                rows.forEach(row => {
+                rows.forEach((row, rowIndex) => {
                     const inputs = row.querySelectorAll('input, textarea, select');
                     const utbat = inputs[utbatIndex] ? inputs[utbatIndex].value.trim() : '';
                     const rgValue = inputs[rgIndex] ? inputs[rgIndex].value.trim() : '';
+                    const bailValue = bailIndex >= 0 && inputs[bailIndex] ? inputs[bailIndex].value.trim() : '';
+                    const gaValue = gaIndex >= 0 && inputs[gaIndex] ? inputs[gaIndex].value.trim() : '';
 
                     if (!utbat) return;
 
@@ -4132,10 +4149,23 @@ return;
                         utbatMap[utbat] = { count: 0, rgs: new Set() };
                     }
 
+                    if (!detailMap[utbat]) {
+                        detailMap[utbat] = [];
+                    }
+
                     utbatMap[utbat].count++;
                     if (rgValue) {
                         utbatMap[utbat].rgs.add(rgValue);
                     }
+
+                    detailMap[utbat].push({
+                        tabName: 'modification',
+                        rowIndex,
+                        utbat,
+                        rg: rgValue,
+                        bail: bailValue,
+                        ga: gaValue
+                    });
                 });
 
                 const multiChanges = Object.entries(utbatMap).filter(([, value]) => value.count > 1 || value.rgs.size > 1);
@@ -4148,15 +4178,18 @@ return;
                     .sort((a, b) => (b.occurrences - a.occurrences) || (b.variations - a.variations))
                     .slice(0, 5);
 
+                rgChangeRegistry = detailMap;
+
                 return {
                     totalEntries: rows.length,
                     utbatCount: Object.keys(utbatMap).length,
                     multiCount: multiChanges.length,
-                    topChanges
+                    topChanges,
+                    details: detailMap
                 };
             } catch (error) {
                 console.error('Erreur calcul insights RG:', error);
-                return { totalEntries: 0, utbatCount: 0, multiCount: 0, topChanges: [] };
+                return { totalEntries: 0, utbatCount: 0, multiCount: 0, topChanges: [], details: {} };
             }
         }
 
@@ -4190,23 +4223,144 @@ return;
                     return;
                 }
 
+                const exportAllBtn = document.createElement('button');
+                exportAllBtn.className = 'btn btn-excel btn-compact';
+                exportAllBtn.style.marginBottom = '8px';
+                exportAllBtn.textContent = '📤 Exporter ces changements';
+                exportAllBtn.onclick = () => exportRGChanges();
+                listContainer.appendChild(exportAllBtn);
+
                 data.topChanges.forEach(change => {
                     const item = document.createElement('div');
                     item.className = 'rg-change-item';
+                    const details = rgChangeRegistry[change.utbat] || [];
+                    const linesPreview = details.slice(0, 3).map(line => {
+                        const parts = [`L${line.rowIndex + 1}`];
+                        if (line.ga) parts.push(`GA ${line.ga}`);
+                        if (line.bail) parts.push(`Bail ${line.bail}`);
+                        return `<small style="color:#555;">${parts.join(' • ')}${line.rg ? ` • RG ${line.rg}` : ''}</small>`;
+                    }).join('<br>');
+
                     item.innerHTML = `
-                        <div>
-                            <strong>${change.utbat}</strong>
-                            <div class="stat-chip-subtext">RG changés plusieurs fois</div>
+                        <div style="display:flex; justify-content:space-between; gap:6px; align-items:center; flex-wrap:wrap;">
+                            <div>
+                                <div style="font-weight: 700;">UT-BAT ${change.utbat}</div>
+                                <div class="rg-change-meta">
+                                    <span>🔁 ${change.occurrences} passages</span>
+                                    <span>🎭 ${change.variations} RG distincts</span>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                <button class="btn btn-secondary btn-compact" onclick="focusRGChange('${change.utbat}')">🔎 Voir les lignes</button>
+                                <button class="btn btn-excel btn-compact" onclick="exportRGChange('${change.utbat}')">📑 Export</button>
+                            </div>
                         </div>
-                        <div class="rg-change-meta">
-                            <span>🔁 ${change.occurrences} passages</span>
-                            <span>🎭 ${change.variations} RG distincts</span>
-                        </div>
+                        ${linesPreview ? `<div style="margin-top:6px;">${linesPreview}</div>` : ''}
                     `;
                     listContainer.appendChild(item);
                 });
             } catch (error) {
                 console.error('Erreur mise à jour suivi changements RG:', error);
+            }
+        }
+
+        function focusRGChange(utbat) {
+            try {
+                const lines = rgChangeRegistry[utbat] || [];
+                if (lines.length === 0) {
+                    showNotification('ℹ️ Aucune ligne repérée pour cet UT-BAT');
+                    return;
+                }
+
+                const targetLine = lines[0];
+                switchTab(targetLine.tabName || 'modification');
+
+                requestAnimationFrame(() => {
+                    const tbody = document.getElementById(`${targetLine.tabName}TableBody`);
+                    if (!tbody) return;
+
+                    const rows = tbody.querySelectorAll('tr');
+                    const row = rows[targetLine.rowIndex];
+                    if (!row) return;
+
+                    row.classList.add('pending-highlight');
+                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const focusable = row.querySelector('input, textarea, select');
+                    if (focusable) focusable.focus();
+                    setTimeout(() => row.classList.remove('pending-highlight'), 2000);
+                });
+            } catch (error) {
+                console.error('Erreur navigation changement RG:', error);
+            }
+        }
+
+        function exportRGChange(utbat) {
+            try {
+                if (!window.XLSX) {
+                    showNotification('❌ Bibliothèque Excel non disponible', 'error');
+                    return;
+                }
+
+                const lines = rgChangeRegistry[utbat] || [];
+                if (lines.length === 0) {
+                    showNotification('ℹ️ Aucun détail à exporter pour cet UT-BAT');
+                    return;
+                }
+
+                const rows = lines.map(line => ({
+                    "UT-BAT": line.utbat,
+                    "Ligne": line.rowIndex + 1,
+                    "GA": line.ga || '',
+                    "Numéro de Bail": line.bail || '',
+                    "RG": line.rg || ''
+                }));
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(rows);
+                XLSX.utils.book_append_sheet(wb, ws, `UTBAT_${utbat}`.substring(0, 31));
+                const fileName = `Changements_RG_${utbat}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                showNotification(`📤 Export des changements RG pour ${utbat}`);
+            } catch (error) {
+                console.error('Erreur export changement RG:', error);
+                showNotification('❌ Erreur export changement RG', 'error');
+            }
+        }
+
+        function exportRGChanges() {
+            try {
+                if (!window.XLSX) {
+                    showNotification('❌ Bibliothèque Excel non disponible', 'error');
+                    return;
+                }
+
+                const entries = Object.entries(rgChangeRegistry || {});
+                if (entries.length === 0) {
+                    showNotification('ℹ️ Aucun changement RG surveillé à exporter');
+                    return;
+                }
+
+                const wb = XLSX.utils.book_new();
+
+                entries.forEach(([utbat, lines]) => {
+                    const rows = lines.map(line => ({
+                        "UT-BAT": line.utbat,
+                        "Ligne": line.rowIndex + 1,
+                        "GA": line.ga || '',
+                        "Numéro de Bail": line.bail || '',
+                        "RG": line.rg || ''
+                    }));
+
+                    const ws = XLSX.utils.json_to_sheet(rows);
+                    XLSX.utils.book_append_sheet(wb, ws, `UTBAT_${utbat}`.substring(0, 31));
+                });
+
+                const fileName = `Changements_RG_surveilles_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                showNotification(`📊 Export des changements RG surveillés généré (${entries.length} UT-BAT)`);
+            } catch (error) {
+                console.error('Erreur export global changements RG:', error);
+                showNotification('❌ Erreur export global RG', 'error');
             }
         }
 
@@ -4758,6 +4912,7 @@ return;
 
                 statsToDisplay.forEach(stat => {
                     const rate = stat.total > 0 ? Math.round((stat.processed / stat.total) * 100) : 0;
+                    const pendingRows = collectPendingRows(stat.tabName).slice(0, 4);
 
                     const card = document.createElement('div');
                     card.className = 'stats-card';
@@ -4783,11 +4938,29 @@ return;
                         <div style="text-align: center; margin-top: 10px; font-weight: 600; color: #667eea;">
                             ${rate}% complété
                         </div>
+                        <div style="margin-top: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                                <span style="font-weight: 600; color: #444;">En attente</span>
+                                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('${stat.tabName}')">
+                                    📍 Ouvrir la prochaine
+                                </button>
+                            </div>
+                            <div style="margin-top: 6px; display: grid; gap: 6px;">
+                                ${pendingRows.length === 0
+                                    ? '<div style="color: #777; font-size: 12px;">Aucune ligne en attente</div>'
+                                    : pendingRows.map(row => `
+                                        <div class="pending-link" onclick="focusPendingRow('${stat.tabName}', ${row.index});">
+                                            <span>${row.title}</span>
+                                            <small>${row.subtitle}</small>
+                                        </div>
+                                    `).join('')}
+                            </div>
+                        </div>
                     `;
-                    
+
                     individualStatsContainer.appendChild(card);
                 });
-                
+
             } catch (error) {
                 console.error('Erreur mise à jour statistiques individuelles:', error);
             }
@@ -6453,6 +6626,43 @@ function updateTabsChart() {
             }
         }
 
+        function exportActiveBatch() {
+            try {
+                const activeBatch = getActiveBatch();
+                if (!activeBatch) {
+                    showNotification('ℹ️ Sélectionnez un lot à exporter', 'info');
+                    return;
+                }
+
+                if (!activeBatch.tasks || activeBatch.tasks.length === 0) {
+                    showNotification('❌ Ce lot ne contient aucune tâche', 'error');
+                    return;
+                }
+
+                const rows = activeBatch.tasks.map(task => ({
+                    "Lot": activeBatch.name,
+                    "Onglet": getTabDisplayName(task.targetTab),
+                    "Résumé": task.summary,
+                    "Priorité": task.priority || 'Normale',
+                    "Créée le": task.createdAt ? new Date(task.createdAt).toLocaleDateString('fr-FR') : '',
+                    "Détails": Object.entries(task.data || {})
+                        .filter(([_, value]) => value)
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join(' | ')
+                }));
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(rows);
+                XLSX.utils.book_append_sheet(wb, ws, activeBatch.name.substring(0, 31) || 'Lot');
+                const fileName = `lot_${activeBatch.name || 'taches'}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                showNotification(`📤 Lot exporté: ${fileName}`);
+            } catch (error) {
+                console.error('Erreur export lot de tâches:', error);
+                showNotification('❌ Erreur lors de l\'export du lot', 'error');
+            }
+        }
+
         // 🔧 FONCTIONS SPÉCIALISÉES PAR ONGLET
         function validateAllBauxStates() {
             try {
@@ -6805,6 +7015,65 @@ function updateTabsChart() {
                 const rgSheet = XLSX.utils.aoa_to_sheet(rgData);
                 XLSX.utils.book_append_sheet(wb, rgSheet, 'Changements RG');
 
+                const rgDetailData = [['UT-BAT', 'Ligne', 'GA', 'Numéro de Bail', 'RG']];
+                const rgDetailEntries = Object.entries(rgInsights.details || {});
+                if (rgDetailEntries.length === 0) {
+                    rgDetailData.push(['Aucun détail disponible', '', '', '', '']);
+                } else {
+                    rgDetailEntries.forEach(([utbat, lines]) => {
+                        lines.forEach(line => {
+                            rgDetailData.push([
+                                utbat,
+                                line.rowIndex + 1,
+                                line.ga || '',
+                                line.bail || '',
+                                line.rg || ''
+                            ]);
+                        });
+                    });
+                }
+
+                const rgDetailSheet = XLSX.utils.aoa_to_sheet(rgDetailData);
+                XLSX.utils.book_append_sheet(wb, rgDetailSheet, 'RG surveillés');
+
+                const pendingData = [['Onglet', 'Ligne', 'GA', 'Numéro de Bail', 'RG']];
+                Object.keys(tabConfigs).forEach(tabName => {
+                    if (tabName === 'baserg') return;
+                    const pendingRows = collectPendingRows(tabName);
+                    if (pendingRows.length === 0) return;
+                    pendingRows.forEach(row => {
+                        pendingData.push([
+                            getTabDisplayName(tabName),
+                            row.index + 1,
+                            row.ga || '',
+                            row.bail || '',
+                            row.rg || ''
+                        ]);
+                    });
+                });
+
+                const pendingSheet = XLSX.utils.aoa_to_sheet(pendingData.length > 1 ? pendingData : [['Aucune ligne en attente']]);
+                XLSX.utils.book_append_sheet(wb, pendingSheet, 'En attente');
+
+                const qualityIssues = getQualityIssues();
+                const qualityData = [['Onglet', 'Ligne', 'Colonne', 'Gravité', 'Valeur', 'Message']];
+                if (qualityIssues.length === 0) {
+                    qualityData.push(['Aucune alerte', '', '', '', '', '']);
+                } else {
+                    qualityIssues.forEach(issue => {
+                        qualityData.push([
+                            getTabDisplayName(issue.tabName),
+                            issue.rowIndex + 1,
+                            issue.columnName,
+                            issue.severity,
+                            issue.value || '',
+                            issue.message || ''
+                        ]);
+                    });
+                }
+                const qualitySheet = XLSX.utils.aoa_to_sheet(qualityData);
+                XLSX.utils.book_append_sheet(wb, qualitySheet, 'Alertes qualité');
+
                 if (chartSnapshots.length > 0) {
                     const chartData = [];
                     chartSnapshots.forEach((snapshot, index) => {
@@ -6843,7 +7112,7 @@ function updateTabsChart() {
         function saveAllData() {
             try {
                 const allData = {
-                    version: '17.0',
+                    version: 'live',
                     timestamp: new Date().toISOString(),
                     rowCounters: rowCounters,
                     rgDatabase: rgDatabase,
@@ -7195,9 +7464,9 @@ function updateTabsChart() {
                 setupFileDropZones();
                 updateStatsDashboard();
 
-                showNotification('🚀 MARTINE v17.0 - Tous onglets fonctionnels', 'success');
+                showNotification('🚀 MARTINE - Tous onglets fonctionnels', 'success');
                 showSaveStatus('💾 Application prête - Auto-sauvegarde activée');
-                logActivity('Application MARTINE v17.0 initialisée', 'success');
+                logActivity('Application MARTINE initialisée', 'success');
                 
             } catch (error) {
                 console.error('Erreur initialisation:', error);
@@ -7300,6 +7569,7 @@ function updateTabsChart() {
         window.executeAllPendingTasks = executeAllPendingTasks;
         window.clearAllPendingTasks = clearAllPendingTasks;
         window.exportTasksToExcel = exportTasksToExcel;
+        window.exportActiveBatch = exportActiveBatch;
         window.validateAllBauxStates = validateAllBauxStates;
         window.markAllAsOK = markAllAsOK;
         window.validateAllRGCodes = validateAllRGCodes;
@@ -7310,6 +7580,9 @@ function updateTabsChart() {
         window.handleBackupImport = handleBackupImport;
         window.toggleQualityAlerts = toggleQualityAlerts;
         window.focusQualityIssue = focusQualityIssue;
+        window.focusRGChange = focusRGChange;
+        window.exportRGChange = exportRGChange;
+        window.exportRGChanges = exportRGChanges;
     </script>
 </body>
 </html>
