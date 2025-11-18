@@ -2474,7 +2474,7 @@
         <!-- ONGLET STATISTIQUES -->
         <div id="statistiques" class="tab-content">
             <div class="stats-actions">
-                <div class="fun-badge">🎉 Stats ludiques activées</div>
+                <div class="fun-badge">Stats ludiques activées</div>
                 <div class="stats-search-row">
                     <input type="text" id="statsSearch" placeholder="Rechercher un onglet de statistiques..." oninput="filterStatsCards(this.value)">
                     <button class="btn btn-secondary btn-compact" onclick="filterStatsCards(document.getElementById('statsSearch').value)">🔎 Filtrer</button>
@@ -3361,30 +3361,56 @@
                                         utOccurrences[normalized].push(row);
                                     });
 
+                                    const duplicateCodes = [];
+                                    let duplicateRows = 0;
+
                                     Object.entries(utOccurrences)
                                         .filter(([, rows]) => rows.length > 1)
                                         .forEach(([code, rows]) => {
-                                            processedData.utDuplicateCodes.push(code);
-                                            processedData.utDuplicateCount += rows.length;
+                                            duplicateCodes.push(code);
+                                            duplicateRows += rows.length;
+                                        });
 
-                                            rows.forEach(row => {
-                                                const currentValidation = row.validations[codeIndex];
+                                    processedData.utDuplicateCodes = duplicateCodes;
+                                    processedData.utDuplicateCount = duplicateRows;
 
-                                                if (currentValidation?.status === 'valid') {
-                                                    processedData.validationResults.valid--;
-                                                    processedData.validationResults.warnings++;
+                                    if (duplicateCodes.length > 0) {
+                                        const duplicatesSet = new Set(duplicateCodes);
+                                        const seenCodes = new Set();
+                                        const filteredRows = [];
+
+                                        processedData.rows.forEach(row => {
+                                            const normalized = normalizeUTValue(row.data[codeIndex]);
+
+                                            if (normalized && duplicatesSet.has(normalized)) {
+                                                if (seenCodes.has(normalized)) {
+                                                    return; // Ignorer les doublons supplémentaires
                                                 }
 
-                                                if (currentValidation?.status !== 'error') {
-                                                    row.validations[codeIndex] = {
-                                                        status: 'warning',
-                                                        message: 'Code UT en double dans l\'import',
-                                                        originalValue: row.data[codeIndex]
-                                                    };
-                                                    row.hasWarnings = true;
-                                                }
+                                                seenCodes.add(normalized);
+                                                row.validations[codeIndex] = {
+                                                    status: 'warning',
+                                                    message: 'Code UT en double (doublons ignorés, un seul conservé)',
+                                                    originalValue: row.data[codeIndex]
+                                                };
+                                                row.hasWarnings = true;
+                                            }
+
+                                            filteredRows.push(row);
+                                        });
+
+                                        processedData.rows = filteredRows;
+                                        processedData.validationResults = { valid: 0, errors: 0, warnings: 0, total: filteredRows.length };
+
+                                        filteredRows.forEach(row => {
+                                            row.validations.forEach(validation => {
+                                                if (!validation) return;
+                                                if (validation.status === 'valid') processedData.validationResults.valid++;
+                                                if (validation.status === 'warning') processedData.validationResults.warnings++;
+                                                if (validation.status === 'error') processedData.validationResults.errors++;
                                             });
                                         });
+                                    }
                                 }
                             }
 
@@ -3410,7 +3436,7 @@
 
             if (duplicateRows > 0) {
                 const message = `⚠️ ${duplicateCodes} code(s) UT apparaissent en double (${duplicateRows} ligne(s)). ` +
-                    'Merci de retirer les doublons avant de valider l\'import.';
+                    'Les doublons ont été ignorés automatiquement : un seul exemplaire est conservé.';
                 showNotification(message, 'warning');
             }
         }
@@ -7404,6 +7430,8 @@ function updateTabsChart() {
                         <td style="font-size: 13px;">${task.summary}</td>
                         <td>${createdDate}</td>
                         <td>
+                            <button class="btn btn-success" style="padding: 4px 8px; font-size: 11px; margin-right: 4px;" onclick="createTaskFromBatch('${task.id}')">🚀 Créer</button>
+                            <button class="btn btn-warning" style="padding: 4px 8px; font-size: 11px; margin-right: 4px;" onclick="editBatchTask('${task.id}')">✏️ Modifier</button>
                             <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteTaskDraft('${task.id}')">🗑️ Supprimer</button>
                         </td>
                     `;
@@ -7430,6 +7458,81 @@ function updateTabsChart() {
             } catch (error) {
                 console.error('Erreur suppression tâche du lot:', error);
                 showNotification('❌ Erreur lors de la suppression du lot', 'error');
+            }
+        }
+
+        function editBatchTask(taskId) {
+            try {
+                const activeBatch = getActiveBatch();
+                if (!activeBatch) {
+                    showNotification('ℹ️ Sélectionnez un lot avant de modifier une tâche', 'info');
+                    return;
+                }
+
+                const task = activeBatch.tasks.find(t => t.id === taskId);
+                if (!task) return;
+
+                document.getElementById('taskTargetTab').value = task.targetTab;
+                updateTaskFields();
+
+                setTimeout(() => {
+                    const columns = tabConfigs[task.targetTab]?.columns || [];
+                    columns.forEach((column, index) => {
+                        const input = document.getElementById(`taskField_${index}`);
+                        if (input && task.data[column]) {
+                            input.value = task.data[column];
+                        }
+                    });
+                }, 80);
+
+                activeBatch.tasks = activeBatch.tasks.filter(t => t.id !== taskId);
+                taskDrafts = activeBatch.tasks;
+                updateTaskBatchDisplay();
+                saveAllData();
+
+                showNotification('✏️ Tâche du lot chargée pour modification');
+            } catch (error) {
+                console.error('Erreur modification tâche du lot:', error);
+                showNotification('❌ Erreur lors de la modification de la tâche du lot', 'error');
+            }
+        }
+
+        function createTaskFromBatch(taskId) {
+            try {
+                const activeBatch = getActiveBatch();
+                if (!activeBatch) {
+                    showNotification('ℹ️ Sélectionnez un lot avant de créer la tâche', 'info');
+                    return;
+                }
+
+                const task = activeBatch.tasks.find(t => t.id === taskId);
+                if (!task) return;
+
+                const columns = tabConfigs[task.targetTab]?.columns || [];
+                const taskDataArray = columns.map(column => task.data[column] || '');
+
+                addRowWithData(task.targetTab, taskDataArray);
+                updateStats(task.targetTab);
+
+                completedTasks.push({
+                    ...task,
+                    completedAt: new Date(),
+                    status: 'completed_from_batch',
+                    sourceBatch: activeBatch.name
+                });
+
+                activeBatch.tasks = activeBatch.tasks.filter(t => t.id !== taskId);
+                taskDrafts = activeBatch.tasks;
+
+                updateTaskBatchDisplay();
+                updateTasksStats();
+                saveAllData();
+
+                showNotification(`🚀 Tâche créée depuis le lot vers ${task.targetTabName}`);
+                logActivity(`Tâche du lot exécutée (${task.targetTabName})`, 'success');
+            } catch (error) {
+                console.error('Erreur création tâche depuis lot:', error);
+                showNotification('❌ Erreur lors de la création de la tâche du lot', 'error');
             }
         }
 
