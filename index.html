@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MARTINE v17.0 - Version Complète SNCF</title>
+    <title>MARTINE - Version Complète SNCF</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -121,6 +121,46 @@
         .quality-alert-item .alert-meta {
             font-size: 12px;
             color: #556;
+        }
+
+        .rg-suggestion-panel {
+            position: absolute;
+            background: #fff;
+            border: 1px solid #dfe3ff;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            max-height: 190px;
+            overflow-y: auto;
+            min-width: 220px;
+            z-index: 1200;
+            padding: 6px;
+        }
+
+        .rg-suggestion-item {
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            transition: background 0.15s ease;
+        }
+
+        .rg-suggestion-item:hover,
+        .rg-suggestion-item.active {
+            background: #f3f4ff;
+        }
+
+        .rg-suggestion-code {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .rg-suggestion-name {
+            color: #555;
+            font-size: 13px;
+            flex: 1;
+            text-align: right;
         }
 
         .quality-alert-empty {
@@ -716,12 +756,28 @@
             transform: none;
         }
 
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+
+        .btn-compact {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
         .controls {
             display: flex;
             gap: 15px;
             margin-bottom: 25px;
             flex-wrap: wrap;
             align-items: center;
+        }
+
+        .pending-highlight {
+            animation: pulse 0.8s ease-in-out 0s 3;
+            outline: 2px solid #ffc107;
+            outline-offset: 2px;
         }
 
         /* 📊 TABLEAU PRINCIPAL */
@@ -844,6 +900,107 @@
             border: 1px solid rgba(102, 126, 234, 0.2);
         }
 
+        .stats-item.pending-expand {
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+        }
+
+        .stats-item.pending-expand:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.2);
+        }
+
+        .stats-item.pending-expand .stat-actions {
+            display: none;
+            margin-top: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .stats-item.pending-expand.open .stat-actions {
+            display: flex;
+        }
+
+        .pending-list {
+            display: none;
+            margin-top: 10px;
+            background: #f8f9ff;
+            border: 1px solid #eef2ff;
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 6px;
+            gap: 6px;
+        }
+
+        .stats-item.pending-expand.open .pending-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pending-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #dfe3ff;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
+        }
+
+        .pending-link:hover {
+            background: #eef2ff;
+            transform: translateY(-1px);
+        }
+
+        .pending-link small {
+            color: #666;
+        }
+
+        .stats-item .stat-hint {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        .stats-item.pending-expand .stat-hint {
+            display: none;
+        }
+
+        .stats-item.pending-expand.open .stat-hint {
+            display: block;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-toggle {
+            width: 22px;
+            height: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.12);
+            color: #667eea;
+            font-weight: 800;
+            font-size: 13px;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .stats-item.pending-expand.open .stat-toggle {
+            transform: rotate(90deg);
+            background: rgba(102, 126, 234, 0.2);
+        }
+
         /* 📊 DASHBOARD STATISTIQUES */
         .stats-dashboard {
             display: grid;
@@ -866,6 +1023,49 @@
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .card-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .activity-entry {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border: 1px solid #eef2ff;
+            border-radius: 8px;
+            background: #f9f9ff;
+        }
+
+        .activity-entry .activity-meta {
+            color: #666;
+            font-size: 11px;
+        }
+
+        .activity-entry .activity-type {
+            font-size: 12px;
+            padding: 4px 6px;
+            border-radius: 6px;
+            background: #eef2ff;
+            color: #445;
+            font-weight: 700;
+        }
+
+        .activity-detail {
+            max-height: 240px;
+            overflow-y: auto;
         }
 
         .progress-bar {
@@ -1053,12 +1253,13 @@
     </div>
     <div class="header">
         <div class="save-status" id="saveStatus">💾 Auto-sauvegarde activée</div>
-        <h1>Suivi Mise en Qualité - SNCF PROJECT <span class="project-martine">M.A.R.T.I.N.E V17</span></h1>
+        <h1>Suivi Mise en Qualité - SNCF PROJECT <span class="project-martine">M.A.R.T.I.N.E</span></h1>
         <div class="controls" style="justify-content: center; margin-top: 15px;">
             <button class="btn btn-excel" onclick="exportAllToExcel()">📊 Export Global Excel</button>
             <button class="btn btn-primary" onclick="exportCompleteBackup()">📤 Télécharger Sauvegarde</button>
             <button class="btn btn-primary" onclick="importCompleteBackup()">📥 Importer Sauvegarde</button>
             <input type="file" id="backupFileInput" accept="application/json" style="display: none;" onchange="handleBackupImport()">
+            <button class="btn btn-primary" onclick="expandAllTextFields()">🪄 Afficher tout le texte</button>
         </div>
     </div>
 
@@ -1083,8 +1284,8 @@
                 <h4>🔍 Filtres avancés</h4>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>GA</label>
-                        <input type="text" id="filterCreationGA" placeholder="Filtrer par GA..." oninput="filterTable('creation')">
+                        <label>Numéro de bail</label>
+                        <input type="text" id="filterCreationBail" placeholder="Filtrer par numéro de bail..." oninput="filterTable('creation')">
                     </div>
                     <div class="filter-group">
                         <label>Date de</label>
@@ -1179,7 +1380,17 @@
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="creationTotalRows">0</span></div>
                 <div class="stats-item">✅ Traités: <span id="creationProcessedRows">0</span></div>
-                <div class="stats-item">⏳ En attente: <span id="creationPendingRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'creation')">
+                    <div class="stat-header">
+                        <span class="stat-toggle" aria-hidden="true">▸</span>
+                        <div class="stat-main">⏳ En attente: <span id="creationPendingRows">0</span></div>
+                    </div>
+                    <span class="stat-hint">Cliquer pour ouvrir la prochaine ligne en attente</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('creation');">📍 Aller aux en attente</button>
+                    </div>
+                    <div class="pending-list" id="creationPendingList"></div>
+                </div>
                 <div class="stats-item">📈 Taux: <span id="creationCompletionRate">0%</span></div>
             </div>
         </div>
@@ -1191,8 +1402,8 @@
                 <h4>🔍 Filtres avancés</h4>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>GA</label>
-                        <input type="text" id="filterModificationGA" placeholder="Filtrer par GA..." oninput="filterTable('modification')">
+                        <label>Numéro de bail</label>
+                        <input type="text" id="filterModificationBail" placeholder="Filtrer par numéro de bail..." oninput="filterTable('modification')">
                     </div>
                     <div class="filter-group">
                         <label>Date de</label>
@@ -1287,7 +1498,17 @@
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="modificationTotalRows">0</span></div>
                 <div class="stats-item">✅ Traités: <span id="modificationProcessedRows">0</span></div>
-                <div class="stats-item">⏳ En attente: <span id="modificationPendingRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'modification')">
+                    <div class="stat-header">
+                        <span class="stat-toggle" aria-hidden="true">▸</span>
+                        <div class="stat-main">⏳ En attente: <span id="modificationPendingRows">0</span></div>
+                    </div>
+                    <span class="stat-hint">Déplier pour sauter à la prochaine ligne en attente</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('modification');">📍 Aller aux en attente</button>
+                    </div>
+                    <div class="pending-list" id="modificationPendingList"></div>
+                </div>
                 <div class="stats-item">📈 Taux: <span id="modificationCompletionRate">0%</span></div>
             </div>
         </div>
@@ -1299,8 +1520,8 @@
                 <h4>🔍 Filtres avancés</h4>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>GA</label>
-                        <input type="text" id="filterResiliationGA" placeholder="Filtrer par GA..." oninput="filterTable('resiliation')">
+                        <label>Numéro de bail</label>
+                        <input type="text" id="filterResiliationBail" placeholder="Filtrer par numéro de bail..." oninput="filterTable('resiliation')">
                     </div>
                     <div class="filter-group">
                         <label>Date de</label>
@@ -1393,7 +1614,17 @@
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="resiliationTotalRows">0</span></div>
                 <div class="stats-item">✅ Traités: <span id="resiliationProcessedRows">0</span></div>
-                <div class="stats-item">⏳ En attente: <span id="resiliationPendingRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'resiliation')">
+                    <div class="stat-header">
+                        <span class="stat-toggle" aria-hidden="true">▸</span>
+                        <div class="stat-main">⏳ En attente: <span id="resiliationPendingRows">0</span></div>
+                    </div>
+                    <span class="stat-hint">Cliquer pour accéder à la prochaine fiche en attente</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('resiliation');">📍 Aller aux en attente</button>
+                    </div>
+                    <div class="pending-list" id="resiliationPendingList"></div>
+                </div>
                 <div class="stats-item">📈 Taux: <span id="resiliationCompletionRate">0%</span></div>
             </div>
         </div>
@@ -1405,8 +1636,8 @@
                 <h4>🔍 Filtres avancés</h4>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>GA</label>
-                        <input type="text" id="filterAutremodifGA" placeholder="Filtrer par GA..." oninput="filterTable('autremodif')">
+                        <label>Numéro de bail</label>
+                        <input type="text" id="filterAutremodifBail" placeholder="Filtrer par numéro de bail..." oninput="filterTable('autremodif')">
                     </div>
                     <div class="filter-group">
                         <label>Date de</label>
@@ -1500,7 +1731,17 @@
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="autremodifTotalRows">0</span></div>
                 <div class="stats-item">✅ Traités: <span id="autremodifProcessedRows">0</span></div>
-                <div class="stats-item">⏳ En attente: <span id="autremodifPendingRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'autremodif')">
+                    <div class="stat-header">
+                        <span class="stat-toggle" aria-hidden="true">▸</span>
+                        <div class="stat-main">⏳ En attente: <span id="autremodifPendingRows">0</span></div>
+                    </div>
+                    <span class="stat-hint">Afficher la prochaine ligne en attente d'un clic</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('autremodif');">📍 Aller aux en attente</button>
+                    </div>
+                    <div class="pending-list" id="autremodifPendingList"></div>
+                </div>
                 <div class="stats-item">📈 Taux: <span id="autremodifCompletionRate">0%</span></div>
             </div>
         </div>
@@ -1512,8 +1753,8 @@
                 <h4>🔍 Filtres avancés</h4>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>GA</label>
-                        <input type="text" id="filterModifsurfaceGA" placeholder="Filtrer par GA..." oninput="filterTable('modifsurface')">
+                        <label>Numéro de bail</label>
+                        <input type="text" id="filterModifsurfaceBail" placeholder="Filtrer par numéro de bail..." oninput="filterTable('modifsurface')">
                     </div>
                     <div class="filter-group">
                         <label>Date de</label>
@@ -1606,7 +1847,17 @@
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="modifsurfaceTotalRows">0</span></div>
                 <div class="stats-item">✅ Traités: <span id="modifsurfaceProcessedRows">0</span></div>
-                <div class="stats-item">⏳ En attente: <span id="modifsurfacePendingRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'modifsurface')">
+                    <div class="stat-header">
+                        <span class="stat-toggle" aria-hidden="true">▸</span>
+                        <div class="stat-main">⏳ En attente: <span id="modifsurfacePendingRows">0</span></div>
+                    </div>
+                    <span class="stat-hint">Déplier pour naviguer vers la prochaine surface en attente</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('modifsurface');">📍 Aller aux en attente</button>
+                    </div>
+                    <div class="pending-list" id="modifsurfacePendingList"></div>
+                </div>
                 <div class="stats-item">📈 Surface totale modifiée: <span id="modifsurfaceTotalDifference">0 m²</span></div>
                 <div class="stats-item">📈 Taux: <span id="modifsurfaceCompletionRate">0%</span></div>
             </div>
@@ -1722,7 +1973,17 @@
                     <div class="stats-item" style="color: #dc3545;">❌ NOK: <span id="verifbauxNOKRows">0</span></div>
                     <div class="stats-item" style="color: #ffc107;">⏳ En cours: <span id="verifbauxEnCoursRows">0</span></div>
                     <div class="stats-item">✅ Traités: <span id="verifbauxProcessedRows">0</span></div>
-                    <div class="stats-item">⏳ En attente: <span id="verifbauxPendingRows">0</span></div>
+                    <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'verifbaux')">
+                        <div class="stat-header">
+                            <span class="stat-toggle" aria-hidden="true">▸</span>
+                            <div class="stat-main">⏳ En attente: <span id="verifbauxPendingRows">0</span></div>
+                        </div>
+                        <span class="stat-hint">Déplier pour retrouver la prochaine vérification à traiter</span>
+                        <div class="stat-actions">
+                            <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('verifbaux');">📍 Aller aux en attente</button>
+                        </div>
+                        <div class="pending-list" id="verifbauxPendingList"></div>
+                    </div>
                     <div class="stats-item">📈 Taux de validation: <span id="verifbauxValidationRate">0%</span></div>
                     <div class="stats-item">📈 Taux de traitement: <span id="verifbauxCompletionRate">0%</span></div>
                 </div>
@@ -1917,6 +2178,7 @@
                         <button class="btn btn-success" id="createBatchTasksBtn" onclick="saveBatchAsPending()" disabled>
                             🚀 Créer toutes les tâches du lot
                         </button>
+                        <button class="btn btn-excel" onclick="exportActiveBatch()">📤 Exporter ce lot</button>
                     </div>
                 </div>
                 <table>
@@ -2023,10 +2285,18 @@
                 </div>
 
                 <div class="stats-card">
-                    <h3>📈 Activité récente</h3>
-                    <div id="recentActivity">
-                        <div style="color: #666; text-align: center; padding: 20px;">
+                    <div class="card-title-row">
+                        <h3>📈 Activité récente</h3>
+                        <button id="activityToggleBtn" class="btn btn-secondary btn-compact" onclick="toggleActivityDetails()">▸ Détails</button>
+                    </div>
+                    <div id="recentActivityCompact" class="activity-list">
+                        <div style="color: #666; text-align: center; padding: 12px;">
                             Chargement des activités récentes...
+                        </div>
+                    </div>
+                    <div id="recentActivityDetail" class="activity-list activity-detail" style="display: none;">
+                        <div style="color: #666; text-align: center; padding: 12px;">
+                            Chargement des activités détaillées...
                         </div>
                     </div>
                 </div>
@@ -2370,7 +2640,9 @@
         let autoSaveInterval = null;
         let chartInstances = {};
         let activityLog = [];
+        let activityDetailsExpanded = false;
         let qualityAlertsExpanded = false;
+        let rgChangeRegistry = {};
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -2425,31 +2697,57 @@
         }
 
         function updateRecentActivity() {
-            const container = document.getElementById('recentActivity');
-            if (!container) return;
-            
+            const compact = document.getElementById('recentActivityCompact');
+            const detail = document.getElementById('recentActivityDetail');
+            const toggleBtn = document.getElementById('activityToggleBtn');
+            if (!compact || !detail) return;
+
+            if (toggleBtn) {
+                toggleBtn.textContent = `${activityDetailsExpanded ? '▾' : '▸'} Détails`;
+            }
+
             if (activityLog.length === 0) {
-                container.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">Aucune activité récente</div>';
+                const empty = '<div style="color: #666; text-align: center; padding: 12px;">Aucune activité récente</div>';
+                compact.innerHTML = empty;
+                detail.innerHTML = empty;
                 return;
             }
-            
-            const html = activityLog.slice(0, 5).map(activity => {
-                const timeStr = activity.timestamp.toLocaleTimeString('fr-FR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
+
+            const renderEntries = (entries, withDate = false) => entries.map(activity => {
+                const timeStr = activity.timestamp.toLocaleTimeString('fr-FR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                const dateStr = activity.timestamp.toLocaleDateString('fr-FR', {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: 'short'
                 });
                 const icon = getNotificationIcon(activity.type);
-                
+
                 return `
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid #eee; font-size: 13px;">
+                    <div class="activity-entry">
                         <div style="font-size: 14px;">${icon}</div>
                         <div style="flex: 1;">${activity.message}</div>
-                        <div style="color: #666; font-size: 11px;">${timeStr}</div>
+                        ${withDate ? `<div class="activity-type">${activity.type}</div>` : ''}
+                        <div class="activity-meta">${withDate ? `${dateStr} · ${timeStr}` : timeStr}</div>
                     </div>
                 `;
             }).join('');
-            
-            container.innerHTML = html;
+
+            const compactEntries = activityLog.slice(0, 5);
+            const detailEntries = activityLog.slice(0, 20);
+
+            compact.innerHTML = renderEntries(compactEntries);
+            detail.innerHTML = renderEntries(detailEntries, true);
+
+            compact.style.display = activityDetailsExpanded ? 'none' : 'flex';
+            detail.style.display = activityDetailsExpanded ? 'flex' : 'none';
+        }
+
+        function toggleActivityDetails() {
+            activityDetailsExpanded = !activityDetailsExpanded;
+            updateRecentActivity();
         }
 
         function showSaveStatus(message, type = 'success') {
@@ -2825,9 +3123,12 @@
                 message: '',
                 originalValue: value
             };
-            
+
             if (!columnName || !value) return validation;
-            
+
+            const normalizedValue = value.toString().trim();
+            const upperValue = normalizedValue.toUpperCase();
+
             const rule = validationRules[columnName];
             if (rule) {
                 if (rule.pattern && value) {
@@ -2836,7 +3137,8 @@
                         validation.message = rule.message;
                     }
                 } else if (rule.values && value) {
-                    if (!rule.values.includes(value)) {
+                    const target = rule.values.map(v => v.toUpperCase());
+                    if (!target.includes(upperValue)) {
                         validation.status = rule.type === 'flexible' ? 'warning' : 'error';
                         validation.message = rule.message;
                     }
@@ -3244,6 +3546,16 @@ return;
             }
         }
 
+        function expandAllTextFields() {
+            try {
+                const textAreas = document.querySelectorAll('textarea.editable-textarea');
+                textAreas.forEach(autoResizeField);
+                showNotification('🪄 Les champs texte ont été ajustés pour tout afficher');
+            } catch (error) {
+                console.error('Erreur ajustement champs texte:', error);
+            }
+        }
+
         function createEditableField(column, tabName, value = '') {
             if (column === 'Traité') {
                 const select = document.createElement('select');
@@ -3332,6 +3644,7 @@ return;
 
                 input.addEventListener('input', () => {
                     autoResizeField(input);
+                    applySmartSuggestion(input, column);
                     validateInputInRealTime(input, column, tabName);
                     saveAllData();
                     updateStats(tabName);
@@ -3353,6 +3666,8 @@ return;
             deleteBtn.onclick = () => deleteRow(row, tabName);
             actionCell.appendChild(deleteBtn);
             row.appendChild(actionCell);
+
+            applyIntelligentRGFill(row, tabName);
 
             return row;
         }
@@ -3632,11 +3947,178 @@ return;
                     if (pendingElement) pendingElement.textContent = pending;
                     if (rateElement) rateElement.textContent = completionRate + '%';
                 }
-                
+
+                if (document.getElementById(`${tabName}PendingList`)) {
+                    renderPendingList(tabName);
+                }
+
             } catch (error) {
                 console.error('Erreur mise à jour statistiques:', error);
             }
         }
+
+        function isRowPending(row, tabName) {
+            const inputs = row.querySelectorAll('input, textarea, select');
+            const hasData = Array.from(inputs).some(input => input.value.trim() !== '');
+            if (!hasData) return false;
+
+            if (tabName === 'verifbaux') {
+                const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
+                const traiteValue = inputs[traiteIndex] ? inputs[traiteIndex].value.toLowerCase() : '';
+                return traiteValue !== 'oui';
+            }
+
+            const dateTraitementIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
+            if (dateTraitementIndex >= 0) {
+                const dateTraitement = inputs[dateTraitementIndex] ? inputs[dateTraitementIndex].value : '';
+                return !dateTraitement;
+            }
+
+            return false;
+        }
+
+        function collectPendingRows(tabName) {
+            const tbody = document.getElementById(`${tabName}TableBody`);
+            if (!tbody) return [];
+
+            const columns = tabConfigs[tabName]?.columns || [];
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            const bailIndexPrimary = columns.indexOf('Numéro de Bail');
+            const bailIndexFallback = columns.indexOf('Numéro Bail');
+
+            return rows
+                .map((row, index) => {
+                    if (!isRowPending(row, tabName)) return null;
+
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const gaIndex = columns.indexOf('GA');
+                    const bailIndex = bailIndexPrimary >= 0 ? bailIndexPrimary : bailIndexFallback;
+                    const rgIndex = columns.indexOf('RG');
+
+                    const ga = gaIndex >= 0 && inputs[gaIndex] ? inputs[gaIndex].value : '';
+                    const bail = bailIndex >= 0 && inputs[bailIndex] ? inputs[bailIndex].value : '';
+                    const rg = rgIndex >= 0 && inputs[rgIndex] ? inputs[rgIndex].value : '';
+
+                    const titleParts = [`Ligne ${index + 1}`];
+                    if (ga) titleParts.push(`GA ${ga}`);
+                    if (bail) titleParts.push(`Bail ${bail}`);
+
+                    return {
+                        index,
+                        title: titleParts.join(' • '),
+                        subtitle: rg ? `RG ${rg}` : 'Cliquez pour ouvrir',
+                        ga,
+                        bail,
+                        rg
+                    };
+                })
+                .filter(Boolean);
+        }
+
+        function renderPendingList(tabName) {
+            const container = document.getElementById(`${tabName}PendingList`);
+            if (!container) return;
+
+            const pendingRows = collectPendingRows(tabName);
+
+            if (pendingRows.length === 0) {
+                container.innerHTML = '<div class="pending-link"><span>Aucune ligne en attente</span><small>Tout est traité</small></div>';
+                return;
+            }
+
+            container.innerHTML = pendingRows.map(item => `
+                <div class="pending-link" onclick="event.stopPropagation(); focusPendingRow('${tabName}', ${item.index});">
+                    <span>${item.title}</span>
+                    <small>${item.subtitle}</small>
+                </div>
+            `).join('');
+        }
+
+        function focusPendingRow(tabName, rowIndex) {
+            try {
+                switchTab(tabName);
+
+                requestAnimationFrame(() => {
+                    const tbody = document.getElementById(`${tabName}TableBody`);
+                    if (!tbody) return;
+
+                    const rows = tbody.querySelectorAll('tr');
+                    const target = rows[rowIndex];
+                    if (!target) return;
+
+                    target.classList.add('pending-highlight');
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    const focusable = target.querySelector('input, textarea, select');
+                    if (focusable) focusable.focus();
+
+                    setTimeout(() => target.classList.remove('pending-highlight'), 2000);
+                });
+
+            } catch (error) {
+                console.error('Erreur focus ligne en attente:', error);
+            }
+        }
+
+        function goToNextPending(tabName) {
+            try {
+                switchTab(tabName);
+
+                requestAnimationFrame(() => {
+                    const tbody = document.getElementById(`${tabName}TableBody`);
+                    if (!tbody) return;
+
+                    const pendingRow = Array.from(tbody.querySelectorAll('tr')).find(row => isRowPending(row, tabName));
+
+                    if (!pendingRow) {
+                        showNotification(`ℹ️ Aucune ligne en attente dans ${getTabDisplayName(tabName)}`);
+                        return;
+                    }
+
+                    pendingRow.classList.add('pending-highlight');
+                    pendingRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    const focusable = pendingRow.querySelector('input, textarea, select');
+                    if (focusable) focusable.focus();
+
+                    setTimeout(() => pendingRow.classList.remove('pending-highlight'), 2000);
+                    showNotification(`📍 Prochaine ligne en attente affichée dans ${getTabDisplayName(tabName)}`);
+                });
+            } catch (error) {
+                console.error('Erreur navigation vers ligne en attente:', error);
+                showNotification('❌ Impossible de trouver une ligne en attente', 'error');
+            }
+        }
+
+        function togglePendingStat(element, tabName) {
+            try {
+                const alreadyOpen = element.classList.contains('open');
+                document.querySelectorAll('.stats-item.pending-expand.open').forEach(item => {
+                    if (item !== element) item.classList.remove('open');
+                });
+
+                element.classList.toggle('open', !alreadyOpen);
+
+                if (!alreadyOpen) {
+                    renderPendingList(tabName);
+                    const hint = element.querySelector('.stat-hint');
+                    if (hint) {
+                        hint.textContent = `Cliquer sur "Aller aux en attente" pour ouvrir ${getTabDisplayName(tabName)}`;
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'ouverture des stats en attente:', error);
+            }
+        }
+
+        document.addEventListener('click', (event) => {
+            const target = event.target;
+            const isStat = target.closest('.stats-item.pending-expand');
+            if (!isStat) {
+                document.querySelectorAll('.stats-item.pending-expand.open').forEach(item => item.classList.remove('open'));
+            }
+        });
 
         function updateRGUsageStats() {
             try {
@@ -3771,19 +4253,24 @@ return;
         function getRGChangeInsights() {
             try {
                 const tbody = document.getElementById('modificationTableBody');
-                const defaultInsights = { totalEntries: 0, utbatCount: 0, multiCount: 0, topChanges: [] };
+                const defaultInsights = { totalEntries: 0, utbatCount: 0, multiCount: 0, topChanges: [], details: {} };
 
                 if (!tbody) return defaultInsights;
 
                 const utbatIndex = tabConfigs['modification'].columns.indexOf('UT-BAT');
                 const rgIndex = tabConfigs['modification'].columns.indexOf('RG');
+                const bailIndex = tabConfigs['modification'].columns.indexOf('Numéro de Bail');
+                const gaIndex = tabConfigs['modification'].columns.indexOf('GA');
                 const rows = tbody.querySelectorAll('tr');
                 const utbatMap = {};
+                const detailMap = {};
 
-                rows.forEach(row => {
+                rows.forEach((row, rowIndex) => {
                     const inputs = row.querySelectorAll('input, textarea, select');
                     const utbat = inputs[utbatIndex] ? inputs[utbatIndex].value.trim() : '';
                     const rgValue = inputs[rgIndex] ? inputs[rgIndex].value.trim() : '';
+                    const bailValue = bailIndex >= 0 && inputs[bailIndex] ? inputs[bailIndex].value.trim() : '';
+                    const gaValue = gaIndex >= 0 && inputs[gaIndex] ? inputs[gaIndex].value.trim() : '';
 
                     if (!utbat) return;
 
@@ -3791,10 +4278,23 @@ return;
                         utbatMap[utbat] = { count: 0, rgs: new Set() };
                     }
 
+                    if (!detailMap[utbat]) {
+                        detailMap[utbat] = [];
+                    }
+
                     utbatMap[utbat].count++;
                     if (rgValue) {
                         utbatMap[utbat].rgs.add(rgValue);
                     }
+
+                    detailMap[utbat].push({
+                        tabName: 'modification',
+                        rowIndex,
+                        utbat,
+                        rg: rgValue,
+                        bail: bailValue,
+                        ga: gaValue
+                    });
                 });
 
                 const multiChanges = Object.entries(utbatMap).filter(([, value]) => value.count > 1 || value.rgs.size > 1);
@@ -3807,15 +4307,18 @@ return;
                     .sort((a, b) => (b.occurrences - a.occurrences) || (b.variations - a.variations))
                     .slice(0, 5);
 
+                rgChangeRegistry = detailMap;
+
                 return {
                     totalEntries: rows.length,
                     utbatCount: Object.keys(utbatMap).length,
                     multiCount: multiChanges.length,
-                    topChanges
+                    topChanges,
+                    details: detailMap
                 };
             } catch (error) {
                 console.error('Erreur calcul insights RG:', error);
-                return { totalEntries: 0, utbatCount: 0, multiCount: 0, topChanges: [] };
+                return { totalEntries: 0, utbatCount: 0, multiCount: 0, topChanges: [], details: {} };
             }
         }
 
@@ -3849,23 +4352,144 @@ return;
                     return;
                 }
 
+                const exportAllBtn = document.createElement('button');
+                exportAllBtn.className = 'btn btn-excel btn-compact';
+                exportAllBtn.style.marginBottom = '8px';
+                exportAllBtn.textContent = '📤 Exporter ces changements';
+                exportAllBtn.onclick = () => exportRGChanges();
+                listContainer.appendChild(exportAllBtn);
+
                 data.topChanges.forEach(change => {
                     const item = document.createElement('div');
                     item.className = 'rg-change-item';
+                    const details = rgChangeRegistry[change.utbat] || [];
+                    const linesPreview = details.slice(0, 3).map(line => {
+                        const parts = [`L${line.rowIndex + 1}`];
+                        if (line.ga) parts.push(`GA ${line.ga}`);
+                        if (line.bail) parts.push(`Bail ${line.bail}`);
+                        return `<small style="color:#555;">${parts.join(' • ')}${line.rg ? ` • RG ${line.rg}` : ''}</small>`;
+                    }).join('<br>');
+
                     item.innerHTML = `
-                        <div>
-                            <strong>${change.utbat}</strong>
-                            <div class="stat-chip-subtext">RG changés plusieurs fois</div>
+                        <div style="display:flex; justify-content:space-between; gap:6px; align-items:center; flex-wrap:wrap;">
+                            <div>
+                                <div style="font-weight: 700;">UT-BAT ${change.utbat}</div>
+                                <div class="rg-change-meta">
+                                    <span>🔁 ${change.occurrences} passages</span>
+                                    <span>🎭 ${change.variations} RG distincts</span>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                <button class="btn btn-secondary btn-compact" onclick="focusRGChange('${change.utbat}')">🔎 Voir les lignes</button>
+                                <button class="btn btn-excel btn-compact" onclick="exportRGChange('${change.utbat}')">📑 Export</button>
+                            </div>
                         </div>
-                        <div class="rg-change-meta">
-                            <span>🔁 ${change.occurrences} passages</span>
-                            <span>🎭 ${change.variations} RG distincts</span>
-                        </div>
+                        ${linesPreview ? `<div style="margin-top:6px;">${linesPreview}</div>` : ''}
                     `;
                     listContainer.appendChild(item);
                 });
             } catch (error) {
                 console.error('Erreur mise à jour suivi changements RG:', error);
+            }
+        }
+
+        function focusRGChange(utbat) {
+            try {
+                const lines = rgChangeRegistry[utbat] || [];
+                if (lines.length === 0) {
+                    showNotification('ℹ️ Aucune ligne repérée pour cet UT-BAT');
+                    return;
+                }
+
+                const targetLine = lines[0];
+                switchTab(targetLine.tabName || 'modification');
+
+                requestAnimationFrame(() => {
+                    const tbody = document.getElementById(`${targetLine.tabName}TableBody`);
+                    if (!tbody) return;
+
+                    const rows = tbody.querySelectorAll('tr');
+                    const row = rows[targetLine.rowIndex];
+                    if (!row) return;
+
+                    row.classList.add('pending-highlight');
+                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const focusable = row.querySelector('input, textarea, select');
+                    if (focusable) focusable.focus();
+                    setTimeout(() => row.classList.remove('pending-highlight'), 2000);
+                });
+            } catch (error) {
+                console.error('Erreur navigation changement RG:', error);
+            }
+        }
+
+        function exportRGChange(utbat) {
+            try {
+                if (!window.XLSX) {
+                    showNotification('❌ Bibliothèque Excel non disponible', 'error');
+                    return;
+                }
+
+                const lines = rgChangeRegistry[utbat] || [];
+                if (lines.length === 0) {
+                    showNotification('ℹ️ Aucun détail à exporter pour cet UT-BAT');
+                    return;
+                }
+
+                const rows = lines.map(line => ({
+                    "UT-BAT": line.utbat,
+                    "Ligne": line.rowIndex + 1,
+                    "GA": line.ga || '',
+                    "Numéro de Bail": line.bail || '',
+                    "RG": line.rg || ''
+                }));
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(rows);
+                XLSX.utils.book_append_sheet(wb, ws, `UTBAT_${utbat}`.substring(0, 31));
+                const fileName = `Changements_RG_${utbat}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                showNotification(`📤 Export des changements RG pour ${utbat}`);
+            } catch (error) {
+                console.error('Erreur export changement RG:', error);
+                showNotification('❌ Erreur export changement RG', 'error');
+            }
+        }
+
+        function exportRGChanges() {
+            try {
+                if (!window.XLSX) {
+                    showNotification('❌ Bibliothèque Excel non disponible', 'error');
+                    return;
+                }
+
+                const entries = Object.entries(rgChangeRegistry || {});
+                if (entries.length === 0) {
+                    showNotification('ℹ️ Aucun changement RG surveillé à exporter');
+                    return;
+                }
+
+                const wb = XLSX.utils.book_new();
+
+                entries.forEach(([utbat, lines]) => {
+                    const rows = lines.map(line => ({
+                        "UT-BAT": line.utbat,
+                        "Ligne": line.rowIndex + 1,
+                        "GA": line.ga || '',
+                        "Numéro de Bail": line.bail || '',
+                        "RG": line.rg || ''
+                    }));
+
+                    const ws = XLSX.utils.json_to_sheet(rows);
+                    XLSX.utils.book_append_sheet(wb, ws, `UTBAT_${utbat}`.substring(0, 31));
+                });
+
+                const fileName = `Changements_RG_surveilles_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                showNotification(`📊 Export des changements RG surveillés généré (${entries.length} UT-BAT)`);
+            } catch (error) {
+                console.error('Erreur export global changements RG:', error);
+                showNotification('❌ Erreur export global RG', 'error');
             }
         }
 
@@ -3925,6 +4549,17 @@ return;
             }
         }
 
+        function normalizeRGValue(value) {
+            if (value === null || value === undefined) return '';
+            const cleaned = value
+                .toString()
+                .trim()
+                .toUpperCase()
+                .replace(/[\s_\-]+/g, '');
+
+            return cleaned.replace(/^0+(?=[A-Z0-9])/, '');
+        }
+
         function updateRGDatabase() {
             try {
                 const tbody = document.getElementById('basergTableBody');
@@ -3932,14 +4567,16 @@ return;
 
                 rgDatabase = {};
                 const rows = tbody.querySelectorAll('tr');
-                
+
                 rows.forEach(row => {
                     const inputs = row.querySelectorAll('input, textarea, select');
                     const codeRG = inputs[0] ? inputs[0].value.trim() : '';
+                    const normalizedCode = normalizeRGValue(codeRG);
                     const nomRG = inputs[1] ? inputs[1].value.trim() : '';
-                    
-                    if (codeRG) {
-                        rgDatabase[codeRG] = {
+
+                    if (normalizedCode) {
+                        rgDatabase[normalizedCode] = {
+                            codeAffiche: codeRG || normalizedCode,
                             nom: nomRG,
                             utilisations: 0,
                             derniereUtilisation: null
@@ -3949,6 +4586,7 @@ return;
 
                 updateRGUsageStats();
                 refreshRGSuggestions();
+                applyIntelligentRGFillAll();
 
             } catch (error) {
                 console.error('Erreur mise à jour base RG:', error);
@@ -3982,7 +4620,7 @@ return;
 
             Object.entries(rgDatabase).forEach(([code, data]) => {
                 const option = document.createElement('option');
-                option.value = code;
+                option.value = data.codeAffiche || code;
                 option.label = data.nom || '';
                 codeList.appendChild(option);
 
@@ -3996,10 +4634,22 @@ return;
         }
 
         function findBestRGMatch(value) {
-            const normalized = (value || '').trim();
+            const normalized = normalizeRGValue(value || '');
             if (!normalized) return null;
             if (rgDatabase[normalized]) return normalized;
-            return Object.keys(rgDatabase).find(code => code.startsWith(normalized)) || null;
+
+            const displayMatch = Object.entries(rgDatabase).find(([, data]) => normalizeRGValue(data.codeAffiche) === normalized);
+            if (displayMatch) return displayMatch[0];
+
+            const startsWithMatch = Object.keys(rgDatabase)
+                .find(code => normalizeRGValue(code).startsWith(normalized) || normalized.startsWith(normalizeRGValue(code)));
+            if (startsWithMatch) return startsWithMatch;
+
+            const partialMatch = Object.entries(rgDatabase)
+                .find(([code, data]) => normalizeRGValue(code).includes(normalized) || normalizeRGValue(data.codeAffiche || '').includes(normalized));
+            if (partialMatch) return partialMatch[0];
+
+            return Object.keys(rgDatabase).find(code => normalizeRGValue(code) === normalized) || null;
         }
 
         function findBestRGNameMatch(value) {
@@ -4031,40 +4681,155 @@ return;
             return inputs[rgIndex] || null;
         }
 
-        function autoFillNomFromRG(rgValue, row, tabName) {
-            if (Object.keys(rgDatabase).length === 0) return;
+        let currentRGSuggestionPanel = null;
 
-            const match = findBestRGMatch(rgValue);
-            if (!match) return;
-
+        function commitRGSelection(match, row, tabName) {
+            const rgInput = getRGInput(row, tabName);
             const nomInput = getNomRGInput(row, tabName);
+            const data = rgDatabase[match] || {};
+
+            if (rgInput) {
+                rgInput.value = data.codeAffiche || match;
+                addColumnSuggestion(tabName === 'baserg' ? 'Code RG' : 'RG', rgInput.value);
+            }
+
             if (nomInput) {
-                nomInput.value = rgDatabase[match]?.nom || '';
+                nomInput.value = data.nom || '';
                 nomInput.dataset.autoFilled = 'true';
                 addColumnSuggestion('Nom de RG', nomInput.value);
             }
+
+            saveAllData();
+            updateStats(tabName);
+            hideRGSuggestionPanel();
+
+            return match;
         }
 
-        function autoFillRGFromName(nomValue, row, tabName) {
-            if (Object.keys(rgDatabase).length === 0) return;
+        function autoFillNomFromRG(rgValue, row, tabName, options = {}) {
+            if (Object.keys(rgDatabase).length === 0) return null;
+
+            const match = findBestRGMatch(rgValue);
+            if (!match) return null;
+
+            if (options.commit) {
+                return commitRGSelection(match, row, tabName);
+            }
+
+            const nomInput = getNomRGInput(row, tabName);
+            if (nomInput && !nomInput.value && rgDatabase[match]?.nom) {
+                nomInput.placeholder = `Suggestion: ${rgDatabase[match].nom}`;
+            }
+
+            return match;
+        }
+
+        function autoFillRGFromName(nomValue, row, tabName, options = {}) {
+            if (Object.keys(rgDatabase).length === 0) return null;
 
             const matchCode = findBestRGNameMatch(nomValue);
-            if (!matchCode) return;
+            if (!matchCode) return null;
+
+            if (options.commit) {
+                return commitRGSelection(matchCode, row, tabName);
+            }
 
             const rgInput = getRGInput(row, tabName);
-            if (rgInput) {
-                rgInput.value = matchCode;
-                rgInput.dataset.autoFilled = 'true';
-                addColumnSuggestion(tabName === 'baserg' ? 'Code RG' : 'RG', rgInput.value);
+            if (rgInput && !rgInput.value) {
+                rgInput.placeholder = rgDatabase[matchCode]?.codeAffiche || matchCode;
             }
+
+            return matchCode;
+        }
+
+        function getRGSuggestionCandidates(value) {
+            const normalized = normalizeRGValue(value || '');
+            const entries = Object.entries(rgDatabase).map(([code, data]) => ({
+                code,
+                display: data.codeAffiche || code,
+                name: data.nom || ''
+            }));
+
+            if (!normalized) return entries.slice(0, 6);
+
+            return entries
+                .filter(entry => normalizeRGValue(entry.code).includes(normalized) || normalizeRGValue(entry.display).includes(normalized))
+                .sort((a, b) => normalizeRGValue(a.code).indexOf(normalized) - normalizeRGValue(b.code).indexOf(normalized))
+                .slice(0, 8);
+        }
+
+        function positionSuggestionPanel(panel, input) {
+            const rect = input.getBoundingClientRect();
+            panel.style.top = `${rect.bottom + window.scrollY + 6}px`;
+            panel.style.left = `${rect.left + window.scrollX}px`;
+            panel.style.minWidth = `${rect.width}px`;
+        }
+
+        function hideRGSuggestionPanel() {
+            if (currentRGSuggestionPanel && currentRGSuggestionPanel.parentNode) {
+                currentRGSuggestionPanel.parentNode.removeChild(currentRGSuggestionPanel);
+            }
+            currentRGSuggestionPanel = null;
+        }
+
+        function showRGSuggestionPanel(input, suggestions, tabName, row) {
+            hideRGSuggestionPanel();
+
+            if (!suggestions || suggestions.length === 0) return;
+
+            const panel = document.createElement('div');
+            panel.className = 'rg-suggestion-panel';
+
+            panel.innerHTML = suggestions.map((s, index) => `
+                <div class="rg-suggestion-item ${index === 0 ? 'active' : ''}" data-code="${s.code}">
+                    <span class="rg-suggestion-code">${s.display}</span>
+                    <span class="rg-suggestion-name">${s.name || 'Nom manquant'}</span>
+                </div>
+            `).join('');
+
+            panel.addEventListener('mousedown', (event) => {
+                event.preventDefault();
+                const item = event.target.closest('.rg-suggestion-item');
+                if (!item) return;
+                commitRGSelection(item.dataset.code, row, tabName);
+            });
+
+            document.body.appendChild(panel);
+            positionSuggestionPanel(panel, input);
+            currentRGSuggestionPanel = panel;
         }
 
         function setupRGAutoCompletion(input, row, tabName) {
             input.setAttribute('list', 'rgDatalist');
 
-            const syncNom = () => autoFillNomFromRG(input.value, row, tabName);
-            input.addEventListener('input', syncNom);
-            input.addEventListener('change', syncNom);
+            input.addEventListener('input', () => {
+                input.dataset.autoFilled = 'false';
+                const suggestions = getRGSuggestionCandidates(input.value);
+                showRGSuggestionPanel(input, suggestions, tabName, row);
+            });
+
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    const suggestions = getRGSuggestionCandidates(input.value);
+                    if (suggestions[0]) {
+                        commitRGSelection(suggestions[0].code, row, tabName);
+                    } else {
+                        autoFillNomFromRG(input.value, row, tabName, { commit: true });
+                    }
+                }
+            });
+
+            input.addEventListener('blur', () => {
+                setTimeout(() => {
+                    const normalized = normalizeRGValue(input.value);
+                    const match = normalized ? findBestRGMatch(normalized) : null;
+                    if (match && normalizeRGValue(match) === normalized) {
+                        commitRGSelection(match, row, tabName);
+                    }
+                    hideRGSuggestionPanel();
+                }, 120);
+            });
         }
 
         function setupNomRGAutoCompletion(input, row, tabName) {
@@ -4073,6 +4838,44 @@ return;
             input.addEventListener('input', () => {
                 input.dataset.autoFilled = 'false';
                 autoFillRGFromName(input.value, row, tabName);
+            });
+
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    autoFillRGFromName(input.value, row, tabName, { commit: true });
+                }
+            });
+
+            input.addEventListener('blur', () => {
+                const match = autoFillRGFromName(input.value, row, tabName, { commit: true });
+                if (match) hideRGSuggestionPanel();
+            });
+        }
+
+        function applyIntelligentRGFill(row, tabName) {
+            if (tabName === 'baserg') return;
+
+            const rgInput = getRGInput(row, tabName);
+            const nomInput = getNomRGInput(row, tabName);
+
+            if (rgInput && rgInput.value && nomInput && !nomInput.value) {
+                autoFillNomFromRG(rgInput.value, row, tabName, { commit: true });
+            }
+
+            if (nomInput && nomInput.value && rgInput && !rgInput.value) {
+                autoFillRGFromName(nomInput.value, row, tabName, { commit: true });
+            }
+        }
+
+        function applyIntelligentRGFillAll() {
+            Object.keys(tabConfigs).forEach(tabName => {
+                if (tabName === 'baserg') return;
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                tbody.querySelectorAll('tr').forEach(row => applyIntelligentRGFill(row, tabName));
             });
         }
 
@@ -4140,7 +4943,7 @@ return;
                     inputs.forEach((input, index) => {
                         const column = tabConfigs[tabName]?.columns[index];
 
-                        if (!column || column === 'RG' || column === 'Code RG' || column === 'Nom de RG') return;
+                        if (!column) return;
 
                         addColumnSuggestion(column, input.value);
                     });
@@ -4150,14 +4953,41 @@ return;
             refreshColumnSuggestionLists();
         }
 
+        function getColumnSuggestions(column) {
+            return Array.from(columnSuggestions[column] || []);
+        }
+
+        function applySmartSuggestion(input, column) {
+            if (!column) return;
+
+            const currentValue = (input.value || '').toString();
+            if (!currentValue || currentValue.length < 2) return;
+
+            const suggestions = getColumnSuggestions(column)
+                .filter(value => value.toLowerCase().startsWith(currentValue.toLowerCase()))
+                .sort((a, b) => a.length - b.length);
+
+            const bestMatch = suggestions.find(value => value.length > currentValue.length);
+            if (!bestMatch) return;
+
+            const selectionStart = currentValue.length;
+            input.value = bestMatch;
+            if (input.setSelectionRange) {
+                input.setSelectionRange(selectionStart, bestMatch.length);
+            }
+        }
+
         function attachColumnAutocomplete(input, column) {
             if (input.tagName !== 'INPUT') return;
 
-            if (!column || column === 'RG' || column === 'Code RG' || column === 'Nom de RG') return;
+            if (!column) return;
 
-            const datalistId = getColumnListId(column);
+            const existingList = input.getAttribute('list');
+            const datalistId = existingList || getColumnListId(column);
             ensureColumnSuggestionList(column);
-            input.setAttribute('list', datalistId);
+            if (!existingList) {
+                input.setAttribute('list', datalistId);
+            }
 
             if (input.value) {
                 addColumnSuggestion(column, input.value);
@@ -4211,6 +5041,7 @@ return;
 
                 statsToDisplay.forEach(stat => {
                     const rate = stat.total > 0 ? Math.round((stat.processed / stat.total) * 100) : 0;
+                    const pendingRows = collectPendingRows(stat.tabName).slice(0, 4);
 
                     const card = document.createElement('div');
                     card.className = 'stats-card';
@@ -4236,11 +5067,29 @@ return;
                         <div style="text-align: center; margin-top: 10px; font-weight: 600; color: #667eea;">
                             ${rate}% complété
                         </div>
+                        <div style="margin-top: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                                <span style="font-weight: 600; color: #444;">En attente</span>
+                                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('${stat.tabName}')">
+                                    📍 Ouvrir la prochaine
+                                </button>
+                            </div>
+                            <div style="margin-top: 6px; display: grid; gap: 6px;">
+                                ${pendingRows.length === 0
+                                    ? '<div style="color: #777; font-size: 12px;">Aucune ligne en attente</div>'
+                                    : pendingRows.map(row => `
+                                        <div class="pending-link" onclick="focusPendingRow('${stat.tabName}', ${row.index});">
+                                            <span>${row.title}</span>
+                                            <small>${row.subtitle}</small>
+                                        </div>
+                                    `).join('')}
+                            </div>
+                        </div>
                     `;
-                    
+
                     individualStatsContainer.appendChild(card);
                 });
-                
+
             } catch (error) {
                 console.error('Erreur mise à jour statistiques individuelles:', error);
             }
@@ -5906,6 +6755,43 @@ function updateTabsChart() {
             }
         }
 
+        function exportActiveBatch() {
+            try {
+                const activeBatch = getActiveBatch();
+                if (!activeBatch) {
+                    showNotification('ℹ️ Sélectionnez un lot à exporter', 'info');
+                    return;
+                }
+
+                if (!activeBatch.tasks || activeBatch.tasks.length === 0) {
+                    showNotification('❌ Ce lot ne contient aucune tâche', 'error');
+                    return;
+                }
+
+                const rows = activeBatch.tasks.map(task => ({
+                    "Lot": activeBatch.name,
+                    "Onglet": getTabDisplayName(task.targetTab),
+                    "Résumé": task.summary,
+                    "Priorité": task.priority || 'Normale',
+                    "Créée le": task.createdAt ? new Date(task.createdAt).toLocaleDateString('fr-FR') : '',
+                    "Détails": Object.entries(task.data || {})
+                        .filter(([_, value]) => value)
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join(' | ')
+                }));
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(rows);
+                XLSX.utils.book_append_sheet(wb, ws, activeBatch.name.substring(0, 31) || 'Lot');
+                const fileName = `lot_${activeBatch.name || 'taches'}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                showNotification(`📤 Lot exporté: ${fileName}`);
+            } catch (error) {
+                console.error('Erreur export lot de tâches:', error);
+                showNotification('❌ Erreur lors de l\'export du lot', 'error');
+            }
+        }
+
         // 🔧 FONCTIONS SPÉCIALISÉES PAR ONGLET
         function validateAllBauxStates() {
             try {
@@ -6154,6 +7040,53 @@ function updateTabsChart() {
             }
         }
 
+        function getChartsSnapshot() {
+            const snapshots = [];
+
+            const tabsChart = chartInstances.tabsChart;
+            if (tabsChart && tabsChart.data?.labels?.length) {
+                const dataset = tabsChart.data.datasets?.[0]?.data || [];
+                snapshots.push({
+                    title: 'Répartition par onglet',
+                    headers: ['Onglet', 'Entrées affichées'],
+                    rows: tabsChart.data.labels.map((label, idx) => [label, dataset[idx] || 0])
+                });
+            }
+
+            const evolutionChart = chartInstances.evolutionChart;
+            if (evolutionChart && evolutionChart.data?.labels?.length) {
+                const creaData = evolutionChart.data.datasets?.[0]?.data || [];
+                const modifData = evolutionChart.data.datasets?.[1]?.data || [];
+                snapshots.push({
+                    title: 'Traitements mensuels',
+                    headers: ['Mois', 'Création', 'Modification'],
+                    rows: evolutionChart.data.labels.map((label, idx) => [label, creaData[idx] || 0, modifData[idx] || 0])
+                });
+            }
+
+            const verificationChart = chartInstances.verificationChart;
+            if (verificationChart && verificationChart.data?.datasets?.[0]) {
+                const data = verificationChart.data.datasets[0].data || [];
+                snapshots.push({
+                    title: 'État Vérification Baux',
+                    headers: ['État', 'Entrées'],
+                    rows: ['OK', 'NOK', 'En cours'].map((label, idx) => [label, data[idx] || 0])
+                });
+            }
+
+            const surfaceChart = chartInstances.surfaceChart;
+            if (surfaceChart && surfaceChart.data?.labels?.length) {
+                const data = surfaceChart.data.datasets?.[0]?.data || [];
+                snapshots.push({
+                    title: 'Différences de surface',
+                    headers: ['Modification', 'Δ m²'],
+                    rows: surfaceChart.data.labels.map((label, idx) => [label, data[idx] || 0])
+                });
+            }
+
+            return snapshots;
+        }
+
         function exportStatsReport() {
             try {
                 if (!window.XLSX) {
@@ -6161,9 +7094,11 @@ function updateTabsChart() {
                     return;
                 }
 
+                updateCharts();
                 const statsData = getTabStatistics();
                 const qualityCounts = getQualityCounts();
                 const rgInsights = getRGChangeInsights();
+                const chartSnapshots = getChartsSnapshot();
 
                 const wb = XLSX.utils.book_new();
 
@@ -6209,6 +7144,80 @@ function updateTabsChart() {
                 const rgSheet = XLSX.utils.aoa_to_sheet(rgData);
                 XLSX.utils.book_append_sheet(wb, rgSheet, 'Changements RG');
 
+                const rgDetailData = [['UT-BAT', 'Ligne', 'GA', 'Numéro de Bail', 'RG']];
+                const rgDetailEntries = Object.entries(rgInsights.details || {});
+                if (rgDetailEntries.length === 0) {
+                    rgDetailData.push(['Aucun détail disponible', '', '', '', '']);
+                } else {
+                    rgDetailEntries.forEach(([utbat, lines]) => {
+                        lines.forEach(line => {
+                            rgDetailData.push([
+                                utbat,
+                                line.rowIndex + 1,
+                                line.ga || '',
+                                line.bail || '',
+                                line.rg || ''
+                            ]);
+                        });
+                    });
+                }
+
+                const rgDetailSheet = XLSX.utils.aoa_to_sheet(rgDetailData);
+                XLSX.utils.book_append_sheet(wb, rgDetailSheet, 'RG surveillés');
+
+                const pendingData = [['Onglet', 'Ligne', 'GA', 'Numéro de Bail', 'RG']];
+                Object.keys(tabConfigs).forEach(tabName => {
+                    if (tabName === 'baserg') return;
+                    const pendingRows = collectPendingRows(tabName);
+                    if (pendingRows.length === 0) return;
+                    pendingRows.forEach(row => {
+                        pendingData.push([
+                            getTabDisplayName(tabName),
+                            row.index + 1,
+                            row.ga || '',
+                            row.bail || '',
+                            row.rg || ''
+                        ]);
+                    });
+                });
+
+                const pendingSheet = XLSX.utils.aoa_to_sheet(pendingData.length > 1 ? pendingData : [['Aucune ligne en attente']]);
+                XLSX.utils.book_append_sheet(wb, pendingSheet, 'En attente');
+
+                const qualityIssues = getQualityIssues();
+                const qualityData = [['Onglet', 'Ligne', 'Colonne', 'Gravité', 'Valeur', 'Message']];
+                if (qualityIssues.length === 0) {
+                    qualityData.push(['Aucune alerte', '', '', '', '', '']);
+                } else {
+                    qualityIssues.forEach(issue => {
+                        qualityData.push([
+                            getTabDisplayName(issue.tabName),
+                            issue.rowIndex + 1,
+                            issue.columnName,
+                            issue.severity,
+                            issue.value || '',
+                            issue.message || ''
+                        ]);
+                    });
+                }
+                const qualitySheet = XLSX.utils.aoa_to_sheet(qualityData);
+                XLSX.utils.book_append_sheet(wb, qualitySheet, 'Alertes qualité');
+
+                if (chartSnapshots.length > 0) {
+                    const chartData = [];
+                    chartSnapshots.forEach((snapshot, index) => {
+                        chartData.push([snapshot.title]);
+                        chartData.push(snapshot.headers);
+                        snapshot.rows.forEach(row => chartData.push(row));
+                        if (index < chartSnapshots.length - 1) {
+                            chartData.push(['']);
+                        }
+                    });
+
+                    const chartSheet = XLSX.utils.aoa_to_sheet(chartData);
+                    XLSX.utils.book_append_sheet(wb, chartSheet, 'Graphiques');
+                }
+
                 const fileName = `MARTINE_Stats_${new Date().toISOString().split('T')[0]}.xlsx`;
                 XLSX.writeFile(wb, fileName);
 
@@ -6232,7 +7241,7 @@ function updateTabsChart() {
         function saveAllData() {
             try {
                 const allData = {
-                    version: '17.0',
+                    version: 'live',
                     timestamp: new Date().toISOString(),
                     rowCounters: rowCounters,
                     rgDatabase: rgDatabase,
@@ -6526,6 +7535,8 @@ function updateTabsChart() {
                 });
             }
 
+            applyIntelligentRGFillAll();
+
             updatePendingTasksDisplay();
             updateTaskBatchDisplay();
             updateBatchSelectors();
@@ -6582,9 +7593,9 @@ function updateTabsChart() {
                 setupFileDropZones();
                 updateStatsDashboard();
 
-                showNotification('🚀 MARTINE v17.0 - Tous onglets fonctionnels', 'success');
+                showNotification('🚀 MARTINE - Tous onglets fonctionnels', 'success');
                 showSaveStatus('💾 Application prête - Auto-sauvegarde activée');
-                logActivity('Application MARTINE v17.0 initialisée', 'success');
+                logActivity('Application MARTINE initialisée', 'success');
                 
             } catch (error) {
                 console.error('Erreur initialisation:', error);
@@ -6687,6 +7698,7 @@ function updateTabsChart() {
         window.executeAllPendingTasks = executeAllPendingTasks;
         window.clearAllPendingTasks = clearAllPendingTasks;
         window.exportTasksToExcel = exportTasksToExcel;
+        window.exportActiveBatch = exportActiveBatch;
         window.validateAllBauxStates = validateAllBauxStates;
         window.markAllAsOK = markAllAsOK;
         window.validateAllRGCodes = validateAllRGCodes;
@@ -6697,6 +7709,9 @@ function updateTabsChart() {
         window.handleBackupImport = handleBackupImport;
         window.toggleQualityAlerts = toggleQualityAlerts;
         window.focusQualityIssue = focusQualityIssue;
+        window.focusRGChange = focusRGChange;
+        window.exportRGChange = exportRGChange;
+        window.exportRGChanges = exportRGChanges;
     </script>
 </body>
 </html>
