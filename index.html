@@ -3031,6 +3031,9 @@
         let rgChangeRegistry = {};
         let dismissedRGChanges = new Set();
         let fileDialogLock = false;
+        let activeTabName = 'creation';
+        let tabCache = null;
+        let pendingStatsUpdate = null;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -3138,6 +3141,15 @@
             updateRecentActivity();
         }
 
+        const cancelIdle = (handle) => {
+            if (!handle) return;
+            if (window.cancelIdleCallback) {
+                cancelIdleCallback(handle);
+            } else {
+                clearTimeout(handle);
+            }
+        };
+
         function toggleRGChangePanel() {
             try {
                 rgChangePanelExpanded = !rgChangePanelExpanded;
@@ -3181,22 +3193,32 @@
         }
 
         // 🔧 GESTION DES ONGLETS
-        function switchTab(tabName) {
-            try {
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
+        function getTabCache() {
+            if (tabCache) return tabCache;
 
-                const targetContent = document.getElementById(tabName);
-                const targetTab = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
-                
-                if (targetContent) targetContent.classList.add('active');
-                if (targetTab) targetTab.classList.add('active');
+            const contents = new Map();
+            document.querySelectorAll('.tab-content').forEach(content => {
+                if (content.id) {
+                    contents.set(content.id, content);
+                }
+            });
 
-                // Actions spécifiques par onglet
+            const tabs = new Map();
+            document.querySelectorAll('.tab').forEach(tab => {
+                const match = tab.getAttribute('onclick')?.match(/switchTab\('([^']+)'\)/);
+                if (match && match[1]) {
+                    tabs.set(match[1], tab);
+                }
+            });
+
+            tabCache = { contents, tabs };
+            return tabCache;
+        }
+
+        function scheduleTabStatsUpdate(tabName) {
+            cancelIdle(pendingStatsUpdate);
+
+            const runUpdate = () => {
                 if (tabName === 'statistiques') {
                     updateStatsDashboard();
                 } else if (tabName === 'baserg') {
@@ -3207,9 +3229,34 @@
                 } else if (tabName !== 'recherche') {
                     updateStats(tabName);
                 }
+            };
+
+            if (window.requestIdleCallback) {
+                pendingStatsUpdate = requestIdleCallback(runUpdate, { timeout: 120 });
+            } else {
+                pendingStatsUpdate = setTimeout(runUpdate, 16);
+            }
+        }
+
+        function switchTab(tabName) {
+            try {
+                if (tabName === activeTabName) return;
+
+                const { contents, tabs } = getTabCache();
+
+                contents.forEach((content, name) => {
+                    content.classList.toggle('active', name === tabName);
+                });
+
+                tabs.forEach((tab, name) => {
+                    tab.classList.toggle('active', name === tabName);
+                });
+
+                activeTabName = tabName;
+                scheduleTabStatsUpdate(tabName);
 
                 logActivity(`Navigation vers ${getTabDisplayName(tabName)}`, 'info');
-                
+
             } catch (error) {
                 console.error('Erreur changement onglet:', error);
                 showNotification('❌ Erreur lors du changement d\'onglet', 'error');
@@ -4382,9 +4429,41 @@ return;
 
         function expandAllTextFields() {
             try {
-                const textAreas = document.querySelectorAll('textarea.editable-textarea');
-                textAreas.forEach(autoResizeField);
-                showNotification('🪄 Les champs texte ont été ajustés pour tout afficher');
+                const textAreas = Array.from(document.querySelectorAll('textarea.editable-textarea'));
+                if (!textAreas.length) return;
+
+                const total = textAreas.length;
+                const showLoader = total > 80;
+                let processed = 0;
+
+                if (showLoader) {
+                    showProcessingOverlay('Ajustement des champs texte...', 'Préparation des champs...');
+                }
+
+                const processChunk = () => {
+                    const start = performance.now();
+
+                    while (processed < total && performance.now() - start < (showLoader ? 14 : 8)) {
+                        autoResizeField(textAreas[processed]);
+                        processed++;
+                    }
+
+                    if (showLoader) {
+                        const percent = Math.round((processed / total) * 100);
+                        updateProcessingProgress(`Ajustement des champs ${processed}/${total}`, percent);
+                    }
+
+                    if (processed < total) {
+                        requestAnimationFrame(processChunk);
+                    } else {
+                        if (showLoader) {
+                            hideProcessingOverlay();
+                        }
+                        showNotification(`🪄 ${total} champ(s) texte ajusté(s)`);
+                    }
+                };
+
+                requestAnimationFrame(processChunk);
             } catch (error) {
                 console.error('Erreur ajustement champs texte:', error);
             }
