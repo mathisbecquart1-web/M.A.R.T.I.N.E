@@ -4786,6 +4786,38 @@ return;
             }
         }
 
+        function getCompleteRGChangeDetails() {
+            const latestDetails = getRGChangeInsights().details || {};
+            const merged = {};
+
+            const mergeSource = (source) => {
+                Object.entries(source || {}).forEach(([utbat, lines]) => {
+                    const key = (utbat || '').trim().toUpperCase();
+                    if (!key) return;
+                    if (!merged[key]) merged[key] = [];
+                    merged[key].push(...(lines || []));
+                });
+            };
+
+            mergeSource(rgChangeRegistry);
+            mergeSource(latestDetails);
+
+            Object.entries(merged).forEach(([utbat, lines]) => {
+                const seen = new Set();
+                merged[utbat] = (lines || [])
+                    .filter(line => line && typeof line.rowIndex === 'number')
+                    .sort((a, b) => a.rowIndex - b.rowIndex)
+                    .filter(line => {
+                        const key = `${line.tabName || 'modification'}-${line.rowIndex}`;
+                        if (seen.has(key)) return false;
+                        seen.add(key);
+                        return true;
+                    });
+            });
+
+            return merged;
+        }
+
         function exportRGChange(utbat) {
             try {
                 if (!window.XLSX) {
@@ -4794,8 +4826,8 @@ return;
                 }
 
                 const normalized = (utbat || '').trim().toUpperCase();
-                const latestDetails = getRGChangeInsights().details || {};
-                const lines = (latestDetails[normalized] || rgChangeRegistry[normalized] || []).slice().sort((a, b) => a.rowIndex - b.rowIndex);
+                const detailMap = getCompleteRGChangeDetails();
+                const lines = (detailMap[normalized] || []).slice();
 
                 if (lines.length === 0) {
                     showNotification('ℹ️ Aucun détail à exporter pour cet UT-BAT');
@@ -4815,7 +4847,7 @@ return;
                 XLSX.utils.book_append_sheet(wb, ws, `UTBAT_${normalized}`.substring(0, 31));
                 const fileName = `Changements_RG_${normalized}_${new Date().toISOString().split('T')[0]}.xlsx`;
                 XLSX.writeFile(wb, fileName);
-                showNotification(`📤 Export des changements RG pour ${normalized}`);
+                showNotification(`📤 Export des changements RG pour ${normalized} (${rows.length} ligne(s))`);
             } catch (error) {
                 console.error('Erreur export changement RG:', error);
                 showNotification('❌ Erreur export changement RG', 'error');
@@ -4829,14 +4861,15 @@ return;
                     return;
                 }
 
-                const details = getRGChangeInsights().details || {};
-                const entries = Object.entries(details);
+                const detailMap = getCompleteRGChangeDetails();
+                const entries = Object.entries(detailMap).filter(([, lines]) => (lines || []).length > 0);
                 if (entries.length === 0) {
                     showNotification('ℹ️ Aucun changement RG surveillé à exporter');
                     return;
                 }
 
                 const wb = XLSX.utils.book_new();
+                const globalRows = [];
 
                 entries.forEach(([utbat, lines]) => {
                     const ordered = (lines || []).slice().sort((a, b) => a.rowIndex - b.rowIndex);
@@ -4848,13 +4881,24 @@ return;
                         "RG": line.rg || ''
                     }));
 
+                    globalRows.push(...rows);
+
                     const ws = XLSX.utils.json_to_sheet(rows);
                     XLSX.utils.book_append_sheet(wb, ws, `UTBAT_${utbat}`.substring(0, 31));
                 });
 
+                const orderedGlobalRows = globalRows.slice().sort((a, b) => {
+                    return (a["UT-BAT"] || '').localeCompare(b["UT-BAT"] || '')
+                        || (a["Numéro de Bail"] || '').localeCompare(b["Numéro de Bail"] || '')
+                        || ((a["Ligne"] || 0) - (b["Ligne"] || 0));
+                });
+
+                const summarySheet = XLSX.utils.json_to_sheet(orderedGlobalRows);
+                XLSX.utils.book_append_sheet(wb, summarySheet, 'Doublons');
+
                 const fileName = `Changements_RG_surveilles_${new Date().toISOString().split('T')[0]}.xlsx`;
                 XLSX.writeFile(wb, fileName);
-                showNotification(`📊 Export des changements RG surveillés généré (${entries.length} UT-BAT)`);
+                showNotification(`📊 Export des changements RG surveillés généré (${entries.length} UT-BAT, ${globalRows.length} ligne(s))`);
             } catch (error) {
                 console.error('Erreur export global changements RG:', error);
                 showNotification('❌ Erreur export global RG', 'error');
