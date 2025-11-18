@@ -65,6 +65,57 @@
             backdrop-filter: blur(5px);
         }
 
+        .processing-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .processing-overlay.active {
+            display: flex;
+        }
+
+        .processing-card {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+            min-width: 320px;
+            max-width: 480px;
+            text-align: center;
+        }
+
+        .processing-card h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .processing-progress-text {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background: #eef2ff;
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.2s ease;
+        }
+
         .ambient-player {
             position: absolute;
             top: 18px;
@@ -987,6 +1038,15 @@
     </style>
 </head>
 <body>
+    <div id="processingOverlay" class="processing-overlay" aria-live="polite">
+        <div class="processing-card">
+            <h4>Analyse en cours...</h4>
+            <div class="processing-progress-text" id="processingText">Préparation des données</div>
+            <div class="progress-bar" aria-hidden="true">
+                <div class="progress-bar-inner" id="processingProgressBar"></div>
+            </div>
+        </div>
+    </div>
     <div class="header">
         <div class="ambient-player" aria-label="Sélecteur de musique d'ambiance Minecraft">
             <label for="ambientSelector">Ambiance douce</label>
@@ -2619,6 +2679,32 @@
             }
         }
 
+        function showProcessingOverlay(message, progressText = 'Préparation...') {
+            const overlay = document.getElementById('processingOverlay');
+            const text = document.getElementById('processingText');
+            const bar = document.getElementById('processingProgressBar');
+
+            if (text && message) text.textContent = message;
+            if (bar) bar.style.width = '0%';
+            if (overlay) overlay.classList.add('active');
+            updateProcessingProgress(progressText, 0);
+        }
+
+        function updateProcessingProgress(progressText, percentage) {
+            const text = document.getElementById('processingText');
+            const bar = document.getElementById('processingProgressBar');
+
+            if (text && progressText) text.textContent = progressText;
+            if (bar && typeof percentage === 'number') {
+                bar.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
+            }
+        }
+
+        function hideProcessingOverlay() {
+            const overlay = document.getElementById('processingOverlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+
         // 🚀 SYSTÈME IMPORT FICHIER CORRIGÉ
         function triggerFileInput(tabName) {
             const fileInput = document.getElementById(`fileInput${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
@@ -2629,7 +2715,7 @@
             }
         }
 
-        function handleFileImport(tabName, input) {
+        async function handleFileImport(tabName, input) {
             const file = input.files[0];
             if (!file) return;
 
@@ -2641,10 +2727,11 @@
             showNotification(`📥 Analyse du fichier "${file.name}" en cours...`, 'info');
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
+                    showProcessingOverlay('Analyse du fichier en cours...', 'Préparation des données...');
                     let workbook;
-                    
+
                     if (file.name.toLowerCase().endsWith('.csv')) {
                         const csvData = e.target.result;
                         workbook = XLSX.read(csvData, { type: 'string' });
@@ -2656,21 +2743,24 @@
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                    
+
                     if (jsonData.length === 0) {
                         showNotification(`❌ Le fichier "${file.name}" semble vide`, 'error');
+                        hideProcessingOverlay();
                         return;
                     }
-                    
-                    currentPreviewData = processImportData(jsonData, tabName);
+
+                    currentPreviewData = await processImportData(jsonData, tabName);
                     currentTabForPreview = tabName;
-                    
+
                     showPreview(tabName);
                     showNotification(`✅ Fichier "${file.name}" analysé avec succès`, 'success');
-                    
+
                 } catch (error) {
                     console.error('Erreur lecture fichier:', error);
                     showNotification(`❌ Erreur lors de la lecture du fichier "${file.name}"`, 'error');
+                } finally {
+                    hideProcessingOverlay();
                 }
             };
             
@@ -2698,7 +2788,7 @@
             }
         }
 
-        function analyzePastedData(tabName) {
+        async function analyzePastedData(tabName) {
             const textarea = document.getElementById(`pasteTextarea${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
             if (!textarea || !textarea.value.trim()) {
                 showNotification('❌ Aucune donnée à analyser', 'error');
@@ -2707,7 +2797,8 @@
 
             try {
                 showNotification('🔍 Analyse des données collées...', 'info');
-                
+                showProcessingOverlay('Analyse des données collées...', 'Préparation des tableaux...');
+
                 const rawData = textarea.value.trim();
                 const lines = rawData.split('\n');
                 const parsedData = lines.map(line => {
@@ -2716,12 +2807,13 @@
                 
                 if (parsedData.length === 0) {
                     showNotification('❌ Aucune donnée valide trouvée', 'error');
+                    hideProcessingOverlay();
                     return;
                 }
-                
-                currentPreviewData = processImportData(parsedData, tabName);
+
+                currentPreviewData = await processImportData(parsedData, tabName);
                 currentTabForPreview = tabName;
-                
+
                 togglePasteArea(tabName);
                 showPreview(tabName);
                 showNotification(`✅ ${parsedData.length} ligne(s) analysée(s)`, 'success');
@@ -2729,85 +2821,105 @@
             } catch (error) {
                 console.error('Erreur analyse données collées:', error);
                 showNotification('❌ Erreur lors de l\'analyse des données', 'error');
+            } finally {
+                hideProcessingOverlay();
             }
         }
 
         // 🔍 TRAITEMENT ET VALIDATION DES DONNÉES
         function processImportData(rawData, tabName) {
-            try {
-                const expectedColumns = tabConfigs[tabName]?.columns || [];
-                const processedData = {
-                    headers: [],
-                    rows: [],
-                    validationResults: {
-                        valid: 0,
-                        errors: 0,
-                        warnings: 0,
-                        total: 0
-                    }
-                };
-                
-                if (rawData.length === 0) return processedData;
-                
-                // Détecter les en-têtes
-                const firstRow = rawData[0];
-                const hasHeaders = detectHeaders(firstRow, expectedColumns);
-                
-                let dataStartIndex = hasHeaders ? 1 : 0;
-                processedData.headers = hasHeaders ? firstRow : expectedColumns.slice(0, firstRow.length);
-                
-                // Traiter chaque ligne
-                for (let i = dataStartIndex; i < rawData.length; i++) {
-                    const rawRow = rawData[i];
-                    if (!rawRow || rawRow.every(cell => !cell || cell.toString().trim() === '')) {
-                        continue;
-                    }
-                    
-                    const processedRow = {
-                        data: [],
-                        validations: [],
-                        hasErrors: false,
-                        hasWarnings: false
-                    };
-                    
-                    for (let j = 0; j < Math.max(rawRow.length, expectedColumns.length); j++) {
-                        const cellValue = j < rawRow.length ? rawRow[j] : '';
-                        const columnName = j < processedData.headers.length ? processedData.headers[j] : '';
-                        const expectedColumn = j < expectedColumns.length ? expectedColumns[j] : '';
-                        
-                        let cleanValue = cleanCellValue(cellValue, expectedColumn || columnName);
-                        const validation = validateCell(cleanValue, expectedColumn || columnName, tabName);
-                        
-                        processedRow.data.push(cleanValue);
-                        processedRow.validations.push(validation);
-                        
-                        if (validation.status === 'error') {
-                            processedRow.hasErrors = true;
-                            processedData.validationResults.errors++;
-                        } else if (validation.status === 'warning') {
-                            processedRow.hasWarnings = true;
-                            processedData.validationResults.warnings++;
-                        } else if (validation.status === 'valid') {
-                            processedData.validationResults.valid++;
+            return new Promise((resolve, reject) => {
+                try {
+                    const expectedColumns = tabConfigs[tabName]?.columns || [];
+                    const processedData = {
+                        headers: [],
+                        rows: [],
+                        validationResults: {
+                            valid: 0,
+                            errors: 0,
+                            warnings: 0,
+                            total: 0
                         }
+                    };
+
+                    if (rawData.length === 0) {
+                        resolve(processedData);
+                        return;
                     }
-                    
-                    processedData.rows.push(processedRow);
+
+                    const firstRow = rawData[0];
+                    const hasHeaders = detectHeaders(firstRow, expectedColumns);
+
+                    let dataStartIndex = hasHeaders ? 1 : 0;
+                    processedData.headers = hasHeaders ? firstRow : expectedColumns.slice(0, firstRow.length);
+
+                    const totalRows = rawData.length - dataStartIndex;
+                    const batchSize = 200;
+                    let currentIndex = dataStartIndex;
+
+                    const processBatch = () => {
+                        const end = Math.min(currentIndex + batchSize, rawData.length);
+
+                        for (let i = currentIndex; i < end; i++) {
+                            const rawRow = rawData[i];
+                            if (!rawRow || rawRow.every(cell => !cell || cell.toString().trim() === '')) {
+                                continue;
+                            }
+
+                            const processedRow = {
+                                data: [],
+                                validations: [],
+                                hasErrors: false,
+                                hasWarnings: false
+                            };
+
+                            for (let j = 0; j < Math.max(rawRow.length, expectedColumns.length); j++) {
+                                const cellValue = j < rawRow.length ? rawRow[j] : '';
+                                const columnName = j < processedData.headers.length ? processedData.headers[j] : '';
+                                const expectedColumn = j < expectedColumns.length ? expectedColumns[j] : '';
+
+                                let cleanValue = cleanCellValue(cellValue, expectedColumn || columnName);
+                                const validation = validateCell(cleanValue, expectedColumn || columnName, tabName);
+
+                                processedRow.data.push(cleanValue);
+                                processedRow.validations.push(validation);
+
+                                if (validation.status === 'error') {
+                                    processedRow.hasErrors = true;
+                                    processedData.validationResults.errors++;
+                                } else if (validation.status === 'warning') {
+                                    processedRow.hasWarnings = true;
+                                    processedData.validationResults.warnings++;
+                                } else if (validation.status === 'valid') {
+                                    processedData.validationResults.valid++;
+                                }
+                            }
+
+                            processedData.rows.push(processedRow);
+                        }
+
+                        processedData.validationResults.total = processedData.rows.length;
+
+                        const processedCount = processedData.rows.length;
+                        const progress = totalRows > 0 ? Math.min(100, Math.round((processedCount / totalRows) * 100)) : 100;
+                        updateProcessingProgress(`Analyse des lignes ${Math.min(end, rawData.length)}/${rawData.length}`, progress);
+
+                        if (end < rawData.length) {
+                            currentIndex = end;
+                            setTimeout(processBatch, 0);
+                        } else {
+                            resolve(processedData);
+                        }
+                    };
+
+                    setTimeout(processBatch, 0);
+
+                } catch (error) {
+                    console.error('Erreur traitement données:', error);
+                    showNotification('❌ Erreur lors du traitement des données', 'error');
+                    reject(error);
                 }
-                
-                processedData.validationResults.total = processedData.rows.length;
-                
-                return processedData;
-                
-            } catch (error) {
-                console.error('Erreur traitement données:', error);
-                showNotification('❌ Erreur lors du traitement des données', 'error');
-                return {
-                    headers: [],
-                    rows: [],
-                    validationResults: { valid: 0, errors: 0, warnings: 0, total: 0 }
-                };
-            }
+            });
         }
 
         function detectHeaders(firstRow, expectedColumns) {
