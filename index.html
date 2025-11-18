@@ -3916,23 +3916,39 @@
             if (!currentPreviewData) return null;
 
             const headers = currentPreviewData.headers.map(h => (h || '').toString().toLowerCase());
+            const normalizedHeaders = headers.map(h => h.replace(/[\s_\-]+/g, ''));
+
+            const findUTIndex = () => {
+                let idx = normalizedHeaders.findIndex(h => h.includes('codeut'));
+                if (idx === -1) idx = normalizedHeaders.findIndex(h => h === 'utbat' || h === 'ut');
+                if (idx === -1) idx = normalizedHeaders.findIndex(h => h.includes('ut'));
+                return idx;
+            };
+
+            const findRGIndex = () => {
+                let idx = normalizedHeaders.findIndex(h => h.includes('coderg'));
+                if (idx === -1) idx = normalizedHeaders.findIndex(h => h === 'rg');
+                if (idx === -1) idx = normalizedHeaders.findIndex(h => h.includes('rg'));
+                return idx;
+            };
+
+            const utIndex = findUTIndex();
+            const rgIndex = findRGIndex();
+
             let codeIndex = -1;
             let normalizer = (value) => (value || '').toString().trim();
             let label = 'entrées';
 
-            if (currentTabForPreview === 'baseut') {
-                codeIndex = headers.findIndex(h => h.includes('code') && h.includes('ut'));
+            if (currentTabForPreview === 'baseut' || (utIndex !== -1 && currentTabForPreview !== 'baserg')) {
+                codeIndex = utIndex;
                 normalizer = normalizeUTValue;
-                label = 'codes UT';
-            } else if (currentTabForPreview === 'baserg') {
-                codeIndex = headers.findIndex(h => h.includes('code') && h.includes('rg'));
-                if (codeIndex === -1) {
-                    codeIndex = headers.findIndex(h => h === 'rg');
-                }
+                label = 'codes UT / UT-BAT';
+            } else if (currentTabForPreview === 'baserg' || rgIndex !== -1) {
+                codeIndex = rgIndex;
                 normalizer = normalizeRGValue;
                 label = 'codes RG';
             } else {
-                showNotification('ℹ️ Le tri et la suppression des doublons sont disponibles pour les imports RG et UT.', 'info');
+                showNotification('ℹ️ Aucun code UT ou RG détecté pour trier et dédoublonner cette prévisualisation.', 'info');
                 return null;
             }
 
