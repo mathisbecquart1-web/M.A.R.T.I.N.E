@@ -3343,6 +3343,7 @@ return;
 
                 input.addEventListener('input', () => {
                     autoResizeField(input);
+                    applySmartSuggestion(input, column);
                     validateInputInRealTime(input, column, tabName);
                     saveAllData();
                     updateStats(tabName);
@@ -3938,6 +3939,11 @@ return;
             }
         }
 
+        function normalizeRGValue(value) {
+            if (value === null || value === undefined) return '';
+            return value.toString().replace(/\D/g, '').trim();
+        }
+
         function updateRGDatabase() {
             try {
                 const tbody = document.getElementById('basergTableBody');
@@ -3945,14 +3951,16 @@ return;
 
                 rgDatabase = {};
                 const rows = tbody.querySelectorAll('tr');
-                
+
                 rows.forEach(row => {
                     const inputs = row.querySelectorAll('input, textarea, select');
                     const codeRG = inputs[0] ? inputs[0].value.trim() : '';
+                    const normalizedCode = normalizeRGValue(codeRG);
                     const nomRG = inputs[1] ? inputs[1].value.trim() : '';
-                    
-                    if (codeRG) {
-                        rgDatabase[codeRG] = {
+
+                    if (normalizedCode) {
+                        rgDatabase[normalizedCode] = {
+                            codeAffiche: codeRG || normalizedCode,
                             nom: nomRG,
                             utilisations: 0,
                             derniereUtilisation: null
@@ -3996,7 +4004,7 @@ return;
 
             Object.entries(rgDatabase).forEach(([code, data]) => {
                 const option = document.createElement('option');
-                option.value = code;
+                option.value = data.codeAffiche || code;
                 option.label = data.nom || '';
                 codeList.appendChild(option);
 
@@ -4010,10 +4018,12 @@ return;
         }
 
         function findBestRGMatch(value) {
-            const normalized = (value || '').trim();
+            const normalized = normalizeRGValue(value || '');
             if (!normalized) return null;
             if (rgDatabase[normalized]) return normalized;
-            return Object.keys(rgDatabase).find(code => code.startsWith(normalized)) || null;
+
+            return Object.keys(rgDatabase)
+                .find(code => code.startsWith(normalized)) || null;
         }
 
         function findBestRGNameMatch(value) {
@@ -4052,10 +4062,19 @@ return;
             if (!match) return;
 
             const nomInput = getNomRGInput(row, tabName);
+            const rgInput = getRGInput(row, tabName);
+
+            if (rgInput && normalizeRGValue(rgInput.value) !== match) {
+                rgInput.value = rgDatabase[match]?.codeAffiche || match;
+                addColumnSuggestion(tabName === 'baserg' ? 'Code RG' : 'RG', rgInput.value);
+            }
+
             if (nomInput) {
                 nomInput.value = rgDatabase[match]?.nom || '';
                 nomInput.dataset.autoFilled = 'true';
                 addColumnSuggestion('Nom de RG', nomInput.value);
+                saveAllData();
+                updateStats(tabName);
             }
         }
 
@@ -4067,7 +4086,7 @@ return;
 
             const rgInput = getRGInput(row, tabName);
             if (rgInput) {
-                rgInput.value = matchCode;
+                rgInput.value = rgDatabase[matchCode]?.codeAffiche || matchCode;
                 rgInput.dataset.autoFilled = 'true';
                 addColumnSuggestion(tabName === 'baserg' ? 'Code RG' : 'RG', rgInput.value);
             }
@@ -4180,7 +4199,7 @@ return;
                     inputs.forEach((input, index) => {
                         const column = tabConfigs[tabName]?.columns[index];
 
-                        if (!column || column === 'RG' || column === 'Code RG' || column === 'Nom de RG') return;
+                        if (!column) return;
 
                         addColumnSuggestion(column, input.value);
                     });
@@ -4190,14 +4209,41 @@ return;
             refreshColumnSuggestionLists();
         }
 
+        function getColumnSuggestions(column) {
+            return Array.from(columnSuggestions[column] || []);
+        }
+
+        function applySmartSuggestion(input, column) {
+            if (!column) return;
+
+            const currentValue = (input.value || '').toString();
+            if (!currentValue || currentValue.length < 2) return;
+
+            const suggestions = getColumnSuggestions(column)
+                .filter(value => value.toLowerCase().startsWith(currentValue.toLowerCase()))
+                .sort((a, b) => a.length - b.length);
+
+            const bestMatch = suggestions.find(value => value.length > currentValue.length);
+            if (!bestMatch) return;
+
+            const selectionStart = currentValue.length;
+            input.value = bestMatch;
+            if (input.setSelectionRange) {
+                input.setSelectionRange(selectionStart, bestMatch.length);
+            }
+        }
+
         function attachColumnAutocomplete(input, column) {
             if (input.tagName !== 'INPUT') return;
 
-            if (!column || column === 'RG' || column === 'Code RG' || column === 'Nom de RG') return;
+            if (!column) return;
 
-            const datalistId = getColumnListId(column);
+            const existingList = input.getAttribute('list');
+            const datalistId = existingList || getColumnListId(column);
             ensureColumnSuggestionList(column);
-            input.setAttribute('list', datalistId);
+            if (!existingList) {
+                input.setAttribute('list', datalistId);
+            }
 
             if (input.value) {
                 addColumnSuggestion(column, input.value);
