@@ -376,7 +376,7 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            cursor: pointer;
+            pointer-events: none;
             z-index: 1;
         }
 
@@ -2943,8 +2943,8 @@
         function triggerFileInput(tabName) {
             const fileInput = document.getElementById(`fileInput${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
             if (fileInput) {
-                // Supprimer les anciens event listeners pour éviter les doublons
-                fileInput.onclick = null;
+                // Réinitialise la valeur pour pouvoir sélectionner deux fois le même fichier
+                fileInput.value = '';
                 fileInput.click();
             }
         }
@@ -4502,6 +4502,9 @@ return;
                     showNotification('ℹ️ Aucune ligne repérée pour cet UT-BAT');
                     return;
                 }
+
+                // Bascule directement sur l'onglet Recherche pour afficher la liste complète
+                switchTab('recherche');
 
                 const sortedLines = lines.sort((a, b) => a.rowIndex - b.rowIndex);
                 const preparedResults = [];
