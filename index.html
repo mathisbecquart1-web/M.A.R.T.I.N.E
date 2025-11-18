@@ -2781,8 +2781,7 @@
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button class="btn btn-warning" onclick="fixAllErrors()">🔧 Corriger automatiquement</button>
                     <button class="btn btn-secondary" onclick="applyPreviewSmartSuggestions()">💡 Propositions intelligentes (UT/RG)</button>
-                    <button class="btn btn-secondary" onclick="sortPreviewAndDeduplicate()">↕️ Trier / dédoublonner</button>
-                    <button class="btn btn-info" onclick="removePreviewDuplicates()">🧹 Enlever les doublons</button>
+                    <button class="btn btn-secondary" onclick="sortPreviewAndDeduplicate()">🧹 Trier et enlever les doublons</button>
                     <button class="btn btn-danger" onclick="removeErrorRows()">🗑️ Supprimer lignes en erreur</button>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -3482,7 +3481,7 @@
 
                 if (duplicateRows > 0) {
                     const message = `⚠️ ${duplicateCodes} code(s) UT apparaissent en double (${duplicateRows} ligne(s)). ` +
-                        'Utilisez "🧹 Enlever les doublons" pour ne conserver qu\'un exemplaire.';
+                        'Utilisez "🧹 Trier et enlever les doublons" pour ne conserver qu\'un exemplaire.';
                     showNotification(message, 'warning');
                 }
             }
@@ -3493,7 +3492,7 @@
 
                 if (duplicateRows > 0) {
                     const message = `⚠️ ${duplicateCodes} code(s) RG apparaissent en double (${duplicateRows} ligne(s)). ` +
-                        'Cliquez sur "🧹 Enlever les doublons" pour nettoyer la prévisualisation.';
+                        'Cliquez sur "🧹 Trier et enlever les doublons" pour nettoyer la prévisualisation.';
                     showNotification(message, 'warning');
                 }
             }
@@ -3918,6 +3917,40 @@
             const headers = currentPreviewData.headers.map(h => (h || '').toString().toLowerCase());
             const normalizedHeaders = headers.map(h => h.replace(/[\s_\-]+/g, ''));
 
+            const analyzeDataForCodes = () => {
+                if (!currentPreviewData.rows || currentPreviewData.rows.length === 0) return null;
+
+                const columnStats = {};
+                currentPreviewData.rows.forEach(row => {
+                    (row.data || []).forEach((cell, idx) => {
+                        const raw = (cell || '').toString().trim();
+                        if (!raw) return;
+
+                        const normalized = raw.toUpperCase().replace(/[\s_\-]+/g, '');
+                        if (!columnStats[idx]) {
+                            columnStats[idx] = { filled: 0, uniques: new Set() };
+                        }
+                        columnStats[idx].filled++;
+                        columnStats[idx].uniques.add(normalized);
+                    });
+                });
+
+                let bestIndex = -1;
+                let bestScore = 0;
+
+                Object.entries(columnStats).forEach(([idx, info]) => {
+                    const score = info.uniques.size;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestIndex = parseInt(idx, 10);
+                    }
+                });
+
+                if (bestIndex === -1) return null;
+
+                return { index: bestIndex, normalizer: normalizeUTValue, label: 'codes détectés' };
+            };
+
             const findUTIndex = () => {
                 let idx = normalizedHeaders.findIndex(h => h.includes('codeut'));
                 if (idx === -1) idx = normalizedHeaders.findIndex(h => h === 'utbat' || h === 'ut');
@@ -3948,8 +3981,15 @@
                 normalizer = normalizeRGValue;
                 label = 'codes RG';
             } else {
-                showNotification('ℹ️ Aucun code UT ou RG détecté pour trier et dédoublonner cette prévisualisation.', 'info');
-                return null;
+                const fallback = analyzeDataForCodes();
+                if (fallback) {
+                    codeIndex = fallback.index;
+                    normalizer = fallback.normalizer;
+                    label = fallback.label;
+                } else {
+                    showNotification('ℹ️ Aucun code UT ou RG détecté pour trier et dédoublonner cette prévisualisation.', 'info');
+                    return null;
+                }
             }
 
             if (codeIndex === -1) {
@@ -3958,48 +3998,6 @@
             }
 
             return { codeIndex, normalizer, label };
-        }
-
-        function removePreviewDuplicates() {
-            try {
-                const codeInfo = getPreviewCodeInfo();
-                if (!codeInfo) return;
-
-                const { codeIndex, normalizer, label } = codeInfo;
-
-                const seen = new Set();
-                const filteredRows = [];
-                let removed = 0;
-
-                currentPreviewData.rows.forEach(row => {
-                    const key = normalizer(row.data[codeIndex]);
-                    if (!key) {
-                        filteredRows.push(row);
-                        return;
-                    }
-
-                    if (seen.has(key)) {
-                        removed++;
-                        return;
-                    }
-
-                    seen.add(key);
-                    filteredRows.push(row);
-                });
-
-                if (removed > 0) {
-                    currentPreviewData.rows = filteredRows;
-                    updatePreviewStats();
-                    showPreview(currentTabForPreview);
-                    showNotification(`🧹 ${removed} doublon(s) supprimé(s) (${label})`, 'success');
-                } else {
-                    showNotification('ℹ️ Aucun doublon à supprimer', 'warning');
-                }
-
-            } catch (error) {
-                console.error('Erreur suppression doublons:', error);
-                showNotification('❌ Erreur lors du nettoyage des doublons', 'error');
-            }
         }
 
         function sortPreviewAndDeduplicate() {
