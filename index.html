@@ -153,39 +153,6 @@
             transition: width 0.2s ease;
         }
 
-        .ambient-player {
-            position: absolute;
-            top: 18px;
-            left: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.65);
-            padding: 8px 10px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            font-size: 11px;
-            color: #445;
-            backdrop-filter: blur(6px);
-        }
-
-        .ambient-player label {
-            font-weight: 700;
-            font-size: 11px;
-            color: #546;
-            letter-spacing: 0.2px;
-        }
-
-        .ambient-player select {
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 6px;
-            padding: 6px 8px;
-            font-size: 11px;
-            background: rgba(255,255,255,0.9);
-            color: #334;
-            min-width: 180px;
-        }
-
         .tabs-container {
             display: flex;
             background: rgba(255,255,255,0.9);
@@ -1085,17 +1052,6 @@
         </div>
     </div>
     <div class="header">
-        <div class="ambient-player" aria-label="Sélecteur de musique d'ambiance Minecraft">
-            <label for="ambientSelector">Ambiance douce</label>
-            <select id="ambientSelector">
-                <option value="">🔇 Silence</option>
-                <option value="brise">🍃 Brise</option>
-                <option value="crepuscule">🌙 Crépuscule</option>
-                <option value="feuillage">🌿 Feuillage</option>
-                <option value="givre">❄️ Givre</option>
-                <option value="lagon">💧 Lagon</option>
-            </select>
-        </div>
         <div class="save-status" id="saveStatus">💾 Auto-sauvegarde activée</div>
         <h1>Suivi Mise en Qualité - SNCF PROJECT <span class="project-martine">M.A.R.T.I.N.E V17</span></h1>
         <div class="controls" style="justify-content: center; margin-top: 15px;">
@@ -1886,6 +1842,11 @@
                                 <option value="verifbaux">✅ Vérification baux</option>
                             </select>
                         </div>
+
+                        <div class="task-field">
+                            <label>Nombre de tâches à créer :</label>
+                            <input id="taskQuantity" type="number" min="1" max="50" value="1" />
+                        </div>
                         
                         <div id="taskFieldsContainer">
                             <p style="color: #666; text-align: center; padding: 20px;">
@@ -2409,179 +2370,12 @@
         let autoSaveInterval = null;
         let chartInstances = {};
         let activityLog = [];
-        let audioContext = null;
-        let ambientLoopTimer = null;
-        let currentAmbientTrack = null;
         let qualityAlertsExpanded = false;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
             rowCounters[tabName] = 0;
         });
-
-        // 🎵 LECTEUR AMBIANCE DOUCE
-        function getAudioContext() {
-            if (!window.AudioContext && !window.webkitAudioContext) return null;
-
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-
-            return audioContext;
-        }
-
-        const ambientTracks = {
-            brise: {
-                label: 'Brise',
-                tempo: 52,
-                filterHz: 1200,
-                envelope: { attack: 0.5, release: 1.8 },
-                voices: [
-                    { type: 'sine', gain: 0.028, notes: [['C4', 6], ['E4', 6], ['G4', 6], ['E4', 6]] },
-                    { type: 'triangle', gain: 0.018, notes: [['G3', 8], ['D4', 8], ['A3', 8], ['D4', 8]] },
-                    { type: 'sine', gain: 0.012, notes: [['C3', 12], ['C3', 12]] }
-                ]
-            },
-            crepuscule: {
-                label: 'Crépuscule',
-                tempo: 56,
-                filterHz: 1400,
-                envelope: { attack: 0.45, release: 1.6 },
-                voices: [
-                    { type: 'triangle', gain: 0.024, notes: [['A3', 4], ['C4', 4], ['E4', 4], ['C4', 4]] },
-                    { type: 'sine', gain: 0.015, notes: [['E3', 10], ['B3', 10], ['E3', 10], ['A3', 10]] },
-                    { type: 'sine', gain: 0.01, notes: [['A2', 16], ['A2', 16]] }
-                ]
-            },
-            feuillage: {
-                label: 'Feuillage',
-                tempo: 60,
-                filterHz: 1100,
-                envelope: { attack: 0.55, release: 1.9 },
-                voices: [
-                    { type: 'sine', gain: 0.03, notes: [['D4', 5], ['F4', 5], ['A4', 5], ['F4', 5]] },
-                    { type: 'triangle', gain: 0.016, notes: [['A3', 10], ['E4', 10], ['A3', 10], ['D4', 10]] },
-                    { type: 'sine', gain: 0.012, notes: [['D3', 20], ['D3', 20]] }
-                ]
-            },
-            givre: {
-                label: 'Givre',
-                tempo: 48,
-                filterHz: 900,
-                envelope: { attack: 0.6, release: 2.1 },
-                voices: [
-                    { type: 'sine', gain: 0.022, notes: [['E4', 7], ['B3', 7], ['G4', 7], ['B3', 7]] },
-                    { type: 'triangle', gain: 0.014, notes: [['B2', 12], ['F#3', 12], ['B2', 12], ['E3', 12]] },
-                    { type: 'sine', gain: 0.009, notes: [['E3', 24], ['E3', 24]] }
-                ]
-            },
-            lagon: {
-                label: 'Lagon',
-                tempo: 58,
-                filterHz: 1300,
-                envelope: { attack: 0.5, release: 1.7 },
-                voices: [
-                    { type: 'triangle', gain: 0.026, notes: [['G3', 5], ['B3', 5], ['D4', 5], ['B3', 5]] },
-                    { type: 'sine', gain: 0.018, notes: [['D3', 9], ['A3', 9], ['E3', 9], ['A3', 9]] },
-                    { type: 'sine', gain: 0.011, notes: [['G2', 18], ['G2', 18]] }
-                ]
-            }
-        };
-
-        function noteToFrequency(note) {
-            const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-            const match = note.match(/([A-G]#?)(\d)/);
-            if (!match) return 440;
-            const [, name, octave] = match;
-            const midi = notes.indexOf(name) + (parseInt(octave, 10) + 1) * 12;
-            return 440 * Math.pow(2, (midi - 69) / 12);
-        }
-
-        function scheduleAmbientPattern(track, startTime) {
-            const ctx = getAudioContext();
-            if (!ctx) return 0;
-
-            const secondsPerBeat = 60 / track.tempo;
-            const attackBeat = (track.envelope?.attack ?? 0.3);
-            const releaseBeat = (track.envelope?.release ?? 0.8);
-            let longest = 0;
-
-            track.voices.forEach(voice => {
-                let cursor = startTime;
-                voice.notes.forEach(([note, beats]) => {
-                    const osc = ctx.createOscillator();
-                    osc.type = voice.type;
-                    osc.frequency.setValueAtTime(noteToFrequency(note), cursor);
-
-                    const filter = ctx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(track.filterHz || 1500, cursor);
-                    filter.Q.setValueAtTime(0.4, cursor);
-
-                    const gain = ctx.createGain();
-                    const attack = attackBeat * secondsPerBeat;
-                    const release = releaseBeat * secondsPerBeat;
-                    gain.gain.setValueAtTime(0.0001, cursor);
-                    gain.gain.linearRampToValueAtTime(voice.gain, cursor + attack);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, cursor + beats * secondsPerBeat + release);
-
-                    osc.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(ctx.destination);
-
-                    osc.start(cursor);
-                    osc.stop(cursor + beats * secondsPerBeat + release);
-
-                    cursor += beats * secondsPerBeat;
-                    const segmentLength = cursor - startTime + release;
-                    if (segmentLength > longest) longest = segmentLength;
-                });
-            });
-
-            return longest;
-        }
-
-        function stopAmbientMusic() {
-            if (ambientLoopTimer) {
-                clearInterval(ambientLoopTimer);
-                ambientLoopTimer = null;
-            }
-            currentAmbientTrack = null;
-        }
-
-        function playAmbientMusic(key) {
-            const track = ambientTracks[key];
-            if (!track) return;
-
-            stopAmbientMusic();
-
-            const ctx = getAudioContext();
-            if (!ctx) return;
-
-            currentAmbientTrack = key;
-            const loopDuration = scheduleAmbientPattern(track, ctx.currentTime + 0.05);
-            ambientLoopTimer = setInterval(() => {
-                scheduleAmbientPattern(track, ctx.currentTime);
-            }, Math.max(2000, loopDuration * 1000));
-        }
-
-        function setupAmbientSelector() {
-            const selector = document.getElementById('ambientSelector');
-            if (!selector) return;
-
-            selector.addEventListener('change', event => {
-                const choice = event.target.value;
-                if (choice) {
-                    playAmbientMusic(choice);
-                } else {
-                    stopAmbientMusic();
-                }
-            });
-        }
 
         // 🔧 FONCTIONS UTILITAIRES COMPLÈTES
         function showNotification(message, type = 'success') {
@@ -3395,22 +3189,36 @@ return;
 
                 const validRows = previewData.rows.filter(row => row.data.some(cell => cell && cell.toString().trim()));
                 const total = validRows.length;
-                const chunkSize = 150;
+                const chunkSize = 250;
                 let imported = 0;
 
                 showProcessingOverlay('Importation en cours...', `Début de l'import (${total} lignes)`);
 
-                for (let i = 0; i < validRows.length; i += chunkSize) {
-                    const slice = validRows.slice(i, i + chunkSize);
-                    slice.forEach(row => {
-                        addRowWithData(tabName, row.data);
-                        imported++;
-                    });
+                const schedule = window.requestIdleCallback
+                    ? (cb) => requestIdleCallback(cb, { timeout: 60 })
+                    : (cb) => setTimeout(cb, 0);
+
+                while (imported < total) {
+                    const fragment = document.createDocumentFragment();
+                    const end = Math.min(imported + chunkSize, total);
+
+                    for (let i = imported; i < end; i++) {
+                        addRowWithData(tabName, validRows[i].data, {
+                            fragment,
+                            skipStats: true,
+                            skipLog: true,
+                            skipFocus: true,
+                            skipValidation: true
+                        });
+                    }
+
+                    tbody.appendChild(fragment);
+                    imported = end;
 
                     const progress = total > 0 ? Math.round((imported / total) * 100) : 100;
                     updateProcessingProgress(`Importation des lignes ${Math.min(imported, total)}/${total}` , progress);
 
-                    await new Promise(resolve => requestAnimationFrame(resolve));
+                    await new Promise(resolve => schedule(resolve));
                 }
 
                 updateStats(tabName);
@@ -3474,69 +3282,87 @@ return;
             return field;
         }
 
+        function buildRowElement(tabName, data = [], options = {}) {
+            const { skipValidation = false } = options;
+            const columns = tabConfigs[tabName]?.columns || [];
+            const rowNum = ++rowCounters[tabName];
+
+            const row = document.createElement('tr');
+
+            const numberCell = document.createElement('td');
+            numberCell.className = 'row-number';
+            numberCell.textContent = rowNum;
+            row.appendChild(numberCell);
+
+            columns.forEach((column, index) => {
+                const cell = document.createElement('td');
+                const input = createEditableField(column, tabName, data[index] || '');
+
+                if (tabName === 'modifsurface' && column === 'Différence') {
+                    const surfaceAvant = parseFloat(data[columns.indexOf('-')] || 0);
+                    const surfaceApres = parseFloat(data[columns.indexOf('+')] || 0);
+                    input.value = (surfaceApres - surfaceAvant).toFixed(2);
+                    input.readOnly = true;
+                    input.style.backgroundColor = '#f8f9fa';
+                }
+
+                if (tabName === 'baserg' && column === 'Code RG') {
+                    input.addEventListener('input', () => updateRGDatabase());
+                } else if (tabName === 'baserg' && column === 'Nom de RG') {
+                    input.addEventListener('input', () => updateRGDatabase());
+                } else if (tabName === 'baserg' && (column === 'Utilisations' || column === 'Dernière utilisation')) {
+                    input.readOnly = true;
+                    input.style.backgroundColor = '#f8f9fa';
+                    if (column === 'Utilisations') {
+                        input.value = data[index] || '0';
+                    }
+                }
+
+                if (tabName === 'modifsurface' && (column === '-' || column === '+')) {
+                    input.addEventListener('input', () => calculateSurfaceDifference(row));
+                }
+
+                if (column === 'RG' || column === 'Code RG') {
+                    setupRGAutoCompletion(input, row, tabName);
+                } else if (column === 'Nom de RG') {
+                    setupNomRGAutoCompletion(input, row, tabName);
+                }
+
+                attachColumnAutocomplete(input, column);
+
+                input.addEventListener('input', () => {
+                    autoResizeField(input);
+                    validateInputInRealTime(input, column, tabName);
+                    saveAllData();
+                    updateStats(tabName);
+                });
+
+                if (!skipValidation) {
+                    validateInputInRealTime(input, column, tabName);
+                }
+                autoResizeField(input);
+
+                cell.appendChild(input);
+                row.appendChild(cell);
+            });
+
+            const actionCell = document.createElement('td');
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '🗑️';
+            deleteBtn.onclick = () => deleteRow(row, tabName);
+            actionCell.appendChild(deleteBtn);
+            row.appendChild(actionCell);
+
+            return row;
+        }
+
         function addRow(tabName) {
             try {
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) return;
 
-                const columns = tabConfigs[tabName]?.columns || [];
-                const rowNum = ++rowCounters[tabName];
-
-                const row = document.createElement('tr');
-
-                const numberCell = document.createElement('td');
-                numberCell.className = 'row-number';
-                numberCell.textContent = rowNum;
-                row.appendChild(numberCell);
-
-                columns.forEach((column, index) => {
-                    const cell = document.createElement('td');
-                    const input = createEditableField(column, tabName);
-
-                    // Événements spéciaux
-                    if (tabName === 'modifsurface' && (column === '-' || column === '+')) {
-                        input.addEventListener('input', () => calculateSurfaceDifference(row));
-                    }
-
-                    if (tabName === 'baserg' && column === 'Code RG') {
-                        input.addEventListener('input', () => updateRGDatabase());
-                    } else if (tabName === 'baserg' && column === 'Nom de RG') {
-                        input.addEventListener('input', () => updateRGDatabase());
-                    } else if (tabName === 'baserg' && (column === 'Utilisations' || column === 'Dernière utilisation')) {
-                        input.readOnly = true;
-                        input.value = column === 'Utilisations' ? '0' : '';
-                        input.style.backgroundColor = '#f8f9fa';
-                    }
-
-                    if (column === 'RG' || column === 'Code RG') {
-                        setupRGAutoCompletion(input, row, tabName);
-                    } else if (column === 'Nom de RG') {
-                        setupNomRGAutoCompletion(input, row, tabName);
-                    }
-
-                    attachColumnAutocomplete(input, column);
-
-                    attachColumnAutocomplete(input, column);
-
-                    input.addEventListener('input', () => {
-                        autoResizeField(input);
-                        validateInputInRealTime(input, column, tabName);
-                        saveAllData();
-                        updateStats(tabName);
-                    });
-
-                    cell.appendChild(input);
-                    row.appendChild(cell);
-                });
-                
-                const actionCell = document.createElement('td');
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-btn';
-                deleteBtn.textContent = '🗑️';
-                deleteBtn.onclick = () => deleteRow(row, tabName);
-                actionCell.appendChild(deleteBtn);
-                row.appendChild(actionCell);
-
+                const row = buildRowElement(tabName);
                 tbody.appendChild(row);
 
                 const firstInput = row.querySelector('input');
@@ -3549,97 +3375,50 @@ return;
                     updateRGDatabase();
                 }
                 logActivity(`Nouvelle ligne ajoutée dans ${getTabDisplayName(tabName)}`, 'info');
-                
+
             } catch (error) {
                 console.error('Erreur ajout ligne:', error);
                 showNotification('❌ Erreur lors de l\'ajout de ligne', 'error');
             }
         }
 
-        function addRowWithData(tabName, data) {
+        function addRowWithData(tabName, data, options = {}) {
+            const { fragment = null, skipStats = false, skipLog = false, skipFocus = false, skipValidation = false } = options;
             try {
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) return;
-                
-                const columns = tabConfigs[tabName]?.columns || [];
-                const rowNum = ++rowCounters[tabName];
-                
-                const row = document.createElement('tr');
-                
-                const numberCell = document.createElement('td');
-                numberCell.className = 'row-number';
-                numberCell.textContent = rowNum;
-                row.appendChild(numberCell);
-                
-                columns.forEach((column, index) => {
-                    const cell = document.createElement('td');
-                    const input = createEditableField(column, tabName, data[index] || '');
 
-                    // Calculs spécifiques
-                    if (tabName === 'modifsurface' && column === 'Différence') {
-                        const surfaceAvant = parseFloat(data[columns.indexOf('-')] || 0);
-                        const surfaceApres = parseFloat(data[columns.indexOf('+')] || 0);
-                        input.value = (surfaceApres - surfaceAvant).toFixed(2);
-                        input.readOnly = true;
-                        input.style.backgroundColor = '#f8f9fa';
+                const row = buildRowElement(tabName, data, { skipValidation });
+
+                if (fragment) {
+                    fragment.appendChild(row);
+                } else {
+                    tbody.appendChild(row);
+                }
+
+                if (!skipFocus) {
+                    const firstInput = row.querySelector('input');
+                    if (firstInput) {
+                        firstInput.focus();
                     }
+                }
 
-                    if (tabName === 'baserg' && column === 'Code RG') {
-                        input.addEventListener('input', () => updateRGDatabase());
-                    } else if (tabName === 'baserg' && column === 'Nom de RG') {
-                        input.addEventListener('input', () => updateRGDatabase());
-                    } else if (tabName === 'baserg' && (column === 'Utilisations' || column === 'Dernière utilisation')) {
-                        input.readOnly = true;
-                        input.style.backgroundColor = '#f8f9fa';
-                        if (column === 'Utilisations') {
-                            input.value = data[index] || '0';
-                        }
+                if (!skipStats) {
+                    updateStats(tabName);
+                    if (tabName === 'baserg') {
+                        updateRGDatabase();
                     }
-                    
-                    // Événements
-                    if (tabName === 'modifsurface' && (column === '-' || column === '+')) {
-                        input.addEventListener('input', () => calculateSurfaceDifference(row));
-                    }
-
-                    if (column === 'RG' || column === 'Code RG') {
-                        setupRGAutoCompletion(input, row, tabName);
-                    } else if (column === 'Nom de RG') {
-                        setupNomRGAutoCompletion(input, row, tabName);
-                    }
-
-                    attachColumnAutocomplete(input, column);
-
-                    input.addEventListener('input', () => {
-                        autoResizeField(input);
-                        validateInputInRealTime(input, column, tabName);
-                        saveAllData();
-                        updateStats(tabName);
-                    });
-                    
-                    // Validation initiale
-                    validateInputInRealTime(input, column, tabName);
-                    
-                    cell.appendChild(input);
-                    row.appendChild(cell);
-                });
-                
-                const actionCell = document.createElement('td');
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-btn';
-                deleteBtn.textContent = '🗑️';
-                deleteBtn.onclick = () => deleteRow(row, tabName);
-                actionCell.appendChild(deleteBtn);
-                row.appendChild(actionCell);
-                
-                tbody.appendChild(row);
-
-                if (tabName === 'baserg') {
+                } else if (tabName === 'baserg' && !skipValidation) {
                     updateRGDatabase();
+                }
+
+                if (!skipLog) {
+                    logActivity(`Ligne importée dans ${getTabDisplayName(tabName)}`, 'info');
                 }
 
             } catch (error) {
                 console.error('Erreur ajout ligne avec données:', error);
-                showNotification('❌ Erreur lors de l\'ajout de ligne avec données', 'error');
+                showNotification('❌ Erreur lors de l\'ajout de ligne', 'error');
             }
         }
 
@@ -5483,28 +5262,54 @@ function updateTabsChart() {
             }
         }
 
+        function getTaskQuantity() {
+            const qtyInput = document.getElementById('taskQuantity');
+            const parsed = parseInt(qtyInput?.value || '1', 10);
+            const safeValue = Math.min(Math.max(parsed || 1, 1), 50);
+            if (qtyInput) {
+                qtyInput.value = safeValue;
+            }
+            return safeValue;
+        }
+
         function transferTask() {
             try {
                 const targetTab = document.getElementById('taskTargetTab').value;
                 if (!targetTab) return;
-                
+
                 const columns = tabConfigs[targetTab]?.columns || [];
                 const taskData = [];
-                
+                const quantity = getTaskQuantity();
+
                 columns.forEach((column, index) => {
                     const input = document.getElementById(`taskField_${index}`);
                     taskData.push(input ? input.value : '');
                 });
-                
-                addRowWithData(targetTab, taskData);
+
+                const fragment = document.createDocumentFragment();
+                for (let i = 0; i < quantity; i++) {
+                    addRowWithData(targetTab, taskData, {
+                        fragment,
+                        skipStats: true,
+                        skipLog: true,
+                        skipFocus: true,
+                        skipValidation: true
+                    });
+                }
+
+                const tbody = document.getElementById(`${targetTab}TableBody`);
+                if (tbody) {
+                    tbody.appendChild(fragment);
+                }
+
                 updateStats(targetTab);
                 saveAllData();
-                
+
                 clearTaskForm();
-                
-                showNotification(`✅ Tâche transférée vers ${getTabDisplayName(targetTab)}`);
-                logActivity(`Tâche transférée vers ${getTabDisplayName(targetTab)}`, 'success');
-                
+
+                showNotification(`✅ ${quantity} tâche(s) transférée(s) vers ${getTabDisplayName(targetTab)}`);
+                logActivity(`${quantity} tâche(s) transférée(s) vers ${getTabDisplayName(targetTab)}`, 'success');
+
             } catch (error) {
                 console.error('Erreur transfert tâche:', error);
                 showNotification('❌ Erreur lors du transfert de tâche', 'error');
@@ -5518,31 +5323,33 @@ function updateTabsChart() {
 
                 const columns = tabConfigs[targetTab]?.columns || [];
                 const taskData = {};
-                
+                const quantity = getTaskQuantity();
+
                 columns.forEach((column, index) => {
                     const input = document.getElementById(`taskField_${index}`);
                     taskData[column] = input ? input.value : '';
                 });
-                
-                const task = {
-                    id: generateUniqueId(),
-                    targetTab: targetTab,
-                    targetTabName: getTabDisplayName(targetTab),
-                    data: taskData,
-                    createdAt: new Date(),
-                    priority: 'Normale',
-                    summary: generateTaskSummary(taskData)
-                };
-                
-                pendingTasks.push(task);
+
+                for (let i = 0; i < quantity; i++) {
+                    const task = {
+                        id: generateUniqueId(),
+                        targetTab: targetTab,
+                        targetTabName: getTabDisplayName(targetTab),
+                        data: { ...taskData },
+                        createdAt: new Date(),
+                        priority: 'Normale',
+                        summary: generateTaskSummary(taskData)
+                    };
+                    pendingTasks.push(task);
+                }
                 updatePendingTasksDisplay();
                 updateTasksStats();
                 saveAllData();
-                
+
                 clearTaskForm();
-                
-                showNotification('⏳ Tâche mise en attente');
-                logActivity(`Tâche mise en attente pour ${getTabDisplayName(targetTab)}`, 'info');
+
+                showNotification(`⏳ ${quantity} tâche(s) mise(s) en attente`);
+                logActivity(`${quantity} tâche(s) mise(s) en attente pour ${getTabDisplayName(targetTab)}`, 'info');
                 
             } catch (error) {
                 console.error('Erreur sauvegarde tâche en attente:', error);
@@ -5670,31 +5477,33 @@ function updateTabsChart() {
 
                 const columns = tabConfigs[targetTab]?.columns || [];
                 const taskData = {};
+                const quantity = getTaskQuantity();
 
                 columns.forEach((column, index) => {
                     const input = document.getElementById(`taskField_${index}`);
                     taskData[column] = input ? input.value : '';
                 });
 
-                const task = {
-                    id: generateUniqueId(),
-                    targetTab,
-                    targetTabName: getTabDisplayName(targetTab),
-                    data: taskData,
-                    createdAt: new Date(),
-                    priority: 'Normale',
-                    summary: generateTaskSummary(taskData)
-                };
-
-                activeBatch.tasks.push(task);
+                for (let i = 0; i < quantity; i++) {
+                    const task = {
+                        id: generateUniqueId(),
+                        targetTab,
+                        targetTabName: getTabDisplayName(targetTab),
+                        data: { ...taskData },
+                        createdAt: new Date(),
+                        priority: 'Normale',
+                        summary: generateTaskSummary(taskData)
+                    };
+                    activeBatch.tasks.push(task);
+                }
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
                 saveAllData();
 
                 clearTaskForm();
 
-                showNotification('➕ Tâche ajoutée au lot de création');
-                logActivity(`Tâche ajoutée au lot (${task.targetTabName})`, 'info');
+                showNotification(`➕ ${quantity} tâche(s) ajoutée(s) au lot de création`);
+                logActivity(`${quantity} tâche(s) ajoutée(s) au lot (${getTabDisplayName(targetTab)})`, 'info');
 
             } catch (error) {
                 console.error('Erreur ajout tâche au lot:', error);
@@ -5705,6 +5514,8 @@ function updateTabsChart() {
         function clearTaskForm() {
             try {
                 document.getElementById('taskTargetTab').value = '';
+                const qtyInput = document.getElementById('taskQuantity');
+                if (qtyInput) qtyInput.value = 1;
                 updateTaskFields();
             } catch (error) {
                 console.error('Erreur effacement formulaire tâche:', error);
@@ -6411,6 +6222,13 @@ function updateTabsChart() {
         }
 
         // 💾 SAUVEGARDE ET RESTAURATION COMPLÈTE
+        function scheduleIdleTask(callback) {
+            if (window.requestIdleCallback) {
+                return requestIdleCallback(callback, { timeout: 100 });
+            }
+            return setTimeout(callback, 0);
+        }
+
         function saveAllData() {
             try {
                 const allData = {
@@ -6478,7 +6296,7 @@ function updateTabsChart() {
                     return;
                 }
 
-                applyLoadedState(data);
+                scheduleIdleTask(() => applyLoadedState(data));
 
                 showNotification('💾 Données restaurées avec succès');
 
@@ -6688,9 +6506,21 @@ function updateTabsChart() {
                     if (!tabData || tabData.length === 0) return;
 
                     rowCounters[tabName] = 0;
+                    const fragment = document.createDocumentFragment();
                     tabData.forEach(rowData => {
-                        addRowWithData(tabName, rowData);
+                        addRowWithData(tabName, rowData, {
+                            fragment,
+                            skipStats: true,
+                            skipLog: true,
+                            skipFocus: true,
+                            skipValidation: true
+                        });
                     });
+
+                    const tbody = document.getElementById(`${tabName}TableBody`);
+                    if (tbody) {
+                        tbody.appendChild(fragment);
+                    }
 
                     updateStats(tabName);
                 });
@@ -6750,7 +6580,6 @@ function updateTabsChart() {
                 });
 
                 setupFileDropZones();
-                setupAmbientSelector();
                 updateStatsDashboard();
 
                 showNotification('🚀 MARTINE v17.0 - Tous onglets fonctionnels', 'success');
