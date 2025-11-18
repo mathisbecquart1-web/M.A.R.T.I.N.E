@@ -95,6 +95,43 @@
             color: #2c3e50;
         }
 
+        .quality-alerts {
+            margin-top: 15px;
+            text-align: left;
+        }
+
+        .quality-alert-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: #f8f9ff;
+            border: 1px solid #eef2ff;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .quality-alert-item:hover {
+            transform: translateY(-1px);
+            background: #eef2ff;
+        }
+
+        .quality-alert-item .alert-meta {
+            font-size: 12px;
+            color: #556;
+        }
+
+        .quality-alert-empty {
+            text-align: center;
+            color: #667;
+            padding: 10px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border: 1px dashed #dfe3ff;
+        }
+
         .processing-progress-text {
             color: #555;
             font-size: 14px;
@@ -1897,6 +1934,7 @@
                     <div style="display: flex; gap: 10px; justify-content: center;">
                         <button class="btn btn-primary" onclick="executeAllPendingTasks()">🚀 Exécuter toutes les tâches</button>
                         <button class="btn btn-danger" onclick="clearAllPendingTasks()">🗑️ Effacer toutes les tâches</button>
+                        <button class="btn btn-excel" onclick="exportTasksToExcel()">📤 Exporter les tâches</button>
                     </div>
                 </div>
             </div>
@@ -2020,6 +2058,7 @@
                         <div style="font-size: 18px; font-weight: 600; color: #667eea;">Analyse en cours...</div>
                         <div style="color: #666; margin-top: 10px;">Vérification automatique des données</div>
                     </div>
+                    <div id="qualityAlertsContainer" class="quality-alerts"></div>
                 </div>
 
                 <div class="stats-card">
@@ -2373,6 +2412,7 @@
         let audioContext = null;
         let ambientLoopTimer = null;
         let currentAmbientTrack = null;
+        let qualityAlertsExpanded = false;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -3306,10 +3346,10 @@
             }
         }
 
-        function importPreviewedData() {
+        async function importPreviewedData() {
             try {
                 if (!currentPreviewData || !currentTabForPreview) return;
-                
+
                 const errorCount = currentPreviewData.validationResults.errors;
                 if (errorCount > 0) {
                     if (!confirm(`⚠️ Il y a encore ${errorCount} erreur(s). Voulez-vous vraiment importer ?`)) {
@@ -3317,15 +3357,15 @@
                     }
                 }
                 
-                importDataToTable(currentPreviewData, currentTabForPreview);
-                
+                await importDataToTable(currentPreviewData, currentTabForPreview);
+
             } catch (error) {
                 console.error('Erreur import données prévisualisées:', error);
                 showNotification('❌ Erreur lors de l\'import', 'error');
             }
         }
 
-        function importIgnoreErrors() {
+        async function importIgnoreErrors() {
             try {
                 if (!currentPreviewData || !currentTabForPreview)
 return;
@@ -3337,41 +3377,54 @@ return;
                     }
                 }
                 
-                importDataToTable(currentPreviewData, currentTabForPreview);
-                
+                await importDataToTable(currentPreviewData, currentTabForPreview);
+
             } catch (error) {
                 console.error('Erreur import avec erreurs ignorées:', error);
                 showNotification('❌ Erreur lors de l\'import', 'error');
             }
         }
 
-        function importDataToTable(previewData, tabName) {
+        async function importDataToTable(previewData, tabName) {
             try {
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) {
                     showNotification('❌ Tableau cible non trouvé', 'error');
                     return;
                 }
-                
+
+                const validRows = previewData.rows.filter(row => row.data.some(cell => cell && cell.toString().trim()));
+                const total = validRows.length;
+                const chunkSize = 150;
                 let imported = 0;
-                
-                previewData.rows.forEach(row => {
-                    if (row.data.some(cell => cell && cell.toString().trim())) {
+
+                showProcessingOverlay('Importation en cours...', `Début de l'import (${total} lignes)`);
+
+                for (let i = 0; i < validRows.length; i += chunkSize) {
+                    const slice = validRows.slice(i, i + chunkSize);
+                    slice.forEach(row => {
                         addRowWithData(tabName, row.data);
                         imported++;
-                    }
-                });
-                
+                    });
+
+                    const progress = total > 0 ? Math.round((imported / total) * 100) : 100;
+                    updateProcessingProgress(`Importation des lignes ${Math.min(imported, total)}/${total}` , progress);
+
+                    await new Promise(resolve => requestAnimationFrame(resolve));
+                }
+
                 updateStats(tabName);
                 saveAllData();
                 closePreview();
-                
+                hideProcessingOverlay();
+
                 showNotification(`✅ ${imported} ligne(s) importée(s) avec succès`);
                 logActivity(`Import de ${imported} lignes dans ${getTabDisplayName(tabName)}`, 'success');
-                
+
             } catch (error) {
                 console.error('Erreur import vers tableau:', error);
                 showNotification('❌ Erreur lors de l\'import vers le tableau', 'error');
+                hideProcessingOverlay();
             }
         }
 
@@ -4444,11 +4497,129 @@ return;
             return counts;
         }
 
+        function getQualityIssues() {
+            const issues = [];
+
+            try {
+                Object.keys(tabConfigs).forEach(tabName => {
+                    if (tabName === 'baserg') return;
+
+                    const tbody = document.getElementById(`${tabName}TableBody`);
+                    if (!tbody) return;
+
+                    const rows = tbody.querySelectorAll('tr');
+
+                    rows.forEach((row, rowIndex) => {
+                        const inputs = row.querySelectorAll('input, textarea, select');
+
+                        inputs.forEach((input, colIndex) => {
+                            const columnName = tabConfigs[tabName]?.columns[colIndex];
+                            if (!columnName) return;
+
+                            let severity = null;
+                            if (input.classList.contains('has-error')) {
+                                severity = 'error';
+                            } else if (input.classList.contains('has-warning')) {
+                                severity = 'warning';
+                            }
+
+                            if (severity) {
+                                issues.push({
+                                    tabName,
+                                    rowIndex,
+                                    columnIndex: colIndex,
+                                    columnName,
+                                    severity,
+                                    message: input.title || 'Anomalie détectée',
+                                    value: input.value
+                                });
+                            }
+                        });
+                    });
+                });
+            } catch (error) {
+                console.error('Erreur collecte alertes qualité:', error);
+            }
+
+            return issues.sort((a, b) => {
+                const order = { error: 0, warning: 1 };
+                return (order[a.severity] ?? 2) - (order[b.severity] ?? 2);
+            });
+        }
+
+        function toggleQualityAlerts() {
+            qualityAlertsExpanded = !qualityAlertsExpanded;
+            updateQualityStatus();
+        }
+
+        function renderQualityAlerts(issues) {
+            const container = document.getElementById('qualityAlertsContainer');
+            if (!container) return;
+
+            if (!issues || issues.length === 0) {
+                container.innerHTML = '<div class="quality-alert-empty">Pas d\'alerte à afficher</div>';
+                return;
+            }
+
+            const visibleIssues = qualityAlertsExpanded ? issues : issues.slice(0, 5);
+
+            const alertsHtml = visibleIssues.map(issue => {
+                const icon = issue.severity === 'error' ? '❌' : '⚠️';
+                const label = issue.severity === 'error' ? 'Erreur' : 'Avertissement';
+
+                return `
+                    <div class="quality-alert-item" onclick="focusQualityIssue('${issue.tabName}', ${issue.rowIndex}, ${issue.columnIndex})">
+                        <div>
+                            <div><strong>${icon} ${label}</strong> - ${getTabDisplayName(issue.tabName)} (${issue.columnName})</div>
+                            <div class="alert-meta">${issue.message}</div>
+                        </div>
+                        <div class="alert-meta">Ligne ${issue.rowIndex + 1}</div>
+                    </div>
+                `;
+            }).join('');
+
+            const toggleButton = issues.length > 5
+                ? `<button class="btn btn-secondary" style="width: 100%; margin-top: 8px;" onclick="toggleQualityAlerts()">${qualityAlertsExpanded ? 'Réduire la liste' : 'Afficher toutes les alertes'} (${issues.length})</button>`
+                : '';
+
+            container.innerHTML = alertsHtml + toggleButton;
+        }
+
+        function focusQualityIssue(tabName, rowIndex, columnIndex) {
+            try {
+                switchTab(tabName);
+
+                requestAnimationFrame(() => {
+                    const tbody = document.getElementById(`${tabName}TableBody`);
+                    if (!tbody) return;
+
+                    const rows = tbody.querySelectorAll('tr');
+                    const targetRow = rows[rowIndex];
+                    if (targetRow) {
+                        targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetRow.classList.add('highlight-result');
+                        setTimeout(() => targetRow.classList.remove('highlight-result'), 2000);
+
+                        const inputs = targetRow.querySelectorAll('input, textarea, select');
+                        const targetInput = inputs[columnIndex];
+                        if (targetInput) {
+                            targetInput.focus();
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Erreur lors du focus sur une alerte qualité:', error);
+            }
+        }
+
+        
         function updateQualityStatus(counts) {
             try {
                 const container = document.getElementById('qualityStatus');
                 if (!container) return;
 
+                const issues = getQualityIssues();
                 const { errors = 0, warnings = 0 } = counts || getQualityCounts();
 
                 let status, icon, color;
@@ -4473,6 +4644,8 @@ return;
                     <div style="color: #666; margin-top: 10px;">Dernière vérification: ${new Date().toLocaleTimeString('fr-FR')}</div>
                 `;
 
+                renderQualityAlerts(issues);
+
             } catch (error) {
                 console.error('Erreur mise à jour qualité:', error);
             }
@@ -4489,7 +4662,7 @@ return;
             }
         }
 
-        function updateTabsChart() {
+function updateTabsChart() {
             try {
                 const ctx = document.getElementById('tabsChart');
                 if (!ctx) return;
@@ -4553,24 +4726,67 @@ return;
             }
         }
 
+        function getMonthlyTreatmentCounts(tabName) {
+            const counts = new Map();
+
+            try {
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return counts;
+
+                const rows = tbody.querySelectorAll('tr');
+                const dateIndex = tabConfigs[tabName]?.columns.indexOf('Date Traitement');
+                if (dateIndex === undefined || dateIndex < 0) return counts;
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const dateValue = inputs[dateIndex] ? inputs[dateIndex].value : '';
+                    const date = reviveDate(dateValue);
+
+                    if (date) {
+                        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                        counts.set(key, (counts.get(key) || 0) + 1);
+                    }
+                });
+
+            } catch (error) {
+                console.error('Erreur collecte données évolution:', error);
+            }
+
+            return counts;
+        }
+
+        function formatMonthLabel(monthKey) {
+            const [year, month] = monthKey.split('-').map(Number);
+            const date = new Date(year, month - 1, 1);
+            return date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+        }
+
         function updateEvolutionChart() {
             try {
                 const ctx = document.getElementById('evolutionChart');
                 if (!ctx || !window.Chart) return;
-                
-                // Simuler des données d'évolution
-                const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'];
-                const creationData = [12, 19, 8, 15, 25, 32];
-                const modificationData = [8, 12, 15, 10, 18, 22];
-                
+
+                const creationCounts = getMonthlyTreatmentCounts('creation');
+                const modificationCounts = getMonthlyTreatmentCounts('modification');
+
+                const monthKeys = Array.from(new Set([
+                    ...creationCounts.keys(),
+                    ...modificationCounts.keys()
+                ])).sort();
+
+                const selectedMonths = monthKeys.length > 0 ? monthKeys.slice(-6) : [];
+                const labels = selectedMonths.length > 0 ? selectedMonths.map(formatMonthLabel) : ['Aucune donnée'];
+                const creationData = selectedMonths.length > 0 ? selectedMonths.map(key => creationCounts.get(key) || 0) : [0];
+                const modificationData = selectedMonths.length > 0 ? selectedMonths.map(key => modificationCounts.get(key) || 0) : [0];
+
                 if (chartInstances.evolutionChart) {
                     chartInstances.evolutionChart.destroy();
                 }
-                
+
                 chartInstances.evolutionChart = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: months,
+                        labels: labels,
                         datasets: [{
                             label: 'Création',
                             data: creationData,
@@ -4602,7 +4818,7 @@ return;
                         }
                     }
                 });
-                
+
             } catch (error) {
                 console.error('Erreur graphique évolution:', error);
             }
@@ -5832,6 +6048,53 @@ return;
             }
         }
 
+        function exportTasksToExcel() {
+            try {
+                if (pendingTasks.length === 0 && completedTasks.length === 0) {
+                    showNotification('❌ Aucune tâche à exporter', 'error');
+                    return;
+                }
+
+                const buildTaskRow = (task, status) => ({
+                    Statut: status,
+                    Onglet: getTabDisplayName(task.targetTab),
+                    Résumé: task.summary,
+                    Priorité: task.priority || 'Normale',
+                    'Créée le': task.createdAt ? new Date(task.createdAt).toLocaleDateString('fr-FR') : '',
+                    'Complétée le': task.completedAt ? new Date(task.completedAt).toLocaleDateString('fr-FR') : '',
+                    Détails: Object.entries(task.data || {})
+                        .filter(([_, value]) => value)
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join(' | ')
+                });
+
+                const pendingRows = pendingTasks.map(task => buildTaskRow(task, 'En attente'));
+                const completedRows = completedTasks.map(task => buildTaskRow(task, 'Complétée'));
+
+                const workbook = XLSX.utils.book_new();
+
+                if (pendingRows.length > 0) {
+                    const pendingSheet = XLSX.utils.json_to_sheet(pendingRows);
+                    XLSX.utils.book_append_sheet(workbook, pendingSheet, 'En attente');
+                }
+
+                if (completedRows.length > 0) {
+                    const completedSheet = XLSX.utils.json_to_sheet(completedRows);
+                    XLSX.utils.book_append_sheet(workbook, completedSheet, 'Complétées');
+                }
+
+                const fileName = `taches_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(workbook, fileName);
+
+                showNotification(`📤 Tâches exportées: ${fileName}`);
+                logActivity('Export des tâches en Excel', 'info');
+
+            } catch (error) {
+                console.error('Erreur export des tâches:', error);
+                showNotification('❌ Erreur lors de l\'export des tâches', 'error');
+            }
+        }
+
         // 🔧 FONCTIONS SPÉCIALISÉES PAR ONGLET
         function validateAllBauxStates() {
             try {
@@ -6594,6 +6857,7 @@ return;
         window.deleteTask = deleteTask;
         window.executeAllPendingTasks = executeAllPendingTasks;
         window.clearAllPendingTasks = clearAllPendingTasks;
+        window.exportTasksToExcel = exportTasksToExcel;
         window.validateAllBauxStates = validateAllBauxStates;
         window.markAllAsOK = markAllAsOK;
         window.validateAllRGCodes = validateAllRGCodes;
@@ -6602,6 +6866,8 @@ return;
         window.exportCompleteBackup = exportCompleteBackup;
         window.importCompleteBackup = importCompleteBackup;
         window.handleBackupImport = handleBackupImport;
+        window.toggleQualityAlerts = toggleQualityAlerts;
+        window.focusQualityIssue = focusQualityIssue;
     </script>
 </body>
 </html>
