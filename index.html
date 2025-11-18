@@ -1415,7 +1415,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Glissez-déposez votre fichier Excel ou cliquez pour sélectionner. Validation automatique des données selon les règles SNCF.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('creation')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputCreation" accept=".xlsx,.xls,.csv" onchange="handleFileImport('creation', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -1533,7 +1533,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Import de fichiers Excel avec validation des codes RG, GA et numéros de bail.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('modification')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputModification" accept=".xlsx,.xls,.csv" onchange="handleFileImport('modification', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -1651,7 +1651,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Import de données de résiliation avec validation automatique GA et numéros de bail.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('resiliation')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputResiliation" accept=".xlsx,.xls,.csv" onchange="handleFileImport('resiliation', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -1767,7 +1767,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Import de données de modifications diverses avec validation automatique.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('autremodif')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputAutremodif" accept=".xlsx,.xls,.csv" onchange="handleFileImport('autremodif', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -1880,7 +1880,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Import avec calcul automatique des différences de surface. Les différences sont calculées automatiquement (+ - -).</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('modifsurface')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputModifsurface" accept=".xlsx,.xls,.csv" onchange="handleFileImport('modifsurface', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -2002,7 +2002,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Import avec validation stricte des états (OK/NOK/EN COURS) et vérification des codes RG contre la base.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('verifbaux')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputVerifbaux" accept=".xlsx,.xls,.csv" onchange="handleFileImport('verifbaux', this)">
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
                             <div style="color: #666; font-size: 14px;">Validation des états OK/NOK/EN COURS</div>
@@ -2094,7 +2094,7 @@
                     <div class="import-method">
                         <h5>📁 Import fichier Excel</h5>
                         <p>Import de la base de référence des codes RG avec validation et détection des doublons.</p>
-                        <div class="file-drop-zone" onclick="triggerFileInput('baserg')">
+                        <div class="file-drop-zone">
                             <input type="file" class="file-input-hidden" id="fileInputBaserg" accept=".xlsx,.xls,.csv" onchange="handleFileImport('baserg', this)">
                             <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
                             <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
@@ -2745,6 +2745,7 @@
         let activityDetailsExpanded = false;
         let qualityAlertsExpanded = false;
         let rgChangeRegistry = {};
+        let dismissedRGChanges = new Set();
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -4374,7 +4375,7 @@ return;
                     const bailValue = bailIndex >= 0 && inputs[bailIndex] ? inputs[bailIndex].value.trim() : '';
                     const gaValue = gaIndex >= 0 && inputs[gaIndex] ? inputs[gaIndex].value.trim() : '';
 
-                    if (!utbat) return;
+                    if (!utbat || dismissedRGChanges.has(utbat)) return;
 
                     if (!utbatMap[utbat]) {
                         utbatMap[utbat] = { count: 0, rgs: new Set() };
@@ -4481,8 +4482,9 @@ return;
                                     <span>🎭 ${change.variations} RG distincts</span>
                                 </div>
                             </div>
-                            <div style="display:flex; gap:6px;">
+                            <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
                                 <button class="btn btn-secondary btn-compact" onclick="focusRGChange('${change.utbat}')">🔎 Voir les lignes</button>
+                                <button class="btn btn-warning btn-compact" onclick="dismissRGChange('${change.utbat}')">🗂️ Retirer le doublon</button>
                                 <button class="btn btn-excel btn-compact" onclick="exportRGChange('${change.utbat}')">📑 Export</button>
                             </div>
                         </div>
@@ -4560,6 +4562,29 @@ return;
             } catch (error) {
                 console.error('Erreur navigation changement RG:', error);
                 showNotification('❌ Erreur lors de la navigation', 'error');
+            }
+        }
+
+        function dismissRGChange(utbat) {
+            try {
+                const normalized = (utbat || '').trim().toUpperCase();
+                if (!normalized) return;
+
+                dismissedRGChanges.add(normalized);
+
+                if (rgChangeRegistry[normalized]) {
+                    delete rgChangeRegistry[normalized];
+                }
+
+                const refreshedInsights = getRGChangeInsights();
+                updateRGChangeWidget(refreshedInsights);
+                updateStatChips(getTabStatistics().general, refreshedInsights, getQualityCounts());
+                saveAllData();
+
+                showNotification(`✅ UT-BAT ${normalized} retiré des doublons après vérification`);
+            } catch (error) {
+                console.error('Erreur suppression doublon RG:', error);
+                showNotification('❌ Impossible de retirer ce doublon', 'error');
             }
         }
 
@@ -7374,6 +7399,7 @@ function updateTabsChart() {
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
                     activityLog: activityLog,
+                    dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
                 
@@ -7451,6 +7477,7 @@ function updateTabsChart() {
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
                     activityLog: activityLog,
+                    dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
                 
@@ -7578,6 +7605,7 @@ function updateTabsChart() {
             }
 
             rgDatabase = data.rgDatabase || {};
+            dismissedRGChanges = new Set(data.dismissedRGChanges || []);
             refreshRGSuggestions();
 
             pendingTasks = (data.pendingTasks || []).map(task => ({
@@ -7762,6 +7790,7 @@ function updateTabsChart() {
                     
                     newDropZone.addEventListener('click', (e) => {
                         if (e.target === newDropZone || e.target.closest('.file-drop-zone') === newDropZone) {
+                            newFileInput.value = '';
                             newFileInput.click();
                         }
                     });
