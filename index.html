@@ -716,12 +716,28 @@
             transform: none;
         }
 
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+
+        .btn-compact {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
         .controls {
             display: flex;
             gap: 15px;
             margin-bottom: 25px;
             flex-wrap: wrap;
             align-items: center;
+        }
+
+        .pending-highlight {
+            animation: pulse 0.8s ease-in-out 0s 3;
+            outline: 2px solid #ffc107;
+            outline-offset: 2px;
         }
 
         /* 📊 TABLEAU PRINCIPAL */
@@ -1183,6 +1199,9 @@
                 <div class="stats-item">⏳ En attente: <span id="creationPendingRows">0</span></div>
                 <div class="stats-item">📈 Taux: <span id="creationCompletionRate">0%</span></div>
             </div>
+            <div class="stats-actions" style="margin-top: 10px;">
+                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('creation')">⏩ Aller à la prochaine en attente</button>
+            </div>
         </div>
 
         <!-- ONGLET MODIFICATION RG -->
@@ -1291,6 +1310,9 @@
                 <div class="stats-item">⏳ En attente: <span id="modificationPendingRows">0</span></div>
                 <div class="stats-item">📈 Taux: <span id="modificationCompletionRate">0%</span></div>
             </div>
+            <div class="stats-actions" style="margin-top: 10px;">
+                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('modification')">⏩ Aller à la prochaine en attente</button>
+            </div>
         </div>
 
         <!-- ONGLET RÉSILIATION -->
@@ -1396,6 +1418,9 @@
                 <div class="stats-item">✅ Traités: <span id="resiliationProcessedRows">0</span></div>
                 <div class="stats-item">⏳ En attente: <span id="resiliationPendingRows">0</span></div>
                 <div class="stats-item">📈 Taux: <span id="resiliationCompletionRate">0%</span></div>
+            </div>
+            <div class="stats-actions" style="margin-top: 10px;">
+                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('resiliation')">⏩ Aller à la prochaine en attente</button>
             </div>
         </div>
 
@@ -1504,6 +1529,9 @@
                 <div class="stats-item">⏳ En attente: <span id="autremodifPendingRows">0</span></div>
                 <div class="stats-item">📈 Taux: <span id="autremodifCompletionRate">0%</span></div>
             </div>
+            <div class="stats-actions" style="margin-top: 10px;">
+                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('autremodif')">⏩ Aller à la prochaine en attente</button>
+            </div>
         </div>
 
         <!-- ONGLET MODIFICATION SURFACE -->
@@ -1610,6 +1638,9 @@
                 <div class="stats-item">⏳ En attente: <span id="modifsurfacePendingRows">0</span></div>
                 <div class="stats-item">📈 Surface totale modifiée: <span id="modifsurfaceTotalDifference">0 m²</span></div>
                 <div class="stats-item">📈 Taux: <span id="modifsurfaceCompletionRate">0%</span></div>
+            </div>
+            <div class="stats-actions" style="margin-top: 10px;">
+                <button class="btn btn-secondary btn-compact" onclick="goToNextPending('modifsurface')">⏩ Aller à la prochaine en attente</button>
             </div>
         </div>
 
@@ -1726,6 +1757,9 @@
                     <div class="stats-item">⏳ En attente: <span id="verifbauxPendingRows">0</span></div>
                     <div class="stats-item">📈 Taux de validation: <span id="verifbauxValidationRate">0%</span></div>
                     <div class="stats-item">📈 Taux de traitement: <span id="verifbauxCompletionRate">0%</span></div>
+                </div>
+                <div class="stats-actions" style="margin-top: 10px;">
+                    <button class="btn btn-secondary btn-compact" onclick="goToNextPending('verifbaux')">⏩ Aller à la prochaine en attente</button>
                 </div>
             </div>
 
@@ -3652,6 +3686,56 @@ return;
             }
         }
 
+        function isRowPending(row, tabName) {
+            const inputs = row.querySelectorAll('input, textarea, select');
+            const hasData = Array.from(inputs).some(input => input.value.trim() !== '');
+            if (!hasData) return false;
+
+            if (tabName === 'verifbaux') {
+                const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
+                const traiteValue = inputs[traiteIndex] ? inputs[traiteIndex].value.toLowerCase() : '';
+                return traiteValue !== 'oui';
+            }
+
+            const dateTraitementIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
+            if (dateTraitementIndex >= 0) {
+                const dateTraitement = inputs[dateTraitementIndex] ? inputs[dateTraitementIndex].value : '';
+                return !dateTraitement;
+            }
+
+            return false;
+        }
+
+        function goToNextPending(tabName) {
+            try {
+                switchTab(tabName);
+
+                requestAnimationFrame(() => {
+                    const tbody = document.getElementById(`${tabName}TableBody`);
+                    if (!tbody) return;
+
+                    const pendingRow = Array.from(tbody.querySelectorAll('tr')).find(row => isRowPending(row, tabName));
+
+                    if (!pendingRow) {
+                        showNotification(`ℹ️ Aucune ligne en attente dans ${getTabDisplayName(tabName)}`);
+                        return;
+                    }
+
+                    pendingRow.classList.add('pending-highlight');
+                    pendingRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    const focusable = pendingRow.querySelector('input, textarea, select');
+                    if (focusable) focusable.focus();
+
+                    setTimeout(() => pendingRow.classList.remove('pending-highlight'), 2000);
+                    showNotification(`📍 Prochaine ligne en attente affichée dans ${getTabDisplayName(tabName)}`);
+                });
+            } catch (error) {
+                console.error('Erreur navigation vers ligne en attente:', error);
+                showNotification('❌ Impossible de trouver une ligne en attente', 'error');
+            }
+        }
+
         function updateRGUsageStats() {
             try {
                 const tbody = document.getElementById('basergTableBody');
@@ -3941,7 +4025,8 @@ return;
 
         function normalizeRGValue(value) {
             if (value === null || value === undefined) return '';
-            return value.toString().replace(/\D/g, '').trim();
+            const cleaned = value.toString().replace(/\D/g, '').trim();
+            return cleaned.replace(/^0+(?=\d)/, '');
         }
 
         function updateRGDatabase() {
@@ -4022,8 +4107,14 @@ return;
             if (!normalized) return null;
             if (rgDatabase[normalized]) return normalized;
 
-            return Object.keys(rgDatabase)
-                .find(code => code.startsWith(normalized)) || null;
+            const displayMatch = Object.entries(rgDatabase).find(([, data]) => normalizeRGValue(data.codeAffiche) === normalized);
+            if (displayMatch) return displayMatch[0];
+
+            const startsWithMatch = Object.keys(rgDatabase)
+                .find(code => code.startsWith(normalized) || normalized.startsWith(code));
+            if (startsWithMatch) return startsWithMatch;
+
+            return Object.keys(rgDatabase).find(code => normalizeRGValue(code) === normalized) || null;
         }
 
         function findBestRGNameMatch(value) {
