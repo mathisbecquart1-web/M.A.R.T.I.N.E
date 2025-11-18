@@ -944,6 +944,22 @@
             background-color: rgba(255, 193, 7, 0.05);
         }
 
+        .copy-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #138496;
+        }
+
         .delete-btn {
             background: #dc3545;
             color: white;
@@ -1440,6 +1456,7 @@
         <button class="tab" onclick="switchTab('autremodif')">🔧 Autre modification</button>
         <button class="tab" onclick="switchTab('modifsurface')">📐 Modification surface</button>
         <button class="tab" onclick="switchTab('verifbaux')">✅ Vérification baux</button>
+        <button class="tab" onclick="switchTab('pni')">🧾 PNI</button>
         <button class="tab" onclick="switchTab('baserg')">🗂️ Base RG & UT</button>
         <button class="tab" onclick="switchTab('taches')">📝 Tâches à faire</button>
         <button class="tab" onclick="switchTab('statistiques')">📊 Statistiques</button>
@@ -2128,7 +2145,7 @@
                             <th style="width: 100px;">Région</th>
                             <th style="width: 200px;">Commentaire</th>
                             <th style="width: 100px;">Traité</th>
-                            <th style="width: 50px;">Action</th>
+                            <th style="width: 70px;">Action</th>
                         </tr>
                     </thead>
                     <tbody id="verifbauxTableBody">
@@ -2137,11 +2154,11 @@
             </div>
 
             <!-- STATISTIQUES SPÉCIALISÉES -->
-                <div class="stats">
-                    <div class="stats-item">📊 Total: <span id="verifbauxTotalRows">0</span></div>
-                    <div class="stats-item" style="color: #28a745;">✅ OK: <span id="verifbauxOKRows">0</span></div>
-                    <div class="stats-item" style="color: #dc3545;">❌ NOK: <span id="verifbauxNOKRows">0</span></div>
-                    <div class="stats-item" style="color: #ffc107;">⏳ En cours: <span id="verifbauxEnCoursRows">0</span></div>
+            <div class="stats">
+                <div class="stats-item">📊 Total: <span id="verifbauxTotalRows">0</span></div>
+                <div class="stats-item" style="color: #28a745;">✅ OK: <span id="verifbauxOKRows">0</span></div>
+                <div class="stats-item" style="color: #dc3545;">❌ NOK: <span id="verifbauxNOKRows">0</span></div>
+                <div class="stats-item" style="color: #ffc107;">⏳ En cours: <span id="verifbauxEnCoursRows">0</span></div>
                     <div class="stats-item">✅ Traités: <span id="verifbauxProcessedRows">0</span></div>
                     <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'verifbaux')">
                         <div class="stat-header">
@@ -2159,7 +2176,94 @@
                 </div>
             </div>
 
-            <!-- ONGLET BASE RG & UT -->
+        <!-- ONGLET PNI -->
+        <div id="pni" class="tab-content">
+            <!-- FILTRES -->
+            <div class="filters-section">
+                <h4>🔍 Filtres PNI</h4>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>GA</label>
+                        <input type="text" id="filterPniGA" placeholder="Filtrer par GA..." oninput="filterTable('pni')">
+                    </div>
+                    <div class="filter-group">
+                        <label>RG</label>
+                        <input type="text" id="filterPniRG" placeholder="Filtrer par RG..." oninput="filterTable('pni')">
+                    </div>
+                    <div class="filter-group">
+                        <label>État</label>
+                        <select id="filterPniEtat" onchange="filterTable('pni')">
+                            <option value="">Tous</option>
+                            <option value="OK">OK</option>
+                            <option value="NOK">NOK</option>
+                            <option value="EN COURS">EN COURS</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>UT-BAT</label>
+                        <input type="text" id="filterPniUTBAT" placeholder="Filtrer par UT-BAT..." oninput="filterTable('pni')">
+                    </div>
+                    <div class="filter-group">
+                        <label>Lieu</label>
+                        <input type="text" id="filterPniLieu" placeholder="Filtrer par lieu..." oninput="filterTable('pni')">
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTRÔLES -->
+            <div class="controls">
+                <button class="btn btn-primary" onclick="addRow('pni')">➕ Ajouter ligne</button>
+                <button class="btn btn-excel" onclick="exportToExcel('pni')">📊 Exporter Excel</button>
+                <button class="btn btn-danger" onclick="clearAll('pni')">🗑️ Effacer tout</button>
+            </div>
+
+            <!-- TABLEAU -->
+            <div class="table-container">
+                <table id="pniTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th style="width: 80px;">GA</th>
+                            <th style="width: 100px;">UT-BAT</th>
+                            <th style="width: 80px;">RG</th>
+                            <th style="width: 120px;">Numéro Bail</th>
+                            <th style="width: 100px;">État</th>
+                            <th style="width: 150px;">Lieu</th>
+                            <th style="width: 150px;">Nom du Bâtiment</th>
+                            <th style="width: 100px;">Région</th>
+                            <th style="width: 200px;">Commentaire</th>
+                            <th style="width: 100px;">Traité</th>
+                            <th style="width: 70px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pniTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- STATISTIQUES SPÉCIALISÉES -->
+            <div class="stats">
+                <div class="stats-item">📊 Total: <span id="pniTotalRows">0</span></div>
+                <div class="stats-item" style="color: #28a745;">✅ OK: <span id="pniOKRows">0</span></div>
+                <div class="stats-item" style="color: #dc3545;">❌ NOK: <span id="pniNOKRows">0</span></div>
+                <div class="stats-item" style="color: #ffc107;">⏳ En cours: <span id="pniEnCoursRows">0</span></div>
+                <div class="stats-item">✅ Traités: <span id="pniProcessedRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'pni')">
+                    <div class="stat-header">
+                        <span class="stat-toggle" aria-hidden="true">▸</span>
+                        <div class="stat-main">⏳ En attente: <span id="pniPendingRows">0</span></div>
+                    </div>
+                    <span class="stat-hint">Déplier pour naviguer vers la prochaine ligne PNI</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('pni');">📍 Aller aux en attente</button>
+                    </div>
+                    <div class="pending-list" id="pniPendingList"></div>
+                </div>
+                <div class="stats-item">📈 Taux de validation: <span id="pniValidationRate">0%</span></div>
+                <div class="stats-item">📈 Taux de traitement: <span id="pniCompletionRate">0%</span></div>
+            </div>
+        </div>
+
+        <!-- ONGLET BASE RG & UT -->
         <div id="baserg" class="tab-content">
             <datalist id="rgDatalist"></datalist>
             <datalist id="rgNomDatalist"></datalist>
@@ -2349,6 +2453,7 @@
                                 <option value="autremodif">🔧 Autre modification</option>
                                 <option value="modifsurface">📐 Modification surface</option>
                                 <option value="verifbaux">✅ Vérification baux</option>
+                                <option value="pni">🧾 PNI</option>
                             </select>
                         </div>
 
@@ -2659,6 +2764,7 @@
                             <option value="autremodif">🔧 Autre modification</option>
                             <option value="modifsurface">📐 Modification surface</option>
                             <option value="verifbaux">✅ Vérification baux</option>
+                            <option value="pni">🧾 PNI</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -2830,6 +2936,11 @@
                 columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'État', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Traité'],
                 displayName: 'Vérification baux',
                 icon: '✅'
+            },
+            pni: {
+                columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'État', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Traité'],
+                displayName: 'PNI',
+                icon: '🧾'
             },
             baserg: {
                 columns: ['Code RG', 'Nom de RG', 'Utilisations', 'Dernière utilisation'],
@@ -4396,6 +4507,14 @@ return;
             });
 
             const actionCell = document.createElement('td');
+            if (tabName === 'verifbaux') {
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = '📋 PNI';
+                copyBtn.title = 'Copier vers PNI';
+                copyBtn.onclick = () => copyVerifRowToPNI(row);
+                actionCell.appendChild(copyBtn);
+            }
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
             deleteBtn.textContent = '🗑️';
@@ -4597,7 +4716,7 @@ return;
                 let processed = 0;
                 let pending = 0;
                 
-                if (tabName === 'verifbaux') {
+                if (['verifbaux', 'pni'].includes(tabName)) {
                     let ok = 0, nok = 0, enCours = 0;
                     let treated = 0;
 
@@ -4707,7 +4826,7 @@ return;
             const hasData = Array.from(inputs).some(input => input.value.trim() !== '');
             if (!hasData) return false;
 
-            if (tabName === 'verifbaux') {
+            if (['verifbaux', 'pni'].includes(tabName)) {
                 const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
                 const traiteValue = inputs[traiteIndex] ? inputs[traiteIndex].value.toLowerCase() : '';
                 return traiteValue !== 'oui';
@@ -4878,7 +4997,7 @@ return;
                 const usageCounts = {};
                 const tabUsageDates = {};
 
-                ['creation', 'modification', 'verifbaux'].forEach(tabName => {
+                ['creation', 'modification', 'verifbaux', 'pni'].forEach(tabName => {
                     const tabBody = document.getElementById(`${tabName}TableBody`);
                     if (!tabBody) return;
 
@@ -5030,12 +5149,12 @@ return;
 
                 rows.forEach(row => {
                     const inputs = row.querySelectorAll('input, textarea, select');
-                    const traiteIndex = tabName === 'verifbaux'
+                    const traiteIndex = ['verifbaux', 'pni'].includes(tabName)
                         ? tabConfigs[tabName].columns.indexOf('Traité')
                         : tabConfigs[tabName].columns.indexOf('Date Traitement');
 
                     const traiteValue = inputs[traiteIndex] ? inputs[traiteIndex].value : '';
-                    const isProcessed = tabName === 'verifbaux'
+                    const isProcessed = ['verifbaux', 'pni'].includes(tabName)
                         ? traiteValue.trim().toLowerCase() === 'oui'
                         : !!traiteValue;
 
@@ -8132,6 +8251,29 @@ function updateTabsChart() {
         }
 
         // 🔧 FONCTIONS SPÉCIALISÉES PAR ONGLET
+        function copyVerifRowToPNI(row) {
+            try {
+                const verifColumns = tabConfigs['verifbaux'].columns;
+                const pniColumns = tabConfigs['pni'].columns;
+                const inputs = row.querySelectorAll('input, textarea, select');
+
+                const mappedData = pniColumns.map(column => {
+                    const sourceIndex = verifColumns.indexOf(column);
+                    return sourceIndex >= 0 && inputs[sourceIndex]
+                        ? inputs[sourceIndex].value
+                        : '';
+                });
+
+                addRowWithData('pni', mappedData, { skipLog: true });
+                updateStats('pni');
+                saveAllData();
+                showNotification('📋 Ligne copiée vers PNI');
+            } catch (error) {
+                console.error('Erreur lors de la copie vers PNI:', error);
+                showNotification('❌ Impossible de copier la ligne vers PNI', 'error');
+            }
+        }
+
         function validateAllBauxStates() {
             try {
                 const tbody = document.getElementById('verifbauxTableBody');
@@ -8218,7 +8360,7 @@ function updateTabsChart() {
                 let validCodes = 0;
                 let checkedTabs = 0;
                 
-                ['creation', 'modification', 'verifbaux'].forEach(tabName => {
+                ['creation', 'modification', 'verifbaux', 'pni'].forEach(tabName => {
                     const tbody = document.getElementById(`${tabName}TableBody`);
                     if (!tbody) return;
                     
