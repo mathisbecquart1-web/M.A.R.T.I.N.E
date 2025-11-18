@@ -2746,6 +2746,7 @@
         let qualityAlertsExpanded = false;
         let rgChangeRegistry = {};
         let dismissedRGChanges = new Set();
+        let fileDialogLock = false;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -2943,10 +2944,27 @@
         // 🚀 SYSTÈME IMPORT FICHIER CORRIGÉ
         function triggerFileInput(tabName) {
             const fileInput = document.getElementById(`fileInput${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
-            if (fileInput) {
-                // Réinitialise la valeur pour pouvoir sélectionner deux fois le même fichier
-                fileInput.value = '';
+            openFilePicker(fileInput);
+        }
+
+        function openFilePicker(fileInput) {
+            if (!fileInput || fileDialogLock) return;
+
+            fileDialogLock = true;
+            fileInput.value = '';
+
+            try {
+                if (typeof fileInput.showPicker === 'function') {
+                    fileInput.showPicker();
+                } else {
+                    fileInput.click();
+                }
+            } catch (error) {
                 fileInput.click();
+            } finally {
+                setTimeout(() => {
+                    fileDialogLock = false;
+                }, 350);
             }
         }
 
@@ -4366,47 +4384,73 @@ return;
                 const gaIndex = tabConfigs['modification'].columns.indexOf('GA');
                 const rows = tbody.querySelectorAll('tr');
                 const utbatMap = {};
-                const detailMap = {};
+                const linesByUtbat = {};
 
                 rows.forEach((row, rowIndex) => {
                     const inputs = row.querySelectorAll('input, textarea, select');
-                    const utbat = inputs[utbatIndex] ? inputs[utbatIndex].value.trim() : '';
+                    const utbatRaw = inputs[utbatIndex] ? inputs[utbatIndex].value.trim() : '';
+                    const utbat = utbatRaw.toUpperCase();
                     const rgValue = inputs[rgIndex] ? inputs[rgIndex].value.trim() : '';
                     const bailValue = bailIndex >= 0 && inputs[bailIndex] ? inputs[bailIndex].value.trim() : '';
+                    const bailKey = bailValue.trim().toUpperCase();
                     const gaValue = gaIndex >= 0 && inputs[gaIndex] ? inputs[gaIndex].value.trim() : '';
 
                     if (!utbat || dismissedRGChanges.has(utbat)) return;
 
                     if (!utbatMap[utbat]) {
-                        utbatMap[utbat] = { count: 0, rgs: new Set() };
+                        utbatMap[utbat] = { bails: {} };
                     }
 
-                    if (!detailMap[utbat]) {
-                        detailMap[utbat] = [];
+                    const bailGroup = bailKey || '__NO_BAIL__';
+                    if (!utbatMap[utbat].bails[bailGroup]) {
+                        utbatMap[utbat].bails[bailGroup] = { count: 0, rgs: new Set(), displayBail: bailValue };
                     }
 
-                    utbatMap[utbat].count++;
+                    utbatMap[utbat].bails[bailGroup].count++;
                     if (rgValue) {
-                        utbatMap[utbat].rgs.add(rgValue);
+                        utbatMap[utbat].bails[bailGroup].rgs.add(rgValue);
                     }
 
-                    detailMap[utbat].push({
+                    if (!linesByUtbat[utbat]) {
+                        linesByUtbat[utbat] = [];
+                    }
+
+                    linesByUtbat[utbat].push({
                         tabName: 'modification',
                         rowIndex,
                         utbat,
+                        utbatDisplay: utbatRaw || utbat,
                         rg: rgValue,
                         bail: bailValue,
+                        bailKey: bailGroup,
                         ga: gaValue
                     });
                 });
 
-                const multiChanges = Object.entries(utbatMap).filter(([, value]) => value.count > 1 || value.rgs.size > 1);
+                const detailMap = {};
+                const multiChanges = [];
+
+                Object.entries(utbatMap).forEach(([utbat, meta]) => {
+                    const bailEntries = Object.entries(meta.bails).filter(([bailKey, stats]) =>
+                        bailKey !== '__NO_BAIL__' && (stats.count > 1 || stats.rgs.size > 1)
+                    );
+
+                    if (bailEntries.length === 0) return;
+
+                    const allowedBails = new Set(bailEntries.map(([bailKey]) => bailKey));
+                    detailMap[utbat] = (linesByUtbat[utbat] || []).filter(line => allowedBails.has(line.bailKey));
+
+                    bailEntries.forEach(([bailKey, stats]) => {
+                        multiChanges.push({
+                            utbat,
+                            bail: stats.displayBail || (bailKey === '__NO_BAIL__' ? 'Bail manquant' : bailKey),
+                            occurrences: stats.count,
+                            variations: stats.rgs.size
+                        });
+                    });
+                });
+
                 const topChanges = multiChanges
-                    .map(([utbat, value]) => ({
-                        utbat,
-                        occurrences: value.count,
-                        variations: value.rgs.size
-                    }))
                     .sort((a, b) => (b.occurrences - a.occurrences) || (b.variations - a.variations))
                     .slice(0, 5);
 
@@ -4414,7 +4458,7 @@ return;
 
                 return {
                     totalEntries: rows.length,
-                    utbatCount: Object.keys(utbatMap).length,
+                    utbatCount: Object.keys(detailMap).length,
                     multiCount: multiChanges.length,
                     topChanges,
                     details: detailMap
@@ -4469,9 +4513,32 @@ return;
                     const linesPreview = details.slice(0, 3).map(line => {
                         const parts = [`L${line.rowIndex + 1}`];
                         if (line.ga) parts.push(`GA ${line.ga}`);
-                        if (line.bail) parts.push(`Bail ${line.bail}`);
+                        parts.push(line.bail ? `Bail ${line.bail}` : 'Bail manquant');
                         return `<small style="color:#555;">${parts.join(' • ')}${line.rg ? ` • RG ${line.rg}` : ''}</small>`;
                     }).join('<br>');
+
+                    const fullDetails = document.createElement('div');
+                    fullDetails.style.marginTop = '8px';
+                    fullDetails.style.display = 'none';
+                    fullDetails.innerHTML = details.length === 0
+                        ? '<div style="color:#666;">Aucun détail disponible</div>'
+                        : details.map(line => {
+                            const parts = [`L${line.rowIndex + 1}`];
+                            if (line.ga) parts.push(`GA ${line.ga}`);
+                            parts.push(line.bail ? `Bail ${line.bail}` : 'Bail manquant');
+                            if (line.rg) parts.push(`RG ${line.rg}`);
+                            return `<div style="padding:4px 0; border-top:1px dashed #eef2ff;">${parts.join(' • ')}</div>`;
+                        }).join('');
+
+                    const toggleBtn = document.createElement('button');
+                    toggleBtn.className = 'btn btn-secondary btn-compact';
+                    toggleBtn.textContent = '▸ Détails complets';
+                    toggleBtn.style.marginTop = '6px';
+                    toggleBtn.onclick = () => {
+                        const expanded = fullDetails.style.display === 'block';
+                        fullDetails.style.display = expanded ? 'none' : 'block';
+                        toggleBtn.textContent = expanded ? '▸ Détails complets' : '▾ Masquer les détails';
+                    };
 
                     item.innerHTML = `
                         <div style="display:flex; justify-content:space-between; gap:6px; align-items:center; flex-wrap:wrap;">
@@ -4480,6 +4547,7 @@ return;
                                 <div class="rg-change-meta">
                                     <span>🔁 ${change.occurrences} passages</span>
                                     <span>🎭 ${change.variations} RG distincts</span>
+                                    <span>🏷️ Bail ${change.bail || 'non renseigné'}</span>
                                 </div>
                             </div>
                             <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
@@ -4490,6 +4558,8 @@ return;
                         </div>
                         ${linesPreview ? `<div style="margin-top:6px;">${linesPreview}</div>` : ''}
                     `;
+                    item.appendChild(toggleBtn);
+                    item.appendChild(fullDetails);
                     listContainer.appendChild(item);
                 });
             } catch (error) {
@@ -4499,7 +4569,8 @@ return;
 
         function focusRGChange(utbat) {
             try {
-                const lines = (rgChangeRegistry[utbat] || []).slice();
+                const normalized = (utbat || '').trim().toUpperCase();
+                const lines = (rgChangeRegistry[normalized] || []).slice();
                 if (lines.length === 0) {
                     showNotification('ℹ️ Aucune ligne repérée pour cet UT-BAT');
                     return;
@@ -4540,7 +4611,7 @@ return;
                 const searchParams = {
                     ga: '',
                     rg: '',
-                    utbat: utbat.toLowerCase(),
+                    utbat: normalized.toLowerCase(),
                     bail: '',
                     advancedBail: '',
                     dateFrom: '',
@@ -4558,7 +4629,7 @@ return;
                     resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
 
-                showNotification(`🔎 ${preparedResults.length} ligne(s) pour UT-BAT ${utbat}`);
+                showNotification(`🔎 ${preparedResults.length} ligne(s) pour UT-BAT ${normalized}`);
             } catch (error) {
                 console.error('Erreur navigation changement RG:', error);
                 showNotification('❌ Erreur lors de la navigation', 'error');
@@ -7780,18 +7851,22 @@ function updateTabsChart() {
                     newDropZone.addEventListener('drop', (e) => {
                         e.preventDefault();
                         newDropZone.classList.remove('dragover');
-                        
+
                         const files = e.dataTransfer.files;
                         if (files.length > 0) {
                             newFileInput.files = files;
                             handleFileImport(tabName, newFileInput);
                         }
                     });
-                    
+
+                    newFileInput.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        newFileInput.value = '';
+                    });
+
                     newDropZone.addEventListener('click', (e) => {
                         if (e.target === newDropZone || e.target.closest('.file-drop-zone') === newDropZone) {
-                            newFileInput.value = '';
-                            newFileInput.click();
+                            openFilePicker(newFileInput);
                         }
                     });
                 });
