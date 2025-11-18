@@ -2342,7 +2342,7 @@
                         <div class="stat-chip-subtext" id="chipQualitySummary">Pas d'alerte à signaler</div>
                     </div>
                 </div>
-                <button class="btn btn-excel" onclick="exportStatsReport()">📤 Exporter toutes les statistiques</button>
+                <button class="btn btn-excel" onclick="exportStatsReport()">📑 Exporter toutes les statistiques</button>
             </div>
 
             <!-- VUE D'ENSEMBLE -->
@@ -7244,140 +7244,69 @@ function updateTabsChart() {
 
         function exportStatsReport() {
             try {
-                if (!window.XLSX) {
-                    showNotification('❌ Bibliothèque Excel non disponible', 'error');
+                updateCharts();
+
+                const statsContainer = document.getElementById('statistiques');
+                if (!statsContainer) {
+                    showNotification('❌ Onglet statistiques introuvable', 'error');
                     return;
                 }
 
-                updateCharts();
-                const statsData = getTabStatistics();
-                const qualityCounts = getQualityCounts();
-                const rgInsights = getRGChangeInsights();
-                const chartSnapshots = getChartsSnapshot();
+                const clone = statsContainer.cloneNode(true);
+                const originalCanvases = statsContainer.querySelectorAll('canvas');
+                const clonedCanvases = clone.querySelectorAll('canvas');
 
-                const wb = XLSX.utils.book_new();
-
-                const summaryData = [
-                    ['Métrique', 'Valeur'],
-                    ['Total entrées', statsData.general.total],
-                    ['Traitées', statsData.general.traites],
-                    ['En attente', statsData.general.attente],
-                    ['Taux global', `${statsData.general.taux}%`],
-                    ['UT-BAT surveillés', rgInsights.utbatCount],
-                    ['Changements multiples', rgInsights.multiCount],
-                    ['Erreurs qualité', qualityCounts.errors],
-                    ['Avertissements qualité', qualityCounts.warnings],
-                    ['Export généré le', new Date().toLocaleString('fr-FR')]
-                ];
-
-                const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-                XLSX.utils.book_append_sheet(wb, summarySheet, 'Synthèse');
-
-                const perTabData = [['Onglet', 'Total', 'Traités', 'En attente', 'Taux']];
-                statsData.perTab.forEach(stat => {
-                    perTabData.push([
-                        getTabDisplayName(stat.tabName),
-                        stat.total,
-                        stat.processed,
-                        stat.pending,
-                        `${stat.rate}%`
-                    ]);
+                originalCanvases.forEach((canvas, index) => {
+                    const clonedCanvas = clonedCanvases[index];
+                    try {
+                        const img = document.createElement('img');
+                        img.src = canvas.toDataURL('image/png');
+                        img.alt = canvas.getAttribute('aria-label') || 'Graphique statistiques';
+                        img.style.width = '100%';
+                        img.style.maxWidth = '100%';
+                        img.style.display = 'block';
+                        img.style.margin = '10px auto';
+                        clonedCanvas.replaceWith(img);
+                    } catch (e) {
+                        console.error('Conversion du graphique en image échouée', e);
+                    }
                 });
 
-                const perTabSheet = XLSX.utils.aoa_to_sheet(perTabData);
-                XLSX.utils.book_append_sheet(wb, perTabSheet, 'Par onglet');
+                const styleBlocks = Array.from(document.querySelectorAll('style'))
+                    .map(style => style.innerHTML)
+                    .join('\n');
 
-                const rgData = [['UT-BAT', 'Occurrences', 'Variations RG']];
-                if (rgInsights.topChanges.length === 0) {
-                    rgData.push(['Aucun doublon détecté', '', '']);
-                } else {
-                    rgInsights.topChanges.forEach(change => {
-                        rgData.push([change.utbat, change.occurrences, change.variations]);
-                    });
-                }
+                const exportHtml = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Export Statistiques MARTINE</title>
+    <style>${styleBlocks}</style>
+</head>
+<body style="background: white;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 20px;">
+        <h1 style="margin-bottom: 20px; color: #2c3e50;">Export de l'onglet Statistiques</h1>
+        <div style="margin-bottom: 12px; color: #555; font-size: 13px;">
+            Généré le ${new Date().toLocaleString('fr-FR')}
+        </div>
+        ${clone.innerHTML}
+    </div>
+</body>
+</html>`;
 
-                const rgSheet = XLSX.utils.aoa_to_sheet(rgData);
-                XLSX.utils.book_append_sheet(wb, rgSheet, 'Changements RG');
+                const blob = new Blob([exportHtml], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const fileName = `MARTINE_Statistiques_${new Date().toISOString().split('T')[0]}.html`;
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
 
-                const rgDetailData = [['UT-BAT', 'Ligne', 'GA', 'Numéro de Bail', 'RG']];
-                const rgDetailEntries = Object.entries(rgInsights.details || {});
-                if (rgDetailEntries.length === 0) {
-                    rgDetailData.push(['Aucun détail disponible', '', '', '', '']);
-                } else {
-                    rgDetailEntries.forEach(([utbat, lines]) => {
-                        lines.forEach(line => {
-                            rgDetailData.push([
-                                utbat,
-                                line.rowIndex + 1,
-                                line.ga || '',
-                                line.bail || '',
-                                line.rg || ''
-                            ]);
-                        });
-                    });
-                }
-
-                const rgDetailSheet = XLSX.utils.aoa_to_sheet(rgDetailData);
-                XLSX.utils.book_append_sheet(wb, rgDetailSheet, 'RG surveillés');
-
-                const pendingData = [['Onglet', 'Ligne', 'GA', 'Numéro de Bail', 'RG']];
-                Object.keys(tabConfigs).forEach(tabName => {
-                    if (tabName === 'baserg') return;
-                    const pendingRows = collectPendingRows(tabName);
-                    if (pendingRows.length === 0) return;
-                    pendingRows.forEach(row => {
-                        pendingData.push([
-                            getTabDisplayName(tabName),
-                            row.index + 1,
-                            row.ga || '',
-                            row.bail || '',
-                            row.rg || ''
-                        ]);
-                    });
-                });
-
-                const pendingSheet = XLSX.utils.aoa_to_sheet(pendingData.length > 1 ? pendingData : [['Aucune ligne en attente']]);
-                XLSX.utils.book_append_sheet(wb, pendingSheet, 'En attente');
-
-                const qualityIssues = getQualityIssues();
-                const qualityData = [['Onglet', 'Ligne', 'Colonne', 'Gravité', 'Valeur', 'Message']];
-                if (qualityIssues.length === 0) {
-                    qualityData.push(['Aucune alerte', '', '', '', '', '']);
-                } else {
-                    qualityIssues.forEach(issue => {
-                        qualityData.push([
-                            getTabDisplayName(issue.tabName),
-                            issue.rowIndex + 1,
-                            issue.columnName,
-                            issue.severity,
-                            issue.value || '',
-                            issue.message || ''
-                        ]);
-                    });
-                }
-                const qualitySheet = XLSX.utils.aoa_to_sheet(qualityData);
-                XLSX.utils.book_append_sheet(wb, qualitySheet, 'Alertes qualité');
-
-                if (chartSnapshots.length > 0) {
-                    const chartData = [];
-                    chartSnapshots.forEach((snapshot, index) => {
-                        chartData.push([snapshot.title]);
-                        chartData.push(snapshot.headers);
-                        snapshot.rows.forEach(row => chartData.push(row));
-                        if (index < chartSnapshots.length - 1) {
-                            chartData.push(['']);
-                        }
-                    });
-
-                    const chartSheet = XLSX.utils.aoa_to_sheet(chartData);
-                    XLSX.utils.book_append_sheet(wb, chartSheet, 'Graphiques');
-                }
-
-                const fileName = `MARTINE_Stats_${new Date().toISOString().split('T')[0]}.xlsx`;
-                XLSX.writeFile(wb, fileName);
-
-                showNotification(`📊 Rapport statistiques exporté: ${fileName}`);
-                logActivity('Export du rapport statistiques', 'success');
+                showNotification(`📑 Export statistiques prêt: ${fileName}`);
+                logActivity('Export HTML de l\'onglet statistiques', 'success');
 
             } catch (error) {
                 console.error('Erreur export rapport statistiques:', error);
