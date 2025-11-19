@@ -787,14 +787,18 @@
         }
 
         .clipboard-preview-body {
-            display: flex;
+            display: grid;
+            grid-template-columns: minmax(360px, 42%) minmax(360px, 1fr);
             gap: 20px;
-            flex-wrap: wrap;
+        }
+
+        @media (max-width: 1200px) {
+            .clipboard-preview-body {
+                grid-template-columns: 1fr;
+            }
         }
 
         .clipboard-panel {
-            flex: 1;
-            min-width: 320px;
             background: #f8f9ff;
             border-radius: 16px;
             padding: 16px;
@@ -804,9 +808,98 @@
             gap: 12px;
         }
 
+        .clipboard-panel-left {
+            min-height: 520px;
+        }
+
         .clipboard-panel h4 {
             margin: 0;
             color: #2c3e50;
+        }
+
+        .clipboard-left-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: 100%;
+        }
+
+        .clipboard-search-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #dfe4ff;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .clipboard-search-card label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .clipboard-search-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .clipboard-search-row input {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #c8d0ff;
+            font-size: 13px;
+        }
+
+        .clipboard-search-row button {
+            white-space: nowrap;
+        }
+
+        .clipboard-search-summary {
+            font-size: 12px;
+            color: #5c6482;
+            margin-top: 6px;
+        }
+
+        .clipboard-search-matches {
+            margin-top: 8px;
+            max-height: 170px;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .clipboard-search-matches button {
+            text-align: left;
+            border: 1px solid #dfe4ff;
+            border-radius: 10px;
+            background: #f4f6ff;
+            padding: 8px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 12px;
+            color: #2c3e50;
+        }
+
+        .clipboard-search-matches button strong {
+            font-size: 13px;
+            color: #1f2a44;
+        }
+
+        .clipboard-search-matches button span {
+            color: #5b658c;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .clipboard-search-matches button:hover {
+            background: #e8ecff;
         }
 
         .clipboard-left-controls,
@@ -815,13 +908,6 @@
             gap: 10px;
             flex-wrap: wrap;
             align-items: center;
-        }
-
-        .clipboard-left-controls input {
-            flex: 1;
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid #c8d0ff;
         }
 
         .clipboard-table-wrapper {
@@ -873,6 +959,15 @@
 
         .clipboard-right-cell.dragover {
             background: rgba(118, 75, 162, 0.15);
+        }
+
+        .clipboard-row-match {
+            background: rgba(102, 126, 234, 0.12);
+        }
+
+        .clipboard-row-focused {
+            outline: 2px solid #ff7f50;
+            outline-offset: -2px;
         }
 
         .clipboard-preview-header {
@@ -3461,14 +3556,23 @@
                 Sélectionnez plusieurs cellules avec CTRL, faites-les glisser vers la colonne souhaitée puis relâchez pour alimenter l'onglet.
             </p>
             <div class="clipboard-preview-body">
-                <div class="clipboard-panel">
+                <div class="clipboard-panel clipboard-panel-left">
                     <h4>📄 Lignes de l'onglet</h4>
-                    <div class="clipboard-left-controls">
-                        <input type="text" id="clipboardLeftSearch" placeholder="Rechercher une ligne dans l'onglet..." oninput="filterClipboardLeft(this.value)">
-                        <button class="btn btn-secondary btn-compact" type="button" onclick="filterClipboardLeft('')">Réinitialiser</button>
-                    </div>
-                    <div class="clipboard-table-wrapper" id="clipboardLeftContainer">
-                        <div class="clipboard-empty-message">Aucune ligne disponible pour le moment.</div>
+                    <div class="clipboard-left-layout">
+                        <div class="clipboard-search-card">
+                            <label for="clipboardLeftSearch">🔍 Rechercher une ligne dans l'onglet</label>
+                            <div class="clipboard-search-row">
+                                <input type="text" id="clipboardLeftSearch" placeholder="GA, UT, RG, bail, commentaire..." oninput="filterClipboardLeft(this.value)">
+                                <button class="btn btn-secondary btn-compact" type="button" onclick="resetClipboardSearch()">Réinitialiser</button>
+                            </div>
+                            <div class="clipboard-search-summary" id="clipboardSearchSummary">Tapez un mot-clé pour filtrer les lignes visibles.</div>
+                            <div class="clipboard-search-matches" id="clipboardSearchMatches">
+                                <div class="clipboard-empty-message">Aucun filtre appliqué.</div>
+                            </div>
+                        </div>
+                        <div class="clipboard-table-wrapper" id="clipboardLeftContainer">
+                            <div class="clipboard-empty-message">Aucune ligne disponible pour le moment.</div>
+                        </div>
                     </div>
                 </div>
                 <div class="clipboard-panel">
@@ -3610,6 +3714,7 @@
         const clipboardDataByTab = {};
         const clipboardTargetMap = new Map();
         const clipboardCellElements = new Map();
+        const clipboardRowRegistry = new Map();
         const clipboardSelectedCells = new Set();
         let clipboardDragPayload = [];
         let clipboardActiveTab = null;
@@ -4611,10 +4716,23 @@
             clipboardDragPayload = [];
             clipboardSelectedCells.forEach(cell => cell.classList.remove('selected'));
             clipboardSelectedCells.clear();
+            const searchInput = document.getElementById('clipboardLeftSearch');
+            if (searchInput) {
+                searchInput.value = '';
+            }
             buildClipboardLeftTable(tabName);
             buildClipboardRightTable(tabName);
-            const searchInput = document.getElementById('clipboardLeftSearch');
-            if (searchInput) searchInput.value = '';
+            if (searchInput) {
+                requestAnimationFrame(() => searchInput.focus());
+            }
+            const summary = document.getElementById('clipboardSearchSummary');
+            if (summary) {
+                summary.textContent = 'Tapez un mot-clé pour filtrer les lignes visibles.';
+            }
+            const matches = document.getElementById('clipboardSearchMatches');
+            if (matches) {
+                matches.innerHTML = '<div class="clipboard-empty-message">Aucun filtre appliqué.</div>';
+            }
             const modal = document.getElementById('clipboardPreviewModal');
             const title = document.getElementById('clipboardPreviewTitle');
             if (title) {
@@ -4626,6 +4744,7 @@
         function buildClipboardLeftTable(tabName) {
             const container = document.getElementById('clipboardLeftContainer');
             clipboardTargetMap.clear();
+            clipboardRowRegistry.clear();
             if (!container) return;
             const sourceTable = document.getElementById(`${tabName}Table`);
             if (!sourceTable) {
@@ -4653,8 +4772,10 @@
             const tbody = document.createElement('tbody');
             rows.forEach((row, rowIndex) => {
                 const tr = document.createElement('tr');
+                const rowNumber = row.querySelector('.row-number')?.textContent?.trim() || (rowIndex + 1).toString();
+                const rowKey = `clipboard-row-${tabName}-${rowIndex}`;
                 const numberCell = document.createElement('td');
-                numberCell.textContent = row.querySelector('.row-number')?.textContent || rowIndex + 1;
+                numberCell.textContent = rowNumber;
                 tr.appendChild(numberCell);
                 const inputs = row.querySelectorAll('input, textarea, select');
                 columns.forEach((column, columnIndex) => {
@@ -4672,12 +4793,25 @@
                     td.addEventListener('drop', handleClipboardLeftDrop);
                     tr.appendChild(td);
                 });
+                const previewPieces = Array.from(inputs)
+                    .slice(0, 3)
+                    .map(input => (input.value || input.textContent || '').trim())
+                    .filter(Boolean)
+                    .slice(0, 2);
+                tr.dataset.rowKey = rowKey;
+                tr.id = rowKey;
+                tr.dataset.rowNumber = rowNumber;
+                tr.dataset.previewValue = previewPieces.join(' • ');
                 tr.dataset.searchValue = tr.textContent.toLowerCase();
+                clipboardRowRegistry.set(rowKey, tr);
                 tbody.appendChild(tr);
             });
             table.appendChild(tbody);
             container.innerHTML = '';
             container.appendChild(table);
+            const searchInput = document.getElementById('clipboardLeftSearch');
+            const initialTerm = searchInput ? searchInput.value : '';
+            filterClipboardLeft(initialTerm);
         }
 
         function buildClipboardRightTable(tabName) {
@@ -4849,15 +4983,83 @@
 
         function filterClipboardLeft(term = '') {
             const rows = document.querySelectorAll('#clipboardLeftContainer tbody tr');
-            const normalized = term.toLowerCase();
+            const normalized = (term || '').toLowerCase().trim();
+            const summary = document.getElementById('clipboardSearchSummary');
+            const matchesContainer = document.getElementById('clipboardSearchMatches');
+            const matches = [];
+
             rows.forEach(row => {
-                if (!normalized) {
-                    row.style.display = '';
-                    return;
+                const rowValue = row.dataset.searchValue || '';
+                const isMatch = !normalized || rowValue.includes(normalized);
+                row.style.display = isMatch ? '' : 'none';
+                if (normalized) {
+                    row.classList.toggle('clipboard-row-match', isMatch);
+                } else {
+                    row.classList.remove('clipboard-row-match');
                 }
-                const matches = row.dataset.searchValue?.includes(normalized);
-                row.style.display = matches ? '' : 'none';
+                if (normalized && isMatch) {
+                    matches.push({
+                        key: row.dataset.rowKey,
+                        label: row.dataset.rowNumber || '',
+                        preview: row.dataset.previewValue || ''
+                    });
+                }
             });
+
+            if (summary) {
+                if (!rows.length) {
+                    summary.textContent = 'Aucune ligne disponible dans cet onglet.';
+                } else if (normalized) {
+                    summary.textContent = `${matches.length} ligne(s) correspondent à "${term}"`;
+                } else {
+                    summary.textContent = 'Tapez un mot-clé pour filtrer les lignes visibles.';
+                }
+            }
+
+            if (matchesContainer) {
+                matchesContainer.innerHTML = '';
+                if (!rows.length) {
+                    matchesContainer.innerHTML = '<div class="clipboard-empty-message">Ajoutez des lignes dans l\'onglet pour commencer.</div>';
+                } else if (!normalized) {
+                    matchesContainer.innerHTML = '<div class="clipboard-empty-message">Aucun filtre appliqué.</div>';
+                } else if (!matches.length) {
+                    matchesContainer.innerHTML = '<div class="clipboard-empty-message">Aucun résultat. Essayez un autre mot-clé.</div>';
+                } else {
+                    matches.slice(0, 8).forEach(match => {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.innerHTML = `<strong>Ligne ${match.label}</strong><span>${match.preview || 'Aucune donnée visible'}</span>`;
+                        button.addEventListener('click', () => focusClipboardRow(match.key));
+                        matchesContainer.appendChild(button);
+                    });
+                    focusClipboardRow(matches[0].key, true);
+                }
+            }
+        }
+
+        function focusClipboardRow(rowKey, silent = false) {
+            if (!rowKey) return;
+            const rowElement = clipboardRowRegistry.get(rowKey) || document.querySelector(`#clipboardLeftContainer [data-row-key="${rowKey}"]`);
+            if (!rowElement) return;
+            const wrapper = document.getElementById('clipboardLeftContainer');
+            if (wrapper) {
+                const rowRect = rowElement.getBoundingClientRect();
+                const wrapperRect = wrapper.getBoundingClientRect();
+                const offset = rowRect.top - wrapperRect.top;
+                wrapper.scrollTop += offset - wrapper.clientHeight / 2 + rowElement.offsetHeight / 2;
+            }
+            if (!silent) {
+                rowElement.classList.add('clipboard-row-focused');
+                setTimeout(() => rowElement.classList.remove('clipboard-row-focused'), 1200);
+            }
+        }
+
+        function resetClipboardSearch() {
+            const searchInput = document.getElementById('clipboardLeftSearch');
+            if (!searchInput) return;
+            searchInput.value = '';
+            filterClipboardLeft('');
+            searchInput.focus();
         }
 
         function copyClipboardSelection() {
@@ -10914,6 +11116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.closeClipboardPreview = closeClipboardPreview;
         window.copyClipboardSelection = copyClipboardSelection;
         window.filterClipboardLeft = filterClipboardLeft;
+        window.resetClipboardSearch = resetClipboardSearch;
         window.deleteSelectedRows = deleteSelectedRows;
         window.addImportToBatch = addImportToBatch;
     </script>
