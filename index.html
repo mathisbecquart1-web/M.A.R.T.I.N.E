@@ -1508,6 +1508,136 @@
             color: #2c3e50;
         }
 
+        .excel-mapping-workbench {
+            margin-top: 16px;
+            border: 1px solid #dfe4ff;
+            border-radius: 12px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .excel-mapping-title {
+            font-size: 13px;
+            margin-bottom: 12px;
+            color: #2f365f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .excel-mapping-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .excel-mapping-column {
+            flex: 1;
+            min-width: 260px;
+        }
+
+        .excel-mapping-column h5 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .excel-drop-zones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .excel-drop-field {
+            border: 1px dashed #b9c2ff;
+            border-radius: 10px;
+            padding: 10px;
+            background: #f7f8ff;
+            min-height: 64px;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .excel-drop-field span {
+            display: block;
+            font-weight: 600;
+            color: #2f365f;
+            margin-bottom: 6px;
+        }
+
+        .excel-drop-field.drag-over {
+            background: #eef2ff;
+            border-color: #6b75ff;
+            box-shadow: inset 0 0 0 1px #6b75ff33;
+        }
+
+        .excel-drop-field.filled {
+            border-style: solid;
+            background: #fff;
+        }
+
+        .excel-column-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .excel-column-pool.drag-over {
+            background: #f5f6ff;
+            border-radius: 12px;
+            padding: 6px;
+        }
+
+        .excel-column-card {
+            border: 1px solid #cad1ff;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+            cursor: grab;
+            min-width: 140px;
+            flex: 1 1 180px;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .excel-column-card strong {
+            display: block;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .excel-column-card small {
+            display: block;
+            color: #5b6096;
+            font-size: 12px;
+        }
+
+        .excel-column-card.dragging {
+            opacity: 0.6;
+            transform: scale(0.97);
+            box-shadow: 0 8px 14px rgba(0, 0, 0, 0.15);
+        }
+
+        .excel-unassign-zone {
+            margin-top: 10px;
+            border: 1px dashed #ffbdbd;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            color: #c0392b;
+            font-size: 13px;
+        }
+
+        .excel-unassign-zone.drag-over {
+            background: #fff5f5;
+            border-color: #ff6b6b;
+        }
+
+        .excel-mapping-empty {
+            text-align: center;
+            padding: 15px;
+            color: #667;
+        }
+
         .excel-preview-empty {
             text-align: center;
             padding: 20px;
@@ -2635,6 +2765,11 @@
                                     Collez vos données pour voir un aperçu interactif.
                                 </div>
                             </div>
+                            <div id="excelMappingWorkbench" class="excel-mapping-workbench">
+                                <div class="excel-mapping-empty">
+                                    Sélectionnez un onglet et collez des données pour organiser vos colonnes par glisser-déposer.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3180,6 +3315,9 @@
         let excelPreviewData = [];
         let excelPreviewColumnOrder = [];
         let excelPreviewDragIndex = null;
+        let excelFieldAssignments = [];
+        let excelAssignmentsTab = null;
+        let excelDraggedColumnIndex = null;
         let chartInstances = {};
         let activityLog = [];
         let activityDetailsExpanded = false;
@@ -7703,7 +7841,7 @@ function updateTabsChart() {
 
                 const columns = tabConfigs[targetTab]?.columns || [];
                 fieldsContainer.innerHTML = '';
-                
+
                 columns.forEach((column, index) => {
                     const fieldDiv = document.createElement('div');
                     fieldDiv.className = 'task-field';
@@ -7724,6 +7862,10 @@ function updateTabsChart() {
                 transferBtn.disabled = false;
                 pendingBtn.disabled = false;
                 batchBtn.disabled = !hasActiveBatch;
+                if (excelPreviewData.length && excelAssignmentsTab !== targetTab) {
+                    initializeExcelFieldAssignments(true);
+                    renderExcelMappingWorkbench();
+                }
                 refreshExcelFieldHints();
                 updateExcelImportButtons();
 
@@ -7761,6 +7903,7 @@ function updateTabsChart() {
                 excelPreviewData = rows;
                 const maxColumns = rows.reduce((max, row) => Math.max(max, row.length), 0);
                 excelPreviewColumnOrder = Array.from({ length: maxColumns }, (_, index) => index);
+                initializeExcelFieldAssignments(true);
                 renderExcelPreview();
                 updateExcelImportButtons();
 
@@ -7825,29 +7968,270 @@ function updateTabsChart() {
                 meta.textContent = `Prévisualisation de ${excelPreviewData.length} ligne(s) – affichage des ${previewLimit} premières. Faites glisser les entêtes pour modifier l'ordre.`;
             }
 
-            if (targetTab) {
-                const mappingTitle = document.createElement('p');
-                mappingTitle.className = 'excel-preview-meta';
-                mappingTitle.textContent = 'Affectation actuelle des colonnes :';
-                container.appendChild(mappingTitle);
+            refreshExcelFieldHints();
+            renderExcelMappingWorkbench();
+        }
 
-                const mappingGrid = document.createElement('div');
-                mappingGrid.className = 'excel-field-hints';
-                const columns = tabConfigs[targetTab]?.columns || [];
-                columns.forEach((column, index) => {
-                    const chip = document.createElement('div');
-                    chip.className = 'mapping-chip';
-                    const mappedIndex = excelPreviewColumnOrder[index];
-                    const mappingLabel = typeof mappedIndex === 'number'
-                        ? `Colonne ${mappedIndex + 1}`
-                        : `Position ${index + 1}`;
-                    chip.innerHTML = `<span>${column}</span>${mappingLabel}`;
-                    mappingGrid.appendChild(chip);
-                });
-                container.appendChild(mappingGrid);
+        function initializeExcelFieldAssignments(force = false) {
+            const targetTab = document.getElementById('taskTargetTab').value || null;
+            const columns = tabConfigs[targetTab]?.columns || [];
+            const hasData = excelPreviewData.length > 0;
+
+            if (!targetTab || !hasData || !columns.length) {
+                excelFieldAssignments = [];
+                excelAssignmentsTab = targetTab;
+                return;
             }
 
+            if (!force && excelAssignmentsTab === targetTab && excelFieldAssignments.length === columns.length) {
+                return;
+            }
+
+            const totalColumns = excelPreviewData.reduce((max, row) => Math.max(max, row.length), 0);
+            const fallbackOrder = excelPreviewColumnOrder.length
+                ? [...excelPreviewColumnOrder]
+                : Array.from({ length: totalColumns }, (_, index) => index);
+
+            excelFieldAssignments = columns.map((_, index) => {
+                if (index < totalColumns) {
+                    return typeof fallbackOrder[index] === 'number' ? fallbackOrder[index] : index;
+                }
+                return null;
+            });
+            excelAssignmentsTab = targetTab;
+        }
+
+        function renderExcelMappingWorkbench() {
+            const container = document.getElementById('excelMappingWorkbench');
+            if (!container) return;
+
+            const targetTab = document.getElementById('taskTargetTab').value;
+            if (!targetTab || !excelPreviewData.length) {
+                container.innerHTML = '<div class="excel-mapping-empty">Collez vos données et choisissez un onglet pour organiser vos colonnes.</div>';
+                return;
+            }
+
+            const columns = tabConfigs[targetTab]?.columns || [];
+            if (!columns.length) {
+                container.innerHTML = '<div class="excel-mapping-empty">Aucun champ disponible pour cet onglet.</div>';
+                return;
+            }
+
+            initializeExcelFieldAssignments();
+
+            const totalColumns = excelPreviewData.reduce((max, row) => Math.max(max, row.length), 0);
+            if (!totalColumns) {
+                container.innerHTML = '<div class="excel-mapping-empty">Aucune colonne détectée dans l\'aperçu.</div>';
+                return;
+            }
+            const assignments = new Map();
+            excelFieldAssignments.forEach((columnIndex, fieldIndex) => {
+                if (typeof columnIndex === 'number') {
+                    assignments.set(columnIndex, fieldIndex);
+                }
+            });
+
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = '';
+            wrapper.className = 'excel-mapping-grid';
+
+            const targetsColumn = document.createElement('div');
+            targetsColumn.className = 'excel-mapping-column';
+            targetsColumn.innerHTML = '<h5>📋 Champs de l\'onglet</h5>';
+
+            const dropZoneList = document.createElement('div');
+            dropZoneList.className = 'excel-drop-zones';
+
+            columns.forEach((column, index) => {
+                const dropZone = document.createElement('div');
+                dropZone.className = 'excel-drop-field';
+                dropZone.dataset.fieldIndex = index;
+                dropZone.addEventListener('dragover', handleExcelFieldDragOver);
+                dropZone.addEventListener('drop', handleExcelFieldDrop);
+                dropZone.addEventListener('dragleave', handleExcelFieldDragLeave);
+
+                const label = document.createElement('span');
+                label.textContent = column;
+                dropZone.appendChild(label);
+
+                const assignedColumn = excelFieldAssignments[index];
+                if (typeof assignedColumn === 'number') {
+                    dropZone.classList.add('filled');
+                    dropZone.appendChild(buildExcelColumnCard(assignedColumn, { showAssignment: false }));
+                } else {
+                    const hint = document.createElement('small');
+                    hint.textContent = 'Déposez une colonne ici';
+                    hint.style.color = '#7a7f9c';
+                    dropZone.appendChild(hint);
+                }
+
+                dropZoneList.appendChild(dropZone);
+            });
+
+            targetsColumn.appendChild(dropZoneList);
+
+            const sourcesColumn = document.createElement('div');
+            sourcesColumn.className = 'excel-mapping-column';
+            sourcesColumn.innerHTML = '<h5>➡️ Colonnes importées</h5>';
+
+            const pool = document.createElement('div');
+            pool.className = 'excel-column-pool';
+            pool.addEventListener('dragover', handleExcelPoolDragOver);
+            pool.addEventListener('drop', handleExcelPoolDrop);
+            pool.addEventListener('dragleave', handleExcelPoolDragLeave);
+
+            for (let columnIndex = 0; columnIndex < totalColumns; columnIndex++) {
+                const assignedFieldIndex = assignments.get(columnIndex);
+                const assignmentLabel = typeof assignedFieldIndex === 'number'
+                    ? columns[assignedFieldIndex] || ''
+                    : null;
+                pool.appendChild(buildExcelColumnCard(columnIndex, {
+                    assignmentLabel
+                }));
+            }
+
+            sourcesColumn.appendChild(pool);
+
+            const unassignZone = document.createElement('div');
+            unassignZone.className = 'excel-unassign-zone';
+            unassignZone.textContent = 'Déposez une carte ici pour libérer la colonne';
+            unassignZone.addEventListener('dragover', handleExcelPoolDragOver);
+            unassignZone.addEventListener('drop', handleExcelUnassignDrop);
+            unassignZone.addEventListener('dragleave', handleExcelPoolDragLeave);
+            sourcesColumn.appendChild(unassignZone);
+
+            wrapper.appendChild(targetsColumn);
+            wrapper.appendChild(sourcesColumn);
+
+            container.innerHTML = '';
+            const title = document.createElement('div');
+            title.className = 'excel-mapping-title';
+            title.innerHTML = '🎯 Faites glisser chaque colonne importée vers le champ correspondant. Déposez dans la zone rouge pour libérer une colonne.';
+            container.appendChild(title);
+            container.appendChild(wrapper);
+        }
+
+        function buildExcelColumnCard(columnIndex, options = {}) {
+            const { assignmentLabel = null, showAssignment = true } = options;
+            const card = document.createElement('div');
+            card.className = 'excel-column-card';
+            card.draggable = true;
+            card.dataset.columnIndex = columnIndex;
+            card.addEventListener('dragstart', handleExcelColumnDragStart);
+            card.addEventListener('dragend', handleExcelColumnDragEnd);
+
+            const title = document.createElement('strong');
+            title.textContent = `Colonne ${columnIndex + 1}`;
+            card.appendChild(title);
+
+            const sample = document.createElement('small');
+            sample.textContent = getExcelColumnSample(columnIndex) || 'Valeur vide';
+            card.appendChild(sample);
+
+            if (showAssignment && assignmentLabel) {
+                const badge = document.createElement('small');
+                badge.textContent = `Affectée à ${assignmentLabel}`;
+                badge.style.color = '#2e7d32';
+                card.appendChild(badge);
+            }
+
+            return card;
+        }
+
+        function getExcelColumnSample(columnIndex) {
+            const sampleRow = excelPreviewData.find(row => (row[columnIndex] || '').trim() !== '');
+            const rawValue = sampleRow ? sampleRow[columnIndex] : (excelPreviewData[0]?.[columnIndex] || '');
+            if (!rawValue) return '';
+            return rawValue.length > 40 ? `${rawValue.slice(0, 37)}…` : rawValue;
+        }
+
+        function assignExcelColumnToField(columnIndex, fieldIndex) {
+            if (typeof columnIndex !== 'number' || typeof fieldIndex !== 'number') return;
+            excelFieldAssignments = excelFieldAssignments.map((current, idx) => {
+                if (idx === fieldIndex) return current;
+                return current === columnIndex ? null : current;
+            });
+            excelFieldAssignments[fieldIndex] = columnIndex;
+            renderExcelMappingWorkbench();
             refreshExcelFieldHints();
+        }
+
+        function unassignExcelColumn(columnIndex) {
+            let updated = false;
+            excelFieldAssignments = excelFieldAssignments.map(value => {
+                if (value === columnIndex) {
+                    updated = true;
+                    return null;
+                }
+                return value;
+            });
+            if (updated) {
+                renderExcelMappingWorkbench();
+                refreshExcelFieldHints();
+            }
+        }
+
+        function handleExcelColumnDragStart(event) {
+            const columnIndex = Number(event.currentTarget.dataset.columnIndex);
+            excelDraggedColumnIndex = Number.isNaN(columnIndex) ? null : columnIndex;
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', `${columnIndex}`);
+            event.currentTarget.classList.add('dragging');
+        }
+
+        function handleExcelColumnDragEnd(event) {
+            event.currentTarget.classList.remove('dragging');
+            excelDraggedColumnIndex = null;
+        }
+
+        function handleExcelFieldDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function handleExcelFieldDragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleExcelFieldDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            const fieldIndex = Number(event.currentTarget.dataset.fieldIndex);
+            const columnIndex = getDraggedExcelColumnIndex(event);
+            if (Number.isNaN(fieldIndex) || columnIndex === null) {
+                return;
+            }
+            assignExcelColumnToField(columnIndex, fieldIndex);
+        }
+
+        function handleExcelPoolDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function handleExcelPoolDragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleExcelPoolDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleExcelUnassignDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            const columnIndex = getDraggedExcelColumnIndex(event);
+            if (columnIndex === null) return;
+            unassignExcelColumn(columnIndex);
+        }
+
+        function getDraggedExcelColumnIndex(event) {
+            const data = event.dataTransfer?.getData('text/plain');
+            if (data && !Number.isNaN(Number(data))) {
+                return Number(data);
+            }
+            return excelDraggedColumnIndex;
         }
 
         function handlePreviewDragStart(event) {
@@ -7885,8 +8269,11 @@ function updateTabsChart() {
             excelPreviewData = [];
             excelPreviewColumnOrder = [];
             excelPreviewDragIndex = null;
+            excelFieldAssignments = [];
+            excelAssignmentsTab = null;
             renderExcelPreview();
             updateExcelImportButtons();
+            renderExcelMappingWorkbench();
             showNotification('♻️ Import Excel réinitialisé', 'info');
         }
 
@@ -7906,14 +8293,22 @@ function updateTabsChart() {
                 return;
             }
 
+            if (excelPreviewData.length) {
+                initializeExcelFieldAssignments();
+            } else {
+                excelFieldAssignments = [];
+            }
+
             container.innerHTML = '';
             columns.forEach((column, index) => {
                 const chip = document.createElement('div');
                 chip.className = 'mapping-chip';
-                const mappedIndex = excelPreviewColumnOrder[index];
+                const mappedIndex = typeof excelFieldAssignments[index] === 'number'
+                    ? excelFieldAssignments[index]
+                    : excelPreviewColumnOrder[index];
                 const label = typeof mappedIndex === 'number'
                     ? `Colonne ${mappedIndex + 1}`
-                    : `Position ${index + 1}`;
+                    : 'Non défini';
                 chip.innerHTML = `<span>${column}</span>${label}`;
                 container.appendChild(chip);
             });
@@ -7953,11 +8348,21 @@ function updateTabsChart() {
                     return;
                 }
 
+                const columnMap = columns.map((_, index) => {
+                    if (typeof excelFieldAssignments[index] === 'number') {
+                        return excelFieldAssignments[index];
+                    }
+                    if (typeof excelPreviewColumnOrder[index] === 'number') {
+                        return excelPreviewColumnOrder[index];
+                    }
+                    return index;
+                });
+
                 cleanRows.forEach(row => {
-                    const orderedCells = excelPreviewColumnOrder.map(index => row[index] ?? '');
                     const taskData = {};
                     columns.forEach((column, columnIndex) => {
-                        taskData[column] = orderedCells[columnIndex] ?? '';
+                        const sourceIndex = columnMap[columnIndex];
+                        taskData[column] = typeof sourceIndex === 'number' ? (row[sourceIndex] ?? '') : '';
                     });
 
                     pendingTasks.push({
