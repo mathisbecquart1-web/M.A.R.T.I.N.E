@@ -1138,11 +1138,21 @@
             margin-bottom: 30px;
         }
 
+        .stats-dashboard.task-layout {
+            grid-template-columns: minmax(620px, 2.6fr) minmax(260px, 1fr);
+            align-items: stretch;
+        }
+
         .stats-card {
             background: white;
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .stats-card.task-stats-card {
+            max-width: 420px;
+            justify-self: stretch;
         }
 
         .stats-card.collapsible {
@@ -1354,6 +1364,16 @@
             backdrop-filter: blur(5px);
         }
 
+        @media (max-width: 1200px) {
+            .stats-dashboard.task-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-card.task-stats-card {
+                max-width: none;
+            }
+        }
+
         /* 📱 RESPONSIVE */
         @media (max-width: 768px) {
             .filters-grid {
@@ -1434,7 +1454,7 @@
 
         .excel-import-layout {
             display: grid;
-            grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+            grid-template-columns: minmax(0, 1.3fr) minmax(340px, 0.9fr);
             gap: 20px;
             align-items: flex-start;
         }
@@ -1474,7 +1494,7 @@
         }
 
         .excel-preview-scroll {
-            max-height: 520px;
+            max-height: 650px;
             overflow: auto;
         }
 
@@ -1518,7 +1538,8 @@
         .excel-preview-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 14px;
+            line-height: 1.4;
         }
 
         .excel-preview-table th,
@@ -1526,6 +1547,8 @@
             border: 1px solid #edf2ff;
             padding: 6px 8px;
             text-align: left;
+            white-space: normal;
+            word-break: break-word;
         }
 
         .excel-preview-table th {
@@ -1544,6 +1567,14 @@
         .excel-preview-table th.dragging {
             opacity: 0.6;
             background: #e0e7ff;
+        }
+
+        .excel-preview-table tbody tr:nth-child(odd) {
+            background: #f9fbff;
+        }
+
+        .excel-preview-table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.08);
         }
 
         .excel-preview-meta {
@@ -2766,7 +2797,7 @@
 
         <!-- ONGLET TÂCHES À FAIRE -->
         <div id="taches" class="tab-content">
-            <div class="stats-dashboard">
+            <div class="stats-dashboard task-layout">
                 <div class="stats-card">
                     <h3>📝 Créer une nouvelle tâche</h3>
                     <div class="task-form">
@@ -2868,7 +2899,7 @@
                     </div>
                 </div>
 
-                <div class="stats-card">
+                <div class="stats-card task-stats-card">
                     <h3>📊 Statistiques des tâches</h3>
                     <div style="text-align: center; margin-bottom: 20px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
