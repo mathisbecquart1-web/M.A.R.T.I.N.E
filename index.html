@@ -4887,6 +4887,28 @@
             clipboardSelectedCells.clear();
         }
 
+        function setupClipboardAutoPreview() {
+            const selector = 'textarea[id^="clipboardInput-"]';
+            const areas = document.querySelectorAll(selector);
+            areas.forEach(area => {
+                if (area.dataset.clipboardPreviewReady === 'true') return;
+                area.dataset.clipboardPreviewReady = 'true';
+                area.addEventListener('paste', (event) => {
+                    const tabName = area.id.replace('clipboardInput-', '');
+                    const triggerPreview = () => {
+                        if ((area.value || '').trim()) {
+                            openClipboardPreview(tabName);
+                        }
+                    };
+                    if (event && event.clipboardData) {
+                        requestAnimationFrame(triggerPreview);
+                    } else {
+                        setTimeout(triggerPreview, 0);
+                    }
+                });
+            });
+        }
+
         // 🔧 ACTIONS DE PRÉVISUALISATION
         function fixAllErrors() {
             try {
@@ -10760,6 +10782,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 setupFileDropZones();
+                setupClipboardAutoPreview();
                 updateStatsDashboard();
 
                 showNotification('🚀 MARTINE - Tous onglets fonctionnels', 'success');
