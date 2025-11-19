@@ -724,6 +724,199 @@
             background: rgba(102, 126, 234, 0.05);
         }
 
+        .row-selected {
+            outline: 2px solid #28a745;
+            outline-offset: -2px;
+            background: rgba(40, 167, 69, 0.08) !important;
+        }
+
+        .clipboard-inline-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 220px;
+            background: #f8f9ff;
+            border: 1px dashed #bfc6ff;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .clipboard-inline-panel textarea {
+            width: 100%;
+            min-height: 80px;
+            resize: vertical;
+            border: 1px solid #d7ddff;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .clipboard-inline-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .clipboard-preview-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 10, 30, 0.82);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+            padding: 20px;
+        }
+
+        .clipboard-preview-modal.show {
+            display: flex;
+        }
+
+        .clipboard-preview-content {
+            background: white;
+            width: 95%;
+            max-width: 1400px;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .clipboard-preview-body {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .clipboard-panel {
+            flex: 1;
+            min-width: 320px;
+            background: #f8f9ff;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: inset 0 0 0 1px #e1e5ff;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .clipboard-panel h4 {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .clipboard-left-controls,
+        .clipboard-right-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .clipboard-left-controls input {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #c8d0ff;
+        }
+
+        .clipboard-table-wrapper {
+            flex: 1;
+            overflow: auto;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid #e1e5ff;
+        }
+
+        .clipboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .clipboard-table th,
+        .clipboard-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eef1ff;
+            font-size: 13px;
+        }
+
+        .clipboard-right-cell {
+            cursor: grab;
+            user-select: text;
+        }
+
+        .clipboard-right-cell:active {
+            cursor: grabbing;
+        }
+
+        .clipboard-right-cell.selected {
+            background: rgba(102, 126, 234, 0.2);
+            outline: 2px solid #667eea;
+        }
+
+        .clipboard-left-cell {
+            min-width: 140px;
+        }
+
+        .clipboard-left-cell.dragover {
+            background: rgba(40, 167, 69, 0.15);
+            border: 1px dashed #28a745;
+        }
+
+        .clipboard-left-cell.updated {
+            animation: pulse 1.2s ease;
+        }
+
+        .clipboard-right-cell.dragover {
+            background: rgba(118, 75, 162, 0.15);
+        }
+
+        .clipboard-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .clipboard-preview-header h3 {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .clipboard-close-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .clipboard-helper-text {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .clipboard-empty-message {
+            text-align: center;
+            padding: 20px;
+            color: #667;
+        }
+
+        .excel-preview-table td.dragover {
+            background: rgba(118, 75, 162, 0.15);
+        }
+
+        .excel-preview-table td.dragging {
+            opacity: 0.7;
+        }
+
         /* ✏️ CELLULES ÉDITABLES */
         .editable-cell {
             position: relative;
@@ -1788,7 +1981,14 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('creation')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('creation')">📊 Exporter Excel</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('creation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('creation')">🗑️ Effacer tout</button>
+                <div class="clipboard-inline-panel">
+                    <textarea id="clipboardInput-creation" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
+                    <div class="clipboard-inline-actions">
+                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('creation')">📋 Prévisualiser collage</button>
+                    </div>
+                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -1906,7 +2106,14 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('modification')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modification')">📊 Exporter Excel</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('modification')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modification')">🗑️ Effacer tout</button>
+                <div class="clipboard-inline-panel">
+                    <textarea id="clipboardInput-modification" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
+                    <div class="clipboard-inline-actions">
+                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('modification')">📋 Prévisualiser collage</button>
+                    </div>
+                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2024,7 +2231,14 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('resiliation')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('resiliation')">📊 Exporter Excel</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('resiliation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('resiliation')">🗑️ Effacer tout</button>
+                <div class="clipboard-inline-panel">
+                    <textarea id="clipboardInput-resiliation" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
+                    <div class="clipboard-inline-actions">
+                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('resiliation')">📋 Prévisualiser collage</button>
+                    </div>
+                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2140,7 +2354,14 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('autremodif')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('autremodif')">📊 Exporter Excel</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('autremodif')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('autremodif')">🗑️ Effacer tout</button>
+                <div class="clipboard-inline-panel">
+                    <textarea id="clipboardInput-autremodif" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
+                    <div class="clipboard-inline-actions">
+                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('autremodif')">📋 Prévisualiser collage</button>
+                    </div>
+                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2254,7 +2475,14 @@
                 <button class="btn btn-primary" onclick="addRow('modifsurface')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modifsurface')">📊 Exporter Excel</button>
                 <button class="btn btn-warning" onclick="recalculateAllSurfaces()">🔄 Recalculer toutes les différences</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('modifsurface')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modifsurface')">🗑️ Effacer tout</button>
+                <div class="clipboard-inline-panel">
+                    <textarea id="clipboardInput-modifsurface" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
+                    <div class="clipboard-inline-actions">
+                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('modifsurface')">📋 Prévisualiser collage</button>
+                    </div>
+                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2376,7 +2604,14 @@
                 <button class="btn btn-excel" onclick="exportToExcel('verifbaux')">📊 Exporter Excel</button>
                 <button class="btn btn-warning" onclick="validateAllBauxStates()">🔍 Valider tous les états</button>
                 <button class="btn btn-success" onclick="markAllAsOK()">✅ Marquer sélection OK</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('verifbaux')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('verifbaux')">🗑️ Effacer tout</button>
+                <div class="clipboard-inline-panel">
+                    <textarea id="clipboardInput-verifbaux" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
+                    <div class="clipboard-inline-actions">
+                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('verifbaux')">📋 Prévisualiser collage</button>
+                    </div>
+                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2464,7 +2699,14 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('pni')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('pni')">📊 Exporter Excel</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('pni')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('pni')">🗑️ Effacer tout</button>
+                <div class="clipboard-inline-panel">
+                    <textarea id="clipboardInput-pni" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
+                    <div class="clipboard-inline-actions">
+                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('pni')">📋 Prévisualiser collage</button>
+                    </div>
+                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2630,8 +2872,22 @@
                 <button class="btn btn-warning" onclick="validateAllRGCodes()">🔍 Vérifier codes RG dans tous les onglets</button>
                 <button class="btn btn-success" onclick="buildRGDatabase()">🔄 Reconstruire index RG</button>
                 <button class="btn btn-success" onclick="buildUTDatabase()">🔄 Reconstruire index UT</button>
-                <button class="btn btn-danger" onclick="clearAll('baserg')">🗑️ Effacer tout</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('baserg')">🗑️ Supprimer sélection RG</button>
+                <button class="btn btn-danger" onclick="clearAll('baserg')">🗑️ Effacer tout RG</button>
+                <div class="clipboard-inline-panel">
+                    <textarea id="clipboardInput-baserg" placeholder="Collez ici les informations RG à distribuer..."></textarea>
+                    <div class="clipboard-inline-actions">
+                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('baserg')">📋 Prévisualiser collage RG</button>
+                    </div>
+                </div>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('baseut')">🗑️ Supprimer sélection UT</button>
                 <button class="btn btn-danger" onclick="clearAll('baseut')">🗑️ Effacer Base UT</button>
+                <div class="clipboard-inline-panel">
+                    <textarea id="clipboardInput-baseut" placeholder="Collez ici les informations UT à distribuer..."></textarea>
+                    <div class="clipboard-inline-actions">
+                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('baseut')">📋 Prévisualiser collage UT</button>
+                    </div>
+                </div>
             </div>
 
             <!-- TABLEAU BASE RG -->
@@ -2754,6 +3010,9 @@
                                 <button class="btn btn-success" id="excelImportBtn" onclick="createTasksFromExcelImport()" disabled>
                                     📥 Créer des tâches depuis l'import
                                 </button>
+                                <button class="btn btn-secondary" id="excelBatchImportBtn" onclick="addImportToBatch()" disabled>
+                                    📦 Ajouter l'import au lot actif
+                                </button>
                                 <label class="excel-option">
                                     <input type="checkbox" id="excelSkipHeader" checked onchange="updateExcelImportButtons()">
                                     Ignorer la première ligne (entêtes)
@@ -2785,6 +3044,10 @@
                             <div>
                                 <div class="preview-stat-number success" id="completedTasksCount">0</div>
                                 <div class="preview-stat-label">Complétées</div>
+                            </div>
+                            <div>
+                                <div class="preview-stat-number" id="lotTasksCount">0</div>
+                                <div class="preview-stat-label">Dans les lots</div>
                             </div>
                             <div>
                                 <div class="preview-stat-number" id="totalTasksCount">0</div>
@@ -3188,6 +3451,39 @@
         </div>
     </div>
 
+    <div class="clipboard-preview-modal" id="clipboardPreviewModal">
+        <div class="clipboard-preview-content">
+            <div class="clipboard-preview-header">
+                <h3 id="clipboardPreviewTitle">📋 Prévisualisation du collage</h3>
+                <button class="clipboard-close-btn" onclick="closeClipboardPreview()">×</button>
+            </div>
+            <p class="clipboard-helper-text">
+                Sélectionnez plusieurs cellules avec CTRL, faites-les glisser vers la colonne souhaitée puis relâchez pour alimenter l'onglet.
+            </p>
+            <div class="clipboard-preview-body">
+                <div class="clipboard-panel">
+                    <h4>📄 Lignes de l'onglet</h4>
+                    <div class="clipboard-left-controls">
+                        <input type="text" id="clipboardLeftSearch" placeholder="Rechercher une ligne dans l'onglet..." oninput="filterClipboardLeft(this.value)">
+                        <button class="btn btn-secondary btn-compact" type="button" onclick="filterClipboardLeft('')">Réinitialiser</button>
+                    </div>
+                    <div class="clipboard-table-wrapper" id="clipboardLeftContainer">
+                        <div class="clipboard-empty-message">Aucune ligne disponible pour le moment.</div>
+                    </div>
+                </div>
+                <div class="clipboard-panel">
+                    <h4>🧾 Données collées</h4>
+                    <div class="clipboard-right-controls">
+                        <button class="btn btn-secondary btn-compact" type="button" onclick="copyClipboardSelection()">📋 Copier la sélection</button>
+                    </div>
+                    <div class="clipboard-table-wrapper" id="clipboardRightContainer">
+                        <div class="clipboard-empty-message">Collez vos informations puis lancez la prévisualisation.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- CRÉDIT PRODUCTEUR -->
     <div class="producer-credit">
         🏢 Développé par Mathis Corp. - SNCF Connect
@@ -3310,6 +3606,14 @@
         let taskBatches = [];
         let activeBatchId = null;
         let completedTasks = [];
+        const selectedRowsByTab = {};
+        const clipboardDataByTab = {};
+        const clipboardTargetMap = new Map();
+        const clipboardCellElements = new Map();
+        const clipboardSelectedCells = new Set();
+        let clipboardDragPayload = [];
+        let clipboardActiveTab = null;
+        let excelCellDragSource = null;
         let savedSearches = [];
         let autoSaveInterval = null;
         let excelPreviewData = [];
@@ -3318,6 +3622,9 @@
         let excelFieldAssignments = [];
         let excelAssignmentsTab = null;
         let excelDraggedColumnIndex = null;
+        Object.keys(tabConfigs).forEach(tabName => {
+            selectedRowsByTab[tabName] = new Set();
+        });
         let chartInstances = {};
         let activityLog = [];
         let activityDetailsExpanded = false;
@@ -4279,6 +4586,307 @@
             currentTabForPreview = null;
         }
 
+        // 📋 COLLABORATION COPIER/COLLER
+        function parseClipboardMatrix(value) {
+            if (!value) return [];
+            return value
+                .split(/\r?\n/)
+                .map(line => line.split(/\t|;|,/).map(cell => cell.trim()))
+                .filter(row => row.some(cell => cell !== ''));
+        }
+
+        function openClipboardPreview(tabName) {
+            const textarea = document.getElementById(`clipboardInput-${tabName}`);
+            if (!textarea) {
+                showNotification('❌ Zone de collage introuvable', 'error');
+                return;
+            }
+            const data = parseClipboardMatrix(textarea.value);
+            if (!data.length) {
+                showNotification('❌ Aucune donnée à prévisualiser', 'error');
+                return;
+            }
+            clipboardDataByTab[tabName] = data;
+            clipboardActiveTab = tabName;
+            clipboardDragPayload = [];
+            clipboardSelectedCells.forEach(cell => cell.classList.remove('selected'));
+            clipboardSelectedCells.clear();
+            buildClipboardLeftTable(tabName);
+            buildClipboardRightTable(tabName);
+            const searchInput = document.getElementById('clipboardLeftSearch');
+            if (searchInput) searchInput.value = '';
+            const modal = document.getElementById('clipboardPreviewModal');
+            const title = document.getElementById('clipboardPreviewTitle');
+            if (title) {
+                title.textContent = `📋 Collage pour ${getTabDisplayName(tabName)}`;
+            }
+            modal.classList.add('show');
+        }
+
+        function buildClipboardLeftTable(tabName) {
+            const container = document.getElementById('clipboardLeftContainer');
+            clipboardTargetMap.clear();
+            if (!container) return;
+            const sourceTable = document.getElementById(`${tabName}Table`);
+            if (!sourceTable) {
+                container.innerHTML = '<div class="clipboard-empty-message">Aucun tableau associé à cet onglet.</div>';
+                return;
+            }
+            const columns = tabConfigs[tabName]?.columns || [];
+            const rows = sourceTable.querySelectorAll('tbody tr');
+            if (!rows.length) {
+                container.innerHTML = '<div class="clipboard-empty-message">Aucune ligne disponible dans l\'onglet.</div>';
+                return;
+            }
+            const table = document.createElement('table');
+            table.className = 'clipboard-table';
+            const thead = document.createElement('thead');
+            const headRow = document.createElement('tr');
+            headRow.innerHTML = '<th style="width:60px;">#</th>';
+            columns.forEach(column => {
+                const th = document.createElement('th');
+                th.textContent = column;
+                headRow.appendChild(th);
+            });
+            thead.appendChild(headRow);
+            table.appendChild(thead);
+            const tbody = document.createElement('tbody');
+            rows.forEach((row, rowIndex) => {
+                const tr = document.createElement('tr');
+                const numberCell = document.createElement('td');
+                numberCell.textContent = row.querySelector('.row-number')?.textContent || rowIndex + 1;
+                tr.appendChild(numberCell);
+                const inputs = row.querySelectorAll('input, textarea, select');
+                columns.forEach((column, columnIndex) => {
+                    const td = document.createElement('td');
+                    td.className = 'clipboard-left-cell';
+                    const targetInput = inputs[columnIndex];
+                    const currentValue = targetInput ? (targetInput.value || targetInput.textContent || '') : '';
+                    td.textContent = currentValue;
+                    const targetId = `clip-${tabName}-${rowIndex}-${columnIndex}`;
+                    td.dataset.targetId = targetId;
+                    td.dataset.tabName = tabName;
+                    clipboardTargetMap.set(targetId, { input: targetInput, displayCell: td, rowElement: row });
+                    td.addEventListener('dragover', handleClipboardLeftDragOver);
+                    td.addEventListener('dragleave', handleClipboardLeftDragLeave);
+                    td.addEventListener('drop', handleClipboardLeftDrop);
+                    tr.appendChild(td);
+                });
+                tr.dataset.searchValue = tr.textContent.toLowerCase();
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            container.innerHTML = '';
+            container.appendChild(table);
+        }
+
+        function buildClipboardRightTable(tabName) {
+            const container = document.getElementById('clipboardRightContainer');
+            clipboardCellElements.clear();
+            if (!container) return;
+            const data = clipboardDataByTab[tabName] || [];
+            if (!data.length) {
+                container.innerHTML = '<div class="clipboard-empty-message">Collez vos informations pour commencer.</div>';
+                return;
+            }
+            const maxColumns = data.reduce((max, row) => Math.max(max, row.length), 0);
+            const table = document.createElement('table');
+            table.className = 'clipboard-table';
+            const thead = document.createElement('thead');
+            const headRow = document.createElement('tr');
+            for (let col = 0; col < maxColumns; col++) {
+                const th = document.createElement('th');
+                th.textContent = `Col ${col + 1}`;
+                headRow.appendChild(th);
+            }
+            thead.appendChild(headRow);
+            table.appendChild(thead);
+            const tbody = document.createElement('tbody');
+            data.forEach((row, rowIndex) => {
+                const tr = document.createElement('tr');
+                for (let colIndex = 0; colIndex < maxColumns; colIndex++) {
+                    const td = document.createElement('td');
+                    td.className = 'clipboard-right-cell';
+                    td.contentEditable = true;
+                    const cellValue = row[colIndex] || '';
+                    td.textContent = cellValue;
+                    const cellKey = `${tabName}-${rowIndex}-${colIndex}`;
+                    td.dataset.cellKey = cellKey;
+                    td.dataset.clipboardTab = tabName;
+                    clipboardCellElements.set(cellKey, td);
+                    td.draggable = true;
+                    td.addEventListener('dragstart', handleClipboardRightCellDragStart);
+                    td.addEventListener('dragend', handleClipboardRightCellDragEnd);
+                    td.addEventListener('dragover', handleClipboardRightCellDragOver);
+                    td.addEventListener('dragleave', handleClipboardRightCellDragLeave);
+                    td.addEventListener('drop', handleClipboardRightCellDrop);
+                    td.addEventListener('input', () => updateClipboardCellValue(tabName, rowIndex, colIndex, td.textContent));
+                    td.addEventListener('click', event => handleClipboardRightCellClick(event, td));
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            container.innerHTML = '';
+            container.appendChild(table);
+        }
+
+        function updateClipboardCellValue(tabName, rowIndex, columnIndex, value) {
+            if (!clipboardDataByTab[tabName]) clipboardDataByTab[tabName] = [];
+            if (!clipboardDataByTab[tabName][rowIndex]) clipboardDataByTab[tabName][rowIndex] = [];
+            clipboardDataByTab[tabName][rowIndex][columnIndex] = value;
+        }
+
+        function handleClipboardRightCellClick(event, cell) {
+            if (!(event.ctrlKey || event.metaKey)) return;
+            event.preventDefault();
+            if (clipboardSelectedCells.has(cell)) {
+                clipboardSelectedCells.delete(cell);
+                cell.classList.remove('selected');
+            } else {
+                clipboardSelectedCells.add(cell);
+                cell.classList.add('selected');
+            }
+        }
+
+        function handleClipboardRightCellDragStart(event) {
+            const cell = event.currentTarget;
+            const cellKey = cell.dataset.cellKey;
+            if (!cellKey) return;
+            if (clipboardSelectedCells.has(cell)) {
+                clipboardDragPayload = Array.from(clipboardSelectedCells).map(selected => selected.dataset.cellKey);
+            } else {
+                clipboardDragPayload = [cellKey];
+            }
+            event.dataTransfer.effectAllowed = 'copyMove';
+            event.dataTransfer.setData('text/plain', clipboardDragPayload.join('|'));
+            cell.classList.add('dragging');
+        }
+
+        function handleClipboardRightCellDragEnd(event) {
+            event.currentTarget.classList.remove('dragging');
+        }
+
+        function handleClipboardRightCellDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('dragover');
+        }
+
+        function handleClipboardRightCellDragLeave(event) {
+            event.currentTarget.classList.remove('dragover');
+        }
+
+        function handleClipboardRightCellDrop(event) {
+            event.preventDefault();
+            const targetCell = event.currentTarget;
+            targetCell.classList.remove('dragover');
+            const payloadKeys = clipboardDragPayload.length ? clipboardDragPayload : (event.dataTransfer.getData('text/plain')?.split('|') || []);
+            if (payloadKeys.length !== 1) {
+                clipboardDragPayload = [];
+                return;
+            }
+            const sourceKey = payloadKeys[0];
+            const sourceCell = clipboardCellElements.get(sourceKey);
+            if (!sourceCell || sourceCell === targetCell) {
+                clipboardDragPayload = [];
+                return;
+            }
+            const sourceValue = sourceCell.textContent;
+            const targetValue = targetCell.textContent;
+            sourceCell.textContent = targetValue;
+            targetCell.textContent = sourceValue;
+            const [tabName, rowIndex, colIndex] = sourceKey.split('-');
+            updateClipboardCellValue(tabName, Number(rowIndex), Number(colIndex), targetValue);
+            const [targetTab, targetRow, targetCol] = (targetCell.dataset.cellKey || '').split('-');
+            if (targetTab) {
+                updateClipboardCellValue(targetTab, Number(targetRow), Number(targetCol), sourceValue);
+            }
+            clipboardDragPayload = [];
+        }
+
+        function handleClipboardLeftDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('dragover');
+        }
+
+        function handleClipboardLeftDragLeave(event) {
+            event.currentTarget.classList.remove('dragover');
+        }
+
+        function getClipboardPayloadValues() {
+            const keys = clipboardDragPayload.length
+                ? clipboardDragPayload
+                : Array.from(clipboardSelectedCells).map(cell => cell.dataset.cellKey);
+            if (!keys.length) return [];
+            return keys.map(key => (clipboardCellElements.get(key)?.textContent || '').trim()).filter(value => value !== '');
+        }
+
+        function handleClipboardLeftDrop(event) {
+            event.preventDefault();
+            const cell = event.currentTarget;
+            cell.classList.remove('dragover');
+            const targetId = cell.dataset.targetId;
+            if (!targetId) return;
+            const values = getClipboardPayloadValues();
+            const combined = values.length ? values.join(' / ') : '';
+            applyClipboardValueToTarget(targetId, combined);
+            clipboardDragPayload = [];
+            cell.textContent = combined;
+            cell.classList.add('updated');
+            setTimeout(() => cell.classList.remove('updated'), 900);
+        }
+
+        function applyClipboardValueToTarget(targetId, value) {
+            const targetInfo = clipboardTargetMap.get(targetId);
+            if (!targetInfo || !targetInfo.input) return;
+            targetInfo.input.value = value;
+            targetInfo.input.dispatchEvent(new Event('input', { bubbles: true }));
+            if (targetInfo.rowElement) {
+                targetInfo.rowElement.classList.add('pending-highlight');
+                setTimeout(() => targetInfo.rowElement.classList.remove('pending-highlight'), 1200);
+            }
+        }
+
+        function filterClipboardLeft(term = '') {
+            const rows = document.querySelectorAll('#clipboardLeftContainer tbody tr');
+            const normalized = term.toLowerCase();
+            rows.forEach(row => {
+                if (!normalized) {
+                    row.style.display = '';
+                    return;
+                }
+                const matches = row.dataset.searchValue?.includes(normalized);
+                row.style.display = matches ? '' : 'none';
+            });
+        }
+
+        function copyClipboardSelection() {
+            if (clipboardSelectedCells.size === 0) {
+                showNotification('ℹ️ Aucune cellule sélectionnée', 'info');
+                return;
+            }
+            const text = Array.from(clipboardSelectedCells)
+                .map(cell => cell.textContent.trim())
+                .join('\n');
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => showNotification('📋 Sélection copiée dans le presse-papiers'))
+                    .catch(() => showNotification('⚠️ Impossible de copier automatiquement', 'warning'));
+            } else {
+                showNotification('⚠️ Navigateur incompatible avec la copie automatique', 'warning');
+            }
+        }
+
+        function closeClipboardPreview() {
+            const modal = document.getElementById('clipboardPreviewModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            clipboardActiveTab = null;
+            clipboardDragPayload = [];
+            clipboardSelectedCells.forEach(cell => cell.classList.remove('selected'));
+            clipboardSelectedCells.clear();
+        }
+
         // 🔧 ACTIONS DE PRÉVISUALISATION
         function fixAllErrors() {
             try {
@@ -4899,7 +5507,65 @@ return;
             applyIntelligentRGFill(row, tabName);
             applyIntelligentUTFill(row, tabName);
 
+            registerRowSelection(row, tabName);
+
             return row;
+        }
+
+        function ensureSelectionSet(tabName) {
+            if (!selectedRowsByTab[tabName]) {
+                selectedRowsByTab[tabName] = new Set();
+            }
+            return selectedRowsByTab[tabName];
+        }
+
+        function registerRowSelection(row, tabName) {
+            if (!row) return;
+            row.addEventListener('click', event => handleRowSelection(event, row, tabName));
+        }
+
+        function handleRowSelection(event, row, tabName) {
+            if (!(event.ctrlKey || event.metaKey)) return;
+            event.preventDefault();
+            const selection = ensureSelectionSet(tabName);
+            if (selection.has(row)) {
+                selection.delete(row);
+                row.classList.remove('row-selected');
+            } else {
+                selection.add(row);
+                row.classList.add('row-selected');
+            }
+        }
+
+        function deleteSelectedRows(tabName) {
+            const selection = ensureSelectionSet(tabName);
+            if (selection.size === 0) {
+                showNotification('ℹ️ Aucune ligne sélectionnée', 'info');
+                return;
+            }
+            if (!confirm(`Supprimer ${selection.size} ligne(s) sélectionnée(s) ?`)) {
+                return;
+            }
+            const rowsToDelete = Array.from(selection);
+            selection.clear();
+            rowsToDelete.forEach(row => row.remove());
+            updateStats(tabName);
+            saveAllData();
+            showNotification(`🗑️ ${rowsToDelete.length} ligne(s) supprimée(s)`);
+            logActivity(`${rowsToDelete.length} lignes supprimées dans ${getTabDisplayName(tabName)}`, 'warning');
+        }
+
+        function clearRowSelection(tabName) {
+            const selection = ensureSelectionSet(tabName);
+            selection.forEach(row => row.classList.remove('row-selected'));
+            selection.clear();
+        }
+
+        function removeRowFromSelection(row, tabName) {
+            const selection = ensureSelectionSet(tabName);
+            if (selection.has(row)) {
+                selection.delete(row);
+            }
         }
 
         function addRow(tabName) {
@@ -4999,6 +5665,7 @@ return;
             try {
                 if (confirm('Êtes-vous sûr de vouloir supprimer cette ligne ?')) {
                     row.remove();
+                    removeRowFromSelection(row, tabName);
                     updateStats(tabName);
                     saveAllData();
                     showNotification('🗑️ Ligne supprimée');
@@ -7950,15 +8617,31 @@ function updateTabsChart() {
             table.appendChild(thead);
 
             const tbody = document.createElement('tbody');
-            excelPreviewData.slice(0, previewLimit).forEach(row => {
+            for (let rowIndex = 0; rowIndex < previewLimit; rowIndex++) {
+                const row = excelPreviewData[rowIndex] || [];
                 const tr = document.createElement('tr');
                 excelPreviewColumnOrder.forEach(columnIndex => {
                     const td = document.createElement('td');
+                    td.contentEditable = true;
+                    td.draggable = true;
+                    td.dataset.rowIndex = rowIndex;
+                    td.dataset.columnIndex = columnIndex;
                     td.textContent = row[columnIndex] || '';
+                    td.addEventListener('dragstart', handleExcelCellDragStart);
+                    td.addEventListener('dragover', handleExcelCellDragOver);
+                    td.addEventListener('dragleave', handleExcelCellDragLeave);
+                    td.addEventListener('drop', handleExcelCellDrop);
+                    td.addEventListener('dragend', handleExcelCellDragEnd);
+                    td.addEventListener('input', () => {
+                        if (!excelPreviewData[rowIndex]) {
+                            excelPreviewData[rowIndex] = [];
+                        }
+                        excelPreviewData[rowIndex][columnIndex] = td.textContent;
+                    });
                     tr.appendChild(td);
                 });
                 tbody.appendChild(tr);
-            });
+            }
             table.appendChild(tbody);
 
             container.innerHTML = '';
@@ -7970,6 +8653,56 @@ function updateTabsChart() {
 
             refreshExcelFieldHints();
             renderExcelMappingWorkbench();
+        }
+
+        function handleExcelCellDragStart(event) {
+            const cell = event.currentTarget;
+            excelCellDragSource = {
+                row: Number(cell.dataset.rowIndex),
+                column: Number(cell.dataset.columnIndex)
+            };
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', 'excel-cell');
+            cell.classList.add('dragging');
+        }
+
+        function handleExcelCellDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('dragover');
+        }
+
+        function handleExcelCellDragLeave(event) {
+            event.currentTarget.classList.remove('dragover');
+        }
+
+        function handleExcelCellDrop(event) {
+            event.preventDefault();
+            const targetCell = event.currentTarget;
+            targetCell.classList.remove('dragover');
+            if (!excelCellDragSource) return;
+            const targetRow = Number(targetCell.dataset.rowIndex);
+            const targetColumn = Number(targetCell.dataset.columnIndex);
+            const sourceRow = excelCellDragSource.row;
+            const sourceColumn = excelCellDragSource.column;
+            const sourceValue = excelPreviewData[sourceRow]?.[sourceColumn] || '';
+            const targetValue = excelPreviewData[targetRow]?.[targetColumn] || '';
+            if (excelPreviewData[sourceRow]) {
+                excelPreviewData[sourceRow][sourceColumn] = targetValue;
+            }
+            if (excelPreviewData[targetRow]) {
+                excelPreviewData[targetRow][targetColumn] = sourceValue;
+            }
+            const sourceCell = document.querySelector(`.excel-preview-table td[data-row-index="${sourceRow}"][data-column-index="${sourceColumn}"]`);
+            if (sourceCell && sourceCell !== targetCell) {
+                sourceCell.textContent = targetValue;
+            }
+            targetCell.textContent = sourceValue;
+            excelCellDragSource = null;
+        }
+
+        function handleExcelCellDragEnd(event) {
+            event.currentTarget.classList.remove('dragging');
+            excelCellDragSource = null;
         }
 
         function initializeExcelFieldAssignments(force = false) {
@@ -8256,6 +8989,7 @@ function updateTabsChart() {
             excelPreviewDragIndex = null;
             renderExcelPreview();
             updateExcelImportButtons();
+            updateTasksStats();
         }
 
         function handlePreviewDragEnd(event) {
@@ -8316,9 +9050,15 @@ function updateTabsChart() {
 
         function updateExcelImportButtons() {
             const importBtn = document.getElementById('excelImportBtn');
-            if (!importBtn) return;
+            const batchBtn = document.getElementById('excelBatchImportBtn');
             const targetTab = document.getElementById('taskTargetTab').value;
-            importBtn.disabled = !(excelPreviewData.length > 0 && Boolean(targetTab));
+            const hasData = excelPreviewData.length > 0 && Boolean(targetTab);
+            if (importBtn) {
+                importBtn.disabled = !hasData;
+            }
+            if (batchBtn) {
+                batchBtn.disabled = !(hasData && Boolean(getActiveBatch()));
+            }
         }
 
         function createTasksFromExcelImport() {
@@ -8385,6 +9125,68 @@ function updateTabsChart() {
             } catch (error) {
                 console.error('Erreur création tâches importées:', error);
                 showNotification('❌ Erreur lors de l\'import des tâches', 'error');
+            }
+        }
+
+        function addImportToBatch() {
+            try {
+                const targetTab = document.getElementById('taskTargetTab').value;
+                const activeBatch = getActiveBatch();
+                if (!targetTab || !activeBatch) {
+                    showNotification('Sélectionnez un onglet et un lot actif avant d\'ajouter l\'import.', 'warning');
+                    return;
+                }
+                if (!excelPreviewData.length) {
+                    showNotification('Prévisualisez vos données avant d\'alimenter le lot.', 'info');
+                    return;
+                }
+                const columns = tabConfigs[targetTab]?.columns || [];
+                if (!columns.length) {
+                    showNotification('Impossible de récupérer les colonnes de destination.', 'error');
+                    return;
+                }
+                const skipHeader = document.getElementById('excelSkipHeader')?.checked;
+                const rows = skipHeader ? excelPreviewData.slice(1) : [...excelPreviewData];
+                const cleanRows = rows.filter(row => row.some(cell => (cell || '').trim() !== ''));
+                if (!cleanRows.length) {
+                    showNotification('Aucune ligne exploitable à ajouter dans le lot.', 'warning');
+                    return;
+                }
+                const columnMap = columns.map((_, index) => {
+                    if (typeof excelFieldAssignments[index] === 'number') {
+                        return excelFieldAssignments[index];
+                    }
+                    if (typeof excelPreviewColumnOrder[index] === 'number') {
+                        return excelPreviewColumnOrder[index];
+                    }
+                    return index;
+                });
+                cleanRows.forEach(row => {
+                    const taskData = {};
+                    columns.forEach((column, columnIndex) => {
+                        const sourceIndex = columnMap[columnIndex];
+                        taskData[column] = typeof sourceIndex === 'number' ? (row[sourceIndex] ?? '') : '';
+                    });
+                    activeBatch.tasks.push({
+                        id: generateUniqueId(),
+                        targetTab,
+                        targetTabName: getTabDisplayName(targetTab),
+                        data: taskData,
+                        createdAt: new Date(),
+                        priority: 'Normale',
+                        summary: generateTaskSummary(taskData)
+                    });
+                });
+                taskDrafts = activeBatch.tasks;
+                updateTaskBatchDisplay();
+                updateBatchSelectors();
+                updateTasksStats();
+                saveAllData();
+                showNotification(`📦 ${cleanRows.length} tâche(s) ajoutée(s) au lot ${activeBatch.name}`);
+                logActivity(`${cleanRows.length} tâches importées vers le lot ${activeBatch.name}`, 'info');
+            } catch (error) {
+                console.error('Erreur ajout import au lot:', error);
+                showNotification('❌ Erreur lors de l\'ajout de l\'import au lot', 'error');
             }
         }
 
@@ -8506,6 +9308,8 @@ function updateTabsChart() {
                 updateBatchSelectors();
                 updateTaskBatchDisplay();
                 saveAllData();
+                updateTasksStats();
+                updateExcelImportButtons();
 
                 if (nameInput) nameInput.value = '';
 
@@ -8524,6 +9328,8 @@ function updateTabsChart() {
             updateTaskBatchDisplay();
             updateTaskFields();
             saveAllData();
+            updateTasksStats();
+            updateExcelImportButtons();
         }
 
         function updateBatchSelectors() {
@@ -8562,6 +9368,8 @@ function updateTabsChart() {
                     label.textContent = `Lot actif : ${batch.name} (${batch.tasks.length} tâche(s))`;
                 }
             }
+
+            updateExcelImportButtons();
         }
 
         function deleteActiveBatch() {
@@ -8581,6 +9389,8 @@ function updateTabsChart() {
                 updateBatchSelectors();
                 updateTaskBatchDisplay();
                 saveAllData();
+                updateTasksStats();
+                updateExcelImportButtons();
 
                 showNotification('🗑️ Lot supprimé');
                 logActivity(`Lot supprimé (${batch.name})`, 'warning');
@@ -8625,6 +9435,8 @@ function updateTabsChart() {
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
                 saveAllData();
+                updateTasksStats();
+                updateExcelImportButtons();
 
                 clearTaskForm();
 
@@ -8781,6 +9593,8 @@ function updateTabsChart() {
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
                 saveAllData();
+                updateTasksStats();
+                updateExcelImportButtons();
             } catch (error) {
                 console.error('Erreur suppression tâche du lot:', error);
                 showNotification('❌ Erreur lors de la suppression du lot', 'error');
@@ -8815,6 +9629,8 @@ function updateTabsChart() {
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
                 saveAllData();
+                updateTasksStats();
+                updateExcelImportButtons();
 
                 showNotification('✏️ Tâche du lot chargée pour modification');
             } catch (error) {
@@ -8897,14 +9713,19 @@ function updateTabsChart() {
             try {
                 const pendingCount = pendingTasks.length;
                 const completedCount = completedTasks.length;
-                const totalCount = pendingCount + completedCount;
+                const lotCount = taskBatches.reduce((sum, batch) => sum + (batch.tasks?.length || 0), 0);
+                const totalCount = pendingCount + completedCount + lotCount;
                 const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-                
+
                 document.getElementById('pendingTasksCount').textContent = pendingCount;
                 document.getElementById('completedTasksCount').textContent = completedCount;
                 document.getElementById('totalTasksCount').textContent = totalCount;
+                const lotElement = document.getElementById('lotTasksCount');
+                if (lotElement) {
+                    lotElement.textContent = lotCount;
+                }
                 document.getElementById('tasksProgress').style.width = completionRate + '%';
-                
+
             } catch (error) {
                 console.error('Erreur mise à jour stats tâches:', error);
             }
@@ -9911,6 +10732,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (tbody) {
                     tbody.innerHTML = '';
                     rowCounters[tabName] = 0;
+                    clearRowSelection(tabName);
                     updateStats(tabName);
                     saveAllData();
                     
@@ -10065,6 +10887,12 @@ document.addEventListener('DOMContentLoaded', () => {
         window.focusRGChange = focusRGChange;
         window.exportRGChange = exportRGChange;
         window.exportRGChanges = exportRGChanges;
+        window.openClipboardPreview = openClipboardPreview;
+        window.closeClipboardPreview = closeClipboardPreview;
+        window.copyClipboardSelection = copyClipboardSelection;
+        window.filterClipboardLeft = filterClipboardLeft;
+        window.deleteSelectedRows = deleteSelectedRows;
+        window.addImportToBatch = addImportToBatch;
     </script>
 </body>
 </html>
