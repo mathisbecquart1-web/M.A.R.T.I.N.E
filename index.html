@@ -730,280 +730,6 @@
             background: rgba(40, 167, 69, 0.08) !important;
         }
 
-        .clipboard-inline-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            min-width: 220px;
-            background: #f8f9ff;
-            border: 1px dashed #bfc6ff;
-            border-radius: 10px;
-            padding: 10px;
-        }
-
-        .clipboard-inline-panel textarea {
-            width: 100%;
-            min-height: 80px;
-            resize: vertical;
-            border: 1px solid #d7ddff;
-            border-radius: 8px;
-            padding: 8px;
-            font-size: 12px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .clipboard-inline-actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-
-        .clipboard-preview-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(5, 10, 30, 0.82);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1200;
-            padding: 20px;
-        }
-
-        .clipboard-preview-modal.show {
-            display: flex;
-        }
-
-        .clipboard-preview-content {
-            background: white;
-            width: 95%;
-            max-width: 1400px;
-            border-radius: 18px;
-            padding: 24px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .clipboard-preview-body {
-            display: grid;
-            grid-template-columns: minmax(360px, 42%) minmax(360px, 1fr);
-            gap: 20px;
-        }
-
-        @media (max-width: 1200px) {
-            .clipboard-preview-body {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .clipboard-panel {
-            background: #f8f9ff;
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: inset 0 0 0 1px #e1e5ff;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .clipboard-panel-left {
-            min-height: 520px;
-        }
-
-        .clipboard-panel h4 {
-            margin: 0;
-            color: #2c3e50;
-        }
-
-        .clipboard-left-layout {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            height: 100%;
-        }
-
-        .clipboard-search-card {
-            background: white;
-            border-radius: 14px;
-            border: 1px solid #dfe4ff;
-            padding: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .clipboard-search-card label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .clipboard-search-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .clipboard-search-row input {
-            flex: 1;
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid #c8d0ff;
-            font-size: 13px;
-        }
-
-        .clipboard-search-row button {
-            white-space: nowrap;
-        }
-
-        .clipboard-search-summary {
-            font-size: 12px;
-            color: #5c6482;
-            margin-top: 6px;
-        }
-
-        .clipboard-search-matches {
-            margin-top: 8px;
-            max-height: 170px;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .clipboard-search-matches button {
-            text-align: left;
-            border: 1px solid #dfe4ff;
-            border-radius: 10px;
-            background: #f4f6ff;
-            padding: 8px 10px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            font-size: 12px;
-            color: #2c3e50;
-        }
-
-        .clipboard-search-matches button strong {
-            font-size: 13px;
-            color: #1f2a44;
-        }
-
-        .clipboard-search-matches button span {
-            color: #5b658c;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .clipboard-search-matches button:hover {
-            background: #e8ecff;
-        }
-
-        .clipboard-left-controls,
-        .clipboard-right-controls {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .clipboard-table-wrapper {
-            flex: 1;
-            overflow: auto;
-            border-radius: 12px;
-            background: white;
-            border: 1px solid #e1e5ff;
-        }
-
-        .clipboard-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .clipboard-table th,
-        .clipboard-table td {
-            padding: 10px;
-            border-bottom: 1px solid #eef1ff;
-            font-size: 13px;
-        }
-
-        .clipboard-right-cell {
-            cursor: grab;
-            user-select: text;
-        }
-
-        .clipboard-right-cell:active {
-            cursor: grabbing;
-        }
-
-        .clipboard-right-cell.selected {
-            background: rgba(102, 126, 234, 0.2);
-            outline: 2px solid #667eea;
-        }
-
-        .clipboard-left-cell {
-            min-width: 140px;
-        }
-
-        .clipboard-left-cell.dragover {
-            background: rgba(40, 167, 69, 0.15);
-            border: 1px dashed #28a745;
-        }
-
-        .clipboard-left-cell.updated {
-            animation: pulse 1.2s ease;
-        }
-
-        .clipboard-right-cell.dragover {
-            background: rgba(118, 75, 162, 0.15);
-        }
-
-        .clipboard-row-match {
-            background: rgba(102, 126, 234, 0.12);
-        }
-
-        .clipboard-row-focused {
-            outline: 2px solid #ff7f50;
-            outline-offset: -2px;
-        }
-
-        .clipboard-preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .clipboard-preview-header h3 {
-            margin: 0;
-            color: #2c3e50;
-        }
-
-        .clipboard-close-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .clipboard-helper-text {
-            font-size: 13px;
-            color: #555;
-        }
-
-        .clipboard-empty-message {
-            text-align: center;
-            padding: 20px;
-            color: #667;
-        }
-
         .excel-preview-table td.dragover {
             background: rgba(118, 75, 162, 0.15);
         }
@@ -1633,16 +1359,24 @@
             .filters-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .import-methods {
                 grid-template-columns: 1fr;
             }
-            
+
             .controls {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
+            .excel-import-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .excel-preview-scroll {
+                max-height: none;
+            }
+
             .preview-content {
                 max-width: 98%;
                 max-height: 95%;
@@ -1696,6 +1430,52 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        .excel-import-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .excel-import-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .excel-preview-panel {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #dfe4ff;
+            padding: 16px;
+            box-shadow: 0 18px 35px rgba(24, 39, 75, 0.15);
+            min-height: 100%;
+        }
+
+        .excel-preview-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .excel-preview-panel-header h5 {
+            font-size: 16px;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .excel-preview-helper {
+            font-size: 12px;
+            color: #556;
+        }
+
+        .excel-preview-scroll {
+            max-height: 520px;
+            overflow: auto;
         }
 
         .excel-paste-area {
@@ -2078,12 +1858,6 @@
                 <button class="btn btn-excel" onclick="exportToExcel('creation')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('creation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('creation')">🗑️ Effacer tout</button>
-                <div class="clipboard-inline-panel">
-                    <textarea id="clipboardInput-creation" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
-                    <div class="clipboard-inline-actions">
-                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('creation')">📋 Prévisualiser collage</button>
-                    </div>
-                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2203,12 +1977,6 @@
                 <button class="btn btn-excel" onclick="exportToExcel('modification')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('modification')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modification')">🗑️ Effacer tout</button>
-                <div class="clipboard-inline-panel">
-                    <textarea id="clipboardInput-modification" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
-                    <div class="clipboard-inline-actions">
-                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('modification')">📋 Prévisualiser collage</button>
-                    </div>
-                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2328,12 +2096,6 @@
                 <button class="btn btn-excel" onclick="exportToExcel('resiliation')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('resiliation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('resiliation')">🗑️ Effacer tout</button>
-                <div class="clipboard-inline-panel">
-                    <textarea id="clipboardInput-resiliation" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
-                    <div class="clipboard-inline-actions">
-                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('resiliation')">📋 Prévisualiser collage</button>
-                    </div>
-                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2451,12 +2213,6 @@
                 <button class="btn btn-excel" onclick="exportToExcel('autremodif')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('autremodif')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('autremodif')">🗑️ Effacer tout</button>
-                <div class="clipboard-inline-panel">
-                    <textarea id="clipboardInput-autremodif" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
-                    <div class="clipboard-inline-actions">
-                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('autremodif')">📋 Prévisualiser collage</button>
-                    </div>
-                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2572,12 +2328,6 @@
                 <button class="btn btn-warning" onclick="recalculateAllSurfaces()">🔄 Recalculer toutes les différences</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('modifsurface')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modifsurface')">🗑️ Effacer tout</button>
-                <div class="clipboard-inline-panel">
-                    <textarea id="clipboardInput-modifsurface" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
-                    <div class="clipboard-inline-actions">
-                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('modifsurface')">📋 Prévisualiser collage</button>
-                    </div>
-                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2701,12 +2451,6 @@
                 <button class="btn btn-success" onclick="markAllAsOK()">✅ Marquer sélection OK</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('verifbaux')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('verifbaux')">🗑️ Effacer tout</button>
-                <div class="clipboard-inline-panel">
-                    <textarea id="clipboardInput-verifbaux" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
-                    <div class="clipboard-inline-actions">
-                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('verifbaux')">📋 Prévisualiser collage</button>
-                    </div>
-                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2796,12 +2540,6 @@
                 <button class="btn btn-excel" onclick="exportToExcel('pni')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('pni')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('pni')">🗑️ Effacer tout</button>
-                <div class="clipboard-inline-panel">
-                    <textarea id="clipboardInput-pni" placeholder="Copiez/collez vos informations à distribuer..."></textarea>
-                    <div class="clipboard-inline-actions">
-                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('pni')">📋 Prévisualiser collage</button>
-                    </div>
-                </div>
             </div>
 
             <!-- TABLEAU -->
@@ -2969,20 +2707,8 @@
                 <button class="btn btn-success" onclick="buildUTDatabase()">🔄 Reconstruire index UT</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('baserg')">🗑️ Supprimer sélection RG</button>
                 <button class="btn btn-danger" onclick="clearAll('baserg')">🗑️ Effacer tout RG</button>
-                <div class="clipboard-inline-panel">
-                    <textarea id="clipboardInput-baserg" placeholder="Collez ici les informations RG à distribuer..."></textarea>
-                    <div class="clipboard-inline-actions">
-                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('baserg')">📋 Prévisualiser collage RG</button>
-                    </div>
-                </div>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('baseut')">🗑️ Supprimer sélection UT</button>
                 <button class="btn btn-danger" onclick="clearAll('baseut')">🗑️ Effacer Base UT</button>
-                <div class="clipboard-inline-panel">
-                    <textarea id="clipboardInput-baseut" placeholder="Collez ici les informations UT à distribuer..."></textarea>
-                    <div class="clipboard-inline-actions">
-                        <button class="btn btn-secondary btn-compact" type="button" onclick="openClipboardPreview('baseut')">📋 Prévisualiser collage UT</button>
-                    </div>
-                </div>
             </div>
 
             <!-- TABLEAU BASE RG -->
@@ -3085,43 +2811,57 @@
                         </div>
 
                         <div class="excel-import" id="excelImportSection">
-                            <h4>📋 Import rapide par copier/coller Excel</h4>
-                            <p style="font-size: 13px; color: #555; margin-bottom: 10px;">
-                                Collez vos lignes depuis Excel, réorganisez les colonnes par glisser-déposer puis créez automatiquement autant de tâches que de lignes importées.
-                            </p>
-                            <div class="excel-field-hints" id="excelFieldHints">
-                                <div class="excel-preview-empty" style="padding: 8px;">
-                                    Sélectionnez un onglet pour voir l'ordre attendu des colonnes.
+                            <div class="excel-import-layout">
+                                <div class="excel-import-form">
+                                    <div>
+                                        <h4>📋 Import rapide par copier/coller Excel</h4>
+                                        <p style="font-size: 13px; color: #555; margin-bottom: 10px;">
+                                            Collez vos lignes depuis Excel, réorganisez les colonnes par glisser-déposer puis créez automatiquement autant de tâches que de lignes importées.
+                                        </p>
+                                    </div>
+                                    <div class="excel-field-hints" id="excelFieldHints">
+                                        <div class="excel-preview-empty" style="padding: 8px;">
+                                            Sélectionnez un onglet pour voir l'ordre attendu des colonnes.
+                                        </div>
+                                    </div>
+                                    <textarea id="excelPasteArea" class="excel-paste-area" placeholder="GA[TAB]Date Demande[TAB]..."></textarea>
+                                    <div class="excel-import-actions">
+                                        <button class="btn btn-secondary" id="excelPreviewBtn" onclick="handleExcelPastePreview()">
+                                            👀 Prévisualiser
+                                        </button>
+                                        <button class="btn btn-danger" type="button" onclick="resetExcelImportArea()">
+                                            ♻️ Effacer l'import
+                                        </button>
+                                        <button class="btn btn-success" id="excelImportBtn" onclick="createTasksFromExcelImport()" disabled>
+                                            📥 Créer des tâches depuis l'import
+                                        </button>
+                                        <button class="btn btn-secondary" id="excelBatchImportBtn" onclick="addImportToBatch()" disabled>
+                                            📦 Ajouter l'import au lot actif
+                                        </button>
+                                        <label class="excel-option">
+                                            <input type="checkbox" id="excelSkipHeader" checked onchange="updateExcelImportButtons()">
+                                            Ignorer la première ligne (entêtes)
+                                        </label>
+                                    </div>
+                                    <div id="excelMappingWorkbench" class="excel-mapping-workbench">
+                                        <div class="excel-mapping-empty">
+                                            Sélectionnez un onglet et collez des données pour organiser vos colonnes par glisser-déposer.
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <textarea id="excelPasteArea" class="excel-paste-area" placeholder="GA[TAB]Date Demande[TAB]..."></textarea>
-                            <div class="excel-import-actions">
-                                <button class="btn btn-secondary" id="excelPreviewBtn" onclick="handleExcelPastePreview()">
-                                    👀 Prévisualiser
-                                </button>
-                                <button class="btn btn-danger" type="button" onclick="resetExcelImportArea()">
-                                    ♻️ Effacer l'import
-                                </button>
-                                <button class="btn btn-success" id="excelImportBtn" onclick="createTasksFromExcelImport()" disabled>
-                                    📥 Créer des tâches depuis l'import
-                                </button>
-                                <button class="btn btn-secondary" id="excelBatchImportBtn" onclick="addImportToBatch()" disabled>
-                                    📦 Ajouter l'import au lot actif
-                                </button>
-                                <label class="excel-option">
-                                    <input type="checkbox" id="excelSkipHeader" checked onchange="updateExcelImportButtons()">
-                                    Ignorer la première ligne (entêtes)
-                                </label>
-                            </div>
-                            <div class="excel-preview-meta" id="excelPreviewMeta">Aucun aperçu pour le moment.</div>
-                            <div id="excelPreviewContainer" class="excel-preview-container">
-                                <div class="excel-preview-empty">
-                                    Collez vos données pour voir un aperçu interactif.
-                                </div>
-                            </div>
-                            <div id="excelMappingWorkbench" class="excel-mapping-workbench">
-                                <div class="excel-mapping-empty">
-                                    Sélectionnez un onglet et collez des données pour organiser vos colonnes par glisser-déposer.
+                                <div class="excel-preview-panel">
+                                    <div class="excel-preview-panel-header">
+                                        <h5>Tableau de prévisualisation</h5>
+                                        <span class="excel-preview-helper">Restez sur le formulaire tout en parcourant vos lignes importées.</span>
+                                    </div>
+                                    <div class="excel-preview-meta" id="excelPreviewMeta">Aucun aperçu pour le moment.</div>
+                                    <div class="excel-preview-scroll">
+                                        <div id="excelPreviewContainer" class="excel-preview-container">
+                                            <div class="excel-preview-empty">
+                                                Collez vos données pour voir un aperçu interactif.
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -3546,47 +3286,7 @@
         </div>
     </div>
 
-    <div class="clipboard-preview-modal" id="clipboardPreviewModal">
-        <div class="clipboard-preview-content">
-            <div class="clipboard-preview-header">
-                <h3 id="clipboardPreviewTitle">📋 Prévisualisation du collage</h3>
-                <button class="clipboard-close-btn" onclick="closeClipboardPreview()">×</button>
-            </div>
-            <p class="clipboard-helper-text">
-                Sélectionnez plusieurs cellules avec CTRL, faites-les glisser vers la colonne souhaitée puis relâchez pour alimenter l'onglet.
-            </p>
-            <div class="clipboard-preview-body">
-                <div class="clipboard-panel clipboard-panel-left">
-                    <h4>📄 Lignes de l'onglet</h4>
-                    <div class="clipboard-left-layout">
-                        <div class="clipboard-search-card">
-                            <label for="clipboardLeftSearch">🔍 Rechercher une ligne dans l'onglet</label>
-                            <div class="clipboard-search-row">
-                                <input type="text" id="clipboardLeftSearch" placeholder="GA, UT, RG, bail, commentaire..." oninput="filterClipboardLeft(this.value)">
-                                <button class="btn btn-secondary btn-compact" type="button" onclick="resetClipboardSearch()">Réinitialiser</button>
-                            </div>
-                            <div class="clipboard-search-summary" id="clipboardSearchSummary">Tapez un mot-clé pour filtrer les lignes visibles.</div>
-                            <div class="clipboard-search-matches" id="clipboardSearchMatches">
-                                <div class="clipboard-empty-message">Aucun filtre appliqué.</div>
-                            </div>
-                        </div>
-                        <div class="clipboard-table-wrapper" id="clipboardLeftContainer">
-                            <div class="clipboard-empty-message">Aucune ligne disponible pour le moment.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="clipboard-panel">
-                    <h4>🧾 Données collées</h4>
-                    <div class="clipboard-right-controls">
-                        <button class="btn btn-secondary btn-compact" type="button" onclick="copyClipboardSelection()">📋 Copier la sélection</button>
-                    </div>
-                    <div class="clipboard-table-wrapper" id="clipboardRightContainer">
-                        <div class="clipboard-empty-message">Collez vos informations puis lancez la prévisualisation.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- CRÉDIT PRODUCTEUR -->
     <div class="producer-credit">
@@ -3711,1406 +3411,6 @@
         let activeBatchId = null;
         let completedTasks = [];
         const selectedRowsByTab = {};
-        const clipboardDataByTab = {};
-        const clipboardTargetMap = new Map();
-        const clipboardCellElements = new Map();
-        const clipboardRowRegistry = new Map();
-        const clipboardSelectedCells = new Set();
-        let clipboardDragPayload = [];
-        let clipboardActiveTab = null;
-        let excelCellDragSource = null;
-        let savedSearches = [];
-        let autoSaveInterval = null;
-        let excelPreviewData = [];
-        let excelPreviewColumnOrder = [];
-        let excelPreviewDragIndex = null;
-        let excelFieldAssignments = [];
-        let excelAssignmentsTab = null;
-        let excelDraggedColumnIndex = null;
-        Object.keys(tabConfigs).forEach(tabName => {
-            selectedRowsByTab[tabName] = new Set();
-        });
-        let chartInstances = {};
-        let activityLog = [];
-        let activityDetailsExpanded = false;
-        let qualityAlertsExpanded = false;
-        let rgChangePanelExpanded = true;
-        let rgChangeRegistry = {};
-        let dismissedRGChanges = new Set();
-        let fileDialogLock = false;
-        let activeTabName = 'creation';
-        let tabCache = null;
-        let pendingStatsUpdate = null;
-
-        // Initialisation des compteurs
-        Object.keys(tabConfigs).forEach(tabName => {
-            rowCounters[tabName] = 0;
-        });
-
-        // 🔧 FONCTIONS UTILITAIRES COMPLÈTES
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="font-size: 16px;">${getNotificationIcon(type)}</div>
-                    <div>${message}</div>
-                </div>
-            `;
-            document.body.appendChild(notification);
-
-            setTimeout(() => notification.classList.add('show'), 100);
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 4000);
-
-            // Log de l'activité
-            logActivity(message, type);
-        }
-
-        function getNotificationIcon(type) {
-            const icons = {
-                'success': '✅',
-                'error': '❌',
-                'warning': '⚠️',
-                'info': 'ℹ️'
-            };
-            return icons[type] || 'ℹ️';
-        }
-
-        function logActivity(message, type) {
-            activityLog.unshift({
-                timestamp: new Date(),
-                message: message,
-                type: type
-            });
-            
-            // Garder seulement les 50 dernières activités
-            if (activityLog.length > 50) {
-                activityLog = activityLog.slice(0, 50);
-            }
-            
-            updateRecentActivity();
-        }
-
-        function updateRecentActivity() {
-            const compact = document.getElementById('recentActivityCompact');
-            const detail = document.getElementById('recentActivityDetail');
-            const toggleBtn = document.getElementById('activityToggleBtn');
-            if (!compact || !detail) return;
-
-            if (toggleBtn) {
-                toggleBtn.textContent = `${activityDetailsExpanded ? '▾' : '▸'} Détails`;
-            }
-
-            if (activityLog.length === 0) {
-                const empty = '<div style="color: #666; text-align: center; padding: 12px;">Aucune activité récente</div>';
-                compact.innerHTML = empty;
-                detail.innerHTML = empty;
-                return;
-            }
-
-            const renderEntries = (entries, withDate = false) => entries.map(activity => {
-                const timeStr = activity.timestamp.toLocaleTimeString('fr-FR', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                const dateStr = activity.timestamp.toLocaleDateString('fr-FR', {
-                    weekday: 'short',
-                    day: '2-digit',
-                    month: 'short'
-                });
-                const icon = getNotificationIcon(activity.type);
-
-                return `
-                    <div class="activity-entry">
-                        <div style="font-size: 14px;">${icon}</div>
-                        <div style="flex: 1;">${activity.message}</div>
-                        ${withDate ? `<div class="activity-type">${activity.type}</div>` : ''}
-                        <div class="activity-meta">${withDate ? `${dateStr} · ${timeStr}` : timeStr}</div>
-                    </div>
-                `;
-            }).join('');
-
-            const compactEntries = activityLog.slice(0, 5);
-            const detailEntries = activityLog.slice(0, 20);
-
-            compact.innerHTML = renderEntries(compactEntries);
-            detail.innerHTML = renderEntries(detailEntries, true);
-
-            compact.style.display = activityDetailsExpanded ? 'none' : 'flex';
-            detail.style.display = activityDetailsExpanded ? 'flex' : 'none';
-        }
-
-        function toggleActivityDetails() {
-            activityDetailsExpanded = !activityDetailsExpanded;
-            updateRecentActivity();
-        }
-
-        const cancelIdle = (handle) => {
-            if (!handle) return;
-            if (window.cancelIdleCallback) {
-                cancelIdleCallback(handle);
-            } else {
-                clearTimeout(handle);
-            }
-        };
-
-        function toggleRGChangePanel() {
-            try {
-                rgChangePanelExpanded = !rgChangePanelExpanded;
-                const panel = document.getElementById('rgChangePanel');
-                const toggle = document.getElementById('rgChangeToggleBtn');
-                if (panel) {
-                    panel.style.display = rgChangePanelExpanded ? 'block' : 'none';
-                }
-                if (toggle) {
-                    toggle.textContent = `${rgChangePanelExpanded ? '▾' : '▸'} Détails`;
-                }
-            } catch (error) {
-                console.error('Erreur bascule panneau changements RG:', error);
-            }
-        }
-
-        function showSaveStatus(message, type = 'success') {
-            const status = document.getElementById('saveStatus');
-            if (status) {
-                const now = new Date();
-                const timeStr = now.toLocaleTimeString('fr-FR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    second: '2-digit' 
-                });
-                status.textContent = `${message} - ${timeStr}`;
-                status.style.color = type === 'error' ? '#dc3545' : '#28a745';
-            }
-        }
-
-        function generateUniqueId() {
-            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        function getTabDisplayName(tabName) {
-            return tabConfigs[tabName]?.displayName || tabName;
-        }
-
-        function getTabIcon(tabName) {
-            return tabConfigs[tabName]?.icon || '📄';
-        }
-
-        // 🔧 GESTION DES ONGLETS
-        function getTabCache() {
-            if (tabCache) return tabCache;
-
-            const contents = new Map();
-            document.querySelectorAll('.tab-content').forEach(content => {
-                if (content.id) {
-                    contents.set(content.id, content);
-                }
-            });
-
-            const tabs = new Map();
-            document.querySelectorAll('.tab').forEach(tab => {
-                const match = tab.getAttribute('onclick')?.match(/switchTab\('([^']+)'\)/);
-                if (match && match[1]) {
-                    tabs.set(match[1], tab);
-                }
-            });
-
-            tabCache = { contents, tabs };
-            return tabCache;
-        }
-
-        function scheduleTabStatsUpdate(tabName) {
-            cancelIdle(pendingStatsUpdate);
-
-            const runUpdate = () => {
-                if (tabName === 'statistiques') {
-                    updateStatsDashboard();
-                } else if (tabName === 'baserg') {
-                    updateRGUsageStats();
-                    updateUTUsageStats();
-                } else if (tabName === 'taches') {
-                    updateTasksStats();
-                } else if (tabName !== 'recherche') {
-                    updateStats(tabName);
-                }
-            };
-
-            if (window.requestIdleCallback) {
-                pendingStatsUpdate = requestIdleCallback(runUpdate, { timeout: 120 });
-            } else {
-                pendingStatsUpdate = setTimeout(runUpdate, 16);
-            }
-        }
-
-        function switchTab(tabName) {
-            try {
-                if (tabName === activeTabName) return;
-
-                const { contents, tabs } = getTabCache();
-
-                contents.forEach((content, name) => {
-                    content.classList.toggle('active', name === tabName);
-                });
-
-                tabs.forEach((tab, name) => {
-                    tab.classList.toggle('active', name === tabName);
-                });
-
-                activeTabName = tabName;
-                scheduleTabStatsUpdate(tabName);
-
-                logActivity(`Navigation vers ${getTabDisplayName(tabName)}`, 'info');
-
-            } catch (error) {
-                console.error('Erreur changement onglet:', error);
-                showNotification('❌ Erreur lors du changement d\'onglet', 'error');
-            }
-        }
-
-        function showProcessingOverlay(message, progressText = 'Préparation...') {
-            const overlay = document.getElementById('processingOverlay');
-            const text = document.getElementById('processingText');
-            const bar = document.getElementById('processingProgressBar');
-
-            if (text && message) text.textContent = message;
-            if (bar) bar.style.width = '0%';
-            if (overlay) overlay.classList.add('active');
-            updateProcessingProgress(progressText, 0);
-        }
-
-        function updateProcessingProgress(progressText, percentage) {
-            const text = document.getElementById('processingText');
-            const bar = document.getElementById('processingProgressBar');
-
-            if (text && progressText) text.textContent = progressText;
-            if (bar && typeof percentage === 'number') {
-                bar.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
-            }
-        }
-
-        function hideProcessingOverlay() {
-            const overlay = document.getElementById('processingOverlay');
-            if (overlay) overlay.classList.remove('active');
-        }
-
-        // 🚀 SYSTÈME IMPORT FICHIER CORRIGÉ
-        function triggerFileInput(tabName) {
-            const fileInput = document.getElementById(`fileInput${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
-            openFilePicker(fileInput);
-        }
-
-        function openFilePicker(fileInput) {
-            if (!fileInput || fileDialogLock) return;
-
-            fileDialogLock = true;
-            fileInput.value = '';
-
-            try {
-                fileInput.click();
-            } finally {
-                setTimeout(() => {
-                    fileDialogLock = false;
-                }, 800);
-            }
-        }
-
-        async function handleFileImport(tabName, input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            if (!window.XLSX) {
-                showNotification('❌ Bibliothèque Excel non chargée', 'error');
-                return;
-            }
-
-            showNotification(`📥 Analyse du fichier "${file.name}" en cours...`, 'info');
-
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                try {
-                    showProcessingOverlay('Analyse du fichier en cours...', 'Préparation des données...');
-                    let workbook;
-
-                    if (file.name.toLowerCase().endsWith('.csv')) {
-                        const csvData = e.target.result;
-                        workbook = XLSX.read(csvData, { type: 'string' });
-                    } else {
-                        const data = new Uint8Array(e.target.result);
-                        workbook = XLSX.read(data, { type: 'array' });
-                    }
-                    
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-                    if (jsonData.length === 0) {
-                        showNotification(`❌ Le fichier "${file.name}" semble vide`, 'error');
-                        hideProcessingOverlay();
-                        return;
-                    }
-
-                    currentPreviewData = await processImportData(jsonData, tabName);
-                    currentTabForPreview = tabName;
-
-                    notifyImportDuplicates(currentPreviewData, tabName);
-                    showPreview(tabName);
-                    showNotification(`✅ Fichier "${file.name}" analysé avec succès`, 'success');
-
-                } catch (error) {
-                    console.error('Erreur lecture fichier:', error);
-                    showNotification(`❌ Erreur lors de la lecture du fichier "${file.name}"`, 'error');
-                } finally {
-                    hideProcessingOverlay();
-                }
-            };
-            
-            if (file.name.toLowerCase().endsWith('.csv')) {
-                reader.readAsText(file);
-            } else {
-                reader.readAsArrayBuffer(file);
-            }
-            
-            input.value = '';
-        }
-
-        // 📋 SYSTÈME COPIER-COLLER
-        function togglePasteArea(tabName) {
-            const pasteArea = document.getElementById(`pasteArea${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
-            if (pasteArea) {
-                pasteArea.classList.toggle('active');
-                if (pasteArea.classList.contains('active')) {
-                    const textarea = pasteArea.querySelector('textarea');
-                    if (textarea) {
-                        textarea.focus();
-                        textarea.value = '';
-                    }
-                }
-            }
-        }
-
-        async function analyzePastedData(tabName) {
-            const textarea = document.getElementById(`pasteTextarea${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
-            if (!textarea || !textarea.value.trim()) {
-                showNotification('❌ Aucune donnée à analyser', 'error');
-                return;
-            }
-
-            try {
-                showNotification('🔍 Analyse des données collées...', 'info');
-                showProcessingOverlay('Analyse des données collées...', 'Préparation des tableaux...');
-
-                const rawData = textarea.value.trim();
-                const lines = rawData.split('\n');
-                const parsedData = lines.map(line => {
-                    return line.split(/\t|;|,/).map(cell => cell.trim().replace(/"/g, ''));
-                });
-                
-                if (parsedData.length === 0) {
-                    showNotification('❌ Aucune donnée valide trouvée', 'error');
-                    hideProcessingOverlay();
-                    return;
-                }
-
-                currentPreviewData = await processImportData(parsedData, tabName);
-                currentTabForPreview = tabName;
-
-                notifyImportDuplicates(currentPreviewData, tabName);
-                togglePasteArea(tabName);
-                showPreview(tabName);
-                showNotification(`✅ ${parsedData.length} ligne(s) analysée(s)`, 'success');
-                
-            } catch (error) {
-                console.error('Erreur analyse données collées:', error);
-                showNotification('❌ Erreur lors de l\'analyse des données', 'error');
-            } finally {
-                hideProcessingOverlay();
-            }
-        }
-
-        // 🔍 TRAITEMENT ET VALIDATION DES DONNÉES
-        function processImportData(rawData, tabName) {
-            return new Promise((resolve, reject) => {
-                try {
-                    const expectedColumns = tabConfigs[tabName]?.columns || [];
-                    const processedData = {
-                        headers: [],
-                        rows: [],
-                        validationResults: {
-                            valid: 0,
-                            errors: 0,
-                            warnings: 0,
-                            total: 0
-                        },
-                        utDuplicateCount: 0,
-                        utDuplicateCodes: [],
-                        rgDuplicateCount: 0,
-                        rgDuplicateCodes: []
-                    };
-
-                    if (rawData.length === 0) {
-                        resolve(processedData);
-                        return;
-                    }
-
-                    const firstRow = rawData[0];
-                    const hasHeaders = detectHeaders(firstRow, expectedColumns);
-
-                    let dataStartIndex = hasHeaders ? 1 : 0;
-                    processedData.headers = hasHeaders ? firstRow : expectedColumns.slice(0, firstRow.length);
-
-                    const totalRows = rawData.length - dataStartIndex;
-                    const batchSize = 200;
-                    let currentIndex = dataStartIndex;
-
-                    const processBatch = () => {
-                        const end = Math.min(currentIndex + batchSize, rawData.length);
-
-                        for (let i = currentIndex; i < end; i++) {
-                            const rawRow = rawData[i];
-                            if (!rawRow || rawRow.every(cell => !cell || cell.toString().trim() === '')) {
-                                continue;
-                            }
-
-                            const processedRow = {
-                                data: [],
-                                validations: [],
-                                hasErrors: false,
-                                hasWarnings: false
-                            };
-
-                            for (let j = 0; j < Math.max(rawRow.length, expectedColumns.length); j++) {
-                                const cellValue = j < rawRow.length ? rawRow[j] : '';
-                                const columnName = j < processedData.headers.length ? processedData.headers[j] : '';
-                                const expectedColumn = j < expectedColumns.length ? expectedColumns[j] : '';
-
-                                let cleanValue = cleanCellValue(cellValue, expectedColumn || columnName);
-                                const validation = validateCell(cleanValue, expectedColumn || columnName, tabName);
-
-                                processedRow.data.push(cleanValue);
-                                processedRow.validations.push(validation);
-
-                                if (validation.status === 'error') {
-                                    processedRow.hasErrors = true;
-                                    processedData.validationResults.errors++;
-                                } else if (validation.status === 'warning') {
-                                    processedRow.hasWarnings = true;
-                                    processedData.validationResults.warnings++;
-                                } else if (validation.status === 'valid') {
-                                    processedData.validationResults.valid++;
-                                }
-                            }
-
-                            processedData.rows.push(processedRow);
-                        }
-
-                        processedData.validationResults.total = processedData.rows.length;
-
-                        const processedCount = processedData.rows.length;
-                        const progress = totalRows > 0 ? Math.min(100, Math.round((processedCount / totalRows) * 100)) : 100;
-                        updateProcessingProgress(`Analyse des lignes ${Math.min(end, rawData.length)}/${rawData.length}`, progress);
-
-                        if (end < rawData.length) {
-                            currentIndex = end;
-                            setTimeout(processBatch, 0);
-                        } else {
-                            if (tabName === 'baseut') {
-                                const codeIndex = processedData.headers.findIndex(h => h.toLowerCase().includes('code') && h.toLowerCase().includes('ut'));
-                                if (codeIndex !== -1) {
-                                    const utOccurrences = {};
-
-                                    processedData.rows.forEach(row => {
-                                        const normalized = normalizeUTValue(row.data[codeIndex]);
-                                        if (!normalized) return;
-                                        if (!utOccurrences[normalized]) {
-                                            utOccurrences[normalized] = [];
-                                        }
-                                        utOccurrences[normalized].push(row);
-                                    });
-
-                                    const duplicateCodes = [];
-                                    let duplicateRows = 0;
-
-                                    Object.entries(utOccurrences)
-                                        .filter(([, rows]) => rows.length > 1)
-                                        .forEach(([code, rows]) => {
-                                            duplicateCodes.push(code);
-                                            duplicateRows += rows.length;
-                                        });
-
-                                    processedData.utDuplicateCodes = duplicateCodes;
-                                    processedData.utDuplicateCount = duplicateRows;
-
-                                    if (duplicateCodes.length > 0) {
-                                        const duplicatesSet = new Set(duplicateCodes);
-
-                                        processedData.rows.forEach(row => {
-                                            const normalized = normalizeUTValue(row.data[codeIndex]);
-                                            if (normalized && duplicatesSet.has(normalized)) {
-                                                row.validations[codeIndex] = {
-                                                    status: 'warning',
-                                                    message: 'Code UT en double détecté',
-                                                    originalValue: row.data[codeIndex]
-                                                };
-                                                row.hasWarnings = true;
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-
-                            if (tabName === 'baserg') {
-                                const codeIndex = processedData.headers.findIndex(h => h.toLowerCase().includes('code') && h.toLowerCase().includes('rg'));
-                                const fallbackIndex = processedData.headers.findIndex(h => h.toLowerCase() === 'rg');
-                                const targetIndex = codeIndex !== -1 ? codeIndex : fallbackIndex;
-
-                                if (targetIndex !== -1) {
-                                    const rgOccurrences = {};
-
-                                    processedData.rows.forEach(row => {
-                                        const normalized = normalizeRGValue(row.data[targetIndex]);
-                                        if (!normalized) return;
-                                        if (!rgOccurrences[normalized]) {
-                                            rgOccurrences[normalized] = [];
-                                        }
-                                        rgOccurrences[normalized].push(row);
-                                    });
-
-                                    const duplicateCodes = [];
-                                    let duplicateRows = 0;
-
-                                    Object.entries(rgOccurrences)
-                                        .filter(([, rows]) => rows.length > 1)
-                                        .forEach(([code, rows]) => {
-                                            duplicateCodes.push(code);
-                                            duplicateRows += rows.length;
-                                        });
-
-                                    processedData.rgDuplicateCodes = duplicateCodes;
-                                    processedData.rgDuplicateCount = duplicateRows;
-
-                                    if (duplicateCodes.length > 0) {
-                                        const duplicatesSet = new Set(duplicateCodes);
-
-                                        processedData.rows.forEach(row => {
-                                            const normalized = normalizeRGValue(row.data[targetIndex]);
-                                            if (normalized && duplicatesSet.has(normalized)) {
-                                                row.validations[targetIndex] = {
-                                                    status: 'warning',
-                                                    message: 'Code RG en double détecté',
-                                                    originalValue: row.data[targetIndex]
-                                                };
-                                                row.hasWarnings = true;
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-
-                            processedData.validationResults = { valid: 0, errors: 0, warnings: 0, total: processedData.rows.length };
-
-                            processedData.rows.forEach(row => {
-                                row.validations.forEach(validation => {
-                                    if (!validation) return;
-                                    if (validation.status === 'valid') processedData.validationResults.valid++;
-                                    if (validation.status === 'warning') processedData.validationResults.warnings++;
-                                    if (validation.status === 'error') processedData.validationResults.errors++;
-                                });
-
-                                row.hasErrors = row.validations.some(v => v && v.status === 'error');
-                                row.hasWarnings = row.validations.some(v => v && v.status === 'warning');
-                            });
-
-                            resolve(processedData);
-                        }
-                    };
-
-                    setTimeout(processBatch, 0);
-
-                } catch (error) {
-                    console.error('Erreur traitement données:', error);
-                    showNotification('❌ Erreur lors du traitement des données', 'error');
-                    reject(error);
-                }
-            });
-        }
-
-        function notifyImportDuplicates(previewData, tabName) {
-            if (!previewData) return;
-
-            if (tabName === 'baseut') {
-                const duplicateRows = previewData.utDuplicateCount || 0;
-                const duplicateCodes = previewData.utDuplicateCodes?.length || 0;
-
-                if (duplicateRows > 0) {
-                    const message = `⚠️ ${duplicateCodes} code(s) UT apparaissent en double (${duplicateRows} ligne(s)). ` +
-                        'Utilisez "🧹 Trier et enlever les doublons" pour ne conserver qu\'un exemplaire.';
-                    showNotification(message, 'warning');
-                }
-            }
-
-            if (tabName === 'baserg') {
-                const duplicateRows = previewData.rgDuplicateCount || 0;
-                const duplicateCodes = previewData.rgDuplicateCodes?.length || 0;
-
-                if (duplicateRows > 0) {
-                    const message = `⚠️ ${duplicateCodes} code(s) RG apparaissent en double (${duplicateRows} ligne(s)). ` +
-                        'Cliquez sur "🧹 Trier et enlever les doublons" pour nettoyer la prévisualisation.';
-                    showNotification(message, 'warning');
-                }
-            }
-        }
-
-        function detectHeaders(firstRow, expectedColumns) {
-            if (!firstRow || firstRow.length === 0) return false;
-            
-            const matchScore = firstRow.reduce((score, cell, index) => {
-                const cellStr = cell.toString().toLowerCase();
-                const expectedStr = expectedColumns[index] ? expectedColumns[index].toLowerCase() : '';
-                
-                if (cellStr.includes('ga') || cellStr.includes('date') || 
-                    cellStr.includes('rg') || cellStr.includes('bail') ||
-                    cellStr.includes('surface') || cellStr.includes('état') ||
-                    cellStr.includes('commentaire') || cellStr.includes('nom')) {
-                    return score + 1;
-                }
-                
-                return score;
-            }, 0);
-            
-            return matchScore >= Math.min(2, firstRow.length * 0.3);
-        }
-
-        function deriveInitialsFromName(rawValue) {
-            const parts = (rawValue || '')
-                .replace(/[^a-zA-Z\s'-]/g, ' ')
-                .trim()
-                .split(/\s+/)
-                .filter(Boolean);
-
-            if (parts.length === 0) return '';
-            if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-
-            const lastWord = parts[parts.length - 1].charAt(0);
-            const firstWord = parts[0].charAt(0);
-
-            return `${lastWord}${firstWord}`.toUpperCase();
-        }
-
-        function cleanCellValue(value, columnName) {
-            if (!value && value !== 0) return '';
-            
-            let cleanValue = value.toString().trim();
-            
-            if (columnName && (columnName.toLowerCase().includes('date'))) {
-                if (typeof value === 'number' && value > 40000 && value < 50000) {
-                    // Date Excel
-                    const excelDate = new Date((value - 25569) * 86400 * 1000);
-                    cleanValue = excelDate.toISOString().split('T')[0];
-                } else if (typeof value === 'string') {
-                    const dateFormats = [
-                        /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
-                        /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
-                        /^(\d{1,2})-(\d{1,2})-(\d{4})$/
-                    ];
-                    
-                    for (let format of dateFormats) {
-                        const match = cleanValue.match(format);
-                        if (match) {
-                            if (format.source.startsWith('^(\\d{4})')) {
-                                cleanValue = `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}`;
-                            } else {
-                                cleanValue = `${match[3]}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}`;
-                            }
-                            break;
-                        }
-                    }
-                }
-            } else if (columnName && (columnName.toLowerCase().includes('surface'))) {
-                cleanValue = cleanValue.replace(',', '.');
-            } else if (columnName && (columnName.toLowerCase().includes('ga'))) {
-                const derived = cleanValue.length !== 2 ? deriveInitialsFromName(cleanValue) : '';
-                cleanValue = (cleanValue.length === 2 ? cleanValue : derived || cleanValue).toUpperCase();
-            } else if (columnName && (columnName.toLowerCase().includes('état') || columnName.toLowerCase().includes('etat'))) {
-                cleanValue = cleanValue.toUpperCase();
-                if (cleanValue === 'ENCOURS' || cleanValue === 'EN_COURS') {
-                    cleanValue = 'EN COURS';
-                }
-            }
-            
-            return cleanValue;
-        }
-
-        function validateCell(value, columnName, tabName) {
-            const validation = {
-                status: 'valid',
-                message: '',
-                originalValue: value
-            };
-
-            if (!columnName || !value) return validation;
-
-            const normalizedValue = value.toString().trim();
-            const upperValue = normalizedValue.toUpperCase();
-
-            const allowedGAPhrases = ['TERTIAIRE', 'FERROVIAIRE', 'INDUSTRIELLE'];
-            const rule = validationRules[columnName];
-            if (rule) {
-                if (rule.pattern && value) {
-                    if (!rule.pattern.test(value)) {
-                        if (columnName === 'GA' && allowedGAPhrases.includes(upperValue)) {
-                            validation.status = 'valid';
-                        } else {
-                            validation.status = rule.type === 'flexible' ? 'warning' : 'error';
-                            validation.message = rule.message;
-                        }
-                    }
-                } else if (rule.values && value) {
-                    const target = rule.values.map(v => v.toUpperCase());
-                    if (!target.includes(upperValue)) {
-                        validation.status = rule.type === 'flexible' ? 'warning' : 'error';
-                        validation.message = rule.message;
-                    }
-                }
-            }
-            
-            // Validations spécifiques
-            if (columnName.toLowerCase().includes('date') && value) {
-                const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-                if (!dateRegex.test(value)) {
-                    validation.status = 'warning';
-                    validation.message = 'Format de date non standard';
-                } else {
-                    const date = new Date(value);
-                    const now = new Date();
-                    if (date > now) {
-                        validation.status = 'warning';
-                        validation.message = 'Date dans le futur';
-                    }
-                }
-            }
-            
-            // Vérification base RG
-            if ((columnName === 'RG' || columnName === 'Code RG') && value && Object.keys(rgDatabase).length > 0) {
-                if (!rgDatabase[value]) {
-                    validation.status = 'warning';
-                    validation.message = 'Code RG non trouvé dans la base';
-                }
-            }
-            
-            return validation;
-        }
-
-        // 🔍 FENÊTRE DE PRÉVISUALISATION
-        function showPreview(tabName) {
-            try {
-                if (!currentPreviewData) return;
-                
-                const modal = document.getElementById('previewModal');
-                const title = document.getElementById('previewTitle');
-                const tableHead = document.getElementById('previewTableHead');
-                const tableBody = document.getElementById('previewTableBody');
-                
-                title.textContent = `🔍 Prévisualisation - ${getTabDisplayName(tabName)}`;
-                
-                const results = currentPreviewData.validationResults;
-                document.getElementById('previewValidCount').textContent = results.valid;
-                document.getElementById('previewErrorCount').textContent = results.errors;
-                document.getElementById('previewWarningCount').textContent = results.warnings;
-                document.getElementById('previewTotalCount').textContent = results.total;
-                
-                // En-tête
-                tableHead.innerHTML = '';
-                const headerRow = document.createElement('tr');
-                headerRow.innerHTML = '<th style="width: 40px;">#</th>';
-                
-                currentPreviewData.headers.forEach((header, index) => {
-                    const th = document.createElement('th');
-                    th.textContent = header;
-                    th.style.minWidth = '120px';
-                    headerRow.appendChild(th);
-                });
-                
-                headerRow.innerHTML += '<th style="width: 80px;">Statut</th>';
-                tableHead.appendChild(headerRow);
-                
-                // Corps du tableau
-                tableBody.innerHTML = '';
-                currentPreviewData.rows.forEach((row, rowIndex) => {
-                    const tr = document.createElement('tr');
-                    
-                    const numberCell = document.createElement('td');
-                    numberCell.textContent = rowIndex + 1;
-                    numberCell.className = 'row-number';
-                    tr.appendChild(numberCell);
-                    
-                    row.data.forEach((cellValue, cellIndex) => {
-                        const td = document.createElement('td');
-                        td.className = 'editable-cell';
-                        td.setAttribute('data-row', rowIndex);
-                        td.setAttribute('data-col', cellIndex);
-                        td.textContent = cellValue;
-                        
-                        const validation = row.validations[cellIndex];
-                        if (validation && validation.status !== 'valid') {
-                            const indicator = document.createElement('div');
-                            indicator.className = `validation-indicator ${validation.status}`;
-                            indicator.title = validation.message;
-                            td.appendChild(indicator);
-                        }
-                        
-                        td.addEventListener('click', () => makeEditable(td, rowIndex, cellIndex));
-                        tr.appendChild(td);
-                    });
-                    
-                    const statusCell = document.createElement('td');
-                    if (row.hasErrors) {
-                        statusCell.innerHTML = '<span style="color: #dc3545;">❌</span>';
-                        statusCell.title = 'Erreurs détectées';
-                    } else if (row.hasWarnings) {
-                        statusCell.innerHTML = '<span style="color: #ffc107;">⚠️</span>';
-                        statusCell.title = 'Avertissements';
-                    } else {
-                        statusCell.innerHTML = '<span style="color: #28a745;">✅</span>';
-                        statusCell.title = 'Données valides';
-                    }
-                    tr.appendChild(statusCell);
-                    
-                    tableBody.appendChild(tr);
-                });
-                
-                modal.classList.add('show');
-                
-            } catch (error) {
-                console.error('Erreur affichage prévisualisation:', error);
-                showNotification('❌ Erreur lors de l\'affichage de la prévisualisation', 'error');
-            }
-        }
-
-        function makeEditable(cell, rowIndex, colIndex) {
-            if (cell.classList.contains('editing')) return;
-            
-            const currentValue = cell.textContent;
-            cell.classList.add('editing');
-            
-            const input = document.createElement('textarea');
-            input.value = currentValue;
-            input.className = 'editable editable-textarea';
-            input.rows = 1;
-            autoResizeField(input);
-
-            cell.innerHTML = '';
-            cell.appendChild(input);
-            input.focus();
-            input.select();
-            
-            function finishEditing() {
-                const newValue = input.value;
-                cell.classList.remove('editing');
-                cell.textContent = newValue;
-                
-                if (currentPreviewData && currentPreviewData.rows[rowIndex]) {
-                    const columnName = currentPreviewData.headers[colIndex];
-                    const cleanValue = cleanCellValue(newValue, columnName);
-                    const validation = validateCell(cleanValue, columnName, currentTabForPreview);
-                    
-                    currentPreviewData.rows[rowIndex].data[colIndex] = cleanValue;
-                    currentPreviewData.rows[rowIndex].validations[colIndex] = validation;
-                    
-                    cell.innerHTML = '';
-                    cell.textContent = cleanValue;
-                    
-                    if (validation.status !== 'valid') {
-                        const indicator = document.createElement('div');
-                        indicator.className = `validation-indicator ${validation.status}`;
-                        indicator.title = validation.message;
-                        cell.appendChild(indicator);
-                    }
-                    
-                    updatePreviewStats();
-                }
-            }
-            
-            input.addEventListener('blur', finishEditing);
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    finishEditing();
-                } else if (e.key === 'Escape') {
-                    cell.classList.remove('editing');
-                    cell.textContent = currentValue;
-                }
-            });
-        }
-
-        function updatePreviewStats() {
-            try {
-                if (!currentPreviewData) return;
-                
-                let valid = 0, errors = 0, warnings = 0;
-                
-                currentPreviewData.rows.forEach(row => {
-                    row.hasErrors = false;
-                    row.hasWarnings = false;
-                    
-                    row.validations.forEach(validation => {
-                        if (validation.status === 'error') {
-                            errors++;
-                            row.hasErrors = true;
-                        } else if (validation.status === 'warning') {
-                            warnings++;
-                            row.hasWarnings = true;
-                        } else if (validation.status === 'valid') {
-                            valid++;
-                        }
-                    });
-                });
-                
-                currentPreviewData.validationResults = {
-                    valid: valid,
-                    errors: errors,
-                    warnings: warnings,
-                    total: currentPreviewData.rows.length
-                };
-                
-                document.getElementById('previewValidCount').textContent = valid;
-                document.getElementById('previewErrorCount').textContent = errors;
-                document.getElementById('previewWarningCount').textContent = warnings;
-                document.getElementById('previewTotalCount').textContent = currentPreviewData.rows.length;
-                
-            } catch (error) {
-                console.error('Erreur mise à jour stats prévisualisation:', error);
-            }
-        }
-
-        function closePreview() {
-            const modal = document.getElementById('previewModal');
-            modal.classList.remove('show');
-            currentPreviewData = null;
-            currentTabForPreview = null;
-        }
-
-        // 📋 COLLABORATION COPIER/COLLER
-        function parseClipboardMatrix(value) {
-            if (!value) return [];
-            return value
-                .split(/\r?\n/)
-                .map(line => line.split(/\t|;|,/).map(cell => cell.trim()))
-                .filter(row => row.some(cell => cell !== ''));
-        }
-
-        function openClipboardPreview(tabName) {
-            const textarea = document.getElementById(`clipboardInput-${tabName}`);
-            if (!textarea) {
-                showNotification('❌ Zone de collage introuvable', 'error');
-                return;
-            }
-            const data = parseClipboardMatrix(textarea.value);
-            if (!data.length) {
-                showNotification('❌ Aucune donnée à prévisualiser', 'error');
-                return;
-            }
-            clipboardDataByTab[tabName] = data;
-            clipboardActiveTab = tabName;
-            clipboardDragPayload = [];
-            clipboardSelectedCells.forEach(cell => cell.classList.remove('selected'));
-            clipboardSelectedCells.clear();
-            const searchInput = document.getElementById('clipboardLeftSearch');
-            if (searchInput) {
-                searchInput.value = '';
-            }
-            buildClipboardLeftTable(tabName);
-            buildClipboardRightTable(tabName);
-            if (searchInput) {
-                requestAnimationFrame(() => searchInput.focus());
-            }
-            const summary = document.getElementById('clipboardSearchSummary');
-            if (summary) {
-                summary.textContent = 'Tapez un mot-clé pour filtrer les lignes visibles.';
-            }
-            const matches = document.getElementById('clipboardSearchMatches');
-            if (matches) {
-                matches.innerHTML = '<div class="clipboard-empty-message">Aucun filtre appliqué.</div>';
-            }
-            const modal = document.getElementById('clipboardPreviewModal');
-            const title = document.getElementById('clipboardPreviewTitle');
-            if (title) {
-                title.textContent = `📋 Collage pour ${getTabDisplayName(tabName)}`;
-            }
-            modal.classList.add('show');
-        }
-
-        function buildClipboardLeftTable(tabName) {
-            const container = document.getElementById('clipboardLeftContainer');
-            clipboardTargetMap.clear();
-            clipboardRowRegistry.clear();
-            if (!container) return;
-            const sourceTable = document.getElementById(`${tabName}Table`);
-            if (!sourceTable) {
-                container.innerHTML = '<div class="clipboard-empty-message">Aucun tableau associé à cet onglet.</div>';
-                return;
-            }
-            const columns = tabConfigs[tabName]?.columns || [];
-            const rows = sourceTable.querySelectorAll('tbody tr');
-            if (!rows.length) {
-                container.innerHTML = '<div class="clipboard-empty-message">Aucune ligne disponible dans l\'onglet.</div>';
-                return;
-            }
-            const table = document.createElement('table');
-            table.className = 'clipboard-table';
-            const thead = document.createElement('thead');
-            const headRow = document.createElement('tr');
-            headRow.innerHTML = '<th style="width:60px;">#</th>';
-            columns.forEach(column => {
-                const th = document.createElement('th');
-                th.textContent = column;
-                headRow.appendChild(th);
-            });
-            thead.appendChild(headRow);
-            table.appendChild(thead);
-            const tbody = document.createElement('tbody');
-            rows.forEach((row, rowIndex) => {
-                const tr = document.createElement('tr');
-                const rowNumber = row.querySelector('.row-number')?.textContent?.trim() || (rowIndex + 1).toString();
-                const rowKey = `clipboard-row-${tabName}-${rowIndex}`;
-                const numberCell = document.createElement('td');
-                numberCell.textContent = rowNumber;
-                tr.appendChild(numberCell);
-                const inputs = row.querySelectorAll('input, textarea, select');
-                columns.forEach((column, columnIndex) => {
-                    const td = document.createElement('td');
-                    td.className = 'clipboard-left-cell';
-                    const targetInput = inputs[columnIndex];
-                    const currentValue = targetInput ? (targetInput.value || targetInput.textContent || '') : '';
-                    td.textContent = currentValue;
-                    const targetId = `clip-${tabName}-${rowIndex}-${columnIndex}`;
-                    td.dataset.targetId = targetId;
-                    td.dataset.tabName = tabName;
-                    clipboardTargetMap.set(targetId, { input: targetInput, displayCell: td, rowElement: row });
-                    td.addEventListener('dragover', handleClipboardLeftDragOver);
-                    td.addEventListener('dragleave', handleClipboardLeftDragLeave);
-                    td.addEventListener('drop', handleClipboardLeftDrop);
-                    tr.appendChild(td);
-                });
-                const previewPieces = Array.from(inputs)
-                    .slice(0, 3)
-                    .map(input => (input.value || input.textContent || '').trim())
-                    .filter(Boolean)
-                    .slice(0, 2);
-                tr.dataset.rowKey = rowKey;
-                tr.id = rowKey;
-                tr.dataset.rowNumber = rowNumber;
-                tr.dataset.previewValue = previewPieces.join(' • ');
-                tr.dataset.searchValue = tr.textContent.toLowerCase();
-                clipboardRowRegistry.set(rowKey, tr);
-                tbody.appendChild(tr);
-            });
-            table.appendChild(tbody);
-            container.innerHTML = '';
-            container.appendChild(table);
-            const searchInput = document.getElementById('clipboardLeftSearch');
-            const initialTerm = searchInput ? searchInput.value : '';
-            filterClipboardLeft(initialTerm);
-        }
-
-        function buildClipboardRightTable(tabName) {
-            const container = document.getElementById('clipboardRightContainer');
-            clipboardCellElements.clear();
-            if (!container) return;
-            const data = clipboardDataByTab[tabName] || [];
-            if (!data.length) {
-                container.innerHTML = '<div class="clipboard-empty-message">Collez vos informations pour commencer.</div>';
-                return;
-            }
-            const maxColumns = data.reduce((max, row) => Math.max(max, row.length), 0);
-            const table = document.createElement('table');
-            table.className = 'clipboard-table';
-            const thead = document.createElement('thead');
-            const headRow = document.createElement('tr');
-            for (let col = 0; col < maxColumns; col++) {
-                const th = document.createElement('th');
-                th.textContent = `Col ${col + 1}`;
-                headRow.appendChild(th);
-            }
-            thead.appendChild(headRow);
-            table.appendChild(thead);
-            const tbody = document.createElement('tbody');
-            data.forEach((row, rowIndex) => {
-                const tr = document.createElement('tr');
-                for (let colIndex = 0; colIndex < maxColumns; colIndex++) {
-                    const td = document.createElement('td');
-                    td.className = 'clipboard-right-cell';
-                    td.contentEditable = true;
-                    const cellValue = row[colIndex] || '';
-                    td.textContent = cellValue;
-                    const cellKey = `${tabName}-${rowIndex}-${colIndex}`;
-                    td.dataset.cellKey = cellKey;
-                    td.dataset.clipboardTab = tabName;
-                    clipboardCellElements.set(cellKey, td);
-                    td.draggable = true;
-                    td.addEventListener('dragstart', handleClipboardRightCellDragStart);
-                    td.addEventListener('dragend', handleClipboardRightCellDragEnd);
-                    td.addEventListener('dragover', handleClipboardRightCellDragOver);
-                    td.addEventListener('dragleave', handleClipboardRightCellDragLeave);
-                    td.addEventListener('drop', handleClipboardRightCellDrop);
-                    td.addEventListener('input', () => updateClipboardCellValue(tabName, rowIndex, colIndex, td.textContent));
-                    td.addEventListener('click', event => handleClipboardRightCellClick(event, td));
-                    tr.appendChild(td);
-                }
-                tbody.appendChild(tr);
-            });
-            table.appendChild(tbody);
-            container.innerHTML = '';
-            container.appendChild(table);
-        }
-
-        function updateClipboardCellValue(tabName, rowIndex, columnIndex, value) {
-            if (!clipboardDataByTab[tabName]) clipboardDataByTab[tabName] = [];
-            if (!clipboardDataByTab[tabName][rowIndex]) clipboardDataByTab[tabName][rowIndex] = [];
-            clipboardDataByTab[tabName][rowIndex][columnIndex] = value;
-        }
-
-        function handleClipboardRightCellClick(event, cell) {
-            if (!(event.ctrlKey || event.metaKey)) return;
-            event.preventDefault();
-            if (clipboardSelectedCells.has(cell)) {
-                clipboardSelectedCells.delete(cell);
-                cell.classList.remove('selected');
-            } else {
-                clipboardSelectedCells.add(cell);
-                cell.classList.add('selected');
-            }
-        }
-
-        function handleClipboardRightCellDragStart(event) {
-            const cell = event.currentTarget;
-            const cellKey = cell.dataset.cellKey;
-            if (!cellKey) return;
-            if (clipboardSelectedCells.has(cell)) {
-                clipboardDragPayload = Array.from(clipboardSelectedCells).map(selected => selected.dataset.cellKey);
-            } else {
-                clipboardDragPayload = [cellKey];
-            }
-            event.dataTransfer.effectAllowed = 'copyMove';
-            event.dataTransfer.setData('text/plain', clipboardDragPayload.join('|'));
-            cell.classList.add('dragging');
-        }
-
-        function handleClipboardRightCellDragEnd(event) {
-            event.currentTarget.classList.remove('dragging');
-        }
-
-        function handleClipboardRightCellDragOver(event) {
-            event.preventDefault();
-            event.currentTarget.classList.add('dragover');
-        }
-
-        function handleClipboardRightCellDragLeave(event) {
-            event.currentTarget.classList.remove('dragover');
-        }
-
-        function handleClipboardRightCellDrop(event) {
-            event.preventDefault();
-            const targetCell = event.currentTarget;
-            targetCell.classList.remove('dragover');
-            const payloadKeys = clipboardDragPayload.length ? clipboardDragPayload : (event.dataTransfer.getData('text/plain')?.split('|') || []);
-            if (payloadKeys.length !== 1) {
-                clipboardDragPayload = [];
-                return;
-            }
-            const sourceKey = payloadKeys[0];
-            const sourceCell = clipboardCellElements.get(sourceKey);
-            if (!sourceCell || sourceCell === targetCell) {
-                clipboardDragPayload = [];
-                return;
-            }
-            const sourceValue = sourceCell.textContent;
-            const targetValue = targetCell.textContent;
-            sourceCell.textContent = targetValue;
-            targetCell.textContent = sourceValue;
-            const [tabName, rowIndex, colIndex] = sourceKey.split('-');
-            updateClipboardCellValue(tabName, Number(rowIndex), Number(colIndex), targetValue);
-            const [targetTab, targetRow, targetCol] = (targetCell.dataset.cellKey || '').split('-');
-            if (targetTab) {
-                updateClipboardCellValue(targetTab, Number(targetRow), Number(targetCol), sourceValue);
-            }
-            clipboardDragPayload = [];
-        }
-
-        function handleClipboardLeftDragOver(event) {
-            event.preventDefault();
-            event.currentTarget.classList.add('dragover');
-        }
-
-        function handleClipboardLeftDragLeave(event) {
-            event.currentTarget.classList.remove('dragover');
-        }
-
-        function getClipboardPayloadValues() {
-            const keys = clipboardDragPayload.length
-                ? clipboardDragPayload
-                : Array.from(clipboardSelectedCells).map(cell => cell.dataset.cellKey);
-            if (!keys.length) return [];
-            return keys.map(key => (clipboardCellElements.get(key)?.textContent || '').trim()).filter(value => value !== '');
-        }
-
-        function handleClipboardLeftDrop(event) {
-            event.preventDefault();
-            const cell = event.currentTarget;
-            cell.classList.remove('dragover');
-            const targetId = cell.dataset.targetId;
-            if (!targetId) return;
-            const values = getClipboardPayloadValues();
-            const combined = values.length ? values.join(' / ') : '';
-            applyClipboardValueToTarget(targetId, combined);
-            clipboardDragPayload = [];
-            cell.textContent = combined;
-            cell.classList.add('updated');
-            setTimeout(() => cell.classList.remove('updated'), 900);
-        }
-
-        function applyClipboardValueToTarget(targetId, value) {
-            const targetInfo = clipboardTargetMap.get(targetId);
-            if (!targetInfo || !targetInfo.input) return;
-            targetInfo.input.value = value;
-            targetInfo.input.dispatchEvent(new Event('input', { bubbles: true }));
-            if (targetInfo.rowElement) {
-                targetInfo.rowElement.classList.add('pending-highlight');
-                setTimeout(() => targetInfo.rowElement.classList.remove('pending-highlight'), 1200);
-            }
-        }
-
-        function filterClipboardLeft(term = '') {
-            const rows = document.querySelectorAll('#clipboardLeftContainer tbody tr');
-            const normalized = (term || '').toLowerCase().trim();
-            const summary = document.getElementById('clipboardSearchSummary');
-            const matchesContainer = document.getElementById('clipboardSearchMatches');
-            const matches = [];
-
-            rows.forEach(row => {
-                const rowValue = row.dataset.searchValue || '';
-                const isMatch = !normalized || rowValue.includes(normalized);
-                row.style.display = isMatch ? '' : 'none';
-                if (normalized) {
-                    row.classList.toggle('clipboard-row-match', isMatch);
-                } else {
-                    row.classList.remove('clipboard-row-match');
-                }
-                if (normalized && isMatch) {
-                    matches.push({
-                        key: row.dataset.rowKey,
-                        label: row.dataset.rowNumber || '',
-                        preview: row.dataset.previewValue || ''
-                    });
-                }
-            });
-
-            if (summary) {
-                if (!rows.length) {
-                    summary.textContent = 'Aucune ligne disponible dans cet onglet.';
-                } else if (normalized) {
-                    summary.textContent = `${matches.length} ligne(s) correspondent à "${term}"`;
-                } else {
-                    summary.textContent = 'Tapez un mot-clé pour filtrer les lignes visibles.';
-                }
-            }
-
-            if (matchesContainer) {
-                matchesContainer.innerHTML = '';
-                if (!rows.length) {
-                    matchesContainer.innerHTML = '<div class="clipboard-empty-message">Ajoutez des lignes dans l\'onglet pour commencer.</div>';
-                } else if (!normalized) {
-                    matchesContainer.innerHTML = '<div class="clipboard-empty-message">Aucun filtre appliqué.</div>';
-                } else if (!matches.length) {
-                    matchesContainer.innerHTML = '<div class="clipboard-empty-message">Aucun résultat. Essayez un autre mot-clé.</div>';
-                } else {
-                    matches.slice(0, 8).forEach(match => {
-                        const button = document.createElement('button');
-                        button.type = 'button';
-                        button.innerHTML = `<strong>Ligne ${match.label}</strong><span>${match.preview || 'Aucune donnée visible'}</span>`;
-                        button.addEventListener('click', () => focusClipboardRow(match.key));
-                        matchesContainer.appendChild(button);
-                    });
-                    focusClipboardRow(matches[0].key, true);
-                }
-            }
-        }
-
-        function focusClipboardRow(rowKey, silent = false) {
-            if (!rowKey) return;
-            const rowElement = clipboardRowRegistry.get(rowKey) || document.querySelector(`#clipboardLeftContainer [data-row-key="${rowKey}"]`);
-            if (!rowElement) return;
-            const wrapper = document.getElementById('clipboardLeftContainer');
-            if (wrapper) {
-                const rowRect = rowElement.getBoundingClientRect();
-                const wrapperRect = wrapper.getBoundingClientRect();
-                const offset = rowRect.top - wrapperRect.top;
-                wrapper.scrollTop += offset - wrapper.clientHeight / 2 + rowElement.offsetHeight / 2;
-            }
-            if (!silent) {
-                rowElement.classList.add('clipboard-row-focused');
-                setTimeout(() => rowElement.classList.remove('clipboard-row-focused'), 1200);
-            }
-        }
-
-        function resetClipboardSearch() {
-            const searchInput = document.getElementById('clipboardLeftSearch');
-            if (!searchInput) return;
-            searchInput.value = '';
-            filterClipboardLeft('');
-            searchInput.focus();
-        }
-
-        function copyClipboardSelection() {
-            if (clipboardSelectedCells.size === 0) {
-                showNotification('ℹ️ Aucune cellule sélectionnée', 'info');
-                return;
-            }
-            const text = Array.from(clipboardSelectedCells)
-                .map(cell => cell.textContent.trim())
-                .join('\n');
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text)
-                    .then(() => showNotification('📋 Sélection copiée dans le presse-papiers'))
-                    .catch(() => showNotification('⚠️ Impossible de copier automatiquement', 'warning'));
-            } else {
-                showNotification('⚠️ Navigateur incompatible avec la copie automatique', 'warning');
-            }
-        }
-
-        function closeClipboardPreview() {
-            const modal = document.getElementById('clipboardPreviewModal');
-            if (!modal) return;
-            modal.classList.remove('show');
-            clipboardActiveTab = null;
-            clipboardDragPayload = [];
-            clipboardSelectedCells.forEach(cell => cell.classList.remove('selected'));
-            clipboardSelectedCells.clear();
-        }
-
-        function setupClipboardAutoPreview() {
-            const selector = 'textarea[id^="clipboardInput-"]';
-            const areas = document.querySelectorAll(selector);
-            areas.forEach(area => {
-                if (area.dataset.clipboardPreviewReady === 'true') return;
-                area.dataset.clipboardPreviewReady = 'true';
-                area.addEventListener('paste', (event) => {
-                    const tabName = area.id.replace('clipboardInput-', '');
-                    const triggerPreview = () => {
-                        if ((area.value || '').trim()) {
-                            openClipboardPreview(tabName);
-                        }
-                    };
-                    if (event && event.clipboardData) {
-                        requestAnimationFrame(triggerPreview);
-                    } else {
-                        setTimeout(triggerPreview, 0);
-                    }
-                });
-            });
-        }
-
         // 🔧 ACTIONS DE PRÉVISUALISATION
         function fixAllErrors() {
             try {
@@ -10984,7 +9284,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 setupFileDropZones();
-                setupClipboardAutoPreview();
                 updateStatsDashboard();
 
                 showNotification('🚀 MARTINE - Tous onglets fonctionnels', 'success');
