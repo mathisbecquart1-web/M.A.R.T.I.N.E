@@ -1,993 +1,566 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Résidence Thalassa - Syndic de Copropriété</title>
-    <style>
-        :root {
-            --blue-500: #0d8af0;
-            --blue-600: #0b6fcc;
-            --blue-100: #e6f3ff;
-            --purple-500: #6c5ce7;
-            --green-500: #00b894;
-            --sand: #f5efe6;
-            --text-dark: #213042;
-            --glass: rgba(255, 255, 255, 0.9);
-            --shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résidence Thalassa · Copropriété Île aux Bahamas</title>
+  <style>
+    :root {
+      --blue: #0f7bff;
+      --purple: #8245ff;
+      --green: #12b886;
+      --amber: #f59f00;
+      --red: #f03e3e;
+      --bg: #eef4ff;
+      --text: #0f172a;
+      --muted: #4b5563;
+      --card: rgba(255, 255, 255, 0.9);
+      --shadow: 0 18px 40px rgba(15, 27, 45, 0.18);
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 18% 20%, #d7e8ff 0, #b2d4ff 25%, #7fb3ff 55%, #3a6cf6 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
 
-        body {
-            font-family: "Inter", "Arial", sans-serif;
-            background: radial-gradient(circle at 10% 20%, #b9ecff 0%, #8cd2ff 25%, #4ca3ff 75%, #0f75d8 100%);
-            color: var(--text-dark);
-            min-height: 100vh;
-        }
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 18px 64px;
+    }
 
-        .page {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 32px 20px 60px;
-        }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      padding-bottom: 18px;
+      backdrop-filter: blur(14px);
+    }
 
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            margin-bottom: 24px;
-            backdrop-filter: blur(10px);
-        }
+    .nav {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 18px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: var(--shadow);
+    }
 
-        .nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 18px;
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            gap: 12px;
-        }
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--blue);
+    }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            color: var(--blue-600);
-            letter-spacing: 0.03em;
-        }
+    .brand .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
 
-        .brand span {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--blue-500), var(--purple-500));
-            color: white;
-            padding: 6px 10px;
-            border-radius: 10px;
-            font-size: 12px;
-        }
+    .nav-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-        .nav-links {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+    button {
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      border-radius: 12px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
 
-        .nav-links button {
-            border: none;
-            background: var(--glass);
-            color: var(--text-dark);
-            padding: 10px 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-        }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: white;
+      padding: 12px 16px;
+      box-shadow: 0 12px 30px rgba(15, 123, 255, 0.3);
+    }
 
-        .nav-links button:hover {
-            transform: translateY(-2px);
-            background: #fff;
-            color: var(--blue-600);
-        }
+    .btn-ghost {
+      background: rgba(15, 123, 255, 0.08);
+      color: var(--blue);
+      padding: 11px 14px;
+      border: 1px solid rgba(15, 123, 255, 0.18);
+    }
 
-        .hero {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.85));
-            padding: 32px 26px;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            display: grid;
-            gap: 16px;
-        }
+    button:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
 
-        .hero h1 {
-            font-size: clamp(28px, 5vw, 42px);
-            color: var(--blue-600);
-            letter-spacing: 0.02em;
-        }
+    .grid { display: grid; gap: 18px; }
 
-        .hero p {
-            color: #4a5568;
-            font-size: 16px;
-        }
+    .hero {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(255, 255, 255, 0.9));
+      padding: 26px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 16px;
+    }
 
-        .cta-row {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+    .hero h1 { margin: 0; font-size: clamp(30px, 5vw, 44px); color: var(--text); }
+    .hero p { margin: 6px 0 0; color: var(--muted); line-height: 1.6; }
 
-        .btn {
-            border: none;
-            padding: 12px 16px;
-            border-radius: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+    .section {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow: var(--shadow);
+    }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--blue-500), var(--purple-500));
-            color: white;
-            box-shadow: 0 10px 25px rgba(12, 116, 231, 0.28);
-        }
+    .section h2 { margin: 0 0 10px; color: var(--text); }
+    .section .subtitle { color: var(--muted); margin-bottom: 12px; }
 
-        .btn-ghost {
-            background: rgba(13, 138, 240, 0.08);
-            color: var(--blue-600);
-            border: 1px solid rgba(13, 138, 240, 0.15);
-        }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .chip {
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      color: var(--muted);
+    }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
-        }
+    .lot-toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .filter {
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(15, 123, 255, 0.1);
+      color: var(--blue);
+      border: 1px solid rgba(15, 123, 255, 0.2);
+      cursor: pointer;
+    }
 
-        .section {
-            margin-top: 24px;
-            background: var(--glass);
-            border-radius: 18px;
-            padding: 24px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.75);
-        }
+    .lot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
 
-        .section h2 {
-            color: var(--blue-600);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-            font-size: 22px;
-        }
+    .lot-card {
+      padding: 14px;
+      border-radius: 14px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86));
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      display: grid;
+      gap: 8px;
+    }
 
-        .pill-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 10px 0 4px;
-        }
+    .lot-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .badge {
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .b-dispo { background: var(--green); }
+    .b-reserve { background: var(--amber); }
+    .b-indispo { background: var(--red); }
 
-        .pill {
-            padding: 8px 12px;
-            border-radius: 12px;
-            background: var(--sand);
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-        }
+    .meta { color: var(--muted); font-size: 14px; }
 
-        .pill:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-        }
+    form { display: grid; gap: 14px; }
+    label { display: grid; gap: 6px; font-weight: 700; color: var(--text); }
+    input, select, textarea {
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      box-shadow: inset 0 2px 6px rgba(15, 27, 45, 0.04);
+    }
+    textarea { min-height: 110px; resize: vertical; }
 
-        .pill.active {
-            background: var(--blue-100);
-            border-color: var(--blue-500);
-            color: var(--blue-600);
-        }
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 14px;
-            margin-top: 12px;
-        }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { text-align: left; padding: 10px 8px; }
+    .table th { color: var(--muted); font-weight: 700; font-size: 13px; }
+    .table tr { background: rgba(255, 255, 255, 0.7); border-radius: 10px; }
+    .table tr + tr td { border-top: 1px solid rgba(0, 0, 0, 0.05); }
+    .table td input, .table td select, .table td textarea { width: 100%; font-size: 14px; }
 
-        .card {
-            background: linear-gradient(145deg, #ffffff, rgba(255, 255, 255, 0.92));
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+    .admin-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 0.2s ease;
+      z-index: 50;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
 
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 16px 30px rgba(0, 0, 0, 0.12);
-        }
+    .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill-box { background: rgba(15, 123, 255, 0.06); color: var(--text); padding: 8px 10px; border-radius: 10px; }
 
-        .lots-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
+    .hidden { display: none !important; }
 
-        .lots-table th,
-        .lots-table td {
-            padding: 12px 14px;
-            text-align: center;
-        }
-
-        .lots-table th {
-            background: linear-gradient(135deg, var(--blue-500), var(--purple-500));
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            font-size: 13px;
-        }
-
-        .lots-table tr {
-            background: white;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .lots-table tr:nth-child(even) {
-            background: #f7f9fb;
-        }
-
-        .lots-table tr:hover {
-            background: #eaf4ff;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 10px;
-            border-radius: 50px;
-            background: rgba(0, 184, 148, 0.12);
-            color: var(--green-500);
-            font-weight: 700;
-            font-size: 12px;
-        }
-
-        .accordion {
-            width: 100%;
-            border: none;
-            background: rgba(13, 138, 240, 0.08);
-            border-radius: 12px;
-            padding: 14px 16px;
-            text-align: left;
-            font-weight: 700;
-            color: var(--text-dark);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 8px;
-        }
-
-        .accordion:hover {
-            background: rgba(13, 138, 240, 0.12);
-        }
-
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            padding-left: 4px;
-        }
-
-        .accordion.open + .accordion-content {
-            padding: 10px 6px 16px;
-        }
-
-        form {
-            display: grid;
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        label {
-            font-weight: 700;
-            color: #334155;
-        }
-
-        input,
-        select,
-        textarea {
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid #d9e1ec;
-            background: #f9fbff;
-            font-size: 14px;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--blue-500);
-            box-shadow: 0 0 0 3px rgba(13, 138, 240, 0.15);
-        }
-
-        textarea {
-            min-height: 110px;
-            resize: vertical;
-        }
-
-        .status {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .status-circle {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--green-500);
-            box-shadow: 0 0 0 6px rgba(0, 184, 148, 0.15);
-        }
-
-        .footer {
-            text-align: center;
-            color: #2f3f52;
-            opacity: 0.9;
-            margin-top: 24px;
-        }
-
-        .detail-panel {
-            margin-top: 14px;
-            background: rgba(0, 0, 0, 0.02);
-            border-radius: 14px;
-            padding: 12px 14px;
-            display: grid;
-            gap: 6px;
-            border: 1px dashed rgba(0, 0, 0, 0.05);
-        }
-
-        .toast {
-            position: fixed;
-            right: 20px;
-            bottom: 24px;
-            background: var(--text-dark);
-            color: white;
-            padding: 12px 16px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: var(--shadow);
-            opacity: 0;
-            transform: translateY(8px);
-            transition: opacity 0.25s ease, transform 0.25s ease;
-            z-index: 40;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @media (max-width: 700px) {
-            .nav {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .cta-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .nav-links {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
+    @media (max-width: 720px) {
+      .nav { flex-direction: column; align-items: flex-start; }
+      .lot-head { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
 </head>
 <body>
-    <div class="page">
-        <header>
-            <div class="nav">
-                <div class="brand">
-                    <span>Thalassa</span>
-                    <div>
-                        <div>Résidence Thalassa</div>
-                        <small>25 lots T4 • Port privé • Bahamas</small>
-                    </div>
-                </div>
-                <div class="nav-links">
-                    <button data-scroll="#lots">Lots</button>
-                    <button data-scroll="#equipements">Équipements</button>
-                    <button data-scroll="#reglement">Règlement</button>
-                    <button data-scroll="#contact">Contact</button>
-                </div>
-            </div>
-        </header>
-
-        <section class="hero" id="hero">
-            <h1>Vivez une copropriété tropicale, simple et connectée</h1>
-            <p>Une interface claire pour vos lots, vos équipements communs et vos démarches en quelques clics.</p>
-            <div class="cta-row">
-                <button class="btn btn-primary" data-scroll="#contact">🔗 Déposer une demande</button>
-            <button class="btn btn-ghost" data-scroll="#equipements">Découvrir les équipements</button>
-            <div class="status">
-                <div class="status-circle"></div>
-                <small>Gestion en ligne 24/7</small>
-            </div>
+  <div class="page">
+    <header>
+      <div class="nav">
+        <div class="brand">
+          <div class="pill">Île aux Bahamas</div>
+          <div>Résidence Thalassa</div>
         </div>
+        <div class="nav-actions">
+          <button class="btn-ghost" onclick="downloadReglement()">📄 Télécharger le règlement</button>
+          <button class="btn-primary" onclick="openAdmin()">🔐 Espace administrateur</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <h1>Cabanons sur pilotis · résidence privée & partagée</h1>
+        <p>Plage, ponton, terrain de beach-volley et golf, port privatif : la copropriété Thalassa offre un cadre exceptionnel pour vivre le rêve des Bahamas. Suivez les disponibilités, demandez des informations et laissez l'équipe gérer les lots en temps réel.</p>
+      </div>
+      <div class="chips">
+        <div class="chip">Ponton / plage / port privatif</div>
+        <div class="chip">Terrain de beach-volley & golf</div>
+        <div class="chip">Règlement clair · respect de la faune</div>
+        <div class="chip">Administration sécurisée TALASSA</div>
+      </div>
     </section>
 
-        <section class="section" id="equipements">
-            <h2>🏝️ Équipements & Espaces communs</h2>
-            <p>Sélectionnez un équipement pour ouvrir sa fiche détaillée.</p>
-            <div class="pill-row" id="amenities">
-                <div class="pill" data-detail="Port privé avec 25 places numérotées et badge d'accès.">⚓ Port privé</div>
-                <div class="pill" data-detail="Espace dédié avec filets réglables et éclairage nocturne.">🏐 Beach-volley</div>
-                <div class="pill" data-detail="Practice 9 trous face à l'océan et prêt de clubs.">⛳ Golf</div>
-                <div class="pill" data-detail="Plage aménagée, douche solaire et transats premium.">🏖️ Plage & ponton</div>
-                <div class="pill" data-detail="Accès fibre 1 Gb/s dans les parties communes.">📶 Wi-Fi fibre</div>
-                <div class="pill" data-detail="Sécurité renforcée, vidéosurveillance et bornes incendie.">🛟 Sécurité</div>
-            </div>
-            <div class="detail-panel" id="amenity-detail">Cliquez sur un équipement pour afficher les informations clés.</div>
-        </section>
+    <section class="section">
+      <div class="lot-toolbar">
+        <h2>Lots disponibles / indisponibles</h2>
+        <div class="pill-list">
+          <div class="pill-box">Filtrer :</div>
+          <button class="filter" onclick="setFilter('all')">Tous</button>
+          <button class="filter" onclick="setFilter('Disponible')">Disponible</button>
+          <button class="filter" onclick="setFilter('Réservé')">Réservé</button>
+          <button class="filter" onclick="setFilter('Indisponible')">Indisponible</button>
+        </div>
+      </div>
+      <div id="lotGrid" class="lot-grid"></div>
+    </section>
 
-        <section class="section" id="lots">
-            <h2>📑 Lots disponibles / indisponibles</h2>
-            <p>Tableau interactif : cliquez sur un lot pour dérouler ses informations et préremplir le formulaire.</p>
-            <table class="lots-table">
-                <thead>
-                    <tr>
-                        <th>Lot</th>
-                        <th>Typologie</th>
-                        <th>Surface</th>
-                        <th>Statut</th>
-                    </tr>
-                </thead>
-                <tbody id="lots-body"></tbody>
-            </table>
-            <div class="detail-panel" id="lot-detail">Sélectionnez un lot pour voir ses atouts et lancer une demande.</div>
-        </section>
+    <section class="section">
+      <div class="admin-bar">
+        <div>
+          <h2>Demande d'information</h2>
+          <p class="subtitle">Les demandes sont sauvegardées automatiquement toutes les 30 secondes et à chaque modification.</p>
+        </div>
+        <button class="btn-ghost" onclick="resetDraft()">Réinitialiser le brouillon</button>
+      </div>
+      <form id="requestForm">
+        <div class="two-col">
+          <label>Nom et prénom
+            <input name="name" required placeholder="Votre nom" />
+          </label>
+          <label>Email
+            <input name="email" type="email" required placeholder="vous@example.com" />
+          </label>
+        </div>
+        <div class="two-col">
+          <label>Téléphone
+            <input name="phone" required placeholder="+33..." />
+          </label>
+          <label>Lot souhaité
+            <select name="lot" id="lotSelect" required></select>
+          </label>
+        </div>
+        <label>Message
+          <textarea name="message" placeholder="Précisez vos besoins, disponibilités de visite, etc." required></textarea>
+        </label>
+        <button class="btn-primary" type="submit">Envoyer la demande</button>
+        <div id="draftStatus" class="meta"></div>
+      </form>
+    </section>
 
-        <section class="section" id="reglement">
-            <h2>📋 Règlement de Copropriété</h2>
-            <p>Les points ci-dessous peuvent être dépliés : chaque ligne contient un rappel pratique.</p>
-            <div class="cta-row" style="margin: 10px 0 16px;">
-                <button class="btn btn-primary" id="download-reglement">⬇️ Télécharger le règlement PDF</button>
-                <small style="color:#4a5568;">Une version PDF est générée automatiquement pour vos dossiers.</small>
-            </div>
-            <button class="accordion">🎯 Destination des lieux <span>+</span></button>
-            <div class="accordion-content">
-                <div class="card">Usage résidentiel T4, affectation cabanons/port conforme à l'EDD.</div>
-            </div>
+    <section class="section">
+      <h2>Règlement de copropriété</h2>
+      <p class="subtitle">Fixe la destination des parties privatives et communes, et les conditions de leur jouissance.</p>
+      <ul class="meta">
+        <li>Pas de bruit après 00h (respect du voisinage et de la faune locale).</li>
+        <li>Animaux autorisés s’ils ne troublent pas la tranquillité.</li>
+        <li>Utilisation du port réservée aux résidents (1 place par cabanon).</li>
+        <li>Plage et ponton : usage collectif, interdiction de privatiser des zones.</li>
+        <li>Terrain de beach-volley & golf : réservation par créneaux pour éviter les conflits.</li>
+        <li>Propreté : chaque résident veille à la propreté des lieux communs.</li>
+        <li>Interdiction de feu de camp ou barbecue hors zones prévues.</li>
+      </ul>
+      <div class="chips">
+        <div class="chip">Présentation orale : 28 novembre</div>
+        <div class="chip">Copro physiquement : lieu à confirmer</div>
+        <div class="chip">EDD & règlement : niveau 5/6</div>
+        <div class="chip">Comité : composition en cours</div>
+      </div>
+      <div style="margin-top:12px;">
+        <button class="btn-ghost" onclick="downloadReglement()">📥 Exporter le règlement (PDF)</button>
+      </div>
+    </section>
 
-            <button class="accordion">🔇 Nuisances sonores <span>+</span></button>
-            <div class="accordion-content">
-                <div class="card">Silence après 00h00. Prévenir le voisinage pour les événements privés.</div>
-            </div>
+    <section id="adminPanel" class="section hidden">
+      <div class="admin-bar">
+        <h2>Administration TALASSA</h2>
+        <button class="btn-ghost" onclick="logout()">Se déconnecter</button>
+      </div>
+      <div class="subtitle">Modifier les statuts des lots et éditer chaque demande envoyée. Tout est sauvegardé localement et reste accessible hors connexion après authentification.</div>
 
-            <button class="accordion">🐕 Animaux <span>+</span></button>
-            <div class="accordion-content">
-                <div class="card">Animaux autorisés avec tenue en laisse dans les espaces communs.</div>
-            </div>
+      <h3>Statuts des lots</h3>
+      <div id="adminLots" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(260px,1fr));"></div>
 
-            <button class="accordion">⚓ Port privé <span>+</span></button>
-            <div class="accordion-content">
-                <div class="card">1 place par lot, réservation via badge. Stationnement minute pour invités.</div>
-            </div>
+      <h3>Demandes reçues</h3>
+      <div class="section" style="padding:12px; background: rgba(255,255,255,0.8);">
+        <table class="table" id="requestsTable"></table>
+      </div>
+    </section>
+  </div>
 
-            <button class="accordion">🧹 Propreté & sécurité <span>+</span></button>
-            <div class="accordion-content">
-                <div class="card">Espaces communs maintenus par le syndic. Feux de camp et BBQ uniquement en zone dédiée.</div>
-            </div>
-        </section>
+  <div id="toast" class="toast"></div>
 
-        <section class="section" id="contact">
-            <h2>✉️ Demande d'information</h2>
-            <p>Complétez le formulaire : le lot choisi est prérempli après sélection dans le tableau.</p>
-            <form id="contact-form">
-                <div>
-                    <label for="lot">Lot concerné</label>
-                    <select id="lot" required>
-                        <option value="">Choisissez un lot</option>
-                    </select>
-                </div>
-                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
-                    <div>
-                        <label for="name">Nom complet</label>
-                        <input id="name" type="text" placeholder="Jane Doe" required />
-                    </div>
-                    <div>
-                        <label for="email">Email</label>
-                        <input id="email" type="email" placeholder="nom@example.com" required />
-                    </div>
-                    <div>
-                        <label for="phone">Téléphone</label>
-                        <input id="phone" type="tel" placeholder="+33 6 00 00 00 00" />
-                    </div>
-                </div>
-                <div>
-                    <label for="message">Votre projet</label>
-                    <textarea id="message" placeholder="Précisez vos besoins : visite, financement, disponibilité…" required></textarea>
-                </div>
-                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
-                    <label style="display:flex;align-items:center;gap:10px;"><input type="checkbox" id="visite" /> Organiser une visite</label>
-                    <label style="display:flex;align-items:center;gap:10px;"><input type="checkbox" id="docs" /> Recevoir le règlement PDF</label>
-                    <label style="display:flex;align-items:center;gap:10px;"><input type="checkbox" id="call" /> Être rappelé par le syndic</label>
-                </div>
-                <div class="cta-row">
-                    <button type="submit" class="btn btn-primary">Envoyer ma demande</button>
-                    <button type="button" class="btn btn-ghost" id="reset-form">Réinitialiser</button>
-                    <small id="autosave-status" style="color:#4a5568;">Sauvegarde automatique activée.</small>
-                </div>
-            </form>
-        </section>
+  <script>
+    const lotKey = 'thalassa_lots_v2';
+    const reqKey = 'thalassa_requests_v2';
+    const draftKey = 'thalassa_draft_v2';
+    let filter = 'all';
+    let isAdmin = false;
+    const defaultLots = Array.from({ length: 25 }, (_, i) => ({
+      id: i + 1,
+      nom: `Lot ${i + 1}`,
+      type: 'T4',
+      surface: '40 m²',
+      statut: 'Disponible'
+    }));
 
-        <section class="section" id="admin">
-            <h2>🔐 Espace administrateur</h2>
-            <p>Connectez-vous pour consulter les demandes d'information enregistrées hors connexion.</p>
-            <form id="admin-login" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
-                <div>
-                    <label for="admin-user">Identifiant</label>
-                    <input id="admin-user" type="text" placeholder="Utilisateur" required />
-                </div>
-                <div>
-                    <label for="admin-pass">Mot de passe</label>
-                    <input id="admin-pass" type="password" placeholder="Mot de passe" required />
-                </div>
-                <button type="submit" class="btn btn-primary">Se connecter</button>
-            </form>
-            <div id="admin-message" style="margin-top:10px; color:#d9534f;"></div>
-            <div id="admin-panel" style="display:none; margin-top:16px;">
-                <div class="card" style="margin-bottom:10px;">
-                    <strong>Statut des lots</strong> — ajustez la disponibilité ou la réservation. Les changements sont visibles sur le tableau public immédiatement.
-                </div>
-                <table class="lots-table" id="admin-lots">
-                    <thead>
-                        <tr>
-                            <th>Lot</th>
-                            <th>Typologie</th>
-                            <th>Surface</th>
-                            <th>Statut (admin)</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <div class="card" style="margin:14px 0 10px;">Demandes reçues (stockées localement pour consultation sans connexion).</div>
-                <table class="lots-table" id="requests-table">
-                    <thead>
-                        <tr>
-                            <th>Lot</th>
-                            <th>Nom</th>
-                            <th>Contact</th>
-                            <th>Projet</th>
-                            <th>Options</th>
-                            <th>Horodatage</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </section>
+    function loadLots() {
+      return JSON.parse(localStorage.getItem(lotKey) || 'null') || defaultLots;
+    }
+    function saveLots(lots) { localStorage.setItem(lotKey, JSON.stringify(lots)); }
 
-        <footer class="footer">
-            <p>© 2024 Résidence Thalassa - Copropriété connectée</p>
-            <p>Bahamas • 25 lots T4 • Port privé • Services digitaux 24/7</p>
-        </footer>
-    </div>
+    function renderLots() {
+      const lots = loadLots();
+      const grid = document.getElementById('lotGrid');
+      grid.innerHTML = '';
+      lots.filter(l => filter === 'all' || l.statut === filter).forEach(lot => {
+        const card = document.createElement('div');
+        card.className = 'lot-card';
+        card.innerHTML = `
+          <div class="lot-head">
+            <div><strong>${lot.nom}</strong></div>
+            ${badge(lot.statut)}
+          </div>
+          <div class="meta">${lot.type} · ${lot.surface}</div>
+          <div class="meta">Port privatif, ponton & plage, terrain de sport</div>
+          <button class="btn-ghost" onclick="prefillLot('${lot.nom}')">Demander ce lot</button>
+        `;
+        grid.appendChild(card);
+      });
+      populateLotOptions(lots);
+      renderAdminLots(lots);
+    }
 
-    <div class="toast" id="toast">✅ Demande envoyée avec succès</div>
+    function badge(status) {
+      const cls = status === 'Disponible' ? 'b-dispo' : status === 'Réservé' ? 'b-reserve' : 'b-indispo';
+      return `<span class="badge ${cls}">${status}</span>`;
+    }
 
-    <script>
-        const lots = Array.from({ length: 25 }, (_, i) => ({
-            id: i + 1,
-            type: "T4",
-            surface: 40,
-            statut: "Disponible",
-            atouts: ["Terrasse avec vue mer", "Climatisation silencieuse", "Accès direct plage"],
-        }));
+    function populateLotOptions(lots) {
+      const sel = document.getElementById('lotSelect');
+      sel.innerHTML = '<option value="">Sélectionner un lot</option>' + lots.map(l => `<option value="${l.nom}">${l.nom} (${l.statut})</option>`).join('');
+    }
 
-        const lotBody = document.getElementById("lots-body");
-        const lotDetail = document.getElementById("lot-detail");
-        const lotSelect = document.getElementById("lot");
-        const autosaveStatus = document.getElementById("autosave-status");
-        const storageKeys = {
-            draft: "thalassa-draft",
-            requests: "thalassa-requests",
-            lotStatuses: "thalassa-lot-statuses",
-        };
+    function prefillLot(name) {
+      document.querySelector('select[name="lot"]').value = name;
+      document.querySelector('form').scrollIntoView({ behavior: 'smooth' });
+    }
 
-        const adminPanel = document.getElementById("admin-panel");
-        const adminMessage = document.getElementById("admin-message");
-        const requestsTableBody = document.querySelector("#requests-table tbody");
-        const adminLotsBody = document.querySelector("#admin-lots tbody");
-        let editingIndex = null;
+    function setFilter(value) { filter = value; renderLots(); }
 
-        const reglementBtn = document.getElementById("download-reglement");
+    function loadRequests() {
+      return JSON.parse(localStorage.getItem(reqKey) || '[]');
+    }
+    function saveRequests(reqs) { localStorage.setItem(reqKey, JSON.stringify(reqs)); }
 
-        function loadLotStatuses() {
-            try {
-                return JSON.parse(localStorage.getItem(storageKeys.lotStatuses)) || {};
-            } catch (e) {
-                return {};
-            }
-        }
+    function submitRequest(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = Object.fromEntries(new FormData(form).entries());
+      const requests = loadRequests();
+      requests.push({ ...data, statut: 'Nouvelle', id: crypto.randomUUID(), date: new Date().toISOString() });
+      saveRequests(requests);
+      localStorage.removeItem(draftKey);
+      form.reset();
+      document.getElementById('draftStatus').textContent = 'Demande enregistrée et envoyée au gestionnaire.';
+      toast('Demande envoyée. Elle est visible par l\'administrateur uniquement.');
+      renderRequests();
+    }
 
-        function saveLotStatuses(statusMap) {
-            localStorage.setItem(storageKeys.lotStatuses, JSON.stringify(statusMap));
-        }
+    function renderRequests() {
+      if (!isAdmin) return;
+      const table = document.getElementById('requestsTable');
+      const reqs = loadRequests();
+      if (!reqs.length) {
+        table.innerHTML = '<tr><td class="meta">Aucune demande pour le moment.</td></tr>';
+        return;
+      }
+      table.innerHTML = `
+        <tr>
+          <th>Nom</th><th>Email</th><th>Téléphone</th><th>Lot</th><th>Message</th><th>Statut</th>
+        </tr>
+      ` + reqs.map(r => `
+        <tr>
+          <td><input value="${r.name || ''}" data-id="${r.id}" data-field="name" /></td>
+          <td><input value="${r.email || ''}" data-id="${r.id}" data-field="email" /></td>
+          <td><input value="${r.phone || ''}" data-id="${r.id}" data-field="phone" /></td>
+          <td><input value="${r.lot || ''}" data-id="${r.id}" data-field="lot" /></td>
+          <td><textarea data-id="${r.id}" data-field="message">${r.message || ''}</textarea></td>
+          <td>
+            <select data-id="${r.id}" data-field="statut">
+              ${['Nouvelle','En cours','Clôturée'].map(s => `<option ${s===r.statut?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </td>
+        </tr>
+      `).join('');
+      table.querySelectorAll('input, textarea, select').forEach(el => el.addEventListener('change', editRequest));
+    }
 
-        function statusBadge(statut) {
-            const colors = {
-                Disponible: "#00b894",
-                Réservé: "#f6c343",
-                Indisponible: "#94a3b8",
-            };
-            const icon = {
-                Disponible: "✅",
-                Réservé: "⏳",
-                Indisponible: "⛔",
-            };
-            return `<span class="badge" style="background:${colors[statut] || "#d9e2ec"}; color:#0f172a;">${icon[statut] || "ℹ️"} ${statut}</span>`;
-        }
+    function editRequest(e) {
+      const { id, field } = e.target.dataset;
+      const reqs = loadRequests();
+      const idx = reqs.findIndex(r => r.id === id);
+      if (idx === -1) return;
+      reqs[idx][field] = e.target.value;
+      saveRequests(reqs);
+      toast('Demande mise à jour et publiée hors connexion.');
+    }
 
-        function renderLots() {
-            const savedStatuses = loadLotStatuses();
-            lotBody.innerHTML = "";
-            lotSelect.innerHTML = '<option value="">Choisissez un lot</option>';
-
-            lots.forEach((lot) => {
-                const statut = savedStatuses[lot.id] || lot.statut;
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>Lot ${lot.id}</td>
-                    <td>${lot.type}</td>
-                    <td>${lot.surface} m²</td>
-                    <td>${statusBadge(statut)}</td>
-                `;
-                row.addEventListener("click", () => showLotDetail({ ...lot, statut }));
-                lotBody.appendChild(row);
-
-                const option = document.createElement("option");
-                option.value = `Lot ${lot.id}`;
-                option.textContent = `Lot ${lot.id} - ${lot.surface} m² (${lot.type})`;
-                lotSelect.appendChild(option);
-            });
-        }
-
-        function renderAdminLots() {
-            if (!adminLotsBody) return;
-            const savedStatuses = loadLotStatuses();
-            adminLotsBody.innerHTML = "";
-
-            lots.forEach((lot) => {
-                const currentStatus = savedStatuses[lot.id] || lot.statut;
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>Lot ${lot.id}</td>
-                    <td>${lot.type}</td>
-                    <td>${lot.surface} m²</td>
-                    <td>
-                        <select data-lot="${lot.id}" style="width:100%;padding:8px;border-radius:10px;border:1px solid #d9e2ec;">
-                            <option value="Disponible" ${currentStatus === "Disponible" ? "selected" : ""}>Disponible</option>
-                            <option value="Réservé" ${currentStatus === "Réservé" ? "selected" : ""}>Réservé</option>
-                            <option value="Indisponible" ${currentStatus === "Indisponible" ? "selected" : ""}>Indisponible</option>
-                        </select>
-                    </td>
-                `;
-                adminLotsBody.appendChild(row);
-            });
-        }
-
-        function loadRequests() {
-            try {
-                return JSON.parse(localStorage.getItem(storageKeys.requests)) || [];
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function saveRequests(requests) {
-            localStorage.setItem(storageKeys.requests, JSON.stringify(requests));
-        }
-
-        function renderRequests() {
-            requestsTableBody.innerHTML = "";
-            const requests = loadRequests();
-            if (!requests.length) {
-                const row = document.createElement("tr");
-                row.innerHTML = `<td colspan="7" style="text-align:center; color:#4a5568;">Aucune demande enregistrée pour le moment.</td>`;
-                requestsTableBody.appendChild(row);
-                return;
-            }
-
-            requests.forEach((req, index) => {
-                const optionsList = req.options || [];
-                const row = document.createElement("tr");
-
-                if (editingIndex === index) {
-                    row.innerHTML = `
-                        <td><input data-field="lot" value="${req.lot}" style="width:100%;padding:8px;border:1px solid #d9e2ec;border-radius:8px;" /></td>
-                        <td><input data-field="name" value="${req.name}" style="width:100%;padding:8px;border:1px solid #d9e2ec;border-radius:8px;" /></td>
-                        <td style="min-width:180px;">
-                            <input data-field="email" value="${req.email}" placeholder="Email" style="width:100%;padding:6px;border:1px solid #d9e2ec;border-radius:8px;margin-bottom:6px;" />
-                            <input data-field="phone" value="${req.phone || ""}" placeholder="Téléphone" style="width:100%;padding:6px;border:1px solid #d9e2ec;border-radius:8px;" />
-                        </td>
-                        <td><textarea data-field="message" style="width:100%;padding:8px;border:1px solid #d9e2ec;border-radius:8px;min-height:60px;">${req.message}</textarea></td>
-                        <td style="min-width:160px; line-height:1.6;">
-                            <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" data-option="Visite" ${optionsList.includes("Visite") ? "checked" : ""}/> Visite</label>
-                            <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" data-option="PDF règlement" ${optionsList.includes("PDF règlement") ? "checked" : ""}/> PDF règlement</label>
-                            <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" data-option="Rappel" ${optionsList.includes("Rappel") ? "checked" : ""}/> Rappel</label>
-                        </td>
-                        <td>${new Date(req.timestamp).toLocaleString()}</td>
-                        <td style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <button class="btn btn-primary" data-save="${index}" style="padding:8px 10px;">Enregistrer</button>
-                            <button class="btn btn-ghost" data-cancel style="padding:8px 10px;">Annuler</button>
-                        </td>
-                    `;
-                } else {
-                    row.innerHTML = `
-                        <td>${req.lot}</td>
-                        <td>${req.name}</td>
-                        <td>${req.email}<br>${req.phone || ""}</td>
-                        <td>${req.message}</td>
-                        <td>${optionsList.join(", ") || "-"}</td>
-                        <td>${new Date(req.timestamp).toLocaleString()}</td>
-                        <td><button class="btn btn-ghost" data-edit="${index}" style="padding:8px 12px;">Modifier</button></td>
-                    `;
-                }
-                requestsTableBody.appendChild(row);
-            });
-        }
-
-        function extractUpdatedRequest(row, current) {
-            const getValue = (selector) => (row.querySelector(selector)?.value || "").trim();
-            const options = Array.from(row.querySelectorAll("[data-option]:checked")).map((opt) => opt.dataset.option);
-            return {
-                ...current,
-                lot: getValue("[data-field='lot']") || "Non précisé",
-                name: getValue("[data-field='name']"),
-                email: getValue("[data-field='email']"),
-                phone: getValue("[data-field='phone']"),
-                message: getValue("[data-field='message']"),
-                options,
-            };
-        }
-
-        requestsTableBody.addEventListener("click", (e) => {
-            const editBtn = e.target.closest("[data-edit]");
-            const saveBtn = e.target.closest("[data-save]");
-            const cancelBtn = e.target.closest("[data-cancel]");
-
-            if (editBtn) {
-                editingIndex = Number(editBtn.dataset.edit);
-                renderRequests();
-                return;
-            }
-
-            if (cancelBtn) {
-                editingIndex = null;
-                renderRequests();
-                return;
-            }
-
-            if (saveBtn) {
-                const index = Number(saveBtn.dataset.save);
-                const row = saveBtn.closest("tr");
-                const requests = loadRequests();
-                if (!requests[index]) return;
-                requests[index] = extractUpdatedRequest(row, requests[index]);
-                saveRequests(requests);
-                adminMessage.style.color = "#2e7d32";
-                adminMessage.textContent = "Demande mise à jour et publiée hors connexion.";
-                editingIndex = null;
-                renderRequests();
-            }
+    function renderAdminLots(lots) {
+      if (!isAdmin) return;
+      const container = document.getElementById('adminLots');
+      container.innerHTML = '';
+      lots.forEach((lot, index) => {
+        const card = document.createElement('div');
+        card.className = 'lot-card';
+        card.innerHTML = `
+          <div class="lot-head"><strong>${lot.nom}</strong>${badge(lot.statut)}</div>
+          <div class="meta">${lot.type} · ${lot.surface}</div>
+          <label>Statut
+            <select data-index="${index}">
+              ${['Disponible','Réservé','Indisponible'].map(s => `<option ${s===lot.statut?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </label>
+        `;
+        card.querySelector('select').addEventListener('change', (e) => {
+          const lotsList = loadLots();
+          lotsList[index].statut = e.target.value;
+          saveLots(lotsList);
+          renderLots();
+          toast('Statut du lot mis à jour.');
         });
+        container.appendChild(card);
+      });
+    }
 
-        adminLotsBody?.addEventListener("change", (e) => {
-            const select = e.target.closest("select[data-lot]");
-            if (!select) return;
-            const lotId = Number(select.dataset.lot);
-            const statusMap = loadLotStatuses();
-            statusMap[lotId] = select.value;
-            saveLotStatuses(statusMap);
-            renderLots();
-            renderAdminLots();
-            adminMessage.style.color = "#2e7d32";
-            adminMessage.textContent = "Statut du lot mis à jour et visible sur le tableau.";
-        });
+    function downloadReglement() {
+      const content = `Résidence Thalassa - Règlement de copropriété\n\n` +
+        `Parties communes : ponton, plage, terrain de beach-volley/golf, port (place de bateau privative).\n` +
+        `Détermine la destination des parties privatives et communes et fixe les règles de jouissance.\n\n` +
+        `Règles :\n` +
+        `- Pas de bruit après 00h (respect du voisinage et de la faune locale).\n` +
+        `- Animaux autorisés s’ils ne troublent pas la tranquillité.\n` +
+        `- Utilisation du port réservée aux résidents (1 place par cabanon).\n` +
+        `- Plage et ponton : usage collectif, interdiction de privatiser des zones.\n` +
+        `- Terrain de beach-volley & golf : réservation par créneaux pour éviter les conflits.\n` +
+        `- Propreté : chaque résident veille à la propreté des lieux communs.\n` +
+        `- Interdiction de feu de camp ou barbecue hors zones prévues.\n\n` +
+        `Dates clés : présentation orale le 28 novembre (copro physiquement, composition, règlement niveau 5/6, EDD, lieu).\n`;
+      const blob = new Blob([content], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Reglement_Residence_Thalassa.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('Règlement PDF téléchargé.');
+    }
 
-        function showLotDetail(lot) {
-            lotDetail.innerHTML = `
-                <strong>Lot ${lot.id}</strong> · ${lot.surface} m² · ${lot.type} · ${statusBadge(lot.statut)}<br>
-                Atouts : ${lot.atouts.join(", ")}<br>
-                <button class="btn btn-primary" style="margin-top:10px;" data-scroll="#contact">Préremplir le formulaire</button>
-            `;
-            lotSelect.value = `Lot ${lot.id}`;
-            handleSmoothScroll("#contact");
-        }
+    function saveDraft() {
+      const form = document.getElementById('requestForm');
+      const data = Object.fromEntries(new FormData(form).entries());
+      localStorage.setItem(draftKey, JSON.stringify({ data, date: new Date().toISOString() }));
+      updateDraftStatus('Brouillon sauvegardé.');
+    }
 
-        function handleSmoothScroll(target) {
-            const el = document.querySelector(target);
-            if (el) {
-                el.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
-        }
+    function restoreDraft() {
+      const saved = JSON.parse(localStorage.getItem(draftKey) || 'null');
+      if (!saved) return;
+      const form = document.getElementById('requestForm');
+      Object.entries(saved.data).forEach(([k, v]) => { if (form[k]) form[k].value = v; });
+      updateDraftStatus(`Brouillon restauré (${new Date(saved.date).toLocaleTimeString()}).`);
+    }
 
-        function downloadReglement() {
-            const base64Pdf = "JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvRm9udCAvU3VidHlwZSAvVHlwZTEgL0Jhc2VGb250IC9IZWx2ZXRpY2EgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL0xlbmd0aCA4ODkgPj4Kc3RyZWFtCkJUIC9GMSAxOCBUZiA1MCA3NjAgVGQgKFLoZ2xlbWVudCBkZSBjb3Byb3Byael06SAtIFLpc2lkZW5jZSBUaGFsYXNzYSkgVGogRVRcbkJUIC9GMSAxMiBUZiA1MCA3MzIgVGQgKFZlcnNpb24gcHVibGlxdWUgcG91ciBkaWZmdXNpb24gYXV4IHLpc2lkZW50cyBldCB2aXNpdGV1cnMuKSBUaiBFVFxuQlQgL0YxIDExIFRmIDUwIDcwMCBUZCAoMS4gVXNhZ2UgculzaWRlbnRpZWwgZXhjbHVzaWYgOiBhdWN1bmUgbG9jYXRpb24gc2Fpc29ubmnocmUgc2FucyBhY2NvcmQgZHUgc3luZGljLikgVGogRVRcbkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKDIuIFBhcnRpZXMgY29tbXVuZXMgOiBzaWxlbmNlIGFwcuhzIDIyaCwgdHJpIGRlcyBk6WNoZXRzIG9ibGlnYXRvaXJlLikgVGogRVRcbkJUIC9GMSAxMSBUZiA1MCA2NTYgVGQgKDMuIFPpY3VyaXTpIDogYmFkZ2VzIGluZGl2aWR1ZWxzLCByZWdpc3RyZSBkZXMgdmlzaXRldXJzLCBleHRpbmN0ZXVycyB26XJpZmnpcyBjaGFxdWUgdHJpbWVzdHJlLikgVGogRVRcbkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKDQuIEVudHJldGllbiA6IGNsaW1hdGlzYXRpb24gZW50cmV0ZW51ZSBhbm51ZWxsZW1lbnQsIGJhbGNvbnMgZOlnYWfpcyBwb3VyIGZhY2lsaXRlciBsJ+l2YWN1YXRpb24uKSBUaiBFVFxuQlQgL0YxIDExIFRmIDUwIDYxMiBUZCAoNS4gU3RhdGlvbm5lbWVudCA6IHbpaGljdWxlcyBhdXRvcmlz6XMgdW5pcXVlbWVudCBzdXIgbGVzIGVtcGxhY2VtZW50cyBk6WRp6XMgYXUgbG90LikgVGogRVRcbkJUIC9GMSAxMSBUZiA1MCA1OTAgVGQgKDYuIE5hdmlnYXRpb24gOiBxdWFpIHByaXbpIHLpc2VydukgYXV4IGNvcHJvcHJp6XRhaXJlcywgZ2lsZXRzIG9ibGlnYXRvaXJlcyBwb3VyIGxlcyBlbmZhbnRzLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagozIDAgb2JqCjw8IC9UeXBlIC9QYWdlIC9QYXJlbnQgNCAwIFIgL01lZGlhQm94IFswIDAgNjEyIDc5Ml0gL0NvbnRlbnRzIDIgMCBSIC9SZXNvdXJjZXMgPDwgL0ZvbnQgPDwgL0YxIDEgMCBSID4+ID4+ID4+CmVuZG9iago0IDAgb2JqCjw8IC9UeXBlIC9QYWdlcyAvQ291bnQgMSAvS2lkcyBbMyAwIFJdID4+CmVuZG9iago1IDAgb2JqCjw8IC9UeXBlIC9DYXRhbG9nIC9QYWdlcyA0IDAgUiA+PgplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNzkgMDAwMDAgbiAKMDAwMDAwMTAxOSAwMDAwMCBuIAowMDAwMDAxMTQ1IDAwMDAwIG4gCjAwMDAwMDEyMDIgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA2IC9Sb290IDUgMCBSID4+CnN0YXJ0eHJlZgoxMjUxCiUlRU9G";
-            const binary = atob(base64Pdf);
-            const len = binary.length;
-            const buffer = new Uint8Array(len);
-            for (let i = 0; i < len; i++) buffer[i] = binary.charCodeAt(i);
-            const blob = new Blob([buffer], { type: "application/pdf" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = "reglement-thalassa.pdf";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
+    function resetDraft() {
+      document.getElementById('requestForm').reset();
+      localStorage.removeItem(draftKey);
+      updateDraftStatus('Brouillon réinitialisé.');
+    }
 
-        document.querySelectorAll("[data-scroll]").forEach((btn) => {
-            btn.addEventListener("click", () => handleSmoothScroll(btn.dataset.scroll));
-        });
+    function updateDraftStatus(text) {
+      document.getElementById('draftStatus').textContent = text;
+    }
 
-        const pills = document.querySelectorAll(".pill");
-        const amenityDetail = document.getElementById("amenity-detail");
-        pills.forEach((pill) => {
-            pill.addEventListener("click", () => {
-                pills.forEach((p) => p.classList.remove("active"));
-                pill.classList.add("active");
-                amenityDetail.textContent = pill.dataset.detail;
-            });
-        });
+    function toast(message) {
+      const t = document.getElementById('toast');
+      t.textContent = message;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2400);
+    }
 
-        document.querySelectorAll(".accordion").forEach((accordion) => {
-            accordion.addEventListener("click", () => {
-                const content = accordion.nextElementSibling;
-                const isOpen = accordion.classList.contains("open");
-                accordion.classList.toggle("open");
-                accordion.querySelector("span").textContent = isOpen ? "+" : "−";
-                content.style.maxHeight = isOpen ? null : `${content.scrollHeight}px`;
-            });
-        });
-
-        const form = document.getElementById("contact-form");
-        const toast = document.getElementById("toast");
-        const adminLogin = document.getElementById("admin-login");
-
-        function saveDraft() {
-            const draft = {
-                lot: lotSelect.value,
-                name: document.getElementById("name").value,
-                email: document.getElementById("email").value,
-                phone: document.getElementById("phone").value,
-                message: document.getElementById("message").value,
-                visite: document.getElementById("visite").checked,
-                docs: document.getElementById("docs").checked,
-                call: document.getElementById("call").checked,
-            };
-            localStorage.setItem(storageKeys.draft, JSON.stringify(draft));
-            if (autosaveStatus) {
-                autosaveStatus.textContent = `Dernière sauvegarde : ${new Date().toLocaleTimeString()}`;
-            }
-        }
-
-        function restoreDraft() {
-            try {
-                const saved = JSON.parse(localStorage.getItem(storageKeys.draft));
-                if (!saved) return;
-                lotSelect.value = saved.lot || "";
-                document.getElementById("name").value = saved.name || "";
-                document.getElementById("email").value = saved.email || "";
-                document.getElementById("phone").value = saved.phone || "";
-                document.getElementById("message").value = saved.message || "";
-                document.getElementById("visite").checked = !!saved.visite;
-                document.getElementById("docs").checked = !!saved.docs;
-                document.getElementById("call").checked = !!saved.call;
-                if (autosaveStatus) autosaveStatus.textContent = "Brouillon rechargé automatiquement.";
-            } catch (e) {
-                // ignore corrupted drafts
-            }
-        }
-
-        function clearDraft() {
-            localStorage.removeItem(storageKeys.draft);
-            if (autosaveStatus) autosaveStatus.textContent = "Sauvegarde automatique activée.";
-        }
-
-        form.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const request = {
-                lot: lotSelect.value || "Non précisé",
-                name: document.getElementById("name").value,
-                email: document.getElementById("email").value,
-                phone: document.getElementById("phone").value,
-                message: document.getElementById("message").value,
-                options: [
-                    document.getElementById("visite").checked ? "Visite" : null,
-                    document.getElementById("docs").checked ? "PDF règlement" : null,
-                    document.getElementById("call").checked ? "Rappel" : null,
-                ].filter(Boolean),
-                timestamp: Date.now(),
-            };
-
-            const requests = loadRequests();
-            requests.push(request);
-            saveRequests(requests);
-            renderRequests();
-
-            if (document.getElementById("docs").checked) {
-                downloadReglement();
-            }
-
-            toast.classList.add("show");
-            setTimeout(() => toast.classList.remove("show"), 2800);
-            form.reset();
-            clearDraft();
-        });
-
-        document.getElementById("reset-form").addEventListener("click", () => {
-            form.reset();
-            lotSelect.value = "";
-            clearDraft();
-        });
-
-        reglementBtn.addEventListener("click", downloadReglement);
-
-        form.addEventListener("input", saveDraft);
-        setInterval(saveDraft, 30000);
-
-        adminLogin.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const user = document.getElementById("admin-user").value;
-            const pass = document.getElementById("admin-pass").value;
-            if (user === "TALASSA" && pass === "TALASSAVIVEZLEREVE") {
-                adminMessage.style.color = "#2e7d32";
-                adminMessage.textContent = "Connexion réussie. Demandes disponibles ci-dessous.";
-                adminPanel.style.display = "block";
-                renderRequests();
-                renderAdminLots();
-            } else {
-                adminMessage.style.color = "#d9534f";
-                adminMessage.textContent = "Identifiants incorrects : accès refusé.";
-                adminPanel.style.display = "none";
-            }
-        });
-
-        renderLots();
-        restoreDraft();
+    function openAdmin() {
+      const login = prompt('Identifiant administrateur');
+      const pwd = login ? prompt('Mot de passe') : '';
+      if (login === 'TALASSA' && pwd === 'TALASSAVIVEZLEREVE') {
+        isAdmin = true;
+        document.getElementById('adminPanel').classList.remove('hidden');
         renderRequests();
-    </script>
+        renderLots();
+        toast('Connexion réussie.');
+      } else {
+        alert('Identifiants incorrects. Accès refusé.');
+      }
+    }
+
+    function logout() {
+      isAdmin = false;
+      document.getElementById('adminPanel').classList.add('hidden');
+      toast('Vous êtes déconnecté.');
+    }
+
+    document.getElementById('requestForm').addEventListener('submit', submitRequest);
+    document.getElementById('requestForm').addEventListener('input', () => { saveDraft(); });
+    setInterval(saveDraft, 30000);
+
+    restoreDraft();
+    renderLots();
+  </script>
 </body>
 </html>
