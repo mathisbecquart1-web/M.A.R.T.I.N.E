@@ -548,6 +548,24 @@
             </form>
         </section>
 
+        <section class="section" id="public-requests">
+            <h2>📢 Demandes visibles au public</h2>
+            <p>Historique consultable hors connexion. Les modifications administrateur sont immédiatement visibles ici.</p>
+            <table class="lots-table">
+                <thead>
+                    <tr>
+                        <th>Lot</th>
+                        <th>Nom</th>
+                        <th>Contact</th>
+                        <th>Projet</th>
+                        <th>Options</th>
+                        <th>Horodatage</th>
+                    </tr>
+                </thead>
+                <tbody id="public-requests-body"></tbody>
+            </table>
+        </section>
+
         <section class="section" id="admin">
             <h2>🔐 Espace administrateur</h2>
             <p>Connectez-vous pour consulter les demandes d'information enregistrées hors connexion.</p>
@@ -574,6 +592,7 @@
                             <th>Projet</th>
                             <th>Options</th>
                             <th>Horodatage</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -610,6 +629,8 @@
         const adminPanel = document.getElementById("admin-panel");
         const adminMessage = document.getElementById("admin-message");
         const requestsTableBody = document.querySelector("#requests-table tbody");
+        const publicRequestsBody = document.getElementById("public-requests-body");
+        let editingIndex = null;
 
         const reglementBtn = document.getElementById("download-reglement");
 
@@ -646,27 +667,113 @@
 
         function renderRequests() {
             requestsTableBody.innerHTML = "";
+            publicRequestsBody.innerHTML = "";
             const requests = loadRequests();
             if (!requests.length) {
                 const row = document.createElement("tr");
-                row.innerHTML = `<td colspan="6" style="text-align:center; color:#4a5568;">Aucune demande enregistrée pour le moment.</td>`;
+                row.innerHTML = `<td colspan="7" style="text-align:center; color:#4a5568;">Aucune demande enregistrée pour le moment.</td>`;
                 requestsTableBody.appendChild(row);
+
+                const publicRow = document.createElement("tr");
+                publicRow.innerHTML = `<td colspan="6" style="text-align:center; color:#4a5568;">Aucune demande publiée pour l'instant.</td>`;
+                publicRequestsBody.appendChild(publicRow);
                 return;
             }
 
-            requests.forEach((req) => {
+            requests.forEach((req, index) => {
+                const optionsList = req.options || [];
                 const row = document.createElement("tr");
-                row.innerHTML = `
+
+                if (editingIndex === index) {
+                    row.innerHTML = `
+                        <td><input data-field="lot" value="${req.lot}" style="width:100%;padding:8px;border:1px solid #d9e2ec;border-radius:8px;" /></td>
+                        <td><input data-field="name" value="${req.name}" style="width:100%;padding:8px;border:1px solid #d9e2ec;border-radius:8px;" /></td>
+                        <td style="min-width:180px;">
+                            <input data-field="email" value="${req.email}" placeholder="Email" style="width:100%;padding:6px;border:1px solid #d9e2ec;border-radius:8px;margin-bottom:6px;" />
+                            <input data-field="phone" value="${req.phone || ""}" placeholder="Téléphone" style="width:100%;padding:6px;border:1px solid #d9e2ec;border-radius:8px;" />
+                        </td>
+                        <td><textarea data-field="message" style="width:100%;padding:8px;border:1px solid #d9e2ec;border-radius:8px;min-height:60px;">${req.message}</textarea></td>
+                        <td style="min-width:160px; line-height:1.6;">
+                            <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" data-option="Visite" ${optionsList.includes("Visite") ? "checked" : ""}/> Visite</label>
+                            <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" data-option="PDF règlement" ${optionsList.includes("PDF règlement") ? "checked" : ""}/> PDF règlement</label>
+                            <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" data-option="Rappel" ${optionsList.includes("Rappel") ? "checked" : ""}/> Rappel</label>
+                        </td>
+                        <td>${new Date(req.timestamp).toLocaleString()}</td>
+                        <td style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button class="btn btn-primary" data-save="${index}" style="padding:8px 10px;">Enregistrer</button>
+                            <button class="btn btn-ghost" data-cancel style="padding:8px 10px;">Annuler</button>
+                        </td>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <td>${req.lot}</td>
+                        <td>${req.name}</td>
+                        <td>${req.email}<br>${req.phone || ""}</td>
+                        <td>${req.message}</td>
+                        <td>${optionsList.join(", ") || "-"}</td>
+                        <td>${new Date(req.timestamp).toLocaleString()}</td>
+                        <td><button class="btn btn-ghost" data-edit="${index}" style="padding:8px 12px;">Modifier</button></td>
+                    `;
+                }
+                requestsTableBody.appendChild(row);
+
+                const publicRow = document.createElement("tr");
+                publicRow.innerHTML = `
                     <td>${req.lot}</td>
                     <td>${req.name}</td>
                     <td>${req.email}<br>${req.phone || ""}</td>
                     <td>${req.message}</td>
-                    <td>${req.options.join(", ") || "-"}</td>
+                    <td>${optionsList.join(", ") || "-"}</td>
                     <td>${new Date(req.timestamp).toLocaleString()}</td>
                 `;
-                requestsTableBody.appendChild(row);
+                publicRequestsBody.appendChild(publicRow);
             });
         }
+
+        function extractUpdatedRequest(row, current) {
+            const getValue = (selector) => (row.querySelector(selector)?.value || "").trim();
+            const options = Array.from(row.querySelectorAll("[data-option]:checked")).map((opt) => opt.dataset.option);
+            return {
+                ...current,
+                lot: getValue("[data-field='lot']") || "Non précisé",
+                name: getValue("[data-field='name']"),
+                email: getValue("[data-field='email']"),
+                phone: getValue("[data-field='phone']"),
+                message: getValue("[data-field='message']"),
+                options,
+            };
+        }
+
+        requestsTableBody.addEventListener("click", (e) => {
+            const editBtn = e.target.closest("[data-edit]");
+            const saveBtn = e.target.closest("[data-save]");
+            const cancelBtn = e.target.closest("[data-cancel]");
+
+            if (editBtn) {
+                editingIndex = Number(editBtn.dataset.edit);
+                renderRequests();
+                return;
+            }
+
+            if (cancelBtn) {
+                editingIndex = null;
+                renderRequests();
+                return;
+            }
+
+            if (saveBtn) {
+                const index = Number(saveBtn.dataset.save);
+                const row = saveBtn.closest("tr");
+                const requests = loadRequests();
+                if (!requests[index]) return;
+                requests[index] = extractUpdatedRequest(row, requests[index]);
+                saveRequests(requests);
+                adminMessage.style.color = "#2e7d32";
+                adminMessage.textContent = "Demande mise à jour et publiée hors connexion.";
+                editingIndex = null;
+                renderRequests();
+            }
+        });
 
         function showLotDetail(lot) {
             lotDetail.innerHTML = `
@@ -686,7 +793,7 @@
         }
 
         function downloadReglement() {
-            const base64Pdf = "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL01lZGlhQm94WzAgMCA2MTIgNzkyXS9Db250ZW50cyA0IDAgUi9SZXNvdXJjZXM8PC9Gb250PDwvRjEgNSAwIFI+Pj4+Pj4KZW5kb2JqCjQgMCBvYmoKPDwvTGVuZ3RoIDU2Pj4Kc3RyZWFtCkJUIEZMIDMyIFRmIDUwIDcyMCBUZCAoUmVnbGVtZW50IGRlIGNvcHJvcHJpZXRlIC0gUmVzaWRlbmNlIFRoYWxhc3NhKSBUaiBFVApCVCBGMSAxMiBUZiA1MCA2ODAgVGQgKFVzYWdlIHJlcy4gVDRzLCBwcm9wcmllc2l0ZSwgYWNjZXMgYXUgYmFkZ2UpIFRqIEVUCkJUIEYxIDEyIFRmIDUwIDY0MCBUZCAoU2VjdXJpdGUgZXQgcXVpZXR1ZSwgcGxhY2UgZGUgcG9ydCwgcHJvYmFsaXRlIGR1IHNpZ25hbC4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKNSAwIG9iago8PC9UeXBlL0ZvbnQvU3VidHlwZS9UeXBlMS9CYXNlRm9udC9IZWx2ZXRpY2E+PgplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDEwIDAwMDAwIG4gCjAwMDAwMDAwNzYgMDAwMDAgbiAKMDAwMDAwMDE5NCAwMDAwMCBuIAowMDAwMDAwMjY0IDAwMDAwIG4gCjAwMDAwMDAzNTIgMDAwMDAgbiAKdHJhaWxlcgo8PC9TaXplIDYvUm9vdCAxIDAgUj4+CnN0YXJ0eHJlZgowNDIyCiUlRU9G";
+            const base64Pdf = "JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvRm9udCAvU3VidHlwZSAvVHlwZTEgL0Jhc2VGb250IC9IZWx2ZXRpY2EgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL0xlbmd0aCA4ODkgPj4Kc3RyZWFtCkJUIC9GMSAxOCBUZiA1MCA3NjAgVGQgKFLoZ2xlbWVudCBkZSBjb3Byb3Byael06SAtIFLpc2lkZW5jZSBUaGFsYXNzYSkgVGogRVRcbkJUIC9GMSAxMiBUZiA1MCA3MzIgVGQgKFZlcnNpb24gcHVibGlxdWUgcG91ciBkaWZmdXNpb24gYXV4IHLpc2lkZW50cyBldCB2aXNpdGV1cnMuKSBUaiBFVFxuQlQgL0YxIDExIFRmIDUwIDcwMCBUZCAoMS4gVXNhZ2UgculzaWRlbnRpZWwgZXhjbHVzaWYgOiBhdWN1bmUgbG9jYXRpb24gc2Fpc29ubmnocmUgc2FucyBhY2NvcmQgZHUgc3luZGljLikgVGogRVRcbkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKDIuIFBhcnRpZXMgY29tbXVuZXMgOiBzaWxlbmNlIGFwcuhzIDIyaCwgdHJpIGRlcyBk6WNoZXRzIG9ibGlnYXRvaXJlLikgVGogRVRcbkJUIC9GMSAxMSBUZiA1MCA2NTYgVGQgKDMuIFPpY3VyaXTpIDogYmFkZ2VzIGluZGl2aWR1ZWxzLCByZWdpc3RyZSBkZXMgdmlzaXRldXJzLCBleHRpbmN0ZXVycyB26XJpZmnpcyBjaGFxdWUgdHJpbWVzdHJlLikgVGogRVRcbkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKDQuIEVudHJldGllbiA6IGNsaW1hdGlzYXRpb24gZW50cmV0ZW51ZSBhbm51ZWxsZW1lbnQsIGJhbGNvbnMgZOlnYWfpcyBwb3VyIGZhY2lsaXRlciBsJ+l2YWN1YXRpb24uKSBUaiBFVFxuQlQgL0YxIDExIFRmIDUwIDYxMiBUZCAoNS4gU3RhdGlvbm5lbWVudCA6IHbpaGljdWxlcyBhdXRvcmlz6XMgdW5pcXVlbWVudCBzdXIgbGVzIGVtcGxhY2VtZW50cyBk6WRp6XMgYXUgbG90LikgVGogRVRcbkJUIC9GMSAxMSBUZiA1MCA1OTAgVGQgKDYuIE5hdmlnYXRpb24gOiBxdWFpIHByaXbpIHLpc2VydukgYXV4IGNvcHJvcHJp6XRhaXJlcywgZ2lsZXRzIG9ibGlnYXRvaXJlcyBwb3VyIGxlcyBlbmZhbnRzLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagozIDAgb2JqCjw8IC9UeXBlIC9QYWdlIC9QYXJlbnQgNCAwIFIgL01lZGlhQm94IFswIDAgNjEyIDc5Ml0gL0NvbnRlbnRzIDIgMCBSIC9SZXNvdXJjZXMgPDwgL0ZvbnQgPDwgL0YxIDEgMCBSID4+ID4+ID4+CmVuZG9iago0IDAgb2JqCjw8IC9UeXBlIC9QYWdlcyAvQ291bnQgMSAvS2lkcyBbMyAwIFJdID4+CmVuZG9iago1IDAgb2JqCjw8IC9UeXBlIC9DYXRhbG9nIC9QYWdlcyA0IDAgUiA+PgplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNzkgMDAwMDAgbiAKMDAwMDAwMTAxOSAwMDAwMCBuIAowMDAwMDAxMTQ1IDAwMDAwIG4gCjAwMDAwMDEyMDIgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA2IC9Sb290IDUgMCBSID4+CnN0YXJ0eHJlZgoxMjUxCiUlRU9G";
             const binary = atob(base64Pdf);
             const len = binary.length;
             const buffer = new Uint8Array(len);
@@ -830,6 +937,7 @@
 
         hydrateLots();
         restoreDraft();
+        renderRequests();
     </script>
 </body>
 </html>
