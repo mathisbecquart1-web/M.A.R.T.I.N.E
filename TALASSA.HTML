@@ -5,7 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Résidence Thalassa - Syndic de Copropriété</title>
     <style>
-        /* Styles CSS intégrés pour un design moderne et tropical */
+        :root {
+            --blue-500: #0d8af0;
+            --blue-600: #0b6fcc;
+            --blue-100: #e6f3ff;
+            --purple-500: #6c5ce7;
+            --green-500: #00b894;
+            --sand: #f5efe6;
+            --text-dark: #213042;
+            --glass: rgba(255, 255, 255, 0.9);
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,388 +24,622 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            font-family: "Inter", "Arial", sans-serif;
+            background: radial-gradient(circle at 10% 20%, #b9ecff 0%, #8cd2ff 25%, #4ca3ff 75%, #0f75d8 100%);
+            color: var(--text-dark);
             min-height: 100vh;
         }
 
-        .container {
+        .page {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 32px 20px 60px;
         }
 
         header {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px 0;
-            margin-bottom: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
         }
 
-        h1 {
-            text-align: center;
-            color: #0984e3;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            gap: 12px;
         }
 
-        .subtitle {
-            text-align: center;
-            color: #636e72;
-            font-size: 1.2em;
-            font-style: italic;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            color: var(--blue-600);
+            letter-spacing: 0.03em;
+        }
+
+        .brand span {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--blue-500), var(--purple-500));
+            color: white;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links button {
+            border: none;
+            background: var(--glass);
+            color: var(--text-dark);
+            padding: 10px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-links button:hover {
+            transform: translateY(-2px);
+            background: #fff;
+            color: var(--blue-600);
+        }
+
+        .hero {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.85));
+            padding: 32px 26px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: grid;
+            gap: 16px;
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 5vw, 42px);
+            color: var(--blue-600);
+            letter-spacing: 0.02em;
+        }
+
+        .hero p {
+            color: #4a5568;
+            font-size: 16px;
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue-500), var(--purple-500));
+            color: white;
+            box-shadow: 0 10px 25px rgba(12, 116, 231, 0.28);
+        }
+
+        .btn-ghost {
+            background: rgba(13, 138, 240, 0.08);
+            color: var(--blue-600);
+            border: 1px solid rgba(13, 138, 240, 0.15);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
         }
 
         .section {
-            background: rgba(255, 255, 255, 0.9);
-            margin: 20px 0;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            margin-top: 24px;
+            background: var(--glass);
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.75);
         }
 
-        h2 {
-            color: #0984e3;
-            border-bottom: 3px solid #74b9ff;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 1.8em;
+        .section h2 {
+            color: var(--blue-600);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 22px;
         }
 
-        .amenities-grid {
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0 4px;
+        }
+
+        .pill {
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: var(--sand);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        .pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .pill.active {
+            background: var(--blue-100);
+            border-color: var(--blue-500);
+            color: var(--blue-600);
+        }
+
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+            margin-top: 12px;
         }
 
-        .amenity-card {
-            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
+        .card {
+            background: linear-gradient(145deg, #ffffff, rgba(255, 255, 255, 0.92));
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .amenity-card:hover {
-            transform: translateY(-5px);
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 30px rgba(0, 0, 0, 0.12);
         }
 
         .lots-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            background: white;
-            border-radius: 10px;
+            margin-top: 10px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
 
         .lots-table th,
         .lots-table td {
-            padding: 12px 15px;
+            padding: 12px 14px;
             text-align: center;
-            border-bottom: 1px solid #ddd;
         }
 
         .lots-table th {
-            background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+            background: linear-gradient(135deg, var(--blue-500), var(--purple-500));
             color: white;
-            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            font-size: 13px;
+        }
+
+        .lots-table tr {
+            background: white;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
         }
 
         .lots-table tr:nth-child(even) {
-            background-color: #f8f9fa;
+            background: #f7f9fb;
         }
 
         .lots-table tr:hover {
-            background-color: #e3f2fd;
-            transition: background-color 0.3s ease;
+            background: #eaf4ff;
         }
 
-        .rules-list {
-            list-style: none;
-            padding: 0;
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 50px;
+            background: rgba(0, 184, 148, 0.12);
+            color: var(--green-500);
+            font-weight: 700;
+            font-size: 12px;
         }
 
-        .rules-list li {
-            background: #f8f9fa;
-            margin: 10px 0;
-            padding: 15px;
-            border-left: 4px solid #74b9ff;
-            border-radius: 5px;
-            transition: all 0.3s ease;
+        .accordion {
+            width: 100%;
+            border: none;
+            background: rgba(13, 138, 240, 0.08);
+            border-radius: 12px;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
         }
 
-        .rules-list li:hover {
-            background: #e3f2fd;
-            transform: translateX(5px);
+        .accordion:hover {
+            background: rgba(13, 138, 240, 0.12);
         }
 
-        .rules-list li::before {
-            content: "🏖️";
-            margin-right: 10px;
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-left: 4px;
         }
 
-        .presentation-info {
-            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: bold;
-            margin: 20px 0;
+        .accordion.open + .accordion-content {
+            padding: 10px 6px 16px;
         }
 
-        .stats {
+        form {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
+            gap: 12px;
+            margin-top: 12px;
         }
 
-        .stat-card {
-            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
+        label {
+            font-weight: 700;
+            color: #334155;
         }
 
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            display: block;
+        input,
+        select,
+        textarea {
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #d9e1ec;
+            background: #f9fbff;
+            font-size: 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--blue-500);
+            box-shadow: 0 0 0 3px rgba(13, 138, 240, 0.15);
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .status {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .status-circle {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--green-500);
+            box-shadow: 0 0 0 6px rgba(0, 184, 148, 0.15);
         }
 
         .footer {
             text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            color: #636e72;
+            color: #2f3f52;
+            opacity: 0.9;
+            margin-top: 24px;
         }
 
-        @media (max-width: 768px) {
-            .lots-table {
-                font-size: 0.9em;
+        .detail-panel {
+            margin-top: 14px;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: grid;
+            gap: 6px;
+            border: 1px dashed rgba(0, 0, 0, 0.05);
+        }
+
+        .toast {
+            position: fixed;
+            right: 20px;
+            bottom: 24px;
+            background: var(--text-dark);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 40;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 700px) {
+            .nav {
+                flex-direction: column;
+                align-items: stretch;
             }
-            
-            h1 {
-                font-size: 2em;
+
+            .cta-row {
+                flex-direction: column;
+                align-items: flex-start;
             }
-            
-            .container {
-                padding: 10px;
+
+            .nav-links {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- En-tête -->
+    <div class="page">
         <header>
-            <h1>🏝️ Résidence Thalassa</h1>
-            <p class="subtitle">Syndic de Copropriété - Île aux Bahamas</p>
+            <div class="nav">
+                <div class="brand">
+                    <span>Thalassa</span>
+                    <div>
+                        <div>Résidence Thalassa</div>
+                        <small>25 lots T4 • Port privé • Bahamas</small>
+                    </div>
+                </div>
+                <div class="nav-links">
+                    <button data-scroll="#lots">Lots</button>
+                    <button data-scroll="#equipements">Équipements</button>
+                    <button data-scroll="#reglement">Règlement</button>
+                    <button data-scroll="#contact">Contact</button>
+                </div>
+            </div>
         </header>
 
-        <!-- Présentation orale -->
-        <section class="section">
-            <div class="presentation-info">
-                📅 Présentation Orale : 28 Novembre 2024
-            </div>
-        </section>
-
-        <!-- Description de la résidence -->
-        <section class="section">
-            <h2>🏖️ Notre Résidence</h2>
-            <p>Découvrez la Résidence Thalassa, un ensemble exceptionnel de cabanons sur pilotis situé sur une magnifique île aux Bahamas. Notre copropriété offre un cadre de vie unique alliant confort moderne et beauté naturelle tropicale.</p>
-        </section>
-
-        <!-- Parties communes -->
-        <section class="section">
-            <h2>🌊 Parties Communes & Équipements</h2>
-            <div class="amenities-grid">
-                <div class="amenity-card">
-                    <h3>🛥️ Port Privé</h3>
-                    <p>1 place de bateau par cabanon</p>
-                </div>
-                <div class="amenity-card">
-                    <h3>🏖️ Plage Privée</h3>
-                    <p>Usage collectif pour tous les résidents</p>
-                </div>
-                <div class="amenity-card">
-                    <h3>🌉 Ponton</h3>
-                    <p>Accès direct à l'océan</p>
-                </div>
-                <div class="amenity-card">
-                    <h3>🏐 Beach Volley</h3>
-                    <p>Terrain sur réservation</p>
-                </div>
-                <div class="amenity-card">
-                    <h3>⛳ Golf</h3>
-                    <p>Parcours avec système de réservation</p>
+        <section class="hero" id="hero">
+            <h1>Vivez une copropriété tropicale, simple et connectée</h1>
+            <p>Une interface claire pour vos lots, vos équipements communs et vos démarches en quelques clics.</p>
+            <div class="cta-row">
+                <button class="btn btn-primary" data-scroll="#contact">🔗 Déposer une demande</button>
+                <button class="btn btn-ghost" data-scroll="#equipements">Découvrir les équipements</button>
+                <div class="status">
+                    <div class="status-circle"></div>
+                    <small>Gestion en ligne 24/7</small>
                 </div>
             </div>
         </section>
 
-        <!-- Composition de la copropriété -->
-        <section class="section">
-            <h2>🏘️ Composition de la Copropriété</h2>
-            
-            <div class="stats">
-                <div class="stat-card">
-                    <span class="stat-number">25</span>
-                    <span>Lots Total</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">T4</span>
-                    <span>Type de Logement</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">40m²</span>
-                    <span>Surface par Lot</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">1000m²</span>
-                    <span>Surface Totale</span>
-                </div>
+        <section class="section" id="equipements">
+            <h2>🏝️ Équipements & Espaces communs</h2>
+            <p>Sélectionnez un équipement pour ouvrir sa fiche détaillée.</p>
+            <div class="pill-row" id="amenities">
+                <div class="pill" data-detail="Port privé avec 25 places numérotées et badge d'accès.">⚓ Port privé</div>
+                <div class="pill" data-detail="Espace dédié avec filets réglables et éclairage nocturne.">🏐 Beach-volley</div>
+                <div class="pill" data-detail="Practice 9 trous face à l'océan et prêt de clubs.">⛳ Golf</div>
+                <div class="pill" data-detail="Plage aménagée, douche solaire et transats premium.">🏖️ Plage & ponton</div>
+                <div class="pill" data-detail="Accès fibre 1 Gb/s dans les parties communes.">📶 Wi-Fi fibre</div>
+                <div class="pill" data-detail="Sécurité renforcée, vidéosurveillance et bornes incendie.">🛟 Sécurité</div>
             </div>
+            <div class="detail-panel" id="amenity-detail">Cliquez sur un équipement pour afficher les informations clés.</div>
+        </section>
 
+        <section class="section" id="lots">
+            <h2>📑 Lots disponibles</h2>
+            <p>Tableau interactif : cliquez sur un lot pour dérouler ses informations et préremplir le formulaire.</p>
             <table class="lots-table">
                 <thead>
                     <tr>
-                        <th>Numéro de Lot</th>
-                        <th>Type</th>
-                        <th>Surface (m²)</th>
+                        <th>Lot</th>
+                        <th>Typologie</th>
+                        <th>Surface</th>
                         <th>Statut</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr><td>Lot 1</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 2</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 3</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 4</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 5</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 6</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 7</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 8</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 9</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 10</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 11</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 12</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 13</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 14</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 15</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 16</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 17</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 18</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 19</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 20</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 21</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 22</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 23</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 24</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                    <tr><td>Lot 25</td><td>T4</td><td>40</td><td>✅ Disponible</td></tr>
-                </tbody>
+                <tbody id="lots-body"></tbody>
             </table>
+            <div class="detail-panel" id="lot-detail">Sélectionnez un lot pour voir ses atouts et lancer une demande.</div>
         </section>
 
-        <!-- Règlement de copropriété -->
-        <section class="section">
+        <section class="section" id="reglement">
             <h2>📋 Règlement de Copropriété</h2>
-            <h3>🎯 Objectifs du Règlement :</h3>
-            <ul class="rules-list">
-                <li><strong>Déterminer la destination</strong> des parties tant privatives que communes</li>
-                <li><strong>Fixer les conditions</strong> de leur jouissance</li>
-                <li><strong>Établir les règles</strong> relatives à l'administration des parties communes</li>
-            </ul>
+            <p>Les points ci-dessous peuvent être dépliés : chaque ligne contient un rappel pratique.</p>
+            <button class="accordion">🎯 Destination des lieux <span>+</span></button>
+            <div class="accordion-content">
+                <div class="card">Usage résidentiel T4, affectation cabanons/port conforme à l'EDD.</div>
+            </div>
 
-            <h3>📜 Règles de Vie Commune :</h3>
-            <ul class="rules-list">
-                <li><strong>🔇 Nuisances sonores :</strong> Pas de bruit après minuit (respect du voisinage et de la faune locale)</li>
-                <li><strong>🐕 Animaux :</strong> Autorisés sous condition qu'ils ne troublent pas la tranquillité</li>
-                <li><strong>⚓ Port privé :</strong> Usage réservé aux résidents (1 place par cabanon)</li>
-                <li><strong>🏖️ Plage et ponton :</strong> Usage collectif, interdiction de privatiser des zones</li>
-                <li><strong>🏐 Activités sportives :</strong> Beach-volley & golf sur réservation par créneaux</li>
-                <li><strong>🧹 Propreté :</strong> Chaque résident veille à la propreté des lieux communs</li>
-                <li><strong>🔥 Sécurité :</strong> Interdiction de feu de camp ou barbecue hors zones prévues</li>
-            </ul>
-        </section>
+            <button class="accordion">🔇 Nuisances sonores <span>+</span></button>
+            <div class="accordion-content">
+                <div class="card">Silence après 00h00. Prévenir le voisinage pour les événements privés.</div>
+            </div>
 
-        <!-- État Descriptif de Division (EDD) -->
-        <section class="section">
-            <h2>📊 État Descriptif de Division (EDD)</h2>
-            <p>L'EDD de la Résidence Thalassa définit précisément la répartition des parties privatives et communes, garantissant une gestion transparente et équitable de notre copropriété insulaire.</p>
-            
-            <h3>Répartition des Parties :</h3>
-            <div class="stats">
-                <div class="stat-card">
-                    <span class="stat-number">70%</span>
-                    <span>Parties Privatives</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">30%</span>
-                    <span>Parties Communes</span>
-                </div>
+            <button class="accordion">🐕 Animaux <span>+</span></button>
+            <div class="accordion-content">
+                <div class="card">Animaux autorisés avec tenue en laisse dans les espaces communs.</div>
+            </div>
+
+            <button class="accordion">⚓ Port privé <span>+</span></button>
+            <div class="accordion-content">
+                <div class="card">1 place par lot, réservation via badge. Stationnement minute pour invités.</div>
+            </div>
+
+            <button class="accordion">🧹 Propreté & sécurité <span>+</span></button>
+            <div class="accordion-content">
+                <div class="card">Espaces communs maintenus par le syndic. Feux de camp et BBQ uniquement en zone dédiée.</div>
             </div>
         </section>
 
-        <!-- Localisation -->
-        <section class="section">
-            <h2>📍 Localisation</h2>
-            <p><strong>🏝️ Lieu :</strong> Île privée aux Bahamas</p>
-            <p>Notre résidence bénéficie d'un emplacement exceptionnel sur une île paradisiaque des Bahamas, offrant à nos résidents un cadre de vie unique au cœur des Caraïbes.</p>
+        <section class="section" id="contact">
+            <h2>✉️ Demande d'information</h2>
+            <p>Complétez le formulaire : le lot choisi est prérempli après sélection dans le tableau.</p>
+            <form id="contact-form">
+                <div>
+                    <label for="lot">Lot concerné</label>
+                    <select id="lot" required>
+                        <option value="">Choisissez un lot</option>
+                    </select>
+                </div>
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                    <div>
+                        <label for="name">Nom complet</label>
+                        <input id="name" type="text" placeholder="Jane Doe" required />
+                    </div>
+                    <div>
+                        <label for="email">Email</label>
+                        <input id="email" type="email" placeholder="nom@example.com" required />
+                    </div>
+                    <div>
+                        <label for="phone">Téléphone</label>
+                        <input id="phone" type="tel" placeholder="+33 6 00 00 00 00" />
+                    </div>
+                </div>
+                <div>
+                    <label for="message">Votre projet</label>
+                    <textarea id="message" placeholder="Précisez vos besoins : visite, financement, disponibilité…" required></textarea>
+                </div>
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                    <label style="display:flex;align-items:center;gap:10px;"><input type="checkbox" id="visite" /> Organiser une visite</label>
+                    <label style="display:flex;align-items:center;gap:10px;"><input type="checkbox" id="docs" /> Recevoir le règlement PDF</label>
+                    <label style="display:flex;align-items:center;gap:10px;"><input type="checkbox" id="call" /> Être rappelé par le syndic</label>
+                </div>
+                <div class="cta-row">
+                    <button type="submit" class="btn btn-primary">Envoyer ma demande</button>
+                    <button type="button" class="btn btn-ghost" id="reset-form">Réinitialiser</button>
+                </div>
+            </form>
         </section>
 
-        <!-- Pied de page -->
         <footer class="footer">
-            <p>© 2024 Résidence Thalassa - Syndic de Copropriété</p>
-            <p>🏝️ Bahamas | 🏠 25 Lots T4 | 🌊 Vie Tropical de Luxe</p>
+            <p>© 2024 Résidence Thalassa - Copropriété connectée</p>
+            <p>Bahamas • 25 lots T4 • Port privé • Services digitaux 24/7</p>
         </footer>
     </div>
 
-    <!-- Script pour des interactions simples -->
-    <script>
-        // Animation simple au survol des cartes d'équipements
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.amenity-card, .stat-card');
-            
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-10px) scale(1.05)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0) scale(1)';
-                });
-            });
+    <div class="toast" id="toast">✅ Demande envoyée avec succès</div>
 
-            // Animation pour les règles au clic
-            const rules = document.querySelectorAll('.rules-list li');
-            rules.forEach(rule => {
-                rule.addEventListener('click', function() {
-                    this.style.backgroundColor = '#74b9ff';
-                    this.style.color = 'white';
-                    setTimeout(() => {
-                        this.style.backgroundColor = '#f8f9fa';
-                        this.style.color = '#333';
-                    }, 1000);
-                });
+    <script>
+        const lots = Array.from({ length: 25 }, (_, i) => ({
+            id: i + 1,
+            type: "T4",
+            surface: 40,
+            statut: "Disponible",
+            atouts: ["Terrasse avec vue mer", "Climatisation silencieuse", "Accès direct plage"],
+        }));
+
+        const lotBody = document.getElementById("lots-body");
+        const lotDetail = document.getElementById("lot-detail");
+        const lotSelect = document.getElementById("lot");
+
+        function hydrateLots() {
+            lots.forEach((lot) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>Lot ${lot.id}</td>
+                    <td>${lot.type}</td>
+                    <td>${lot.surface} m²</td>
+                    <td><span class="badge">✅ ${lot.statut}</span></td>
+                `;
+                row.addEventListener("click", () => showLotDetail(lot));
+                lotBody.appendChild(row);
+
+                const option = document.createElement("option");
+                option.value = `Lot ${lot.id}`;
+                option.textContent = `Lot ${lot.id} - ${lot.surface} m² (${lot.type})`;
+                lotSelect.appendChild(option);
+            });
+        }
+
+        function showLotDetail(lot) {
+            lotDetail.innerHTML = `
+                <strong>Lot ${lot.id}</strong> · ${lot.surface} m² · ${lot.type}<br>
+                Atouts : ${lot.atouts.join(", ")}<br>
+                <button class="btn btn-primary" style="margin-top:10px;" data-scroll="#contact">Préremplir le formulaire</button>
+            `;
+            lotSelect.value = `Lot ${lot.id}`;
+            handleSmoothScroll("#contact");
+        }
+
+        function handleSmoothScroll(target) {
+            const el = document.querySelector(target);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }
+
+        document.querySelectorAll("[data-scroll]").forEach((btn) => {
+            btn.addEventListener("click", () => handleSmoothScroll(btn.dataset.scroll));
+        });
+
+        const pills = document.querySelectorAll(".pill");
+        const amenityDetail = document.getElementById("amenity-detail");
+        pills.forEach((pill) => {
+            pill.addEventListener("click", () => {
+                pills.forEach((p) => p.classList.remove("active"));
+                pill.classList.add("active");
+                amenityDetail.textContent = pill.dataset.detail;
             });
         });
+
+        document.querySelectorAll(".accordion").forEach((accordion) => {
+            accordion.addEventListener("click", () => {
+                const content = accordion.nextElementSibling;
+                const isOpen = accordion.classList.contains("open");
+                accordion.classList.toggle("open");
+                accordion.querySelector("span").textContent = isOpen ? "+" : "−";
+                content.style.maxHeight = isOpen ? null : `${content.scrollHeight}px`;
+            });
+        });
+
+        const form = document.getElementById("contact-form");
+        const toast = document.getElementById("toast");
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2800);
+            form.reset();
+        });
+
+        document.getElementById("reset-form").addEventListener("click", () => {
+            form.reset();
+            lotSelect.value = "";
+        });
+
+        hydrateLots();
     </script>
 </body>
 </html>
