@@ -435,13 +435,13 @@
             <p>Une interface claire pour vos lots, vos équipements communs et vos démarches en quelques clics.</p>
             <div class="cta-row">
                 <button class="btn btn-primary" data-scroll="#contact">🔗 Déposer une demande</button>
-                <button class="btn btn-ghost" data-scroll="#equipements">Découvrir les équipements</button>
-                <div class="status">
-                    <div class="status-circle"></div>
-                    <small>Gestion en ligne 24/7</small>
-                </div>
+            <button class="btn btn-ghost" data-scroll="#equipements">Découvrir les équipements</button>
+            <div class="status">
+                <div class="status-circle"></div>
+                <small>Gestion en ligne 24/7</small>
             </div>
-        </section>
+        </div>
+    </section>
 
         <section class="section" id="equipements">
             <h2>🏝️ Équipements & Espaces communs</h2>
@@ -477,6 +477,10 @@
         <section class="section" id="reglement">
             <h2>📋 Règlement de Copropriété</h2>
             <p>Les points ci-dessous peuvent être dépliés : chaque ligne contient un rappel pratique.</p>
+            <div class="cta-row" style="margin: 10px 0 16px;">
+                <button class="btn btn-primary" id="download-reglement">⬇️ Télécharger le règlement PDF</button>
+                <small style="color:#4a5568;">Une version PDF est générée automatiquement pour vos dossiers.</small>
+            </div>
             <button class="accordion">🎯 Destination des lieux <span>+</span></button>
             <div class="accordion-content">
                 <div class="card">Usage résidentiel T4, affectation cabanons/port conforme à l'EDD.</div>
@@ -539,8 +543,42 @@
                 <div class="cta-row">
                     <button type="submit" class="btn btn-primary">Envoyer ma demande</button>
                     <button type="button" class="btn btn-ghost" id="reset-form">Réinitialiser</button>
+                    <small id="autosave-status" style="color:#4a5568;">Sauvegarde automatique activée.</small>
                 </div>
             </form>
+        </section>
+
+        <section class="section" id="admin">
+            <h2>🔐 Espace administrateur</h2>
+            <p>Connectez-vous pour consulter les demandes d'information enregistrées hors connexion.</p>
+            <form id="admin-login" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                <div>
+                    <label for="admin-user">Identifiant</label>
+                    <input id="admin-user" type="text" placeholder="Utilisateur" required />
+                </div>
+                <div>
+                    <label for="admin-pass">Mot de passe</label>
+                    <input id="admin-pass" type="password" placeholder="Mot de passe" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Se connecter</button>
+            </form>
+            <div id="admin-message" style="margin-top:10px; color:#d9534f;"></div>
+            <div id="admin-panel" style="display:none; margin-top:16px;">
+                <div class="card" style="margin-bottom:10px;">Demandes reçues (stockées localement pour consultation sans connexion).</div>
+                <table class="lots-table" id="requests-table">
+                    <thead>
+                        <tr>
+                            <th>Lot</th>
+                            <th>Nom</th>
+                            <th>Contact</th>
+                            <th>Projet</th>
+                            <th>Options</th>
+                            <th>Horodatage</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </section>
 
         <footer class="footer">
@@ -563,6 +601,17 @@
         const lotBody = document.getElementById("lots-body");
         const lotDetail = document.getElementById("lot-detail");
         const lotSelect = document.getElementById("lot");
+        const autosaveStatus = document.getElementById("autosave-status");
+        const storageKeys = {
+            draft: "thalassa-draft",
+            requests: "thalassa-requests",
+        };
+
+        const adminPanel = document.getElementById("admin-panel");
+        const adminMessage = document.getElementById("admin-message");
+        const requestsTableBody = document.querySelector("#requests-table tbody");
+
+        const reglementBtn = document.getElementById("download-reglement");
 
         function hydrateLots() {
             lots.forEach((lot) => {
@@ -583,6 +632,42 @@
             });
         }
 
+        function loadRequests() {
+            try {
+                return JSON.parse(localStorage.getItem(storageKeys.requests)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveRequests(requests) {
+            localStorage.setItem(storageKeys.requests, JSON.stringify(requests));
+        }
+
+        function renderRequests() {
+            requestsTableBody.innerHTML = "";
+            const requests = loadRequests();
+            if (!requests.length) {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td colspan="6" style="text-align:center; color:#4a5568;">Aucune demande enregistrée pour le moment.</td>`;
+                requestsTableBody.appendChild(row);
+                return;
+            }
+
+            requests.forEach((req) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${req.lot}</td>
+                    <td>${req.name}</td>
+                    <td>${req.email}<br>${req.phone || ""}</td>
+                    <td>${req.message}</td>
+                    <td>${req.options.join(", ") || "-"}</td>
+                    <td>${new Date(req.timestamp).toLocaleString()}</td>
+                `;
+                requestsTableBody.appendChild(row);
+            });
+        }
+
         function showLotDetail(lot) {
             lotDetail.innerHTML = `
                 <strong>Lot ${lot.id}</strong> · ${lot.surface} m² · ${lot.type}<br>
@@ -598,6 +683,23 @@
             if (el) {
                 el.scrollIntoView({ behavior: "smooth", block: "start" });
             }
+        }
+
+        function downloadReglement() {
+            const base64Pdf = "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL01lZGlhQm94WzAgMCA2MTIgNzkyXS9Db250ZW50cyA0IDAgUi9SZXNvdXJjZXM8PC9Gb250PDwvRjEgNSAwIFI+Pj4+Pj4KZW5kb2JqCjQgMCBvYmoKPDwvTGVuZ3RoIDU2Pj4Kc3RyZWFtCkJUIEZMIDMyIFRmIDUwIDcyMCBUZCAoUmVnbGVtZW50IGRlIGNvcHJvcHJpZXRlIC0gUmVzaWRlbmNlIFRoYWxhc3NhKSBUaiBFVApCVCBGMSAxMiBUZiA1MCA2ODAgVGQgKFVzYWdlIHJlcy4gVDRzLCBwcm9wcmllc2l0ZSwgYWNjZXMgYXUgYmFkZ2UpIFRqIEVUCkJUIEYxIDEyIFRmIDUwIDY0MCBUZCAoU2VjdXJpdGUgZXQgcXVpZXR1ZSwgcGxhY2UgZGUgcG9ydCwgcHJvYmFsaXRlIGR1IHNpZ25hbC4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKNSAwIG9iago8PC9UeXBlL0ZvbnQvU3VidHlwZS9UeXBlMS9CYXNlRm9udC9IZWx2ZXRpY2E+PgplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDEwIDAwMDAwIG4gCjAwMDAwMDAwNzYgMDAwMDAgbiAKMDAwMDAwMDE5NCAwMDAwMCBuIAowMDAwMDAwMjY0IDAwMDAwIG4gCjAwMDAwMDAzNTIgMDAwMDAgbiAKdHJhaWxlcgo8PC9TaXplIDYvUm9vdCAxIDAgUj4+CnN0YXJ0eHJlZgowNDIyCiUlRU9G";
+            const binary = atob(base64Pdf);
+            const len = binary.length;
+            const buffer = new Uint8Array(len);
+            for (let i = 0; i < len; i++) buffer[i] = binary.charCodeAt(i);
+            const blob = new Blob([buffer], { type: "application/pdf" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "reglement-thalassa.pdf";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
         document.querySelectorAll("[data-scroll]").forEach((btn) => {
@@ -626,20 +728,108 @@
 
         const form = document.getElementById("contact-form");
         const toast = document.getElementById("toast");
+        const adminLogin = document.getElementById("admin-login");
+
+        function saveDraft() {
+            const draft = {
+                lot: lotSelect.value,
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                message: document.getElementById("message").value,
+                visite: document.getElementById("visite").checked,
+                docs: document.getElementById("docs").checked,
+                call: document.getElementById("call").checked,
+            };
+            localStorage.setItem(storageKeys.draft, JSON.stringify(draft));
+            if (autosaveStatus) {
+                autosaveStatus.textContent = `Dernière sauvegarde : ${new Date().toLocaleTimeString()}`;
+            }
+        }
+
+        function restoreDraft() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(storageKeys.draft));
+                if (!saved) return;
+                lotSelect.value = saved.lot || "";
+                document.getElementById("name").value = saved.name || "";
+                document.getElementById("email").value = saved.email || "";
+                document.getElementById("phone").value = saved.phone || "";
+                document.getElementById("message").value = saved.message || "";
+                document.getElementById("visite").checked = !!saved.visite;
+                document.getElementById("docs").checked = !!saved.docs;
+                document.getElementById("call").checked = !!saved.call;
+                if (autosaveStatus) autosaveStatus.textContent = "Brouillon rechargé automatiquement.";
+            } catch (e) {
+                // ignore corrupted drafts
+            }
+        }
+
+        function clearDraft() {
+            localStorage.removeItem(storageKeys.draft);
+            if (autosaveStatus) autosaveStatus.textContent = "Sauvegarde automatique activée.";
+        }
 
         form.addEventListener("submit", (e) => {
             e.preventDefault();
+            const request = {
+                lot: lotSelect.value || "Non précisé",
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                message: document.getElementById("message").value,
+                options: [
+                    document.getElementById("visite").checked ? "Visite" : null,
+                    document.getElementById("docs").checked ? "PDF règlement" : null,
+                    document.getElementById("call").checked ? "Rappel" : null,
+                ].filter(Boolean),
+                timestamp: Date.now(),
+            };
+
+            const requests = loadRequests();
+            requests.push(request);
+            saveRequests(requests);
+            renderRequests();
+
+            if (document.getElementById("docs").checked) {
+                downloadReglement();
+            }
+
             toast.classList.add("show");
             setTimeout(() => toast.classList.remove("show"), 2800);
             form.reset();
+            clearDraft();
         });
 
         document.getElementById("reset-form").addEventListener("click", () => {
             form.reset();
             lotSelect.value = "";
+            clearDraft();
+        });
+
+        reglementBtn.addEventListener("click", downloadReglement);
+
+        form.addEventListener("input", saveDraft);
+        setInterval(saveDraft, 30000);
+
+        adminLogin.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const user = document.getElementById("admin-user").value;
+            const pass = document.getElementById("admin-pass").value;
+            if (user === "TALASSA" && pass === "TALASSAVIVEZLEREVE") {
+                adminMessage.style.color = "#2e7d32";
+                adminMessage.textContent = "Connexion réussie. Demandes disponibles ci-dessous.";
+                adminPanel.style.display = "block";
+                renderRequests();
+            } else {
+                adminMessage.style.color = "#d9534f";
+                adminMessage.textContent = "Identifiants incorrects : accès refusé.";
+                adminPanel.style.display = "none";
+            }
         });
 
         hydrateLots();
+        restoreDraft();
     </script>
 </body>
 </html>
