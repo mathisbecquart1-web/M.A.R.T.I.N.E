@@ -724,6 +724,20 @@
             background: rgba(102, 126, 234, 0.05);
         }
 
+        .row-selected {
+            outline: 2px solid #28a745;
+            outline-offset: -2px;
+            background: rgba(40, 167, 69, 0.08) !important;
+        }
+
+        .excel-preview-table td.dragover {
+            background: rgba(118, 75, 162, 0.15);
+        }
+
+        .excel-preview-table td.dragging {
+            opacity: 0.7;
+        }
+
         /* ✏️ CELLULES ÉDITABLES */
         .editable-cell {
             position: relative;
@@ -1124,11 +1138,21 @@
             margin-bottom: 30px;
         }
 
+        .stats-dashboard.task-layout {
+            grid-template-columns: minmax(620px, 2.6fr) minmax(260px, 1fr);
+            align-items: stretch;
+        }
+
         .stats-card {
             background: white;
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .stats-card.task-stats-card {
+            max-width: 420px;
+            justify-self: stretch;
         }
 
         .stats-card.collapsible {
@@ -1340,21 +1364,39 @@
             backdrop-filter: blur(5px);
         }
 
+        @media (max-width: 1200px) {
+            .stats-dashboard.task-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-card.task-stats-card {
+                max-width: none;
+            }
+        }
+
         /* 📱 RESPONSIVE */
         @media (max-width: 768px) {
             .filters-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .import-methods {
                 grid-template-columns: 1fr;
             }
-            
+
             .controls {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
+            .excel-import-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .excel-preview-scroll {
+                max-height: none;
+            }
+
             .preview-content {
                 max-width: 98%;
                 max-height: 95%;
@@ -1410,6 +1452,58 @@
             gap: 8px;
         }
 
+        .excel-import-layout {
+            display: grid;
+            grid-template-columns: minmax(420px, 1fr) minmax(520px, 1.15fr);
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .excel-import-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .excel-preview-panel {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #dfe4ff;
+            padding: 20px;
+            box-shadow: 0 18px 35px rgba(24, 39, 75, 0.12);
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .excel-preview-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .excel-preview-panel-header h5 {
+            font-size: 16px;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .excel-preview-helper {
+            font-size: 12px;
+            color: #556;
+        }
+
+        .excel-preview-scroll {
+            max-height: 720px;
+            overflow: auto;
+            border-radius: 10px;
+            border: 1px solid #e3e8ff;
+            background: linear-gradient(180deg, #fdfdff 0%, #f3f5ff 100%);
+        }
+
         .excel-paste-area {
             width: 100%;
             min-height: 110px;
@@ -1440,31 +1534,39 @@
         }
 
         .excel-preview-container {
-            background: white;
+            background: transparent;
             border-radius: 10px;
-            border: 1px solid #e0e7ff;
             padding: 12px;
             overflow-x: auto;
         }
 
         .excel-preview-table {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
+            min-width: 640px;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 15px;
+            line-height: 1.5;
         }
 
         .excel-preview-table th,
         .excel-preview-table td {
-            border: 1px solid #edf2ff;
-            padding: 6px 8px;
+            border: 1px solid #e1e6ff;
+            padding: 12px 14px;
             text-align: left;
+            white-space: normal;
+            word-break: break-word;
         }
 
         .excel-preview-table th {
-            background: #f3f5ff;
-            position: relative;
+            background: linear-gradient(120deg, #eef1ff, #f9fbff);
+            position: sticky;
+            top: 0;
             cursor: move;
             user-select: none;
+            font-size: 13px;
+            color: #2c3e50;
+            z-index: 2;
         }
 
         .drag-handle {
@@ -1473,9 +1575,46 @@
             margin-right: 6px;
         }
 
+        .excel-row-number-header,
+        .excel-row-number {
+            position: sticky;
+            left: 0;
+            background: #f4f6ff;
+            z-index: 3;
+            font-weight: 600;
+            color: #4a5bbd;
+            text-align: right;
+        }
+
+        .excel-row-number {
+            cursor: default;
+        }
+
+        .excel-preview-table th.excel-row-number-header {
+            cursor: default;
+        }
+
         .excel-preview-table th.dragging {
             opacity: 0.6;
             background: #e0e7ff;
+        }
+
+        .excel-preview-table tbody tr:nth-child(odd) {
+            background: rgba(248, 249, 255, 0.9);
+        }
+
+        .excel-preview-table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.12);
+        }
+
+        .excel-preview-scroll::-webkit-scrollbar {
+            height: 10px;
+            width: 10px;
+        }
+
+        .excel-preview-scroll::-webkit-scrollbar-thumb {
+            background: #b7c1ff;
+            border-radius: 999px;
         }
 
         .excel-preview-meta {
@@ -1508,135 +1647,7 @@
             color: #2c3e50;
         }
 
-        .excel-mapping-workbench {
-            margin-top: 16px;
-            border: 1px solid #dfe4ff;
-            border-radius: 12px;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .excel-mapping-title {
-            font-size: 13px;
-            margin-bottom: 12px;
-            color: #2f365f;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .excel-mapping-grid {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .excel-mapping-column {
-            flex: 1;
-            min-width: 260px;
-        }
-
-        .excel-mapping-column h5 {
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #2c3e50;
-        }
-
-        .excel-drop-zones {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .excel-drop-field {
-            border: 1px dashed #b9c2ff;
-            border-radius: 10px;
-            padding: 10px;
-            background: #f7f8ff;
-            min-height: 64px;
-            transition: background 0.2s ease, border-color 0.2s ease;
-        }
-
-        .excel-drop-field span {
-            display: block;
-            font-weight: 600;
-            color: #2f365f;
-            margin-bottom: 6px;
-        }
-
-        .excel-drop-field.drag-over {
-            background: #eef2ff;
-            border-color: #6b75ff;
-            box-shadow: inset 0 0 0 1px #6b75ff33;
-        }
-
-        .excel-drop-field.filled {
-            border-style: solid;
-            background: #fff;
-        }
-
-        .excel-column-pool {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .excel-column-pool.drag-over {
-            background: #f5f6ff;
-            border-radius: 12px;
-            padding: 6px;
-        }
-
-        .excel-column-card {
-            border: 1px solid #cad1ff;
-            border-radius: 10px;
-            padding: 10px;
-            background: #fff;
-            cursor: grab;
-            min-width: 140px;
-            flex: 1 1 180px;
-            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .excel-column-card strong {
-            display: block;
-            color: #2c3e50;
-            margin-bottom: 4px;
-        }
-
-        .excel-column-card small {
-            display: block;
-            color: #5b6096;
-            font-size: 12px;
-        }
-
-        .excel-column-card.dragging {
-            opacity: 0.6;
-            transform: scale(0.97);
-            box-shadow: 0 8px 14px rgba(0, 0, 0, 0.15);
-        }
-
-        .excel-unassign-zone {
-            margin-top: 10px;
-            border: 1px dashed #ffbdbd;
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-            color: #c0392b;
-            font-size: 13px;
-        }
-
-        .excel-unassign-zone.drag-over {
-            background: #fff5f5;
-            border-color: #ff6b6b;
-        }
-
-        .excel-mapping-empty {
-            text-align: center;
-            padding: 15px;
-            color: #667;
-        }
+        /* Zone de mapping masquée */
 
         .excel-preview-empty {
             text-align: center;
@@ -1788,6 +1799,7 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('creation')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('creation')">📊 Exporter Excel</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('creation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('creation')">🗑️ Effacer tout</button>
             </div>
 
@@ -1906,6 +1918,7 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('modification')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modification')">📊 Exporter Excel</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('modification')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modification')">🗑️ Effacer tout</button>
             </div>
 
@@ -2024,6 +2037,7 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('resiliation')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('resiliation')">📊 Exporter Excel</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('resiliation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('resiliation')">🗑️ Effacer tout</button>
             </div>
 
@@ -2140,6 +2154,7 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('autremodif')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('autremodif')">📊 Exporter Excel</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('autremodif')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('autremodif')">🗑️ Effacer tout</button>
             </div>
 
@@ -2254,6 +2269,7 @@
                 <button class="btn btn-primary" onclick="addRow('modifsurface')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modifsurface')">📊 Exporter Excel</button>
                 <button class="btn btn-warning" onclick="recalculateAllSurfaces()">🔄 Recalculer toutes les différences</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('modifsurface')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modifsurface')">🗑️ Effacer tout</button>
             </div>
 
@@ -2376,6 +2392,7 @@
                 <button class="btn btn-excel" onclick="exportToExcel('verifbaux')">📊 Exporter Excel</button>
                 <button class="btn btn-warning" onclick="validateAllBauxStates()">🔍 Valider tous les états</button>
                 <button class="btn btn-success" onclick="markAllAsOK()">✅ Marquer sélection OK</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('verifbaux')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('verifbaux')">🗑️ Effacer tout</button>
             </div>
 
@@ -2464,6 +2481,7 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('pni')">➕ Ajouter ligne</button>
                 <button class="btn btn-excel" onclick="exportToExcel('pni')">📊 Exporter Excel</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('pni')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('pni')">🗑️ Effacer tout</button>
             </div>
 
@@ -2630,7 +2648,9 @@
                 <button class="btn btn-warning" onclick="validateAllRGCodes()">🔍 Vérifier codes RG dans tous les onglets</button>
                 <button class="btn btn-success" onclick="buildRGDatabase()">🔄 Reconstruire index RG</button>
                 <button class="btn btn-success" onclick="buildUTDatabase()">🔄 Reconstruire index UT</button>
-                <button class="btn btn-danger" onclick="clearAll('baserg')">🗑️ Effacer tout</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('baserg')">🗑️ Supprimer sélection RG</button>
+                <button class="btn btn-danger" onclick="clearAll('baserg')">🗑️ Effacer tout RG</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('baseut')">🗑️ Supprimer sélection UT</button>
                 <button class="btn btn-danger" onclick="clearAll('baseut')">🗑️ Effacer Base UT</button>
             </div>
 
@@ -2689,7 +2709,7 @@
 
         <!-- ONGLET TÂCHES À FAIRE -->
         <div id="taches" class="tab-content">
-            <div class="stats-dashboard">
+            <div class="stats-dashboard task-layout">
                 <div class="stats-card">
                     <h3>📝 Créer une nouvelle tâche</h3>
                     <div class="task-form">
@@ -2734,47 +2754,59 @@
                         </div>
 
                         <div class="excel-import" id="excelImportSection">
-                            <h4>📋 Import rapide par copier/coller Excel</h4>
-                            <p style="font-size: 13px; color: #555; margin-bottom: 10px;">
-                                Collez vos lignes depuis Excel, réorganisez les colonnes par glisser-déposer puis créez automatiquement autant de tâches que de lignes importées.
-                            </p>
-                            <div class="excel-field-hints" id="excelFieldHints">
-                                <div class="excel-preview-empty" style="padding: 8px;">
-                                    Sélectionnez un onglet pour voir l'ordre attendu des colonnes.
+                            <div class="excel-import-layout">
+                                <div class="excel-import-form">
+                                    <div>
+                                        <h4>📋 Import rapide par copier/coller Excel</h4>
+                                        <p style="font-size: 13px; color: #555; margin-bottom: 10px;">
+                                            Collez vos lignes depuis Excel, réorganisez les colonnes par glisser-déposer puis créez automatiquement autant de tâches que de lignes importées.
+                                        </p>
+                                    </div>
+                                    <div class="excel-field-hints" id="excelFieldHints">
+                                        <div class="excel-preview-empty" style="padding: 8px;">
+                                            Sélectionnez un onglet pour voir l'ordre attendu des colonnes.
+                                        </div>
+                                    </div>
+                                    <textarea id="excelPasteArea" class="excel-paste-area" placeholder="GA[TAB]Date Demande[TAB]..."></textarea>
+                                    <div class="excel-import-actions">
+                                        <button class="btn btn-secondary" id="excelPreviewBtn" onclick="handleExcelPastePreview()">
+                                            👀 Prévisualiser
+                                        </button>
+                                        <button class="btn btn-danger" type="button" onclick="resetExcelImportArea()">
+                                            ♻️ Effacer l'import
+                                        </button>
+                                        <button class="btn btn-success" id="excelImportBtn" onclick="createTasksFromExcelImport()" disabled>
+                                            📥 Créer des tâches depuis l'import
+                                        </button>
+                                        <button class="btn btn-secondary" id="excelBatchImportBtn" onclick="addImportToBatch()" disabled>
+                                            📦 Ajouter l'import au lot actif
+                                        </button>
+                                        <label class="excel-option">
+                                            <input type="checkbox" id="excelSkipHeader" checked onchange="updateExcelImportButtons()">
+                                            Ignorer la première ligne (entêtes)
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
-                            <textarea id="excelPasteArea" class="excel-paste-area" placeholder="GA[TAB]Date Demande[TAB]..."></textarea>
-                            <div class="excel-import-actions">
-                                <button class="btn btn-secondary" id="excelPreviewBtn" onclick="handleExcelPastePreview()">
-                                    👀 Prévisualiser
-                                </button>
-                                <button class="btn btn-danger" type="button" onclick="resetExcelImportArea()">
-                                    ♻️ Effacer l'import
-                                </button>
-                                <button class="btn btn-success" id="excelImportBtn" onclick="createTasksFromExcelImport()" disabled>
-                                    📥 Créer des tâches depuis l'import
-                                </button>
-                                <label class="excel-option">
-                                    <input type="checkbox" id="excelSkipHeader" checked onchange="updateExcelImportButtons()">
-                                    Ignorer la première ligne (entêtes)
-                                </label>
-                            </div>
-                            <div class="excel-preview-meta" id="excelPreviewMeta">Aucun aperçu pour le moment.</div>
-                            <div id="excelPreviewContainer" class="excel-preview-container">
-                                <div class="excel-preview-empty">
-                                    Collez vos données pour voir un aperçu interactif.
-                                </div>
-                            </div>
-                            <div id="excelMappingWorkbench" class="excel-mapping-workbench">
-                                <div class="excel-mapping-empty">
-                                    Sélectionnez un onglet et collez des données pour organiser vos colonnes par glisser-déposer.
+                                <div class="excel-preview-panel">
+                                    <div class="excel-preview-panel-header">
+                                        <h5>Tableau de prévisualisation</h5>
+                                        <span class="excel-preview-helper">Restez sur le formulaire tout en parcourant vos lignes importées.</span>
+                                    </div>
+                                    <div class="excel-preview-meta" id="excelPreviewMeta">Aucun aperçu pour le moment.</div>
+                                    <div class="excel-preview-scroll">
+                                        <div id="excelPreviewContainer" class="excel-preview-container">
+                                            <div class="excel-preview-empty">
+                                                Collez vos données pour voir un aperçu interactif.
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="stats-card">
+                <div class="stats-card task-stats-card">
                     <h3>📊 Statistiques des tâches</h3>
                     <div style="text-align: center; margin-bottom: 20px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
@@ -2785,6 +2817,10 @@
                             <div>
                                 <div class="preview-stat-number success" id="completedTasksCount">0</div>
                                 <div class="preview-stat-label">Complétées</div>
+                            </div>
+                            <div>
+                                <div class="preview-stat-number" id="lotTasksCount">0</div>
+                                <div class="preview-stat-label">Dans les lots</div>
                             </div>
                             <div>
                                 <div class="preview-stat-number" id="totalTasksCount">0</div>
@@ -3187,6 +3223,8 @@
             </div>
         </div>
     </div>
+
+    
 
     <!-- CRÉDIT PRODUCTEUR -->
     <div class="producer-credit">
@@ -7934,6 +7972,14 @@ function updateTabsChart() {
 
             const thead = document.createElement('thead');
             const headRow = document.createElement('tr');
+
+            const rowNumberHeader = document.createElement('th');
+            rowNumberHeader.textContent = '#';
+            rowNumberHeader.className = 'excel-row-number-header';
+            rowNumberHeader.setAttribute('aria-label', 'Numéro de ligne');
+            rowNumberHeader.draggable = false;
+            headRow.appendChild(rowNumberHeader);
+
             excelPreviewColumnOrder.forEach((columnIndex, orderIndex) => {
                 const th = document.createElement('th');
                 th.setAttribute('draggable', 'true');
@@ -7950,8 +7996,14 @@ function updateTabsChart() {
             table.appendChild(thead);
 
             const tbody = document.createElement('tbody');
-            excelPreviewData.slice(0, previewLimit).forEach(row => {
+            excelPreviewData.slice(0, previewLimit).forEach((row, rowIndex) => {
                 const tr = document.createElement('tr');
+
+                const numberCell = document.createElement('td');
+                numberCell.className = 'excel-row-number';
+                numberCell.textContent = `${rowIndex + 1}`.padStart(2, '0');
+                tr.appendChild(numberCell);
+
                 excelPreviewColumnOrder.forEach(columnIndex => {
                     const td = document.createElement('td');
                     td.textContent = row[columnIndex] || '';
