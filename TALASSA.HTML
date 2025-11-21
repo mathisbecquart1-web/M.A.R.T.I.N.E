@@ -53,6 +53,22 @@
       box-shadow: var(--shadow);
     }
 
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: inherit;
+      padding: 8px 10px;
+      border-radius: 10px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .nav-links a:hover { background: rgba(15, 123, 255, 0.08); color: var(--text); }
+
     .brand {
       display: flex;
       gap: 12px;
@@ -132,6 +148,19 @@
       color: var(--muted);
     }
 
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+    .kpi {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 6px;
+    }
+    .kpi .label { color: var(--muted); font-size: 13px; }
+    .kpi .value { font-size: 22px; font-weight: 800; color: var(--text); }
+
     .lot-toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
     .filter {
       padding: 8px 12px;
@@ -167,6 +196,34 @@
     .b-indispo { background: var(--red); }
 
     .meta { color: var(--muted); font-size: 14px; }
+
+    .tab-wrapper { margin: 18px 0; }
+    .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+    .tab {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.05);
+      background: rgba(255,255,255,0.8);
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .tab.active { background: linear-gradient(135deg, rgba(15,123,255,0.1), rgba(130,69,255,0.12)); color: var(--text); border-color: rgba(15,123,255,0.22); }
+
+    .tab-panels { margin-top: 12px; }
+    .tab-panel { display: none; background: rgba(255,255,255,0.88); border-radius: 14px; padding: 14px; border: 1px solid rgba(0,0,0,0.04); box-shadow: var(--shadow); }
+    .tab-panel.active { display: grid; gap: 10px; }
+
+    .accordion { border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; overflow: hidden; }
+    .accordion-item + .accordion-item { border-top: 1px solid rgba(0,0,0,0.05); }
+    .accordion-header { padding: 12px 14px; background: rgba(255,255,255,0.85); display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 700; }
+    .accordion-content { padding: 0 14px 14px; display: none; color: var(--muted); line-height: 1.5; }
+    .accordion-item.open .accordion-content { display: block; }
+
+    .badge-soft { padding: 6px 10px; border-radius: 10px; background: rgba(15,123,255,0.08); color: var(--blue); font-weight: 700; }
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .card-sm { background: rgba(255,255,255,0.9); border-radius: 12px; padding: 12px; border: 1px solid rgba(0,0,0,0.05); box-shadow: var(--shadow); display: grid; gap: 6px; }
+    .flag { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; }
 
     form { display: grid; gap: 14px; }
     label { display: grid; gap: 6px; font-weight: 700; color: var(--text); }
@@ -228,6 +285,14 @@
           <div class="pill">Île aux Bahamas</div>
           <div>Résidence Thalassa</div>
         </div>
+        <div class="nav-links">
+          <a href="#hero">Accueil</a>
+          <a href="#tabs">Onglets</a>
+          <a href="#lots">Lots</a>
+          <a href="#services">Services</a>
+          <a href="#agenda">Agenda</a>
+          <a href="#faq">FAQ</a>
+        </div>
         <div class="nav-actions">
           <button class="btn-ghost" onclick="downloadReglement()">📄 Télécharger le règlement</button>
           <button class="btn-primary" onclick="openAdmin()">🔐 Espace administrateur</button>
@@ -235,7 +300,7 @@
       </div>
     </header>
 
-    <section class="hero">
+    <section id="hero" class="hero">
       <div>
         <h1>Cabanons sur pilotis · résidence privée & partagée</h1>
         <p>Plage, ponton, terrain de beach-volley et golf, port privatif : la copropriété Thalassa offre un cadre exceptionnel pour vivre le rêve des Bahamas. Suivez les disponibilités, demandez des informations et laissez l'équipe gérer les lots en temps réel.</p>
@@ -246,9 +311,50 @@
         <div class="chip">Règlement clair · respect de la faune</div>
         <div class="chip">Administration sécurisée TALASSA</div>
       </div>
+      <div class="kpis" id="kpiRow"></div>
     </section>
 
-    <section class="section">
+    <section id="tabs" class="section">
+      <div class="tab-wrapper">
+        <div class="tabs" id="tabsNav"></div>
+        <div class="tab-panels" id="tabsPanels"></div>
+      </div>
+    </section>
+
+    <section class="section" id="services">
+      <h2>Services sur site et confort quotidien</h2>
+      <p class="subtitle">Des onglets dédiés aux loisirs, à la logistique et aux garanties pour un site digne d'un vrai resort.</p>
+      <div class="grid-cards" id="servicesGrid"></div>
+    </section>
+
+    <section class="section" id="agenda">
+      <h2>Agenda & jalons</h2>
+      <p class="subtitle">Toutes les étapes pour la présentation orale du 28 novembre et le suivi de la copropriété.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🎤 Présentation orale</div>
+          <div class="meta">28 novembre · Copro physiquement</div>
+          <div class="badge-soft">Salle & lieu confirmés une semaine avant</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📑 Règlement</div>
+          <div class="meta">Niveau 5/6 · EDD et composition inclus</div>
+          <div class="badge-soft">Téléchargeable, mis à jour à chaque révision</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🛥️ Parties communes</div>
+          <div class="meta">Ponton, plage, port privatif, terrains sportifs</div>
+          <div class="badge-soft">Définition & conditions de jouissance</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📌 Lieu</div>
+          <div class="meta">Île aux Bahamas · Résidence Thalassa</div>
+          <div class="badge-soft">Accès bateau + aérien détaillé dans les onglets</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="lots">
       <div class="lot-toolbar">
         <h2>Lots disponibles / indisponibles</h2>
         <div class="pill-list">
@@ -260,6 +366,7 @@
         </div>
       </div>
       <div id="lotGrid" class="lot-grid"></div>
+      <div style="margin-top:14px;" id="lotFocus" class="section" aria-live="polite"></div>
     </section>
 
     <section class="section">
@@ -318,6 +425,11 @@
       </div>
     </section>
 
+    <section class="section" id="faq">
+      <h2>Questions fréquentes</h2>
+      <div class="accordion" id="faqAccordion"></div>
+    </section>
+
     <section id="adminPanel" class="section hidden">
       <div class="admin-bar">
         <h2>Administration TALASSA</h2>
@@ -343,13 +455,84 @@
     const draftKey = 'thalassa_draft_v2';
     let filter = 'all';
     let isAdmin = false;
-    const defaultLots = Array.from({ length: 25 }, (_, i) => ({
-      id: i + 1,
-      nom: `Lot ${i + 1}`,
-      type: 'T4',
-      surface: '40 m²',
-      statut: 'Disponible'
-    }));
+    const defaultLots = [
+      { id: 1, nom: 'Lot 1', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Accès direct au ponton' },
+      { id: 2, nom: 'Lot 2', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Proche plage principale' },
+      { id: 3, nom: 'Lot 3', type: 'T4', surface: '40 m²', statut: 'Réservé', vue: 'Lagune', note: 'Exposé coucher de soleil' },
+      { id: 4, nom: 'Lot 4', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Calme, proche golf' },
+      { id: 5, nom: 'Lot 5', type: 'T4', surface: '40 m²', statut: 'Indisponible', vue: 'Océan', note: 'Rénovation en cours' },
+      { id: 6, nom: 'Lot 6', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Pontons privés à 50 m' },
+      { id: 7, nom: 'Lot 7', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Prêt pour emménagement' },
+      { id: 8, nom: 'Lot 8', type: 'T4', surface: '40 m²', statut: 'Réservé', vue: 'Océan', note: 'Double terrasse' },
+      { id: 9, nom: 'Lot 9', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Idéal famille' },
+      { id: 10, nom: 'Lot 10', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Accès plage nord' },
+      { id: 11, nom: 'Lot 11', type: 'T4', surface: '40 m²', statut: 'Indisponible', vue: 'Jardin', note: 'Maintenance' },
+      { id: 12, nom: 'Lot 12', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Couchers de soleil' },
+      { id: 13, nom: 'Lot 13', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Ombre et fraîcheur' },
+      { id: 14, nom: 'Lot 14', type: 'T4', surface: '40 m²', statut: 'Réservé', vue: 'Océan', note: 'Vue panoramique' },
+      { id: 15, nom: 'Lot 15', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Pontons secondaires' },
+      { id: 16, nom: 'Lot 16', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Proche terrain de golf' },
+      { id: 17, nom: 'Lot 17', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Terrasse XL' },
+      { id: 18, nom: 'Lot 18', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Prêt à visiter' },
+      { id: 19, nom: 'Lot 19', type: 'T4', surface: '40 m²', statut: 'Indisponible', vue: 'Océan', note: 'Bloc technique' },
+      { id: 20, nom: 'Lot 20', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Idéal coliving' },
+      { id: 21, nom: 'Lot 21', type: 'T4', surface: '40 m²', statut: 'Réservé', vue: 'Lagune', note: 'Option investisseurs' },
+      { id: 22, nom: 'Lot 22', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Très lumineux' },
+      { id: 23, nom: 'Lot 23', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Accessible PMR' },
+      { id: 24, nom: 'Lot 24', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Prêt pour location' },
+      { id: 25, nom: 'Lot 25', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Spot premium' }
+    ];
+
+    const tabDefinitions = [
+      { id: 'presentation', titre: 'Présentation', points: [
+        'Île aux Bahamas : cabanons sur pilotis pensés pour la copropriété',
+        'Parties communes : ponton, plage, terrains de beach-volley & golf',
+        'Port avec place de bateau privative pour chaque lot'
+      ]},
+      { id: 'reglement', titre: 'Règlement', points: [
+        'Pas de bruit après 00h · respect du voisinage et de la faune locale',
+        'Animaux autorisés s’ils ne troublent pas la tranquillité',
+        'Usage collectif des plages et pontons · interdiction de privatiser'
+      ]},
+      { id: 'jouissance', titre: 'Jouissance', points: [
+        'Détermine la destination des parties privatives et communes',
+        'Conditions d’utilisation du port : 1 place par cabanon',
+        'Réservation par créneau pour le beach-volley & golf'
+      ]},
+      { id: 'logistique', titre: 'Accès & logistique', points: [
+        'Navettes bateau programmées · station d’accueil sécurisée',
+        'Accueil bagagerie, conciergerie et maintenance sur place',
+        'Bornes électriques et zones techniques dédiées'
+      ]},
+      { id: 'invest', titre: 'Investissement', points: [
+        'Lots T4 de 40 m² optimisés pour la location premium',
+        'Statuts “Disponible / Réservé / Indisponible” mis à jour en temps réel',
+        'Sauvegarde locale pour consultation hors connexion'
+      ]},
+      { id: 'documents', titre: 'Documents', points: [
+        'Règlement téléchargeable en PDF',
+        'EDD et composition annexés',
+        'Compte-rendus de visites et de présentation' ]}
+    ];
+
+    const services = [
+      { icon: '🏝️', titre: 'Accès plage & ponton', texte: 'Pass prioritaire pour les résidents, surveillance et éclairage doux nocturne.' },
+      { icon: '⛵', titre: 'Port privatif', texte: 'Place dédiée par cabanon, badges sécurisés, assistance amarrage.' },
+      { icon: '🏐', titre: 'Sports & loisirs', texte: 'Terrain de beach-volley & golf en réservation par créneau via l’onglet loisirs.' },
+      { icon: '🧹', titre: 'Propreté & maintenance', texte: 'Équipe de ménage tournante, rappel automatique des règles de propreté.' },
+      { icon: '🦜', titre: 'Respect de la faune', texte: 'Silence après minuit, éclairage basse intensité, indicateurs “quiétude”.' },
+      { icon: '🛰️', titre: 'Connectivité', texte: 'Wifi maillé, sauvegarde locale des demandes et des statuts pour usage hors connexion.' },
+      { icon: '🛟', titre: 'Sécurité', texte: 'Vidéosurveillance discrète, numéros d’urgence et défibrillateur signalés.' },
+      { icon: '🧭', titre: 'Conciergerie', texte: 'Réservations activités, transferts aéroport, équipements supplémentaires sur demande.' }
+    ];
+
+    const faq = [
+      { q: 'Comment accéder à la résidence ?', a: 'Par navette bateau dédiée (port privatif) ou par l’aéroport voisin avec transfert organisé par la conciergerie.' },
+      { q: 'Puis-je venir avec des animaux ?', a: 'Oui, s’ils ne troublent pas la tranquillité. Les promenades sont conseillées en dehors des zones calmes après 20h.' },
+      { q: 'Comment réserver les terrains de sport ?', a: 'Choisissez un créneau dans l’onglet Sports & Loisirs, confirmation instantanée et rappel push.' },
+      { q: 'Les demandes clients sont-elles publiques ?', a: 'Non. Seuls les administrateurs connectés (TALASSA / TALASSAVIVEZLEREVE) peuvent consulter et éditer les demandes.' },
+      { q: 'Puis-je modifier le statut d’un lot ?', a: 'Oui depuis l’espace administrateur : disponible, réservé ou indisponible. La mise à jour est visible côté public immédiatement.' }
+    ];
 
     function loadLots() {
       return JSON.parse(localStorage.getItem(lotKey) || 'null') || defaultLots;
@@ -368,14 +551,16 @@
             <div><strong>${lot.nom}</strong></div>
             ${badge(lot.statut)}
           </div>
-          <div class="meta">${lot.type} · ${lot.surface}</div>
-          <div class="meta">Port privatif, ponton & plage, terrain de sport</div>
+          <div class="meta">${lot.type} · ${lot.surface} · Vue ${lot.vue || 'lagon'}</div>
+          <div class="meta">${lot.note || 'Accès complet aux parties communes'}</div>
           <button class="btn-ghost" onclick="prefillLot('${lot.nom}')">Demander ce lot</button>
         `;
+        card.addEventListener('click', () => focusLot(lot));
         grid.appendChild(card);
       });
       populateLotOptions(lots);
       renderAdminLots(lots);
+      updateKpis();
     }
 
     function badge(status) {
@@ -391,6 +576,9 @@
     function prefillLot(name) {
       document.querySelector('select[name="lot"]').value = name;
       document.querySelector('form').scrollIntoView({ behavior: 'smooth' });
+      const lots = loadLots();
+      const selected = lots.find(l => l.nom === name);
+      if (selected) focusLot(selected);
     }
 
     function setFilter(value) { filter = value; renderLots(); }
@@ -441,6 +629,80 @@
         </tr>
       `).join('');
       table.querySelectorAll('input, textarea, select').forEach(el => el.addEventListener('change', editRequest));
+    }
+
+    function updateKpis() {
+      const lots = loadLots();
+      const dispo = lots.filter(l => l.statut === 'Disponible').length;
+      const reserve = lots.filter(l => l.statut === 'Réservé').length;
+      const indispo = lots.filter(l => l.statut === 'Indisponible').length;
+      document.getElementById('kpiRow').innerHTML = `
+        <div class="kpi"><div class="label">Lots disponibles</div><div class="value">${dispo}</div></div>
+        <div class="kpi"><div class="label">Réservés</div><div class="value">${reserve}</div></div>
+        <div class="kpi"><div class="label">Indisponibles</div><div class="value">${indispo}</div></div>
+        <div class="kpi"><div class="label">Demandes reçues</div><div class="value">${loadRequests().length}</div></div>
+      `;
+    }
+
+    function focusLot(lot) {
+      const target = document.getElementById('lotFocus');
+      target.innerHTML = `
+        <h3>${lot.nom} · ${lot.surface}</h3>
+        <div class="chips">
+          <div class="chip">${lot.type}</div>
+          <div class="chip">Vue ${lot.vue || 'lagon'}</div>
+          <div class="chip">Statut : ${lot.statut}</div>
+        </div>
+        <p class="meta">${lot.note || 'Accès complet aux parties communes'}</p>
+        <div class="grid-cards">
+          <div class="card-sm"><div class="flag">⚓ Port</div><div class="meta">Place privative incluse</div></div>
+          <div class="card-sm"><div class="flag">🏝️ Plage & ponton</div><div class="meta">Accès collectif, pas de privatisation</div></div>
+          <div class="card-sm"><div class="flag">🏐 Sports</div><div class="meta">Beach-volley & golf sur réservation</div></div>
+        </div>
+      `;
+    }
+
+    function renderTabs() {
+      const nav = document.getElementById('tabsNav');
+      const panels = document.getElementById('tabsPanels');
+      nav.innerHTML = tabDefinitions.map((t, i) => `<button class="tab ${i===0?'active':''}" data-tab="${t.id}">${t.titre}</button>`).join('');
+      panels.innerHTML = tabDefinitions.map((t, i) => `
+        <div class="tab-panel ${i===0?'active':''}" data-tab="${t.id}">
+          ${t.points.map(p => `<div class="meta">• ${p}</div>`).join('')}
+        </div>
+      `).join('');
+      nav.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tab)));
+    }
+
+    function setTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.dataset.tab === tabId));
+    }
+
+    function renderServices() {
+      const grid = document.getElementById('servicesGrid');
+      grid.innerHTML = services.map(s => `
+        <div class="card-sm">
+          <div class="flag">${s.icon} ${s.titre}</div>
+          <div class="meta">${s.texte}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderFaq() {
+      const wrap = document.getElementById('faqAccordion');
+      wrap.innerHTML = faq.map((f, i) => `
+        <div class="accordion-item ${i===0?'open':''}">
+          <div class="accordion-header">${f.q}<span>${i===0?'-':'+'}</span></div>
+          <div class="accordion-content">${f.a}</div>
+        </div>
+      `).join('');
+      wrap.querySelectorAll('.accordion-item').forEach(item => {
+        item.querySelector('.accordion-header').addEventListener('click', () => {
+          const open = item.classList.toggle('open');
+          item.querySelector('span').textContent = open ? '-' : '+';
+        });
+      });
     }
 
     function editRequest(e) {
@@ -560,7 +822,12 @@
     setInterval(saveDraft, 30000);
 
     restoreDraft();
+    renderTabs();
+    renderServices();
+    renderFaq();
     renderLots();
+    const initialLot = loadLots().find(l => l.statut === 'Disponible') || loadLots()[0];
+    if (initialLot) focusLot(initialLot);
   </script>
 </body>
 </html>
