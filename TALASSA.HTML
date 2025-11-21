@@ -30,19 +30,21 @@
     .page {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 28px 18px 64px;
+      padding: 28px 18px 72px;
+      display: grid;
+      gap: 18px;
     }
 
     header {
       position: sticky;
       top: 0;
       z-index: 30;
-      padding-bottom: 18px;
+      padding-bottom: 10px;
       backdrop-filter: blur(14px);
     }
 
     .nav {
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid rgba(255, 255, 255, 0.6);
       border-radius: 18px;
       padding: 14px 18px;
@@ -51,12 +53,13 @@
       justify-content: space-between;
       gap: 12px;
       box-shadow: var(--shadow);
+      flex-wrap: wrap;
     }
 
     .nav-links {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
       color: var(--muted);
       font-weight: 600;
     }
@@ -125,8 +128,10 @@
       gap: 16px;
     }
 
+    .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: start; }
+
     .hero h1 { margin: 0; font-size: clamp(30px, 5vw, 44px); color: var(--text); }
-    .hero p { margin: 6px 0 0; color: var(--muted); line-height: 1.6; }
+    .hero p { margin: 6px 0 10px; color: var(--muted); line-height: 1.6; }
 
     .section {
       background: var(--card);
@@ -139,7 +144,7 @@
     .section h2 { margin: 0 0 10px; color: var(--text); }
     .section .subtitle { color: var(--muted); margin-bottom: 12px; }
 
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 4px; }
     .chip {
       padding: 8px 12px;
       border-radius: 12px;
@@ -148,7 +153,20 @@
       color: var(--muted);
     }
 
-    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+    .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill-box { background: rgba(15, 123, 255, 0.06); color: var(--text); padding: 8px 10px; border-radius: 10px; }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0,0,0,0.04);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 12px 26px rgba(0,0,0,0.08);
+      display: grid;
+      gap: 10px;
+    }
+
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
     .kpi {
       background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.7);
@@ -161,43 +179,7 @@
     .kpi .label { color: var(--muted); font-size: 13px; }
     .kpi .value { font-size: 22px; font-weight: 800; color: var(--text); }
 
-    .lot-toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
-    .filter {
-      padding: 8px 12px;
-      border-radius: 10px;
-      background: rgba(15, 123, 255, 0.1);
-      color: var(--blue);
-      border: 1px solid rgba(15, 123, 255, 0.2);
-      cursor: pointer;
-    }
-
-    .lot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
-
-    .lot-card {
-      padding: 14px;
-      border-radius: 14px;
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86));
-      border: 1px solid rgba(0, 0, 0, 0.04);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-      display: grid;
-      gap: 8px;
-    }
-
-    .lot-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-    .badge {
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      font-weight: 800;
-      color: #fff;
-    }
-    .b-dispo { background: var(--green); }
-    .b-occupe { background: var(--amber); }
-    .b-indispo { background: var(--red); }
-
-    .meta { color: var(--muted); font-size: 14px; }
-
-    .tab-wrapper { margin: 18px 0; }
+    .tab-wrapper { margin: 12px 0 0; }
     .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
     .tab {
       padding: 10px 12px;
@@ -247,6 +229,7 @@
     .table tr { background: rgba(255, 255, 255, 0.7); border-radius: 10px; }
     .table tr + tr td { border-top: 1px solid rgba(0, 0, 0, 0.05); }
     .table td input, .table td select, .table td textarea { width: 100%; font-size: 14px; }
+    .table-foot { font-weight: 800; color: var(--text); }
 
     .admin-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
     .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
@@ -266,14 +249,10 @@
     }
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
-    .pill-box { background: rgba(15, 123, 255, 0.06); color: var(--text); padding: 8px 10px; border-radius: 10px; }
-
     .hidden { display: none !important; }
 
     @media (max-width: 720px) {
       .nav { flex-direction: column; align-items: flex-start; }
-      .lot-head { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -285,41 +264,221 @@
           <div class="pill">Île aux Bahamas</div>
           <div>Résidence Thalassa</div>
         </div>
-      <div class="nav-links">
+        <div class="nav-links">
           <a href="#hero">Accueil</a>
+          <a href="#charte">Charte</a>
           <a href="#tabs">Onglets</a>
-          <a href="#copro">Vie de copro</a>
           <a href="#services">Services</a>
+          <a href="#formations">Formations</a>
           <a href="#ag2025">Dernière AG</a>
-          <a href="#agenda">Agenda</a>
-          <a href="#faq">FAQ</a>
+          <a href="#copro">Vie de copro</a>
+          <a href="#owners">Copropriétaires</a>
           <a href="#demandes">Demandes</a>
+          <a href="#faq">FAQ</a>
         </div>
         <div class="nav-actions">
-          <button class="btn-ghost" onclick="downloadReglement()">📄 Télécharger le règlement</button>
-          <button class="btn-primary" onclick="openAdmin()">🔐 Espace administrateur</button>
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Règlement</button>
+          <button type="button" class="btn-primary" onclick="openAdmin()">🔐 Admin TALASSA</button>
         </div>
       </div>
     </header>
 
-    <section id="hero" class="hero">
+    <section id="hero" class="hero split">
       <div>
-        <h1>Cabanons sur pilotis · résidence privée & partagée</h1>
-        <p>Plage, ponton, terrains de beach-volley et golf, port privatif : la copropriété Thalassa offre un cadre exceptionnel pour vivre le rêve des Bahamas. Les copropriétaires disposent d’outils pour la vie sur place, la maintenance et les documents clés, sans aucune logique de réservation.</p>
+        <h1>Cabanons sur pilotis · copropriété privée</h1>
+        <p>Plage, ponton, terrains de beach-volley et golf, port privatif : la résidence Thalassa est pensée pour les copropriétaires uniquement. Toutes les actions sont accessibles via des onglets dédiés et des boutons cliquables pour un site complet et interactif.</p>
+        <div class="chips">
+          <div class="chip">Ponton / plage / port privatif</div>
+          <div class="chip">Terrain de beach-volley & golf</div>
+          <div class="chip">Respect de la faune · silence après 00h</div>
+          <div class="chip">Docs & PV toujours accessibles</div>
+        </div>
+        <div class="pill-list">
+          <span class="pill-box">Pas de réservation · pas de statut disponible/indisponible</span>
+          <span class="pill-box">Accès admin sécurisé (TALASSA / TALASSAVIVEZLEREVE)</span>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+          <button type="button" class="btn-primary" onclick="document.getElementById('demandes').scrollIntoView({behavior:'smooth'})">📨 Envoyer une demande</button>
+          <button type="button" class="btn-ghost" onclick="document.getElementById('ag2025').scrollIntoView({behavior:'smooth'})">🧾 Voir le PV 2025</button>
+        </div>
       </div>
-      <div class="chips">
-        <div class="chip">Ponton / plage / port privatif</div>
-        <div class="chip">Terrain de beach-volley & golf</div>
-        <div class="chip">Règlement clair · respect de la faune</div>
-        <div class="chip">Administration sécurisée TALASSA</div>
+      <div class="panel">
+        <div class="flag">📊 Synthèse rapide</div>
+        <div class="kpis" id="kpiRow"></div>
+        <div class="chips">
+          <div class="chip">AG : 12 mars 2025 — 10 000 / 10 000 tantièmes</div>
+          <div class="chip">Port : 1 place par cabanon (25)</div>
+          <div class="chip">PV & règlement téléchargeables</div>
+        </div>
       </div>
-      <div class="kpis" id="kpiRow"></div>
+    </section>
+
+    <section id="charte" class="section split">
+      <div>
+        <h2>Charte des parties communes</h2>
+        <p class="subtitle">Fixe les règles relatives à l’administration et la jouissance des espaces : ponton, plage, terrains de beach-volley/golf, port privatif (1 place par cabanon).</p>
+        <div class="grid">
+          <div class="card-sm">
+            <div class="flag">🌊 Espaces partagés</div>
+            <div class="meta">Plage & ponton en usage collectif, aucune privatisation. Port réservé aux résidents, badge sécurisé.</div>
+          </div>
+          <div class="card-sm">
+            <div class="flag">🌿 Respect & quiétude</div>
+            <div class="meta">Pas de bruit après 00h, éclairage doux, animaux autorisés s’ils ne troublent pas la tranquillité.</div>
+          </div>
+          <div class="card-sm">
+            <div class="flag">🏐 Sports</div>
+            <div class="meta">Terrains de beach-volley & golf : créneaux partagés affichés, sans réservation ni statut de lot.</div>
+          </div>
+          <div class="card-sm">
+            <div class="flag">🔥 Sécurité & propreté</div>
+            <div class="meta">Propreté collective, interdiction de feu de camp/barbecue hors zones prévues.</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="flag">🆕 Nouvelles options copro</div>
+        <div class="meta">• Formation sensibilisation préservation de la faune.
+• Formation premiers secours sur site.
+• Espace privatif d’une partie d’eau (partie commune) pour certains lots.
+• Affichage des tantièmes généraux et des tantièmes place pour le port.</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📥 Exporter règlement</button>
+          <button type="button" class="btn-primary" onclick="downloadCoproCsv()">📊 Exporter tableau copro</button>
+        </div>
+      </div>
     </section>
 
     <section id="tabs" class="section">
+      <h2>Onglets interactifs</h2>
+      <p class="subtitle">Navigation rapide : accès, services copro, vie de l’île, documents officiels, formations et règles communes.</p>
       <div class="tab-wrapper">
         <div class="tabs" id="tabsNav"></div>
         <div class="tab-panels" id="tabsPanels"></div>
+      </div>
+    </section>
+
+    <section class="section" id="services">
+      <h2>Services sur site et confort quotidien</h2>
+      <p class="subtitle">Grille complète pour un site digne d’un vrai resort copropriétaire.</p>
+      <div class="grid-cards" id="servicesGrid"></div>
+    </section>
+
+    <section class="section" id="formations">
+      <h2>Formations & prévention</h2>
+      <p class="subtitle">Programmes dédiés aux copropriétaires, accessibles hors connexion.</p>
+      <div class="grid-cards">
+        <div class="card-sm"><div class="flag">🦜 Sensibilisation faune</div><div class="meta">Ateliers mensuels sur la protection de la faune locale et le respect des zones calmes.</div></div>
+        <div class="card-sm"><div class="flag">⛑️ Premiers secours</div><div class="meta">Sessions de premiers secours et utilisation du défibrillateur de l’île.</div></div>
+        <div class="card-sm"><div class="flag">🌊 Parcelles d’eau</div><div class="meta">Briefs dédiés aux lots disposant d’un espace privatif d’eau (partie commune).</div></div>
+        <div class="card-sm"><div class="flag">🧾 Règlement animé</div><div class="meta">Lecture guidée des règles clés : bruit, animaux, port, propreté, incendie.</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="agenda">
+      <h2>Agenda & jalons</h2>
+      <p class="subtitle">Toutes les étapes pour la présentation orale du 28 novembre et le suivi de la copropriété.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🎤 Présentation orale</div>
+          <div class="meta">28 novembre · Copro physiquement</div>
+          <div class="badge-soft">Salle & lieu confirmés une semaine avant</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📑 Règlement</div>
+          <div class="meta">Niveau 5/6 · EDD et composition inclus</div>
+          <div class="badge-soft">Téléchargeable, mis à jour à chaque révision</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🛥️ Parties communes</div>
+          <div class="meta">Ponton, plage, port privatif, terrains sportifs</div>
+          <div class="badge-soft">Définition & conditions de jouissance</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📌 Lieu</div>
+          <div class="meta">Île aux Bahamas · Résidence Thalassa</div>
+          <div class="badge-soft">Accès bateau + aérien détaillé dans les onglets</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ag2025">
+      <h2>Dernière Assemblée Générale · 12 mars 2025</h2>
+      <p class="subtitle">Procès-verbal complet de l’AG des copropriétaires — Île du Levant, salle polyvalente.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🧾 Composition du bureau</div>
+          <div class="meta">Président : M. DUPOND · Scrutateur : Mme FLAMENT · Secrétaire : Mme PETIT</div>
+          <div class="badge-soft">Ouverture : 17h15 · 10 000 / 10 000 tantièmes</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📋 Ordre du jour</div>
+          <div class="meta">Détermination des destinations privatives et communes, conditions de jouissance, règles d’administration.</div>
+          <div class="meta">Lieu : Île du Levant · Port privatif et salle polyvalente.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">✅ Résolution adoptée</div>
+          <div class="meta">Autorisation de pratiquer le naturisme sur la parcelle d’eau privative de chaque copropriétaire (Article 24).</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">❌ Résolutions rejetées</div>
+          <div class="meta">1) Naturisme dans toutes les parties communes.</div>
+          <div class="meta">2) Naturisme entre 00h00 et 06h00 dans les parties communes.</div>
+          <div class="meta">3) Naturisme sur une zone commune dédiée en bord de mer.</div>
+        </div>
+      </div>
+      <div class="section" style="margin-top:14px; background: rgba(255,255,255,0.85);">
+        <div class="admin-bar">
+          <div>
+            <div class="flag">📝 Procès-verbal détaillé</div>
+            <div class="meta">Texte intégral pour archivage et consultation hors connexion.</div>
+          </div>
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Télécharger règlement & PV</button>
+        </div>
+        <div class="meta" style="white-space: pre-line; line-height: 1.6; margin-top: 10px;">
+PROCÈS-VERBAL DE L’ASSEMBLÉE GÉNÉRALE DES COPROPRIÉTAIRES
+Résidence TALASSA · Île du Levant — 12 mars 2025, 17h00
+Les copropriétaires de la Résidence TALASSA, régulièrement convoqués par le syndic, se sont réunis en Assemblée Générale dans la salle polyvalente de l’île. La feuille de présence, émargée par les copropriétaires présents et les mandataires, a permis de constater que les copropriétaires présents, représentés ou votants par correspondance totalisent 10 000 / 10 000 tantièmes.
+
+COMPOSITION DU BUREAU
+Président de séance : M. DUPOND
+Scrutateur : Mme FLAMENT
+Secrétaire : Mme PETIT
+La séance est ouverte à 17h15.
+
+LISTE DES COPROPRIÉTAIRES ET TANTIÈMES
+(Tableau fourni par le syndicat — voir section Copropriétaires.)
+
+RÉSOLUTIONS
+RÉSOLUTION 1 — Autorisation du naturisme dans les parties communes
+Majorité requise : Article 25 (tantièmes généraux)
+Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU.
+Résultat : La résolution est rejetée.
+
+RÉSOLUTION 2 — Autorisation du naturisme dans les parties communes entre 00h00 et 06h00
+Majorité requise : Article 25 (tantièmes généraux)
+Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU.
+Résultat : La résolution est rejetée.
+
+RÉSOLUTION 3 — Autorisation du naturisme sur une zone dédiée des parties communes
+Majorité requise : Article 25 (tantièmes généraux)
+Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU.
+Résultat : La résolution est rejetée.
+
+RÉSOLUTION 4 — Autorisation de pratiquer le naturisme sur la parcelle d’eau privative de chaque copropriétaire
+Majorité requise : Article 24 (tantièmes généraux)
+Chaque lot dispose, selon le règlement de copropriété, d’une parcelle d’eau privative permettant des usages maritimes individuels. Il est proposé d’autoriser explicitement la pratique du naturisme dans ces espaces.
+Ont voté contre : Mme SOLOU uniquement.
+Ont voté pour : Tous les autres copropriétaires.
+Résultat : La résolution est adoptée à la majorité.
+
+CLÔTURE DE SÉANCE
+Plus aucune question n’étant posée, la séance est levée à 19h05.
+Président de séance : M. DUPOND
+Secrétaire : Mme PETIT
+Scrutateur : Mme FLAMENT
+Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
+        </div>
       </div>
     </section>
 
@@ -354,100 +513,19 @@
       </div>
     </section>
 
-    <section class="section" id="services">
-      <h2>Services sur site et confort quotidien</h2>
-      <p class="subtitle">Des onglets dédiés aux loisirs, à la logistique et aux garanties pour un site digne d'un vrai resort.</p>
-      <div class="grid-cards" id="servicesGrid"></div>
-    </section>
-
-    <section class="section" id="agenda">
-      <h2>Agenda & jalons</h2>
-      <p class="subtitle">Toutes les étapes pour la présentation orale du 28 novembre et le suivi de la copropriété.</p>
-      <div class="grid-cards">
-        <div class="card-sm">
-          <div class="flag">🎤 Présentation orale</div>
-          <div class="meta">28 novembre · Copro physiquement</div>
-          <div class="badge-soft">Salle & lieu confirmés une semaine avant</div>
+    <section class="section" id="owners">
+      <div class="admin-bar">
+        <div>
+          <h2>Copropriétaires & tantièmes</h2>
+          <p class="subtitle">Tableau interactif pour consulter les 25 cabanons (T4) et leurs tantièmes généraux et place.</p>
         </div>
-        <div class="card-sm">
-          <div class="flag">📑 Règlement</div>
-          <div class="meta">Niveau 5/6 · EDD et composition inclus</div>
-          <div class="badge-soft">Téléchargeable, mis à jour à chaque révision</div>
-        </div>
-        <div class="card-sm">
-          <div class="flag">🛥️ Parties communes</div>
-          <div class="meta">Ponton, plage, port privatif, terrains sportifs</div>
-          <div class="badge-soft">Définition & conditions de jouissance</div>
-        </div>
-        <div class="card-sm">
-          <div class="flag">📌 Lieu</div>
-          <div class="meta">Île aux Bahamas · Résidence Thalassa</div>
-          <div class="badge-soft">Accès bateau + aérien détaillé dans les onglets</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <select id="sectionFilter" aria-label="Filtrer par section"></select>
+          <button type="button" class="btn-ghost" onclick="downloadCoproCsv()">⬇️ Exporter CSV</button>
         </div>
       </div>
-    </section>
-
-    <section class="section" id="ag2025">
-      <h2>Dernière Assemblée Générale · 12 mars 2025</h2>
-      <p class="subtitle">Procès-verbal complet de l’AG des copropriétaires de la Résidence TALASSA — Île du Levant, salle polyvalente.</p>
-      <div class="grid-cards">
-        <div class="card-sm">
-          <div class="flag">🧾 Composition du bureau</div>
-          <div class="meta">Président : M. Dupond · Scrutateur : Mme Flament · Secrétaire : Mme Petit</div>
-          <div class="badge-soft">Séance ouverte à 17h15 · 10 000 / 10 000 tantièmes présents ou représentés</div>
-        </div>
-        <div class="card-sm">
-          <div class="flag">📋 Ordre du jour</div>
-          <div class="meta">Détermination des destinations privatives et communes, conditions de jouissance, règles d’administration.</div>
-          <div class="meta">Lieu : Île du Levant · Résidence TALASSA · Port privatif et salle polyvalente.</div>
-        </div>
-        <div class="card-sm">
-          <div class="flag">✅ Résolution adoptée</div>
-          <div class="meta">Autorisation de pratiquer le naturisme sur la parcelle d’eau privative de chaque copropriétaire.</div>
-          <div class="badge-soft">Majorité Article 24 — Vote : pour (tous sauf Mme Solou), contre (Mme Solou).</div>
-        </div>
-        <div class="card-sm">
-          <div class="flag">❌ Résolutions rejetées</div>
-          <div class="meta">1) Naturisme dans toutes les parties communes.</div>
-          <div class="meta">2) Naturisme dans les parties communes entre 00h00 et 06h00.</div>
-          <div class="meta">3) Naturisme sur une zone commune dédiée en bord de mer.</div>
-        </div>
-      </div>
-      <div class="section" style="margin-top:14px; background: rgba(255,255,255,0.85);">
-        <div class="admin-bar">
-          <div>
-            <div class="flag">📝 Procès-verbal détaillé</div>
-            <div class="meta">Texte intégral pour archivage et consultation hors connexion.</div>
-          </div>
-          <button class="btn-ghost" onclick="downloadReglement()">📄 Télécharger règlement & PV</button>
-        </div>
-        <div class="meta" style="white-space: pre-line; line-height: 1.6; margin-top: 10px;">
-PROCÈS-VERBAL DE L’ASSEMBLÉE GÉNÉRALE DES COPROPRIÉTAIRES
-Résidence TALASSA · Île du Levant — 12 mars 2025, 17h00
-Les copropriétaires, régulièrement convoqués par le syndic, sont réunis en Assemblée Générale dans la salle polyvalente. La feuille de présence émargée constate 10 000 / 10 000 tantièmes.
-
-COMPOSITION DU BUREAU
-Président de séance : M. DUPOND · Scrutateur : Mme FLAMENT · Secrétaire : Mme PETIT
-Ouverture de séance : 17h15.
-
-LISTE DES COPROPRIÉTAIRES ET TANTIÈMES
-Tableau fourni par le syndicat — voir document annexe.
-
-RÉSOLUTIONS
-1 — Autorisation du naturisme dans les parties communes
-Majorité : Article 25. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. Résultat : rejetée.
-2 — Naturisme dans les parties communes entre 00h00 et 06h00
-Majorité : Article 25. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. Résultat : rejetée.
-3 — Naturisme sur une zone dédiée des parties communes
-Majorité : Article 25. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. Résultat : rejetée.
-4 — Naturisme sur la parcelle d’eau privative de chaque copropriétaire
-Majorité : Article 24. Ont voté contre : Mme SOLOU. Ont voté pour : tous les autres copropriétaires. Résultat : adoptée.
-
-CLÔTURE DE SÉANCE
-Plus aucune question n’étant posée, la séance est levée à 19h05.
-Président : M. DUPOND · Secrétaire : Mme PETIT · Scrutateur : Mme FLAMENT.
-Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
-        </div>
+      <div class="section" style="padding:12px; background: rgba(255,255,255,0.8);">
+        <table class="table" id="ownersTable"></table>
       </div>
     </section>
 
@@ -457,7 +535,7 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
           <h2>Demande d'information</h2>
           <p class="subtitle">Questions copropriétaires, signalements ou besoins logistiques. Sauvegarde automatique toutes les 30 secondes et à chaque modification.</p>
         </div>
-        <button class="btn-ghost" onclick="resetDraft()">Réinitialiser le brouillon</button>
+        <button type="button" class="btn-ghost" onclick="resetDraft()">Réinitialiser le brouillon</button>
       </div>
       <form id="requestForm">
         <div class="two-col">
@@ -477,14 +555,14 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
           </label>
         </div>
         <label>Message
-          <textarea name="message" placeholder="Précisez vos besoins, disponibilités de visite, etc." required></textarea>
+          <textarea name="message" placeholder="Précisez vos besoins, incidents, questions sur l’île." required></textarea>
         </label>
         <button class="btn-primary" type="submit">Envoyer la demande</button>
         <div id="draftStatus" class="meta"></div>
       </form>
     </section>
 
-    <section class="section">
+    <section class="section" id="reglement">
       <h2>Règlement de copropriété</h2>
       <p class="subtitle">Fixe la destination des parties privatives et communes, et les conditions de leur jouissance.</p>
       <ul class="meta">
@@ -492,9 +570,12 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
         <li>Animaux autorisés s’ils ne troublent pas la tranquillité.</li>
         <li>Utilisation du port réservée aux résidents (1 place par cabanon).</li>
         <li>Plage et ponton : usage collectif, interdiction de privatiser des zones.</li>
-        <li>Terrain de beach-volley & golf : créneaux partagés affichés sur place, sans réservation.</li>
+        <li>Terrain de beach-volley & golf : créneaux partagés affichés sur place.</li>
         <li>Propreté : chaque résident veille à la propreté des lieux communs.</li>
         <li>Interdiction de feu de camp ou barbecue hors zones prévues.</li>
+        <li>Formation sensibilisation sur la préservation de la faune.</li>
+        <li>Formation premiers secours pour les copropriétaires.</li>
+        <li>Espace privatif d’une partie d’eau (partie commune) pour quelques lots.</li>
       </ul>
       <div class="chips">
         <div class="chip">Présentation orale : 28 novembre</div>
@@ -502,8 +583,9 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
         <div class="chip">EDD & règlement : niveau 5/6</div>
         <div class="chip">Comité : composition en cours</div>
       </div>
-      <div style="margin-top:12px;">
-        <button class="btn-ghost" onclick="downloadReglement()">📥 Exporter le règlement (PDF)</button>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="btn-ghost" onclick="downloadReglement()">📥 Exporter le règlement (PDF)</button>
+        <button type="button" class="btn-primary" onclick="downloadCoproCsv()">📊 Exporter copro (CSV)</button>
       </div>
     </section>
 
@@ -515,7 +597,7 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
     <section id="adminPanel" class="section hidden">
       <div class="admin-bar">
         <h2>Administration TALASSA</h2>
-        <button class="btn-ghost" onclick="logout()">Se déconnecter</button>
+        <button type="button" class="btn-ghost" onclick="logout()">Se déconnecter</button>
       </div>
       <div class="subtitle">Consulter et éditer toutes les demandes envoyées par les copropriétaires. Tout est sauvegardé localement et reste accessible hors connexion après authentification.</div>
 
@@ -529,9 +611,37 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
   <div id="toast" class="toast"></div>
 
   <script>
+    const coproprietaires = [
+      { nom: 'Mr DUPOND', lot: 1, section: 'A', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mr DUPIRE', lot: 2, section: 'A', nature: 'T4', tantiemes: 400, place: 422 },
+      { nom: 'Mme LEGRAND', lot: 3, section: 'A', nature: 'T4', tantiemes: 400, place: 30 },
+      { nom: 'Mme FLAMENT', lot: 4, section: 'A', nature: 'T4', tantiemes: 400, place: 456 },
+      { nom: 'Mr ROY', lot: 5, section: 'A', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mr DUBON', lot: 6, section: 'B', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mme PETIT', lot: 7, section: 'B', nature: 'T4', tantiemes: 400, place: 590 },
+      { nom: 'Mr BOUCHER', lot: 8, section: 'B', nature: 'T4', tantiemes: 400, place: 430 },
+      { nom: 'Mr MARCHAND', lot: 9, section: 'B', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mme LEGRAND', lot: 10, section: 'B', nature: 'T4', tantiemes: 400, place: 444 },
+      { nom: 'Mme VALET', lot: 11, section: 'C', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mme PASZKIEWICZ', lot: 12, section: 'C', nature: 'T4', tantiemes: 400, place: 999 },
+      { nom: 'Mr LAMBLIN', lot: 13, section: 'C', nature: 'T4', tantiemes: 400, place: 444 },
+      { nom: 'Mme BOURNISIEN', lot: 14, section: 'C', nature: 'T4', tantiemes: 400, place: 444 },
+      { nom: 'Mr DRANCOURT HENOCH', lot: 15, section: 'C', nature: 'T4', tantiemes: 400, place: 444 },
+      { nom: 'Mme CAPIAUX', lot: 16, section: 'D', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mr BECQUART', lot: 17, section: 'D', nature: 'T4', tantiemes: 400, place: 555 },
+      { nom: 'Mme DEHAENE', lot: 18, section: 'D', nature: 'T4', tantiemes: 400, place: 600 },
+      { nom: 'Mr VIVIER', lot: 19, section: 'D', nature: 'T4', tantiemes: 400, place: 677 },
+      { nom: 'Mme SPINA', lot: 20, section: 'D', nature: 'T4', tantiemes: 400, place: 999 },
+      { nom: 'Mme SOLOU', lot: 21, section: 'E', nature: 'T4', tantiemes: 400, place: 444 },
+      { nom: 'Mme MAILLART', lot: 22, section: 'E', nature: 'T4', tantiemes: 400, place: 888 },
+      { nom: 'Mr GRABAR', lot: 23, section: 'E', nature: 'T4', tantiemes: 400, place: 888 },
+      { nom: 'Mr BERNARD', lot: 24, section: 'E', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mme RICCHAUD', lot: 25, section: 'E', nature: 'T4', tantiemes: 400, place: 246 }
+    ];
+
     const reqKey = 'thalassa_requests_v3';
     const draftKey = 'thalassa_draft_v3';
-    const lotNames = Array.from({ length: 25 }, (_, i) => `Lot ${i + 1} — T4 · 40 m²`);
+    const lotNames = coproprietaires.map(c => `Lot ${c.lot} — ${c.nom} (Section ${c.section} · ${c.nature})`);
     let isAdmin = false;
 
     const tabDefinitions = [
@@ -541,25 +651,35 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
         'Accueil bagagerie, conciergerie et maintenance sur place',
         'Bornes électriques et zones techniques dédiées'
       ]},
+      { id: 'communs', titre: 'Parties communes', points: [
+        'Ponton, plage, terrains de beach-volley et golf en usage collectif',
+        'Port réservé aux résidents : 1 place par cabanon, badges sécurisés',
+        'Espace privatif d’une partie d’eau pour certains lots (voir tableau copro)',
+        'Propreté partagée, incendie encadré, aucun feu libre'
+      ]},
+      { id: 'regles', titre: 'Règles de vie', points: [
+        'Silence après 00h, respect de la faune locale',
+        'Animaux autorisés s’ils ne troublent pas la tranquillité',
+        'Terrains sportifs : créneaux partagés affichés sur place',
+        'Aucune logique de réservation ni statut disponible/indisponible des lots'
+      ]},
+      { id: 'docs', titre: 'Documents & AG', points: [
+        'Règlement de copropriété et EDD (niveau 5/6)',
+        'PV complet de l’AG du 12 mars 2025',
+        'Composition du bureau et liste des tantièmes par lot',
+        'Exports PDF/CSV accessibles hors connexion'
+      ]},
       { id: 'services-copro', titre: 'Services copropriétaires', points: [
         'Conciergerie propriétaires (maintenance, ménage, équipements)',
         'Suivi des travaux, incidents et tableaux d’affichage partagés',
-        'Clés numériques, badges port, et kit d’accueil copropriétaire'
+        'Clés numériques, badges port, kit d’accueil copropriétaire'
       ]},
-      { id: 'vie', titre: 'Vie de l’île', points: [
-        '25 cabanons T4 dédiés aux copropriétaires, non destinés à la location',
-        'Échanges entre voisins, entraide et annonces internes dans l’onglet communauté',
-        'Tableau de bord des interventions et de la propreté partagée'
-      ]},
-      { id: 'ag', titre: 'AG 12 mars 2025', points: [
-        'Assemblée Générale tenue le 12 mars 2025 à 17h00 (10 000 / 10 000 tantièmes)',
-        'Bureau : Président M. Dupond · Scrutateur Mme Flament · Secrétaire Mme Petit',
-        'Résolutions naturisme : trois rejetées, une adoptée (parcelle d’eau privative)'
-      ]},
-      { id: 'documents', titre: 'Documents', points: [
-        'Règlement téléchargeable en PDF',
-        'EDD et composition annexés',
-        'Compte-rendus de visites et de présentation' ]}
+      { id: 'formations-tab', titre: 'Formations', points: [
+        'Sensibilisation préservation de la faune',
+        'Premiers secours sur site',
+        'Parcelles d’eau privatives : bonnes pratiques',
+        'Lecture guidée du règlement'
+      ]}
     ];
 
     const services = [
@@ -578,13 +698,65 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
       { q: 'Puis-je venir avec des animaux ?', a: 'Oui, s’ils ne troublent pas la tranquillité. Les promenades sont conseillées en dehors des zones calmes après 20h.' },
       { q: 'Comment s’organisent les terrains de sport ?', a: 'Créneaux affichés sur tableau partagé dans l’onglet Sports & Loisirs, sans réservation ni statut de lot.' },
       { q: 'Les demandes copro sont-elles publiques ?', a: 'Non. Seuls les administrateurs connectés (TALASSA / TALASSAVIVEZLEREVE) peuvent consulter et éditer les demandes.' },
-      { q: 'Où trouver les documents officiels ?', a: 'Dans la section Documents et via le bouton de téléchargement du règlement et du PV.' }
+      { q: 'Où trouver les documents officiels ?', a: 'Dans la section Documents et via le bouton de téléchargement du règlement et du PV.' },
+      { q: 'Existe-t-il des formations ?', a: 'Oui : sensibilisation faune, premiers secours, brief sur les parcelles d’eau privatives.' }
     ];
 
     function populateLotOptions() {
       const sel = document.getElementById('lotSelect');
       sel.innerHTML = '<option value="">Sélectionner un lot</option>' + lotNames.map(l => `<option value="${l}">${l}</option>`).join('');
     }
+
+    function populateSectionFilter() {
+      const select = document.getElementById('sectionFilter');
+      const sections = ['Tous', ...new Set(coproprietaires.map(c => c.section))];
+      select.innerHTML = sections.map(s => `<option value="${s}">${s === 'Tous' ? 'Toutes les sections' : 'Section ' + s}</option>`).join('');
+      select.addEventListener('change', renderOwners);
+    }
+
+    function renderOwners() {
+      const table = document.getElementById('ownersTable');
+      const filter = document.getElementById('sectionFilter').value;
+      const rows = coproprietaires.filter(c => filter === 'Tous' || c.section === filter);
+      const totalGen = rows.reduce((a, c) => a + c.tantiemes, 0);
+      const totalPlace = rows.reduce((a, c) => a + c.place, 0);
+      table.innerHTML = `
+        <tr>
+          <th>Lot</th><th>Propriétaire</th><th>Section</th><th>Nature</th><th>Tantièmes généraux</th><th>Tantièmes place</th>
+        </tr>
+        ${rows.map(c => `
+          <tr>
+            <td>Lot ${c.lot}</td>
+            <td>${c.nom}</td>
+            <td>${c.section}</td>
+            <td>${c.nature}</td>
+            <td>${c.tantiemes}</td>
+            <td>${c.place}</td>
+          </tr>`).join('')}
+        <tr class="table-foot">
+          <td colspan="4">Totaux (${filter === 'Tous' ? 'ensemble' : 'Section ' + filter})</td>
+          <td>${totalGen}</td>
+          <td>${totalPlace}</td>
+        </tr>
+      `;
+    }
+
+    function downloadCoproCsv() {
+      const header = 'Lot;Propriétaire;Section;Nature;Tantièmes généraux;Tantièmes place';
+      const lines = coproprietaires.map(c => `${c.lot};${c.nom};${c.section};${c.nature};${c.tantiemes};${c.place}`);
+      const content = [header, ...lines, 'Total;;;' + totalTantiemes() + ';' + totalPlaces()].join('\n');
+      const blob = new Blob([content], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Coproprietaires_Thalassa.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('Tableau copropriétaires exporté.');
+    }
+
+    function totalTantiemes() { return coproprietaires.reduce((a, c) => a + c.tantiemes, 0); }
+    function totalPlaces() { return coproprietaires.reduce((a, c) => a + c.place, 0); }
 
     function loadRequests() {
       return JSON.parse(localStorage.getItem(reqKey) || '[]');
@@ -601,7 +773,7 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
       localStorage.removeItem(draftKey);
       form.reset();
       updateDraftStatus('Demande enregistrée et envoyée au gestionnaire.');
-      toast('Demande envoyée. Elle est visible par l'administrateur uniquement.');
+      toast('Demande envoyée. Elle est visible par l\'administrateur uniquement.');
       renderRequests();
       updateKpis();
     }
@@ -637,10 +809,11 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
 
     function updateKpis() {
       const reqs = loadRequests();
+      const uniqueSections = new Set(coproprietaires.map(c => c.section));
       document.getElementById('kpiRow').innerHTML = `
-        <div class="kpi"><div class="label">Cabanons</div><div class="value">${lotNames.length}</div></div>
-        <div class="kpi"><div class="label">Places au port</div><div class="value">${lotNames.length}</div></div>
-        <div class="kpi"><div class="label">Dernière AG</div><div class="value">12/03/2025</div></div>
+        <div class="kpi"><div class="label">Cabanons</div><div class="value">${coproprietaires.length}</div></div>
+        <div class="kpi"><div class="label">Sections</div><div class="value">${uniqueSections.size}</div></div>
+        <div class="kpi"><div class="label">Tantièmes généraux</div><div class="value">${totalTantiemes()}</div></div>
         <div class="kpi"><div class="label">Demandes reçues</div><div class="value">${reqs.length}</div></div>
       `;
     }
@@ -699,36 +872,40 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
     }
 
     function downloadReglement() {
-      const content = `Résidence Thalassa - Règlement de copropriété
-
-` +
-        `Parties communes : ponton, plage, terrain de beach-volley/golf, port (place de bateau privative).
-` +
-        `Détermine la destination des parties privatives et communes et fixe les règles de jouissance.
-
-` +
-        `Règles :
-` +
-        `- Pas de bruit après 00h (respect du voisinage et de la faune locale).
-` +
-        `- Animaux autorisés s’ils ne troublent pas la tranquillité.
-` +
-        `- Utilisation du port réservée aux résidents (1 place par cabanon).
-` +
-        `- Plage et ponton : usage collectif, interdiction de privatiser des zones.
-` +
-        `- Terrain de beach-volley & golf : créneaux partagés affichés sur place, sans réservation.
-` +
-        `- Propreté : chaque résident veille à la propreté des lieux communs.
-` +
-        `- Interdiction de feu de camp ou barbecue hors zones prévues.
-
-` +
-        `AG 12 mars 2025 : 10 000 / 10 000 tantièmes. Naturisme parties communes rejeté (3 résolutions). Naturisme sur parcelle d’eau privative adopté (Article 24). Bureau : Dupond / Flament / Petit.
-
-` +
-        `Dates clés : présentation orale le 28 novembre (copro physiquement, composition, règlement niveau 5/6, EDD, lieu).
-`;
+      const regles = [
+        'Pas de bruit après 00h (respect du voisinage et de la faune locale).',
+        'Animaux autorisés s’ils ne troublent pas la tranquillité.',
+        'Utilisation du port réservée aux résidents (1 place par cabanon).',
+        'Plage et ponton : usage collectif, interdiction de privatiser des zones.',
+        'Terrain de beach-volley & golf : créneaux partagés affichés sur place.',
+        'Propreté : chaque résident veille à la propreté des lieux communs.',
+        'Interdiction de feu de camp ou barbecue hors zones prévues.',
+        'Formation sensibilisation sur la préservation de la faune.',
+        'Formation premiers secours.',
+        'Espace privatif d’une partie d’eau (partie commune) pour quelques lots.'
+      ];
+      const coproLines = coproprietaires.map(c => `Lot ${c.lot} — ${c.nom} — Section ${c.section} — ${c.nature} — Tantièmes généraux ${c.tantiemes} — Tantièmes place ${c.place}`);
+      const content = [
+        'Résidence Thalassa — Île aux Bahamas, cabanons sur pilotis',
+        'Parties communes : ponton, plage, terrain de beach-volley/golf, port (place de bateau privative).',
+        'Fixe les règles relatives à l’administration des parties communes.',
+        '',
+        'RÈGLES PRINCIPALES',
+        ...regles,
+        '',
+        'FORMATIONS',
+        '- Sensibilisation faune locale',
+        '- Premiers secours',
+        '- Brief parcelles d’eau privatives',
+        '',
+        'TABLEAU COPROPRIÉTAIRES',
+        ...coproLines,
+        `Total tantièmes généraux : ${totalTantiemes()}`,
+        `Total tantièmes place : ${totalPlaces()}`,
+        '',
+        'AG 12 mars 2025 : 10 000 / 10 000 tantièmes. Naturisme parties communes rejeté (3 résolutions). Naturisme sur parcelle d’eau privative adopté (Article 24). Bureau : Dupond / Flament / Petit.',
+        'Dates clés : présentation orale le 28 novembre (copro physiquement, composition, règlement niveau 5/6, EDD, lieu).'
+      ].join('\n');
       const blob = new Blob([content], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -795,6 +972,8 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
     setInterval(saveDraft, 30000);
 
     populateLotOptions();
+    populateSectionFilter();
+    renderOwners();
     restoreDraft();
     renderTabs();
     renderServices();
