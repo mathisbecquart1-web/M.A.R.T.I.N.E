@@ -285,15 +285,15 @@
           <div class="pill">Île aux Bahamas</div>
           <div>Résidence Thalassa</div>
         </div>
-        <div class="nav-links">
+      <div class="nav-links">
           <a href="#hero">Accueil</a>
           <a href="#tabs">Onglets</a>
-          <a href="#lots">Lots</a>
+          <a href="#copro">Vie de copro</a>
           <a href="#services">Services</a>
-          <a href="#copro">Options copropriétaires</a>
           <a href="#ag2025">Dernière AG</a>
           <a href="#agenda">Agenda</a>
           <a href="#faq">FAQ</a>
+          <a href="#demandes">Demandes</a>
         </div>
         <div class="nav-actions">
           <button class="btn-ghost" onclick="downloadReglement()">📄 Télécharger le règlement</button>
@@ -305,7 +305,7 @@
     <section id="hero" class="hero">
       <div>
         <h1>Cabanons sur pilotis · résidence privée & partagée</h1>
-        <p>Plage, ponton, terrain de beach-volley et golf, port privatif : la copropriété Thalassa offre un cadre exceptionnel pour vivre le rêve des Bahamas. Chaque copropriétaire suit les lots en temps réel, collabore sans réservation et retrouve tous les documents clés.</p>
+        <p>Plage, ponton, terrains de beach-volley et golf, port privatif : la copropriété Thalassa offre un cadre exceptionnel pour vivre le rêve des Bahamas. Les copropriétaires disposent d’outils pour la vie sur place, la maintenance et les documents clés, sans aucune logique de réservation.</p>
       </div>
       <div class="chips">
         <div class="chip">Ponton / plage / port privatif</div>
@@ -451,22 +451,7 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
       </div>
     </section>
 
-    <section class="section" id="lots">
-      <div class="lot-toolbar">
-        <h2>Lots disponibles / indisponibles</h2>
-        <div class="pill-list">
-          <div class="pill-box">Filtrer :</div>
-          <button class="filter" onclick="setFilter('all')">Tous</button>
-          <button class="filter" onclick="setFilter('Disponible')">Disponible</button>
-          <button class="filter" onclick="setFilter('Occupé')">Occupé</button>
-          <button class="filter" onclick="setFilter('Indisponible')">Indisponible</button>
-        </div>
-      </div>
-      <div id="lotGrid" class="lot-grid"></div>
-      <div style="margin-top:14px;" id="lotFocus" class="section" aria-live="polite"></div>
-    </section>
-
-    <section class="section">
+    <section class="section" id="demandes">
       <div class="admin-bar">
         <div>
           <h2>Demande d'information</h2>
@@ -532,10 +517,7 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
         <h2>Administration TALASSA</h2>
         <button class="btn-ghost" onclick="logout()">Se déconnecter</button>
       </div>
-      <div class="subtitle">Modifier les statuts des lots et éditer chaque demande envoyée. Tout est sauvegardé localement et reste accessible hors connexion après authentification.</div>
-
-      <h3>Statuts des lots</h3>
-      <div id="adminLots" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(260px,1fr));"></div>
+      <div class="subtitle">Consulter et éditer toutes les demandes envoyées par les copropriétaires. Tout est sauvegardé localement et reste accessible hors connexion après authentification.</div>
 
       <h3>Demandes reçues</h3>
       <div class="section" style="padding:12px; background: rgba(255,255,255,0.8);">
@@ -547,56 +529,14 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
   <div id="toast" class="toast"></div>
 
   <script>
-    const lotKey = 'thalassa_lots_v2';
-    const reqKey = 'thalassa_requests_v2';
-    const draftKey = 'thalassa_draft_v2';
-    let filter = 'all';
+    const reqKey = 'thalassa_requests_v3';
+    const draftKey = 'thalassa_draft_v3';
+    const lotNames = Array.from({ length: 25 }, (_, i) => `Lot ${i + 1} — T4 · 40 m²`);
     let isAdmin = false;
-    const defaultLots = [
-      { id: 1, nom: 'Lot 1', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Accès direct au ponton' },
-      { id: 2, nom: 'Lot 2', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Proche plage principale' },
-      { id: 3, nom: 'Lot 3', type: 'T4', surface: '40 m²', statut: 'Occupé', vue: 'Lagune', note: 'Exposé coucher de soleil' },
-      { id: 4, nom: 'Lot 4', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Calme, proche golf' },
-      { id: 5, nom: 'Lot 5', type: 'T4', surface: '40 m²', statut: 'Indisponible', vue: 'Océan', note: 'Rénovation en cours' },
-      { id: 6, nom: 'Lot 6', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Pontons privés à 50 m' },
-      { id: 7, nom: 'Lot 7', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Prêt pour emménagement' },
-      { id: 8, nom: 'Lot 8', type: 'T4', surface: '40 m²', statut: 'Occupé', vue: 'Océan', note: 'Double terrasse' },
-      { id: 9, nom: 'Lot 9', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Idéal famille' },
-      { id: 10, nom: 'Lot 10', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Accès plage nord' },
-      { id: 11, nom: 'Lot 11', type: 'T4', surface: '40 m²', statut: 'Indisponible', vue: 'Jardin', note: 'Maintenance' },
-      { id: 12, nom: 'Lot 12', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Couchers de soleil' },
-      { id: 13, nom: 'Lot 13', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Ombre et fraîcheur' },
-      { id: 14, nom: 'Lot 14', type: 'T4', surface: '40 m²', statut: 'Occupé', vue: 'Océan', note: 'Vue panoramique' },
-      { id: 15, nom: 'Lot 15', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Pontons secondaires' },
-      { id: 16, nom: 'Lot 16', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Proche terrain de golf' },
-      { id: 17, nom: 'Lot 17', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Terrasse XL' },
-      { id: 18, nom: 'Lot 18', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Prêt à visiter' },
-      { id: 19, nom: 'Lot 19', type: 'T4', surface: '40 m²', statut: 'Indisponible', vue: 'Océan', note: 'Bloc technique' },
-      { id: 20, nom: 'Lot 20', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Idéal coliving' },
-      { id: 21, nom: 'Lot 21', type: 'T4', surface: '40 m²', statut: 'Occupé', vue: 'Lagune', note: 'Option investisseurs' },
-      { id: 22, nom: 'Lot 22', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Très lumineux' },
-      { id: 23, nom: 'Lot 23', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Accessible PMR' },
-      { id: 24, nom: 'Lot 24', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Prêt pour location' },
-      { id: 25, nom: 'Lot 25', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Spot premium' }
-    ];
 
     const tabDefinitions = [
-      { id: 'presentation', titre: 'Présentation', points: [
-        'Île aux Bahamas : cabanons sur pilotis pensés pour la copropriété',
-        'Parties communes : ponton, plage, terrains de beach-volley & golf',
-        'Port avec place de bateau privative pour chaque lot'
-      ]},
-      { id: 'reglement', titre: 'Règlement', points: [
-        'Pas de bruit après 00h · respect du voisinage et de la faune locale',
-        'Animaux autorisés s’ils ne troublent pas la tranquillité',
-        'Usage collectif des plages et pontons · interdiction de privatiser'
-      ]},
-      { id: 'jouissance', titre: 'Jouissance', points: [
-        'Détermine la destination des parties privatives et communes',
-        'Conditions d’utilisation du port : 1 place par cabanon',
-        'Créneaux partagés pour le beach-volley & golf sans réservation'
-      ]},
-      { id: 'logistique', titre: 'Accès & logistique', points: [
+      { id: 'lieu', titre: 'Lieu & accès', points: [
+        'Île aux Bahamas, cabanons sur pilotis avec plage et ponton',
         'Navettes bateau programmées · station d’accueil sécurisée',
         'Accueil bagagerie, conciergerie et maintenance sur place',
         'Bornes électriques et zones techniques dédiées'
@@ -606,10 +546,10 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
         'Suivi des travaux, incidents et tableaux d’affichage partagés',
         'Clés numériques, badges port, et kit d’accueil copropriétaire'
       ]},
-      { id: 'invest', titre: 'Vie & statut des lots', points: [
-        'Lots T4 de 40 m² dédiés aux copropriétaires',
-        'Statuts “Disponible / Occupé / Indisponible” mis à jour en temps réel',
-        'Sauvegarde locale pour consultation hors connexion'
+      { id: 'vie', titre: 'Vie de l’île', points: [
+        '25 cabanons T4 dédiés aux copropriétaires, non destinés à la location',
+        'Échanges entre voisins, entraide et annonces internes dans l’onglet communauté',
+        'Tableau de bord des interventions et de la propreté partagée'
       ]},
       { id: 'ag', titre: 'AG 12 mars 2025', points: [
         'Assemblée Générale tenue le 12 mars 2025 à 17h00 (10 000 / 10 000 tantièmes)',
@@ -625,70 +565,26 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
     const services = [
       { icon: '🏝️', titre: 'Accès plage & ponton', texte: 'Pass prioritaire pour les résidents, surveillance et éclairage doux nocturne.' },
       { icon: '⛵', titre: 'Port privatif', texte: 'Place dédiée par cabanon, badges sécurisés, assistance amarrage.' },
-      { icon: '🏐', titre: 'Sports & loisirs', texte: 'Terrain de beach-volley & golf en créneaux partagés (tableau affiché, sans réservation).' },
-      { icon: '🧹', titre: 'Propreté & maintenance', texte: 'Équipe de ménage tournante, rappel automatique des règles de propreté.' },
+      { icon: '🏐', titre: 'Sports & loisirs', texte: 'Terrains en créneaux partagés (tableau affiché), sans principe de réservation.' },
+      { icon: '🧹', titre: 'Propreté & maintenance', texte: 'Équipe de ménage tournante, suivi des interventions et planification visible.' },
       { icon: '🦜', titre: 'Respect de la faune', texte: 'Silence après minuit, éclairage basse intensité, indicateurs “quiétude”.' },
-      { icon: '🛰️', titre: 'Connectivité', texte: 'Wifi maillé, sauvegarde locale des demandes et des statuts pour usage hors connexion.' },
+      { icon: '🛰️', titre: 'Connectivité', texte: 'Wifi maillé, sauvegarde locale des demandes et des documents pour usage hors connexion.' },
       { icon: '🛟', titre: 'Sécurité', texte: 'Vidéosurveillance discrète, numéros d’urgence et défibrillateur signalés.' },
-      { icon: '🧭', titre: 'Conciergerie', texte: 'Activités, transferts, équipements copropriétaires (kit bateau, golf, beach).'}
+      { icon: '🤝', titre: 'Communauté', texte: 'Espace d’annonces internes, entraide et partage d’équipements entre copropriétaires.' }
     ];
 
     const faq = [
       { q: 'Comment accéder à la résidence ?', a: 'Par navette bateau dédiée (port privatif) ou par l’aéroport voisin avec transfert organisé par la conciergerie.' },
       { q: 'Puis-je venir avec des animaux ?', a: 'Oui, s’ils ne troublent pas la tranquillité. Les promenades sont conseillées en dehors des zones calmes après 20h.' },
-      { q: 'Comment s’organisent les terrains de sport ?', a: 'Créneaux affichés sur tableau partagé et dans l’onglet Sports & Loisirs, sans réservation formelle.' },
-      { q: 'Les demandes clients sont-elles publiques ?', a: 'Non. Seuls les administrateurs connectés (TALASSA / TALASSAVIVEZLEREVE) peuvent consulter et éditer les demandes.' },
-      { q: 'Puis-je modifier le statut d’un lot ?', a: 'Oui depuis l’espace administrateur : disponible, occupé ou indisponible. La mise à jour est visible côté public immédiatement.' }
+      { q: 'Comment s’organisent les terrains de sport ?', a: 'Créneaux affichés sur tableau partagé dans l’onglet Sports & Loisirs, sans réservation ni statut de lot.' },
+      { q: 'Les demandes copro sont-elles publiques ?', a: 'Non. Seuls les administrateurs connectés (TALASSA / TALASSAVIVEZLEREVE) peuvent consulter et éditer les demandes.' },
+      { q: 'Où trouver les documents officiels ?', a: 'Dans la section Documents et via le bouton de téléchargement du règlement et du PV.' }
     ];
 
-    function loadLots() {
-      return JSON.parse(localStorage.getItem(lotKey) || 'null') || defaultLots;
-    }
-    function saveLots(lots) { localStorage.setItem(lotKey, JSON.stringify(lots)); }
-
-    function renderLots() {
-      const lots = loadLots();
-      const grid = document.getElementById('lotGrid');
-      grid.innerHTML = '';
-      lots.filter(l => filter === 'all' || l.statut === filter).forEach(lot => {
-        const card = document.createElement('div');
-        card.className = 'lot-card';
-        card.innerHTML = `
-          <div class="lot-head">
-            <div><strong>${lot.nom}</strong></div>
-            ${badge(lot.statut)}
-          </div>
-          <div class="meta">${lot.type} · ${lot.surface} · Vue ${lot.vue || 'lagon'}</div>
-          <div class="meta">${lot.note || 'Accès complet aux parties communes'}</div>
-          <button class="btn-ghost" onclick="prefillLot('${lot.nom}')">Demander ce lot</button>
-        `;
-        card.addEventListener('click', () => focusLot(lot));
-        grid.appendChild(card);
-      });
-      populateLotOptions(lots);
-      renderAdminLots(lots);
-      updateKpis();
-    }
-
-    function badge(status) {
-      const cls = status === 'Disponible' ? 'b-dispo' : status === 'Occupé' ? 'b-occupe' : 'b-indispo';
-      return `<span class="badge ${cls}">${status}</span>`;
-    }
-
-    function populateLotOptions(lots) {
+    function populateLotOptions() {
       const sel = document.getElementById('lotSelect');
-      sel.innerHTML = '<option value="">Sélectionner un lot</option>' + lots.map(l => `<option value="${l.nom}">${l.nom} (${l.statut})</option>`).join('');
+      sel.innerHTML = '<option value="">Sélectionner un lot</option>' + lotNames.map(l => `<option value="${l}">${l}</option>`).join('');
     }
-
-    function prefillLot(name) {
-      document.querySelector('select[name="lot"]').value = name;
-      document.querySelector('form').scrollIntoView({ behavior: 'smooth' });
-      const lots = loadLots();
-      const selected = lots.find(l => l.nom === name);
-      if (selected) focusLot(selected);
-    }
-
-    function setFilter(value) { filter = value; renderLots(); }
 
     function loadRequests() {
       return JSON.parse(localStorage.getItem(reqKey) || '[]');
@@ -704,9 +600,10 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
       saveRequests(requests);
       localStorage.removeItem(draftKey);
       form.reset();
-      document.getElementById('draftStatus').textContent = 'Demande enregistrée et envoyée au gestionnaire.';
-      toast('Demande envoyée. Elle est visible par l\'administrateur uniquement.');
+      updateDraftStatus('Demande enregistrée et envoyée au gestionnaire.');
+      toast('Demande envoyée. Elle est visible par l'administrateur uniquement.');
       renderRequests();
+      updateKpis();
     }
 
     function renderRequests() {
@@ -739,33 +636,12 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
     }
 
     function updateKpis() {
-      const lots = loadLots();
-      const dispo = lots.filter(l => l.statut === 'Disponible').length;
-      const occupe = lots.filter(l => l.statut === 'Occupé').length;
-      const indispo = lots.filter(l => l.statut === 'Indisponible').length;
+      const reqs = loadRequests();
       document.getElementById('kpiRow').innerHTML = `
-        <div class="kpi"><div class="label">Lots disponibles</div><div class="value">${dispo}</div></div>
-        <div class="kpi"><div class="label">Occupés</div><div class="value">${occupe}</div></div>
-        <div class="kpi"><div class="label">Indisponibles</div><div class="value">${indispo}</div></div>
-        <div class="kpi"><div class="label">Demandes reçues</div><div class="value">${loadRequests().length}</div></div>
-      `;
-    }
-
-    function focusLot(lot) {
-      const target = document.getElementById('lotFocus');
-      target.innerHTML = `
-        <h3>${lot.nom} · ${lot.surface}</h3>
-        <div class="chips">
-          <div class="chip">${lot.type}</div>
-          <div class="chip">Vue ${lot.vue || 'lagon'}</div>
-          <div class="chip">Statut : ${lot.statut}</div>
-        </div>
-        <p class="meta">${lot.note || 'Accès complet aux parties communes'}</p>
-        <div class="grid-cards">
-          <div class="card-sm"><div class="flag">⚓ Port</div><div class="meta">Place privative incluse</div></div>
-          <div class="card-sm"><div class="flag">🏝️ Plage & ponton</div><div class="meta">Accès collectif, pas de privatisation</div></div>
-          <div class="card-sm"><div class="flag">🏐 Sports</div><div class="meta">Beach-volley & golf en créneaux partagés</div></div>
-        </div>
+        <div class="kpi"><div class="label">Cabanons</div><div class="value">${lotNames.length}</div></div>
+        <div class="kpi"><div class="label">Places au port</div><div class="value">${lotNames.length}</div></div>
+        <div class="kpi"><div class="label">Dernière AG</div><div class="value">12/03/2025</div></div>
+        <div class="kpi"><div class="label">Demandes reçues</div><div class="value">${reqs.length}</div></div>
       `;
     }
 
@@ -822,47 +698,37 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
       toast('Demande mise à jour et publiée hors connexion.');
     }
 
-    function renderAdminLots(lots) {
-      if (!isAdmin) return;
-      const container = document.getElementById('adminLots');
-      container.innerHTML = '';
-      lots.forEach((lot, index) => {
-        const card = document.createElement('div');
-        card.className = 'lot-card';
-        card.innerHTML = `
-          <div class="lot-head"><strong>${lot.nom}</strong>${badge(lot.statut)}</div>
-          <div class="meta">${lot.type} · ${lot.surface}</div>
-          <label>Statut
-            <select data-index="${index}">
-              ${['Disponible','Occupé','Indisponible'].map(s => `<option ${s===lot.statut?'selected':''}>${s}</option>`).join('')}
-            </select>
-          </label>
-        `;
-        card.querySelector('select').addEventListener('change', (e) => {
-          const lotsList = loadLots();
-          lotsList[index].statut = e.target.value;
-          saveLots(lotsList);
-          renderLots();
-          toast('Statut du lot mis à jour.');
-        });
-        container.appendChild(card);
-      });
-    }
-
     function downloadReglement() {
-      const content = `Résidence Thalassa - Règlement de copropriété\n\n` +
-        `Parties communes : ponton, plage, terrain de beach-volley/golf, port (place de bateau privative).\n` +
-        `Détermine la destination des parties privatives et communes et fixe les règles de jouissance.\n\n` +
-        `Règles :\n` +
-        `- Pas de bruit après 00h (respect du voisinage et de la faune locale).\n` +
-        `- Animaux autorisés s’ils ne troublent pas la tranquillité.\n` +
-        `- Utilisation du port réservée aux résidents (1 place par cabanon).\n` +
-        `- Plage et ponton : usage collectif, interdiction de privatiser des zones.\n` +
-        `- Terrain de beach-volley & golf : créneaux partagés affichés sur place, sans réservation.\n` +
-        `- Propreté : chaque résident veille à la propreté des lieux communs.\n` +
-        `- Interdiction de feu de camp ou barbecue hors zones prévues.\n\n` +
-        `AG 12 mars 2025 : 10 000 / 10 000 tantièmes. Naturisme parties communes rejeté (3 résolutions). Naturisme sur parcelle d’eau privative adopté (Article 24). Bureau : Dupond / Flament / Petit.\n\n` +
-        `Dates clés : présentation orale le 28 novembre (copro physiquement, composition, règlement niveau 5/6, EDD, lieu).\n`;
+      const content = `Résidence Thalassa - Règlement de copropriété
+
+` +
+        `Parties communes : ponton, plage, terrain de beach-volley/golf, port (place de bateau privative).
+` +
+        `Détermine la destination des parties privatives et communes et fixe les règles de jouissance.
+
+` +
+        `Règles :
+` +
+        `- Pas de bruit après 00h (respect du voisinage et de la faune locale).
+` +
+        `- Animaux autorisés s’ils ne troublent pas la tranquillité.
+` +
+        `- Utilisation du port réservée aux résidents (1 place par cabanon).
+` +
+        `- Plage et ponton : usage collectif, interdiction de privatiser des zones.
+` +
+        `- Terrain de beach-volley & golf : créneaux partagés affichés sur place, sans réservation.
+` +
+        `- Propreté : chaque résident veille à la propreté des lieux communs.
+` +
+        `- Interdiction de feu de camp ou barbecue hors zones prévues.
+
+` +
+        `AG 12 mars 2025 : 10 000 / 10 000 tantièmes. Naturisme parties communes rejeté (3 résolutions). Naturisme sur parcelle d’eau privative adopté (Article 24). Bureau : Dupond / Flament / Petit.
+
+` +
+        `Dates clés : présentation orale le 28 novembre (copro physiquement, composition, règlement niveau 5/6, EDD, lieu).
+`;
       const blob = new Blob([content], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -912,7 +778,6 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
         isAdmin = true;
         document.getElementById('adminPanel').classList.remove('hidden');
         renderRequests();
-        renderLots();
         toast('Connexion réussie.');
       } else {
         alert('Identifiants incorrects. Accès refusé.');
@@ -929,13 +794,12 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
     document.getElementById('requestForm').addEventListener('input', () => { saveDraft(); });
     setInterval(saveDraft, 30000);
 
+    populateLotOptions();
     restoreDraft();
     renderTabs();
     renderServices();
     renderFaq();
-    renderLots();
-    const initialLot = loadLots().find(l => l.statut === 'Disponible') || loadLots()[0];
-    if (initialLot) focusLot(initialLot);
+    updateKpis();
   </script>
 </body>
 </html>
