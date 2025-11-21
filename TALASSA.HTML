@@ -192,7 +192,7 @@
       color: #fff;
     }
     .b-dispo { background: var(--green); }
-    .b-reserve { background: var(--amber); }
+    .b-occupe { background: var(--amber); }
     .b-indispo { background: var(--red); }
 
     .meta { color: var(--muted); font-size: 14px; }
@@ -290,6 +290,8 @@
           <a href="#tabs">Onglets</a>
           <a href="#lots">Lots</a>
           <a href="#services">Services</a>
+          <a href="#copro">Options copropriétaires</a>
+          <a href="#ag2025">Dernière AG</a>
           <a href="#agenda">Agenda</a>
           <a href="#faq">FAQ</a>
         </div>
@@ -303,7 +305,7 @@
     <section id="hero" class="hero">
       <div>
         <h1>Cabanons sur pilotis · résidence privée & partagée</h1>
-        <p>Plage, ponton, terrain de beach-volley et golf, port privatif : la copropriété Thalassa offre un cadre exceptionnel pour vivre le rêve des Bahamas. Suivez les disponibilités, demandez des informations et laissez l'équipe gérer les lots en temps réel.</p>
+        <p>Plage, ponton, terrain de beach-volley et golf, port privatif : la copropriété Thalassa offre un cadre exceptionnel pour vivre le rêve des Bahamas. Chaque copropriétaire suit les lots en temps réel, collabore sans réservation et retrouve tous les documents clés.</p>
       </div>
       <div class="chips">
         <div class="chip">Ponton / plage / port privatif</div>
@@ -318,6 +320,37 @@
       <div class="tab-wrapper">
         <div class="tabs" id="tabsNav"></div>
         <div class="tab-panels" id="tabsPanels"></div>
+      </div>
+    </section>
+
+    <section class="section" id="copro">
+      <h2>Options & services pour copropriétaires</h2>
+      <p class="subtitle">Des outils concrets pour la vie sur l’île, l’entretien des cabanons et la coordination entre copropriétaires.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🛠️ Maintenance express</div>
+          <div class="meta">Déclarez incidents techniques, déclenchez une intervention, suivez le statut en temps réel.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🧺 Conciergerie ménage</div>
+          <div class="meta">Planning partagé de ménage des cabanons, rotation hebdomadaire et kit de nettoyage fourni.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🗂️ Documents copro</div>
+          <div class="meta">Règlement, EDD, composition du bureau, comptes rendus et PV d’AG accessibles hors connexion.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🛟 Port & sécurité</div>
+          <div class="meta">Badges numériques, suivi des autorisations, rappel des consignes et de l’utilisation du port privatif.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🏐 Sports & loisirs</div>
+          <div class="meta">Tableau de créneaux partagé pour le beach-volley et le golf, sans réservation obligatoire.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🤝 Vie communautaire</div>
+          <div class="meta">Forum d’annonces, échanges de matériel, entraide pour arrivées/départs et événements sur place.</div>
+        </div>
       </div>
     </section>
 
@@ -354,6 +387,70 @@
       </div>
     </section>
 
+    <section class="section" id="ag2025">
+      <h2>Dernière Assemblée Générale · 12 mars 2025</h2>
+      <p class="subtitle">Procès-verbal complet de l’AG des copropriétaires de la Résidence TALASSA — Île du Levant, salle polyvalente.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🧾 Composition du bureau</div>
+          <div class="meta">Président : M. Dupond · Scrutateur : Mme Flament · Secrétaire : Mme Petit</div>
+          <div class="badge-soft">Séance ouverte à 17h15 · 10 000 / 10 000 tantièmes présents ou représentés</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📋 Ordre du jour</div>
+          <div class="meta">Détermination des destinations privatives et communes, conditions de jouissance, règles d’administration.</div>
+          <div class="meta">Lieu : Île du Levant · Résidence TALASSA · Port privatif et salle polyvalente.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">✅ Résolution adoptée</div>
+          <div class="meta">Autorisation de pratiquer le naturisme sur la parcelle d’eau privative de chaque copropriétaire.</div>
+          <div class="badge-soft">Majorité Article 24 — Vote : pour (tous sauf Mme Solou), contre (Mme Solou).</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">❌ Résolutions rejetées</div>
+          <div class="meta">1) Naturisme dans toutes les parties communes.</div>
+          <div class="meta">2) Naturisme dans les parties communes entre 00h00 et 06h00.</div>
+          <div class="meta">3) Naturisme sur une zone commune dédiée en bord de mer.</div>
+        </div>
+      </div>
+      <div class="section" style="margin-top:14px; background: rgba(255,255,255,0.85);">
+        <div class="admin-bar">
+          <div>
+            <div class="flag">📝 Procès-verbal détaillé</div>
+            <div class="meta">Texte intégral pour archivage et consultation hors connexion.</div>
+          </div>
+          <button class="btn-ghost" onclick="downloadReglement()">📄 Télécharger règlement & PV</button>
+        </div>
+        <div class="meta" style="white-space: pre-line; line-height: 1.6; margin-top: 10px;">
+PROCÈS-VERBAL DE L’ASSEMBLÉE GÉNÉRALE DES COPROPRIÉTAIRES
+Résidence TALASSA · Île du Levant — 12 mars 2025, 17h00
+Les copropriétaires, régulièrement convoqués par le syndic, sont réunis en Assemblée Générale dans la salle polyvalente. La feuille de présence émargée constate 10 000 / 10 000 tantièmes.
+
+COMPOSITION DU BUREAU
+Président de séance : M. DUPOND · Scrutateur : Mme FLAMENT · Secrétaire : Mme PETIT
+Ouverture de séance : 17h15.
+
+LISTE DES COPROPRIÉTAIRES ET TANTIÈMES
+Tableau fourni par le syndicat — voir document annexe.
+
+RÉSOLUTIONS
+1 — Autorisation du naturisme dans les parties communes
+Majorité : Article 25. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. Résultat : rejetée.
+2 — Naturisme dans les parties communes entre 00h00 et 06h00
+Majorité : Article 25. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. Résultat : rejetée.
+3 — Naturisme sur une zone dédiée des parties communes
+Majorité : Article 25. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. Résultat : rejetée.
+4 — Naturisme sur la parcelle d’eau privative de chaque copropriétaire
+Majorité : Article 24. Ont voté contre : Mme SOLOU. Ont voté pour : tous les autres copropriétaires. Résultat : adoptée.
+
+CLÔTURE DE SÉANCE
+Plus aucune question n’étant posée, la séance est levée à 19h05.
+Président : M. DUPOND · Secrétaire : Mme PETIT · Scrutateur : Mme FLAMENT.
+Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
+        </div>
+      </div>
+    </section>
+
     <section class="section" id="lots">
       <div class="lot-toolbar">
         <h2>Lots disponibles / indisponibles</h2>
@@ -361,7 +458,7 @@
           <div class="pill-box">Filtrer :</div>
           <button class="filter" onclick="setFilter('all')">Tous</button>
           <button class="filter" onclick="setFilter('Disponible')">Disponible</button>
-          <button class="filter" onclick="setFilter('Réservé')">Réservé</button>
+          <button class="filter" onclick="setFilter('Occupé')">Occupé</button>
           <button class="filter" onclick="setFilter('Indisponible')">Indisponible</button>
         </div>
       </div>
@@ -373,7 +470,7 @@
       <div class="admin-bar">
         <div>
           <h2>Demande d'information</h2>
-          <p class="subtitle">Les demandes sont sauvegardées automatiquement toutes les 30 secondes et à chaque modification.</p>
+          <p class="subtitle">Questions copropriétaires, signalements ou besoins logistiques. Sauvegarde automatique toutes les 30 secondes et à chaque modification.</p>
         </div>
         <button class="btn-ghost" onclick="resetDraft()">Réinitialiser le brouillon</button>
       </div>
@@ -390,7 +487,7 @@
           <label>Téléphone
             <input name="phone" required placeholder="+33..." />
           </label>
-          <label>Lot souhaité
+          <label>Lot concerné
             <select name="lot" id="lotSelect" required></select>
           </label>
         </div>
@@ -410,7 +507,7 @@
         <li>Animaux autorisés s’ils ne troublent pas la tranquillité.</li>
         <li>Utilisation du port réservée aux résidents (1 place par cabanon).</li>
         <li>Plage et ponton : usage collectif, interdiction de privatiser des zones.</li>
-        <li>Terrain de beach-volley & golf : réservation par créneaux pour éviter les conflits.</li>
+        <li>Terrain de beach-volley & golf : créneaux partagés affichés sur place, sans réservation.</li>
         <li>Propreté : chaque résident veille à la propreté des lieux communs.</li>
         <li>Interdiction de feu de camp ou barbecue hors zones prévues.</li>
       </ul>
@@ -458,25 +555,25 @@
     const defaultLots = [
       { id: 1, nom: 'Lot 1', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Accès direct au ponton' },
       { id: 2, nom: 'Lot 2', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Proche plage principale' },
-      { id: 3, nom: 'Lot 3', type: 'T4', surface: '40 m²', statut: 'Réservé', vue: 'Lagune', note: 'Exposé coucher de soleil' },
+      { id: 3, nom: 'Lot 3', type: 'T4', surface: '40 m²', statut: 'Occupé', vue: 'Lagune', note: 'Exposé coucher de soleil' },
       { id: 4, nom: 'Lot 4', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Calme, proche golf' },
       { id: 5, nom: 'Lot 5', type: 'T4', surface: '40 m²', statut: 'Indisponible', vue: 'Océan', note: 'Rénovation en cours' },
       { id: 6, nom: 'Lot 6', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Pontons privés à 50 m' },
       { id: 7, nom: 'Lot 7', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Prêt pour emménagement' },
-      { id: 8, nom: 'Lot 8', type: 'T4', surface: '40 m²', statut: 'Réservé', vue: 'Océan', note: 'Double terrasse' },
+      { id: 8, nom: 'Lot 8', type: 'T4', surface: '40 m²', statut: 'Occupé', vue: 'Océan', note: 'Double terrasse' },
       { id: 9, nom: 'Lot 9', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Idéal famille' },
       { id: 10, nom: 'Lot 10', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Accès plage nord' },
       { id: 11, nom: 'Lot 11', type: 'T4', surface: '40 m²', statut: 'Indisponible', vue: 'Jardin', note: 'Maintenance' },
       { id: 12, nom: 'Lot 12', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Couchers de soleil' },
       { id: 13, nom: 'Lot 13', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Ombre et fraîcheur' },
-      { id: 14, nom: 'Lot 14', type: 'T4', surface: '40 m²', statut: 'Réservé', vue: 'Océan', note: 'Vue panoramique' },
+      { id: 14, nom: 'Lot 14', type: 'T4', surface: '40 m²', statut: 'Occupé', vue: 'Océan', note: 'Vue panoramique' },
       { id: 15, nom: 'Lot 15', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Pontons secondaires' },
       { id: 16, nom: 'Lot 16', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Proche terrain de golf' },
       { id: 17, nom: 'Lot 17', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Terrasse XL' },
       { id: 18, nom: 'Lot 18', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Prêt à visiter' },
       { id: 19, nom: 'Lot 19', type: 'T4', surface: '40 m²', statut: 'Indisponible', vue: 'Océan', note: 'Bloc technique' },
       { id: 20, nom: 'Lot 20', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Idéal coliving' },
-      { id: 21, nom: 'Lot 21', type: 'T4', surface: '40 m²', statut: 'Réservé', vue: 'Lagune', note: 'Option investisseurs' },
+      { id: 21, nom: 'Lot 21', type: 'T4', surface: '40 m²', statut: 'Occupé', vue: 'Lagune', note: 'Option investisseurs' },
       { id: 22, nom: 'Lot 22', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Océan', note: 'Très lumineux' },
       { id: 23, nom: 'Lot 23', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Jardin', note: 'Accessible PMR' },
       { id: 24, nom: 'Lot 24', type: 'T4', surface: '40 m²', statut: 'Disponible', vue: 'Lagune', note: 'Prêt pour location' },
@@ -497,17 +594,27 @@
       { id: 'jouissance', titre: 'Jouissance', points: [
         'Détermine la destination des parties privatives et communes',
         'Conditions d’utilisation du port : 1 place par cabanon',
-        'Réservation par créneau pour le beach-volley & golf'
+        'Créneaux partagés pour le beach-volley & golf sans réservation'
       ]},
       { id: 'logistique', titre: 'Accès & logistique', points: [
         'Navettes bateau programmées · station d’accueil sécurisée',
         'Accueil bagagerie, conciergerie et maintenance sur place',
         'Bornes électriques et zones techniques dédiées'
       ]},
-      { id: 'invest', titre: 'Investissement', points: [
-        'Lots T4 de 40 m² optimisés pour la location premium',
-        'Statuts “Disponible / Réservé / Indisponible” mis à jour en temps réel',
+      { id: 'services-copro', titre: 'Services copropriétaires', points: [
+        'Conciergerie propriétaires (maintenance, ménage, équipements)',
+        'Suivi des travaux, incidents et tableaux d’affichage partagés',
+        'Clés numériques, badges port, et kit d’accueil copropriétaire'
+      ]},
+      { id: 'invest', titre: 'Vie & statut des lots', points: [
+        'Lots T4 de 40 m² dédiés aux copropriétaires',
+        'Statuts “Disponible / Occupé / Indisponible” mis à jour en temps réel',
         'Sauvegarde locale pour consultation hors connexion'
+      ]},
+      { id: 'ag', titre: 'AG 12 mars 2025', points: [
+        'Assemblée Générale tenue le 12 mars 2025 à 17h00 (10 000 / 10 000 tantièmes)',
+        'Bureau : Président M. Dupond · Scrutateur Mme Flament · Secrétaire Mme Petit',
+        'Résolutions naturisme : trois rejetées, une adoptée (parcelle d’eau privative)'
       ]},
       { id: 'documents', titre: 'Documents', points: [
         'Règlement téléchargeable en PDF',
@@ -518,20 +625,20 @@
     const services = [
       { icon: '🏝️', titre: 'Accès plage & ponton', texte: 'Pass prioritaire pour les résidents, surveillance et éclairage doux nocturne.' },
       { icon: '⛵', titre: 'Port privatif', texte: 'Place dédiée par cabanon, badges sécurisés, assistance amarrage.' },
-      { icon: '🏐', titre: 'Sports & loisirs', texte: 'Terrain de beach-volley & golf en réservation par créneau via l’onglet loisirs.' },
+      { icon: '🏐', titre: 'Sports & loisirs', texte: 'Terrain de beach-volley & golf en créneaux partagés (tableau affiché, sans réservation).' },
       { icon: '🧹', titre: 'Propreté & maintenance', texte: 'Équipe de ménage tournante, rappel automatique des règles de propreté.' },
       { icon: '🦜', titre: 'Respect de la faune', texte: 'Silence après minuit, éclairage basse intensité, indicateurs “quiétude”.' },
       { icon: '🛰️', titre: 'Connectivité', texte: 'Wifi maillé, sauvegarde locale des demandes et des statuts pour usage hors connexion.' },
       { icon: '🛟', titre: 'Sécurité', texte: 'Vidéosurveillance discrète, numéros d’urgence et défibrillateur signalés.' },
-      { icon: '🧭', titre: 'Conciergerie', texte: 'Réservations activités, transferts aéroport, équipements supplémentaires sur demande.' }
+      { icon: '🧭', titre: 'Conciergerie', texte: 'Activités, transferts, équipements copropriétaires (kit bateau, golf, beach).'}
     ];
 
     const faq = [
       { q: 'Comment accéder à la résidence ?', a: 'Par navette bateau dédiée (port privatif) ou par l’aéroport voisin avec transfert organisé par la conciergerie.' },
       { q: 'Puis-je venir avec des animaux ?', a: 'Oui, s’ils ne troublent pas la tranquillité. Les promenades sont conseillées en dehors des zones calmes après 20h.' },
-      { q: 'Comment réserver les terrains de sport ?', a: 'Choisissez un créneau dans l’onglet Sports & Loisirs, confirmation instantanée et rappel push.' },
+      { q: 'Comment s’organisent les terrains de sport ?', a: 'Créneaux affichés sur tableau partagé et dans l’onglet Sports & Loisirs, sans réservation formelle.' },
       { q: 'Les demandes clients sont-elles publiques ?', a: 'Non. Seuls les administrateurs connectés (TALASSA / TALASSAVIVEZLEREVE) peuvent consulter et éditer les demandes.' },
-      { q: 'Puis-je modifier le statut d’un lot ?', a: 'Oui depuis l’espace administrateur : disponible, réservé ou indisponible. La mise à jour est visible côté public immédiatement.' }
+      { q: 'Puis-je modifier le statut d’un lot ?', a: 'Oui depuis l’espace administrateur : disponible, occupé ou indisponible. La mise à jour est visible côté public immédiatement.' }
     ];
 
     function loadLots() {
@@ -564,7 +671,7 @@
     }
 
     function badge(status) {
-      const cls = status === 'Disponible' ? 'b-dispo' : status === 'Réservé' ? 'b-reserve' : 'b-indispo';
+      const cls = status === 'Disponible' ? 'b-dispo' : status === 'Occupé' ? 'b-occupe' : 'b-indispo';
       return `<span class="badge ${cls}">${status}</span>`;
     }
 
@@ -634,11 +741,11 @@
     function updateKpis() {
       const lots = loadLots();
       const dispo = lots.filter(l => l.statut === 'Disponible').length;
-      const reserve = lots.filter(l => l.statut === 'Réservé').length;
+      const occupe = lots.filter(l => l.statut === 'Occupé').length;
       const indispo = lots.filter(l => l.statut === 'Indisponible').length;
       document.getElementById('kpiRow').innerHTML = `
         <div class="kpi"><div class="label">Lots disponibles</div><div class="value">${dispo}</div></div>
-        <div class="kpi"><div class="label">Réservés</div><div class="value">${reserve}</div></div>
+        <div class="kpi"><div class="label">Occupés</div><div class="value">${occupe}</div></div>
         <div class="kpi"><div class="label">Indisponibles</div><div class="value">${indispo}</div></div>
         <div class="kpi"><div class="label">Demandes reçues</div><div class="value">${loadRequests().length}</div></div>
       `;
@@ -657,7 +764,7 @@
         <div class="grid-cards">
           <div class="card-sm"><div class="flag">⚓ Port</div><div class="meta">Place privative incluse</div></div>
           <div class="card-sm"><div class="flag">🏝️ Plage & ponton</div><div class="meta">Accès collectif, pas de privatisation</div></div>
-          <div class="card-sm"><div class="flag">🏐 Sports</div><div class="meta">Beach-volley & golf sur réservation</div></div>
+          <div class="card-sm"><div class="flag">🏐 Sports</div><div class="meta">Beach-volley & golf en créneaux partagés</div></div>
         </div>
       `;
     }
@@ -727,7 +834,7 @@
           <div class="meta">${lot.type} · ${lot.surface}</div>
           <label>Statut
             <select data-index="${index}">
-              ${['Disponible','Réservé','Indisponible'].map(s => `<option ${s===lot.statut?'selected':''}>${s}</option>`).join('')}
+              ${['Disponible','Occupé','Indisponible'].map(s => `<option ${s===lot.statut?'selected':''}>${s}</option>`).join('')}
             </select>
           </label>
         `;
@@ -751,9 +858,10 @@
         `- Animaux autorisés s’ils ne troublent pas la tranquillité.\n` +
         `- Utilisation du port réservée aux résidents (1 place par cabanon).\n` +
         `- Plage et ponton : usage collectif, interdiction de privatiser des zones.\n` +
-        `- Terrain de beach-volley & golf : réservation par créneaux pour éviter les conflits.\n` +
+        `- Terrain de beach-volley & golf : créneaux partagés affichés sur place, sans réservation.\n` +
         `- Propreté : chaque résident veille à la propreté des lieux communs.\n` +
         `- Interdiction de feu de camp ou barbecue hors zones prévues.\n\n` +
+        `AG 12 mars 2025 : 10 000 / 10 000 tantièmes. Naturisme parties communes rejeté (3 résolutions). Naturisme sur parcelle d’eau privative adopté (Article 24). Bureau : Dupond / Flament / Petit.\n\n` +
         `Dates clés : présentation orale le 28 novembre (copro physiquement, composition, règlement niveau 5/6, EDD, lieu).\n`;
       const blob = new Blob([content], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
