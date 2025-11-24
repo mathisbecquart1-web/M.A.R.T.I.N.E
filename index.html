@@ -8816,6 +8816,7 @@ function updateTabsChart() {
 
                 updateBatchSelectors();
                 updateTaskBatchDisplay();
+                updateTasksStats();
                 saveAllData();
 
                 if (nameInput) nameInput.value = '';
@@ -8891,6 +8892,7 @@ function updateTabsChart() {
 
                 updateBatchSelectors();
                 updateTaskBatchDisplay();
+                updateTasksStats();
                 saveAllData();
 
                 showNotification('🗑️ Lot supprimé');
@@ -8935,6 +8937,7 @@ function updateTabsChart() {
                 }
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
+                updateTasksStats();
                 saveAllData();
 
                 clearTaskForm();
@@ -9180,6 +9183,7 @@ function updateTabsChart() {
                 activeBatch.tasks = activeBatch.tasks.filter(task => task.id !== taskId);
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
+                updateTasksStats();
                 saveAllData();
             } catch (error) {
                 console.error('Erreur suppression tâche du lot:', error);
@@ -9328,11 +9332,13 @@ function updateTabsChart() {
             try {
                 const pendingCount = pendingTasks.length;
                 const completedCount = completedTasks.length;
-                const totalCount = pendingCount + completedCount;
+                const lotTasksCount = taskBatches.reduce((sum, batch) => sum + (batch.tasks?.length || 0), 0);
+                const totalCount = pendingCount + completedCount + lotTasksCount;
                 const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-                
+
                 document.getElementById('pendingTasksCount').textContent = pendingCount;
                 document.getElementById('completedTasksCount').textContent = completedCount;
+                document.getElementById('lotTasksCount').textContent = lotTasksCount;
                 document.getElementById('totalTasksCount').textContent = totalCount;
                 document.getElementById('tasksProgress').style.width = completionRate + '%';
 
