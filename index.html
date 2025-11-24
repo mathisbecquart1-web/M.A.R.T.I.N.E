@@ -3569,6 +3569,14 @@
         let taskExcelCells = [];
         let draggedTaskCellId = null;
         let rowSelections = {};
+        let dragSelectionState = {
+            active: false,
+            tab: null,
+            anchorRow: null,
+            baseSelection: new Set(),
+            didDrag: false
+        };
+        let suppressRowClickSelection = false;
         let bulkEditTab = null;
 
         // Initialisation des compteurs
@@ -5059,11 +5067,15 @@ return;
                     handleRowSelection(event, row, tabName);
                 }
             });
+            row.addEventListener('mousedown', (event) => beginRowDragSelection(event, row, tabName));
+            row.addEventListener('mouseenter', (event) => continueRowDragSelection(event, row, tabName));
 
             const numberCell = document.createElement('td');
             numberCell.className = 'row-number';
             numberCell.textContent = rowNum;
-            numberCell.title = 'Ctrl/Cmd + clic pour sélectionner plusieurs lignes';
+            numberCell.title = 'Ctrl/Cmd + clic ou glisser pour sélectionner plusieurs lignes';
+            numberCell.addEventListener('mousedown', (event) => beginRowDragSelection(event, row, tabName));
+            numberCell.addEventListener('mouseenter', (event) => continueRowDragSelection(event, row, tabName));
             numberCell.addEventListener('click', (event) => handleRowSelection(event, row, tabName));
             row.appendChild(numberCell);
 
@@ -5237,8 +5249,102 @@ return;
             return rowSelections[tabName];
         }
 
+        function beginRowDragSelection(event, row, tabName) {
+            try {
+                if (event.button !== 0) return;
+                if (event.target.closest('input, textarea, select, button')) return;
+
+                event.preventDefault();
+                const selection = getRowSelectionSet(tabName);
+
+                dragSelectionState.active = true;
+                dragSelectionState.tab = tabName;
+                dragSelectionState.anchorRow = row;
+                dragSelectionState.baseSelection = (event.ctrlKey || event.metaKey)
+                    ? new Set(selection)
+                    : new Set();
+                dragSelectionState.didDrag = false;
+
+                selection.clear();
+                dragSelectionState.baseSelection.forEach(id => selection.add(id));
+                if (row.dataset.rowId) {
+                    selection.add(row.dataset.rowId);
+                }
+                refreshRowSelections(tabName);
+                updateBulkSelectionInfo(tabName);
+                suppressRowClickSelection = true;
+                setTimeout(() => suppressRowClickSelection = false, 0);
+
+                document.addEventListener('mouseup', endRowDragSelection, { once: true });
+            } catch (error) {
+                console.error('Erreur démarrage sélection glissée:', error);
+            }
+        }
+
+        function updateDragSelection(row, tabName) {
+            try {
+                if (!dragSelectionState.active || dragSelectionState.tab !== tabName) return;
+
+                const tbody = row.closest('tbody');
+                if (!tbody) return;
+
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const anchorIndex = rows.indexOf(dragSelectionState.anchorRow);
+                const currentIndex = rows.indexOf(row);
+                if (anchorIndex === -1 || currentIndex === -1) return;
+
+                if (anchorIndex !== currentIndex) {
+                    dragSelectionState.didDrag = true;
+                }
+
+                const selection = getRowSelectionSet(tabName);
+                selection.clear();
+                dragSelectionState.baseSelection.forEach(id => selection.add(id));
+
+                const [start, end] = anchorIndex < currentIndex
+                    ? [anchorIndex, currentIndex]
+                    : [currentIndex, anchorIndex];
+
+                for (let i = start; i <= end; i++) {
+                    const id = rows[i]?.dataset.rowId;
+                    if (id) selection.add(id);
+                }
+
+                refreshRowSelections(tabName);
+                updateBulkSelectionInfo(tabName);
+            } catch (error) {
+                console.error('Erreur mise à jour sélection glissée:', error);
+            }
+        }
+
+        function continueRowDragSelection(event, row, tabName) {
+            if (!dragSelectionState.active || dragSelectionState.tab !== tabName) return;
+            updateDragSelection(row, tabName);
+        }
+
+        function endRowDragSelection() {
+            try {
+                if (!dragSelectionState.active) return;
+
+                if (dragSelectionState.didDrag) {
+                    suppressRowClickSelection = true;
+                    setTimeout(() => suppressRowClickSelection = false, 0);
+                }
+
+                dragSelectionState.active = false;
+                dragSelectionState.tab = null;
+                dragSelectionState.anchorRow = null;
+                dragSelectionState.baseSelection = new Set();
+                dragSelectionState.didDrag = false;
+            } catch (error) {
+                console.error('Erreur fin sélection glissée:', error);
+            }
+        }
+
         function handleRowSelection(event, row, tabName) {
             try {
+                if (suppressRowClickSelection) return;
+
                 const rowId = row.dataset.rowId;
                 if (!rowId) return;
 
