@@ -1416,6 +1416,104 @@
             margin-bottom: 20px;
         }
 
+        .task-paste-panel {
+            border: 1px dashed #cdd4ff;
+            background: #fff;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .task-paste-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .task-paste-actions .btn {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .task-paste-help {
+            color: #6c757d;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .task-paste-textarea {
+            width: 100%;
+            min-height: 90px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #d9ddf0;
+            resize: vertical;
+            font-size: 13px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .excel-cell-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #e2e6f5;
+            background: #f8f9ff;
+            min-height: 70px;
+        }
+
+        .excel-cell-pool.empty {
+            justify-content: center;
+            align-items: center;
+            color: #7a7f9c;
+            font-size: 13px;
+        }
+
+        .excel-cell-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: #fff;
+            border: 1px solid #dfe3ff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.12);
+            cursor: grab;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            min-width: 120px;
+            max-width: 240px;
+            user-select: none;
+        }
+
+        .excel-cell-pill strong {
+            background: #eef2ff;
+            color: #4c51bf;
+            padding: 4px 7px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .excel-cell-pill .excel-cell-value {
+            font-size: 13px;
+            color: #2c3e50;
+            line-height: 1.3;
+            max-width: 180px;
+            word-break: break-word;
+        }
+
+        .excel-cell-pill.dragging {
+            opacity: 0.75;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(102, 126, 234, 0.25);
+        }
+
+        .task-drop-target {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
         .task-field {
             margin-bottom: 15px;
         }
@@ -1434,6 +1532,84 @@
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 14px;
+        }
+
+        .task-table {
+            table-layout: fixed;
+        }
+
+        .task-summary-cell {
+            font-size: 13px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-word;
+        }
+
+        .task-table tbody tr.clickable-row {
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .task-table tbody tr.clickable-row:hover {
+            background: #f3f4ff;
+        }
+
+        .task-table tbody tr.highlight-task {
+            animation: taskHighlight 1.4s ease;
+        }
+
+        .bulk-edit-meta {
+            font-size: 13px;
+            color: #4b5563;
+            margin-top: 6px;
+        }
+
+        .bulk-edit-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .bulk-edit-grid label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .bulk-edit-grid select,
+        .bulk-edit-grid textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #d9ddf0;
+            font-size: 13px;
+            resize: vertical;
+        }
+
+        .bulk-edit-grid select[multiple] {
+            min-height: 140px;
+        }
+
+        .bulk-edit-helper {
+            background: #f8f9ff;
+            border: 1px dashed #dfe3ff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #4b5563;
+            margin-bottom: 10px;
+        }
+
+        @keyframes taskHighlight {
+            0% { background-color: #fff7e6; }
+            50% { background-color: #ffe0b3; }
+            100% { background-color: transparent; }
         }
 
         .excel-import {
@@ -1798,6 +1974,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('creation')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('creation')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('creation')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('creation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('creation')">🗑️ Effacer tout</button>
@@ -1917,6 +2094,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('modification')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('modification')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modification')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('modification')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modification')">🗑️ Effacer tout</button>
@@ -2036,6 +2214,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('resiliation')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('resiliation')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('resiliation')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('resiliation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('resiliation')">🗑️ Effacer tout</button>
@@ -2153,6 +2332,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('autremodif')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('autremodif')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('autremodif')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('autremodif')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('autremodif')">🗑️ Effacer tout</button>
@@ -2267,6 +2447,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('modifsurface')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('modifsurface')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modifsurface')">📊 Exporter Excel</button>
                 <button class="btn btn-warning" onclick="recalculateAllSurfaces()">🔄 Recalculer toutes les différences</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('modifsurface')">🗑️ Supprimer sélection</button>
@@ -2389,6 +2570,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('verifbaux')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('verifbaux')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('verifbaux')">📊 Exporter Excel</button>
                 <button class="btn btn-warning" onclick="validateAllBauxStates()">🔍 Valider tous les états</button>
                 <button class="btn btn-success" onclick="markAllAsOK()">✅ Marquer sélection OK</button>
@@ -2480,6 +2662,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('pni')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('pni')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('pni')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('pni')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('pni')">🗑️ Effacer tout</button>
@@ -2643,6 +2826,8 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('baserg')">➕ Ajouter code RG</button>
                 <button class="btn btn-primary" onclick="addRow('baseut')">➕ Ajouter code UT</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('baserg')">✏️ Mise à jour RG en masse</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('baseut')">✏️ Mise à jour UT en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('baserg')">📊 Exporter Base RG</button>
                 <button class="btn btn-excel" onclick="exportToExcel('baseut')">📊 Exporter Base UT</button>
                 <button class="btn btn-warning" onclick="validateAllRGCodes()">🔍 Vérifier codes RG dans tous les onglets</button>
@@ -2731,7 +2916,20 @@
                             <label>Nombre de tâches à créer :</label>
                             <input id="taskQuantity" type="number" min="1" max="50" value="1" />
                         </div>
-                        
+
+                        <div class="task-field">
+                            <label>📋 Coller des cellules Excel</label>
+                            <div class="task-paste-panel">
+                                <textarea id="taskExcelTextarea" class="task-paste-textarea" placeholder="Collez ici des cellules Excel (plusieurs lignes et colonnes)"></textarea>
+                                <div class="task-paste-actions">
+                                    <button class="btn btn-primary" type="button" onclick="parseTaskExcelCells()">🔍 Détecter les cellules</button>
+                                    <button class="btn btn-secondary" type="button" onclick="clearTaskExcelCells()">🧽 Effacer la sélection</button>
+                                </div>
+                                <div class="task-paste-help">Chaque cellule détectée peut être glissée individuellement sur un champ du formulaire.</div>
+                            </div>
+                            <div id="taskExcelCellsContainer" class="excel-cell-pool empty">Collez vos cellules puis cliquez sur "Détecter les cellules" pour les rendre déplaçables.</div>
+                        </div>
+
                         <div id="taskFieldsContainer">
                             <p style="color: #666; text-align: center; padding: 20px;">
                                 Sélectionnez un onglet pour voir les champs disponibles
@@ -2753,56 +2951,6 @@
                             </button>
                         </div>
 
-                        <div class="excel-import" id="excelImportSection">
-                            <div class="excel-import-layout">
-                                <div class="excel-import-form">
-                                    <div>
-                                        <h4>📋 Import rapide par copier/coller Excel</h4>
-                                        <p style="font-size: 13px; color: #555; margin-bottom: 10px;">
-                                            Collez vos lignes depuis Excel, réorganisez les colonnes par glisser-déposer puis créez automatiquement autant de tâches que de lignes importées.
-                                        </p>
-                                    </div>
-                                    <div class="excel-field-hints" id="excelFieldHints">
-                                        <div class="excel-preview-empty" style="padding: 8px;">
-                                            Sélectionnez un onglet pour voir l'ordre attendu des colonnes.
-                                        </div>
-                                    </div>
-                                    <textarea id="excelPasteArea" class="excel-paste-area" placeholder="GA[TAB]Date Demande[TAB]..."></textarea>
-                                    <div class="excel-import-actions">
-                                        <button class="btn btn-secondary" id="excelPreviewBtn" onclick="handleExcelPastePreview()">
-                                            👀 Prévisualiser
-                                        </button>
-                                        <button class="btn btn-danger" type="button" onclick="resetExcelImportArea()">
-                                            ♻️ Effacer l'import
-                                        </button>
-                                        <button class="btn btn-success" id="excelImportBtn" onclick="createTasksFromExcelImport()" disabled>
-                                            📥 Créer des tâches depuis l'import
-                                        </button>
-                                        <button class="btn btn-secondary" id="excelBatchImportBtn" onclick="addImportToBatch()" disabled>
-                                            📦 Ajouter l'import au lot actif
-                                        </button>
-                                        <label class="excel-option">
-                                            <input type="checkbox" id="excelSkipHeader" checked onchange="updateExcelImportButtons()">
-                                            Ignorer la première ligne (entêtes)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="excel-preview-panel">
-                                    <div class="excel-preview-panel-header">
-                                        <h5>Tableau de prévisualisation</h5>
-                                        <span class="excel-preview-helper">Restez sur le formulaire tout en parcourant vos lignes importées.</span>
-                                    </div>
-                                    <div class="excel-preview-meta" id="excelPreviewMeta">Aucun aperçu pour le moment.</div>
-                                    <div class="excel-preview-scroll">
-                                        <div id="excelPreviewContainer" class="excel-preview-container">
-                                            <div class="excel-preview-empty">
-                                                Collez vos données pour voir un aperçu interactif.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -2859,7 +3007,7 @@
                         <button class="btn btn-excel" onclick="exportActiveBatch()">📤 Exporter ce lot</button>
                     </div>
                 </div>
-                <table>
+                <table class="task-table">
                     <thead>
                         <tr>
                             <th style="width: 40px;">#</th>
@@ -2879,7 +3027,7 @@
 
             <!-- TABLEAU DES TÂCHES EN ATTENTE -->
             <div class="table-container">
-                <table id="tachesTable">
+                <table id="tachesTable" class="task-table">
                     <thead>
                         <tr>
                             <th style="width: 40px;">#</th>
@@ -2895,6 +3043,29 @@
                             <td colspan="6" style="text-align: center; padding: 40px; color: #666;">
                                 📝 Aucune tâche en attente. Créez une nouvelle tâche ci-dessus !
                             </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-container" style="margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; flex-wrap: wrap;">
+                    <h4 style="margin: 0;">📜 Historique des tâches terminées</h4>
+                    <div style="font-size: 12px; color: #666;">Les tâches exécutées sont conservées avec leur date et heure d'envoi.</div>
+                </div>
+                <table id="completedTasksTable" class="task-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th style="width: 180px;">Onglet destination</th>
+                            <th style="width: 320px;">Résumé</th>
+                            <th style="width: 200px;">Terminé le</th>
+                            <th style="width: 120px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completedTasksTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 30px; color: #666;">📭 Aucune tâche terminée pour le moment.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -3224,7 +3395,35 @@
         </div>
     </div>
 
-    
+    <!-- MISE À JOUR MASSIVE VIA COLLAGE EXCEL -->
+    <div class="preview-modal" id="bulkEditModal">
+        <div class="preview-content">
+            <div class="preview-header">
+                <h3 id="bulkEditTitle">✏️ Mise à jour en masse</h3>
+                <button class="close-preview" onclick="closeBulkUpdateModal()">×</button>
+            </div>
+            <div class="bulk-edit-helper" id="bulkEditHelper">Sélectionnez les lignes à modifier (Ctrl/Cmd + clic), choisissez les colonnes concernées puis collez vos valeurs depuis Excel.</div>
+            <div class="bulk-edit-grid">
+                <div>
+                    <label for="bulkEditColumns">Colonnes à modifier (ordre = colonnes collées)</label>
+                    <select id="bulkEditColumns" multiple></select>
+                    <div class="bulk-edit-meta" id="bulkEditSelectionInfo"></div>
+                </div>
+                <div>
+                    <label for="bulkEditPaste">Collage Excel</label>
+                    <textarea id="bulkEditPaste" rows="8" placeholder="Collez ici vos cellules Excel (une ligne par ligne sélectionnée)"></textarea>
+                    <div class="bulk-edit-meta" id="bulkEditPasteMeta"></div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-success" onclick="applyBulkUpdate()">✅ Appliquer aux lignes sélectionnées</button>
+                <button class="btn btn-secondary" onclick="resetBulkUpdateArea()">🧽 Réinitialiser</button>
+                <button class="btn btn-danger" onclick="closeBulkUpdateModal()">❌ Fermer</button>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- CRÉDIT PRODUCTEUR -->
     <div class="producer-credit">
@@ -3367,6 +3566,18 @@
         let activeTabName = 'creation';
         let tabCache = null;
         let pendingStatsUpdate = null;
+        let taskExcelCells = [];
+        let draggedTaskCellId = null;
+        let rowSelections = {};
+        let dragSelectionState = {
+            active: false,
+            tab: null,
+            anchorRow: null,
+            baseSelection: new Set(),
+            didDrag: false
+        };
+        let suppressRowClickSelection = false;
+        let bulkEditTab = null;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -3587,6 +3798,8 @@
 
                 activeTabName = tabName;
                 scheduleTabStatsUpdate(tabName);
+                refreshRowSelections(tabName);
+                updateBulkSelectionInfo(tabName);
 
                 logActivity(`Navigation vers ${getTabDisplayName(tabName)}`, 'info');
 
@@ -4846,10 +5059,24 @@ return;
             const rowNum = ++rowCounters[tabName];
 
             const row = document.createElement('tr');
+            const rowId = options.rowId || generateUniqueId();
+            row.dataset.rowId = rowId;
+            row.addEventListener('click', (event) => {
+                if (event.ctrlKey || event.metaKey) {
+                    event.preventDefault();
+                    handleRowSelection(event, row, tabName);
+                }
+            });
+            row.addEventListener('mousedown', (event) => beginRowDragSelection(event, row, tabName));
+            row.addEventListener('mouseenter', (event) => continueRowDragSelection(event, row, tabName));
 
             const numberCell = document.createElement('td');
             numberCell.className = 'row-number';
             numberCell.textContent = rowNum;
+            numberCell.title = 'Ctrl/Cmd + clic ou glisser pour sélectionner plusieurs lignes';
+            numberCell.addEventListener('mousedown', (event) => beginRowDragSelection(event, row, tabName));
+            numberCell.addEventListener('mouseenter', (event) => continueRowDragSelection(event, row, tabName));
+            numberCell.addEventListener('click', (event) => handleRowSelection(event, row, tabName));
             row.appendChild(numberCell);
 
             columns.forEach((column, index) => {
@@ -4968,12 +5195,16 @@ return;
         }
 
         function addRowWithData(tabName, data, options = {}) {
-            const { fragment = null, skipStats = false, skipLog = false, skipFocus = false, skipValidation = false } = options;
+            const { fragment = null, skipStats = false, skipLog = false, skipFocus = false, skipValidation = false, rowId = null } = options;
             try {
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) return;
 
                 const row = buildRowElement(tabName, data, { skipValidation });
+
+                if (rowId) {
+                    row.dataset.taskId = rowId;
+                }
 
                 if (fragment) {
                     fragment.appendChild(row);
@@ -5011,6 +5242,150 @@ return;
             }
         }
 
+        function getRowSelectionSet(tabName) {
+            if (!rowSelections[tabName]) {
+                rowSelections[tabName] = new Set();
+            }
+            return rowSelections[tabName];
+        }
+
+        function beginRowDragSelection(event, row, tabName) {
+            try {
+                if (event.button !== 0) return;
+                if (event.target.closest('input, textarea, select, button')) return;
+
+                event.preventDefault();
+                const selection = getRowSelectionSet(tabName);
+
+                dragSelectionState.active = true;
+                dragSelectionState.tab = tabName;
+                dragSelectionState.anchorRow = row;
+                dragSelectionState.baseSelection = (event.ctrlKey || event.metaKey)
+                    ? new Set(selection)
+                    : new Set();
+                dragSelectionState.didDrag = false;
+
+                selection.clear();
+                dragSelectionState.baseSelection.forEach(id => selection.add(id));
+                if (row.dataset.rowId) {
+                    selection.add(row.dataset.rowId);
+                }
+                refreshRowSelections(tabName);
+                updateBulkSelectionInfo(tabName);
+                suppressRowClickSelection = true;
+                setTimeout(() => suppressRowClickSelection = false, 0);
+
+                document.addEventListener('mouseup', endRowDragSelection, { once: true });
+            } catch (error) {
+                console.error('Erreur démarrage sélection glissée:', error);
+            }
+        }
+
+        function updateDragSelection(row, tabName) {
+            try {
+                if (!dragSelectionState.active || dragSelectionState.tab !== tabName) return;
+
+                const tbody = row.closest('tbody');
+                if (!tbody) return;
+
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const anchorIndex = rows.indexOf(dragSelectionState.anchorRow);
+                const currentIndex = rows.indexOf(row);
+                if (anchorIndex === -1 || currentIndex === -1) return;
+
+                if (anchorIndex !== currentIndex) {
+                    dragSelectionState.didDrag = true;
+                }
+
+                const selection = getRowSelectionSet(tabName);
+                selection.clear();
+                dragSelectionState.baseSelection.forEach(id => selection.add(id));
+
+                const [start, end] = anchorIndex < currentIndex
+                    ? [anchorIndex, currentIndex]
+                    : [currentIndex, anchorIndex];
+
+                for (let i = start; i <= end; i++) {
+                    const id = rows[i]?.dataset.rowId;
+                    if (id) selection.add(id);
+                }
+
+                refreshRowSelections(tabName);
+                updateBulkSelectionInfo(tabName);
+            } catch (error) {
+                console.error('Erreur mise à jour sélection glissée:', error);
+            }
+        }
+
+        function continueRowDragSelection(event, row, tabName) {
+            if (!dragSelectionState.active || dragSelectionState.tab !== tabName) return;
+            updateDragSelection(row, tabName);
+        }
+
+        function endRowDragSelection() {
+            try {
+                if (!dragSelectionState.active) return;
+
+                if (dragSelectionState.didDrag) {
+                    suppressRowClickSelection = true;
+                    setTimeout(() => suppressRowClickSelection = false, 0);
+                }
+
+                dragSelectionState.active = false;
+                dragSelectionState.tab = null;
+                dragSelectionState.anchorRow = null;
+                dragSelectionState.baseSelection = new Set();
+                dragSelectionState.didDrag = false;
+            } catch (error) {
+                console.error('Erreur fin sélection glissée:', error);
+            }
+        }
+
+        function handleRowSelection(event, row, tabName) {
+            try {
+                if (suppressRowClickSelection) return;
+
+                const rowId = row.dataset.rowId;
+                if (!rowId) return;
+
+                const selection = getRowSelectionSet(tabName);
+                const multi = event.ctrlKey || event.metaKey;
+
+                if (!multi) {
+                    selection.clear();
+                }
+
+                if (selection.has(rowId)) {
+                    selection.delete(rowId);
+                } else {
+                    selection.add(rowId);
+                }
+
+                refreshRowSelections(tabName);
+                updateBulkSelectionInfo(tabName);
+            } catch (error) {
+                console.error('Erreur sélection de ligne:', error);
+            }
+        }
+
+        function refreshRowSelections(tabName) {
+            const tbody = document.getElementById(`${tabName}TableBody`);
+            const selection = getRowSelectionSet(tabName);
+            if (!tbody) return;
+
+            tbody.querySelectorAll('tr').forEach(tr => {
+                const isSelected = selection.has(tr.dataset.rowId);
+                tr.classList.toggle('row-selected', isSelected);
+            });
+        }
+
+        function clearRowSelections(tabName) {
+            const selection = getRowSelectionSet(tabName);
+            selection.clear();
+            refreshRowSelections(tabName);
+            updateBulkSelectionInfo(tabName);
+        }
+
         function validateInputInRealTime(input, columnName, tabName) {
             try {
                 const value = input.value;
@@ -5037,6 +5412,11 @@ return;
             try {
                 if (confirm('Êtes-vous sûr de vouloir supprimer cette ligne ?')) {
                     row.remove();
+                    const selection = getRowSelectionSet(tabName);
+                    if (selection.has(row.dataset.rowId)) {
+                        selection.delete(row.dataset.rowId);
+                        refreshRowSelections(tabName);
+                    }
                     updateStats(tabName);
                     saveAllData();
                     showNotification('🗑️ Ligne supprimée');
@@ -5045,6 +5425,35 @@ return;
             } catch (error) {
                 console.error('Erreur suppression ligne:', error);
                 showNotification('❌ Erreur lors de la suppression', 'error');
+            }
+        }
+
+        function deleteSelectedRows(tabName) {
+            try {
+                const selection = getRowSelectionSet(tabName);
+                if (!selection.size) {
+                    showNotification('ℹ️ Aucune ligne sélectionnée', 'info');
+                    return;
+                }
+
+                if (!confirm(`Supprimer les ${selection.size} ligne(s) sélectionnée(s) ?`)) return;
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                selection.forEach(rowId => {
+                    const row = tbody?.querySelector(`tr[data-row-id="${rowId}"]`);
+                    if (row) row.remove();
+                });
+
+                selection.clear();
+                refreshRowSelections(tabName);
+                updateStats(tabName);
+                saveAllData();
+
+                showNotification('🗑️ Sélection supprimée');
+                logActivity(`Sélection supprimée dans ${getTabDisplayName(tabName)}`, 'warning');
+            } catch (error) {
+                console.error('Erreur suppression sélection:', error);
+                showNotification('❌ Erreur lors de la suppression de la sélection', 'error');
             }
         }
 
@@ -7886,12 +8295,16 @@ function updateTabsChart() {
                     
                     const label = document.createElement('label');
                     label.textContent = column;
-                    
+
                     const input = document.createElement('input');
                     input.type = getInputType(column);
                     input.placeholder = `Saisir ${column.toLowerCase()}...`;
                     input.id = `taskField_${index}`;
-                    
+                    input.addEventListener('dragover', handleTaskInputDragOver);
+                    input.addEventListener('drop', handleTaskInputDrop);
+                    input.addEventListener('dragleave', handleTaskInputDragLeave);
+                    input.addEventListener('dragexit', handleTaskInputDragLeave);
+
                     fieldDiv.appendChild(label);
                     fieldDiv.appendChild(input);
                     fieldsContainer.appendChild(fieldDiv);
@@ -7910,6 +8323,137 @@ function updateTabsChart() {
             } catch (error) {
                 console.error('Erreur mise à jour champs tâche:', error);
             }
+        }
+
+        function parseTaskExcelCells() {
+            try {
+                const textarea = document.getElementById('taskExcelTextarea');
+                if (!textarea) return;
+
+                const raw = (textarea.value || '').trim();
+                if (!raw) {
+                    taskExcelCells = [];
+                    renderTaskExcelCells();
+                    showNotification('ℹ️ Aucune donnée détectée dans le collage', 'info');
+                    return;
+                }
+
+                const rows = raw.split(/\r?\n/);
+                const cells = [];
+
+                rows.forEach(line => {
+                    line.split('\t').forEach(value => {
+                        const cleaned = value.trim();
+                        if (cleaned) {
+                            cells.push({ id: generateUniqueId(), value: cleaned });
+                        }
+                    });
+                });
+
+                taskExcelCells = cells;
+                renderTaskExcelCells();
+
+                if (cells.length) {
+                    showNotification(`✅ ${cells.length} cellule(s) prêtes au glisser-déposer`);
+                } else {
+                    showNotification('ℹ️ Aucune cellule exploitable trouvée', 'info');
+                }
+            } catch (error) {
+                console.error('Erreur analyse des cellules Excel collées:', error);
+            }
+        }
+
+        function renderTaskExcelCells() {
+            try {
+                const container = document.getElementById('taskExcelCellsContainer');
+                if (!container) return;
+
+                container.innerHTML = '';
+                if (taskExcelCells.length === 0) {
+                    container.classList.add('empty');
+                    container.textContent = 'Collez vos cellules puis lancez la détection pour les faire glisser vers les champs.';
+                    return;
+                }
+
+                container.classList.remove('empty');
+                taskExcelCells.forEach((cell, index) => {
+                    const pill = document.createElement('div');
+                    pill.className = 'excel-cell-pill';
+                    pill.draggable = true;
+                    pill.dataset.cellId = cell.id;
+                    pill.addEventListener('dragstart', handleTaskCellDragStart);
+                    pill.addEventListener('dragend', handleTaskCellDragEnd);
+
+                    const badge = document.createElement('strong');
+                    badge.textContent = `Cellule ${index + 1}`;
+                    pill.appendChild(badge);
+
+                    const value = document.createElement('div');
+                    value.className = 'excel-cell-value';
+                    value.textContent = cell.value;
+                    value.title = cell.value;
+                    pill.appendChild(value);
+
+                    container.appendChild(pill);
+                });
+            } catch (error) {
+                console.error('Erreur affichage cellules collées:', error);
+            }
+        }
+
+        function clearTaskExcelCells() {
+            try {
+                const textarea = document.getElementById('taskExcelTextarea');
+                if (textarea) {
+                    textarea.value = '';
+                }
+                taskExcelCells = [];
+                renderTaskExcelCells();
+            } catch (error) {
+                console.error('Erreur réinitialisation cellules Excel:', error);
+            }
+        }
+
+        function handleTaskCellDragStart(event) {
+            const cellId = event.currentTarget.dataset.cellId;
+            draggedTaskCellId = cellId;
+            event.dataTransfer.effectAllowed = 'copy';
+            event.dataTransfer.setData('text/plain', cellId);
+            event.currentTarget.classList.add('dragging');
+        }
+
+        function handleTaskCellDragEnd(event) {
+            draggedTaskCellId = null;
+            event.currentTarget.classList.remove('dragging');
+        }
+
+        function getDraggedTaskCellValue(event) {
+            const cellId = event.dataTransfer?.getData('text/plain') || draggedTaskCellId;
+            if (!cellId) return null;
+            const match = taskExcelCells.find(cell => cell.id === cellId);
+            return match ? match.value : null;
+        }
+
+        function handleTaskInputDragOver(event) {
+            if (!taskExcelCells.length) return;
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+            event.currentTarget.classList.add('task-drop-target');
+        }
+
+        function handleTaskInputDragLeave(event) {
+            event.currentTarget.classList.remove('task-drop-target');
+        }
+
+        function handleTaskInputDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('task-drop-target');
+            const value = getDraggedTaskCellValue(event);
+            if (value === null || value === undefined) return;
+            const input = event.currentTarget;
+            input.value = value;
+            input.dispatchEvent(new Event('input'));
+            input.focus();
         }
 
         // 📋 Import Excel par copier/coller
@@ -8457,21 +9001,40 @@ function updateTabsChart() {
 
                 const columns = tabConfigs[targetTab]?.columns || [];
                 const taskData = [];
+                const taskDataObject = {};
                 const quantity = getTaskQuantity();
 
                 columns.forEach((column, index) => {
                     const input = document.getElementById(`taskField_${index}`);
-                    taskData.push(input ? input.value : '');
+                    const value = input ? input.value : '';
+                    taskData.push(value);
+                    taskDataObject[column] = value;
                 });
 
                 const fragment = document.createDocumentFragment();
                 for (let i = 0; i < quantity; i++) {
+                    const taskId = generateUniqueId();
+                    const timestamp = new Date();
+
                     addRowWithData(targetTab, taskData, {
                         fragment,
                         skipStats: true,
                         skipLog: true,
                         skipFocus: true,
-                        skipValidation: true
+                        skipValidation: true,
+                        rowId: taskId
+                    });
+
+                    completedTasks.push({
+                        id: taskId,
+                        targetTab,
+                        targetTabName: getTabDisplayName(targetTab),
+                        data: { ...taskDataObject },
+                        createdAt: timestamp,
+                        completedAt: timestamp,
+                        priority: 'Normale',
+                        summary: generateTaskSummary(taskDataObject),
+                        status: 'completed'
                     });
                 }
 
@@ -8481,6 +9044,7 @@ function updateTabsChart() {
                 }
 
                 updateStats(targetTab);
+                updateTasksStats();
                 saveAllData();
 
                 clearTaskForm();
@@ -8557,6 +9121,7 @@ function updateTabsChart() {
 
                 updateBatchSelectors();
                 updateTaskBatchDisplay();
+                updateTasksStats();
                 saveAllData();
 
                 if (nameInput) nameInput.value = '';
@@ -8632,6 +9197,7 @@ function updateTabsChart() {
 
                 updateBatchSelectors();
                 updateTaskBatchDisplay();
+                updateTasksStats();
                 saveAllData();
 
                 showNotification('🗑️ Lot supprimé');
@@ -8676,6 +9242,7 @@ function updateTabsChart() {
                 }
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
+                updateTasksStats();
                 saveAllData();
 
                 clearTaskForm();
@@ -8694,9 +9261,148 @@ function updateTabsChart() {
                 document.getElementById('taskTargetTab').value = '';
                 const qtyInput = document.getElementById('taskQuantity');
                 if (qtyInput) qtyInput.value = 1;
+                clearTaskExcelCells();
                 updateTaskFields();
             } catch (error) {
                 console.error('Erreur effacement formulaire tâche:', error);
+            }
+        }
+
+        function openBulkUpdateModal(tabName) {
+            try {
+                bulkEditTab = tabName || activeTabName;
+                const modal = document.getElementById('bulkEditModal');
+                const title = document.getElementById('bulkEditTitle');
+                const columnsSelect = document.getElementById('bulkEditColumns');
+
+                if (!modal || !columnsSelect) return;
+
+                const columns = tabConfigs[bulkEditTab]?.columns || [];
+                columnsSelect.innerHTML = '';
+                columns.forEach(column => {
+                    const option = document.createElement('option');
+                    option.value = column;
+                    option.textContent = column;
+                    columnsSelect.appendChild(option);
+                });
+
+                if (title) {
+                    title.textContent = `✏️ Mise à jour en masse – ${getTabDisplayName(bulkEditTab)}`;
+                }
+
+                resetBulkUpdateArea();
+                updateBulkSelectionInfo(bulkEditTab);
+
+                modal.classList.add('show');
+            } catch (error) {
+                console.error('Erreur ouverture modal mise à jour en masse:', error);
+            }
+        }
+
+        function closeBulkUpdateModal() {
+            const modal = document.getElementById('bulkEditModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function resetBulkUpdateArea() {
+            const paste = document.getElementById('bulkEditPaste');
+            const meta = document.getElementById('bulkEditPasteMeta');
+            if (paste) paste.value = '';
+            if (meta) meta.textContent = '';
+        }
+
+        function parseBulkPaste() {
+            try {
+                const paste = document.getElementById('bulkEditPaste');
+                const raw = (paste?.value || '').trim();
+                if (!raw) return [];
+
+                return raw.split(/\r?\n/)
+                    .map(line => line.split('\t'))
+                    .filter(row => row.some(cell => (cell || '').trim() !== ''));
+            } catch (error) {
+                console.error('Erreur analyse collage en masse:', error);
+                return [];
+            }
+        }
+
+        function updateBulkSelectionInfo(tabName) {
+            const info = document.getElementById('bulkEditSelectionInfo');
+            const helper = document.getElementById('bulkEditHelper');
+            const selection = getRowSelectionSet(tabName || bulkEditTab || activeTabName);
+            const count = selection.size;
+
+            if (info) {
+                info.textContent = count
+                    ? `${count} ligne(s) sélectionnée(s) prête(s) pour la mise à jour`
+                    : 'Aucune ligne sélectionnée pour cet onglet.';
+            }
+
+            if (helper) {
+                helper.textContent = 'Sélectionnez les lignes à modifier (Ctrl/Cmd + clic), choisissez les colonnes concernées puis collez vos valeurs depuis Excel.';
+            }
+
+            refreshRowSelections(tabName || bulkEditTab || activeTabName);
+        }
+
+        function applyBulkUpdate() {
+            try {
+                const tabName = bulkEditTab || activeTabName;
+                const columnsSelect = document.getElementById('bulkEditColumns');
+                const selection = getRowSelectionSet(tabName);
+                const rowsData = parseBulkPaste();
+                const pasteMeta = document.getElementById('bulkEditPasteMeta');
+
+                if (!selection.size) {
+                    showNotification('ℹ️ Sélectionnez au moins une ligne avant d\'appliquer', 'info');
+                    return;
+                }
+
+                const chosenColumns = Array.from(columnsSelect?.selectedOptions || []).map(opt => opt.value);
+                if (!chosenColumns.length) {
+                    showNotification('ℹ️ Choisissez les colonnes à modifier', 'info');
+                    return;
+                }
+
+                if (!rowsData.length) {
+                    showNotification('ℹ️ Collez des données Excel à appliquer', 'info');
+                    return;
+                }
+
+                if (pasteMeta) {
+                    pasteMeta.textContent = `${rowsData.length} ligne(s) détectée(s) · ${rowsData[0]?.length || 0} colonne(s)`;
+                }
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                const maxUpdates = Math.min(selection.size, rowsData.length);
+                const columnIndexes = chosenColumns.map(col => tabConfigs[tabName]?.columns.indexOf(col));
+
+                const selectedRowIds = Array.from(selection).slice(0, maxUpdates);
+                selectedRowIds.forEach((rowId, rowIdx) => {
+                    const row = tbody.querySelector(`tr[data-row-id="${rowId}"]`);
+                    if (!row) return;
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    columnIndexes.forEach((colIndex, idx) => {
+                        if (colIndex < 0) return;
+                        const input = inputs[colIndex];
+                        if (!input) return;
+                        const newValue = rowsData[rowIdx]?.[idx] ?? '';
+                        input.value = newValue;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                    });
+                });
+
+                updateStats(tabName);
+                saveAllData();
+                showNotification(`✏️ Mise à jour en masse appliquée sur ${maxUpdates} ligne(s)`);
+                logActivity(`Mise à jour en masse dans ${getTabDisplayName(tabName)}`, 'success');
+
+                closeBulkUpdateModal();
+            } catch (error) {
+                console.error('Erreur application mise à jour en masse:', error);
+                showNotification('❌ Erreur lors de la mise à jour en masse', 'error');
             }
         }
 
@@ -8709,8 +9415,96 @@ function updateTabsChart() {
                     summary.push(`${field}: ${taskData[field]}`);
                 }
             });
-            
+
             return summary.join(' | ') || 'Tâche sans détails spécifiques';
+        }
+
+        function formatCompletionDate(dateValue) {
+            const dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue || Date.now());
+            const datePart = dateObj.toLocaleDateString('fr-FR');
+            const timePart = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            return `${datePart} · ${timePart}`;
+        }
+
+        function escapeHtml(text = '') {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderCompactSummaryCell(summary, fallback = 'Tâche sans détails spécifiques') {
+            const safeText = escapeHtml(summary || fallback);
+            return `<div class="task-summary-cell" title="${safeText}">${safeText}</div>`;
+        }
+
+        function updateCompletedTasksHistory() {
+            try {
+                const tbody = document.getElementById('completedTasksTableBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+
+                if (completedTasks.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 30px; color: #666;">📭 Aucune tâche terminée pour le moment.</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                const sortedTasks = [...completedTasks].sort((a, b) => {
+                    const aDate = a.completedAt ? new Date(a.completedAt) : new Date(a.createdAt || Date.now());
+                    const bDate = b.completedAt ? new Date(b.completedAt) : new Date(b.createdAt || Date.now());
+                    return bDate - aDate;
+                });
+
+                sortedTasks.forEach((task, index) => {
+                    const completionDate = task.completedAt ? new Date(task.completedAt) : new Date();
+                    const row = document.createElement('tr');
+                    const destination = task.targetTabName || getTabDisplayName(task.targetTab);
+                    const origin = task.sourceBatch ? `Lot : ${task.sourceBatch}` : 'Tâche unique';
+
+                    row.innerHTML = `
+                        <td class="row-number">${index + 1}</td>
+                        <td>${getTabIcon(task.targetTab)} ${destination}</td>
+                        <td>${renderCompactSummaryCell(task.summary)}</td>
+                        <td>${formatCompletionDate(completionDate)}<div style="font-size: 12px; color: #666; margin-top: 4px;">${origin}</div></td>
+                        <td>
+                            <button class="btn btn-danger btn-compact" aria-label="Supprimer cette tâche" title="Supprimer cette tâche" data-task-id="${task.id || ''}">🗑️</button>
+                        </td>
+                    `;
+
+                    const goToTask = () => navigateToTask(task);
+                    row.classList.add('clickable-row');
+                    row.dataset.taskId = task.id || '';
+                    row.dataset.targetTab = task.targetTab || '';
+                    row.tabIndex = 0;
+                    row.setAttribute('role', 'button');
+                    row.addEventListener('click', goToTask);
+                    row.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            goToTask();
+                        }
+                    });
+
+                    const deleteButton = row.querySelector('button[data-task-id]');
+                    if (deleteButton) {
+                        deleteButton.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            deleteCompletedTask(task.id);
+                        });
+                    }
+
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Erreur mise à jour historique tâches:', error);
+            }
         }
 
         function updatePendingTasksDisplay() {
@@ -8739,7 +9533,7 @@ function updateTabsChart() {
                     row.innerHTML = `
                         <td class="row-number">${index + 1}</td>
                         <td>${getTabIcon(task.targetTab)} ${task.targetTabName}</td>
-                        <td style="font-size: 13px;">${task.summary}</td>
+                        <td>${renderCompactSummaryCell(task.summary)}</td>
                         <td>${createdDate}</td>
                         <td><span style="color: #667eea;">${task.priority}</span></td>
                         <td>
@@ -8805,7 +9599,7 @@ function updateTabsChart() {
                     row.innerHTML = `
                         <td class="row-number">${index + 1}</td>
                         <td>${getTabIcon(task.targetTab)} ${task.targetTabName}</td>
-                        <td style="font-size: 13px;">${task.summary}</td>
+                        <td>${renderCompactSummaryCell(task.summary)}</td>
                         <td>${createdDate}</td>
                         <td>
                             <button class="btn btn-success" style="padding: 4px 8px; font-size: 11px; margin-right: 4px;" onclick="createTaskFromBatch('${task.id}')">🚀 Créer</button>
@@ -8832,6 +9626,7 @@ function updateTabsChart() {
                 activeBatch.tasks = activeBatch.tasks.filter(task => task.id !== taskId);
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
+                updateTasksStats();
                 saveAllData();
             } catch (error) {
                 console.error('Erreur suppression tâche du lot:', error);
@@ -8889,7 +9684,7 @@ function updateTabsChart() {
                 const columns = tabConfigs[task.targetTab]?.columns || [];
                 const taskDataArray = columns.map(column => task.data[column] || '');
 
-                addRowWithData(task.targetTab, taskDataArray);
+                addRowWithData(task.targetTab, taskDataArray, { rowId: task.id });
                 updateStats(task.targetTab);
 
                 completedTasks.push({
@@ -8945,18 +9740,53 @@ function updateTabsChart() {
             }
         }
 
+        function navigateToTask(task) {
+            try {
+                if (!task || !task.targetTab) return;
+
+                const previousTab = activeTabName;
+                switchTab(task.targetTab);
+
+                const tabChanged = previousTab !== task.targetTab;
+
+                const focusRow = () => {
+                    const tableBody = document.getElementById(`${task.targetTab}TableBody`);
+                    if (!tableBody) return;
+
+                    const targetRow = tableBody.querySelector(`tr[data-task-id="${task.id}"]`) || tableBody.querySelector('tr:last-child');
+                    if (!targetRow) return;
+
+                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targetRow.classList.add('highlight-task');
+                    setTimeout(() => targetRow.classList.remove('highlight-task'), 1400);
+                };
+
+                if (tabChanged) {
+                    setTimeout(focusRow, 120);
+                } else {
+                    focusRow();
+                }
+            } catch (error) {
+                console.error('Erreur navigation vers la tâche:', error);
+            }
+        }
+
         function updateTasksStats() {
             try {
                 const pendingCount = pendingTasks.length;
                 const completedCount = completedTasks.length;
-                const totalCount = pendingCount + completedCount;
+                const lotTasksCount = taskBatches.reduce((sum, batch) => sum + (batch.tasks?.length || 0), 0);
+                const totalCount = pendingCount + completedCount + lotTasksCount;
                 const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-                
+
                 document.getElementById('pendingTasksCount').textContent = pendingCount;
                 document.getElementById('completedTasksCount').textContent = completedCount;
+                document.getElementById('lotTasksCount').textContent = lotTasksCount;
                 document.getElementById('totalTasksCount').textContent = totalCount;
                 document.getElementById('tasksProgress').style.width = completionRate + '%';
-                
+
+                updateCompletedTasksHistory();
+
             } catch (error) {
                 console.error('Erreur mise à jour stats tâches:', error);
             }
@@ -8970,8 +9800,8 @@ function updateTabsChart() {
                 const columns = tabConfigs[task.targetTab]?.columns || [];
                 const taskDataArray = columns.map(column => task.data[column] || '');
                 
-                addRowWithData(task.targetTab, taskDataArray);
-                
+                addRowWithData(task.targetTab, taskDataArray, { rowId: task.id });
+
                 // Déplacer vers les tâches complétées
                 completedTasks.push({
                     ...task,
@@ -9044,6 +9874,28 @@ function updateTabsChart() {
             }
         }
 
+        function deleteCompletedTask(taskId) {
+            try {
+                const task = completedTasks.find(t => t.id === taskId);
+                if (!task) return;
+
+                if (!confirm('Supprimer cette tâche de l\'historique ?')) {
+                    return;
+                }
+
+                completedTasks = completedTasks.filter(t => t.id !== taskId);
+                updateTasksStats();
+                saveAllData();
+
+                const destination = task.targetTabName || getTabDisplayName(task.targetTab);
+                showNotification(`🗑️ Tâche retirée de l'historique (${destination})`);
+                logActivity(`Tâche supprimée de l'historique (${destination})`, 'warning');
+            } catch (error) {
+                console.error('Erreur suppression tâche terminée:', error);
+                showNotification('❌ Erreur lors de la suppression de l\'historique', 'error');
+            }
+        }
+
         function executeAllPendingTasks() {
             try {
                 if (pendingTasks.length === 0) {
@@ -9062,7 +9914,7 @@ function updateTabsChart() {
                     const columns = tabConfigs[task.targetTab]?.columns || [];
                     const taskDataArray = columns.map(column => task.data[column] || '');
                     
-                    addRowWithData(task.targetTab, taskDataArray);
+                    addRowWithData(task.targetTab, taskDataArray, { rowId: task.id });
                     updateStats(task.targetTab);
                     
                     completedTasks.push({
@@ -9963,6 +10815,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (tbody) {
                     tbody.innerHTML = '';
                     rowCounters[tabName] = 0;
+                    clearRowSelections(tabName);
                     updateStats(tabName);
                     saveAllData();
                     
@@ -9982,6 +10835,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 loadAllData();
                 refreshRGSuggestions();
+                renderTaskExcelCells();
 
                 autoSaveInterval = setInterval(saveAllData, 60000); // Toutes les minutes
 
@@ -10062,6 +10916,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.switchTab = switchTab;
         window.addRow = addRow;
         window.deleteRow = deleteRow;
+        window.deleteSelectedRows = deleteSelectedRows;
         window.exportToExcel = exportToExcel;
         window.exportAllToExcel = exportAllToExcel;
         window.exportStatsReport = exportStatsReport;
@@ -10087,6 +10942,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.exportSearchResults = exportSearchResults;
         window.goToResult = goToResult;
         window.updateTaskFields = updateTaskFields;
+        window.parseTaskExcelCells = parseTaskExcelCells;
+        window.clearTaskExcelCells = clearTaskExcelCells;
         window.transferTask = transferTask;
         window.saveTaskAsPending = saveTaskAsPending;
         window.createTaskBatch = createTaskBatch;
@@ -10117,6 +10974,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.focusRGChange = focusRGChange;
         window.exportRGChange = exportRGChange;
         window.exportRGChanges = exportRGChanges;
+        window.openBulkUpdateModal = openBulkUpdateModal;
+        window.closeBulkUpdateModal = closeBulkUpdateModal;
+        window.applyBulkUpdate = applyBulkUpdate;
     </script>
 </body>
 </html>
