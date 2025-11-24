@@ -1416,6 +1416,104 @@
             margin-bottom: 20px;
         }
 
+        .task-paste-panel {
+            border: 1px dashed #cdd4ff;
+            background: #fff;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .task-paste-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .task-paste-actions .btn {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .task-paste-help {
+            color: #6c757d;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .task-paste-textarea {
+            width: 100%;
+            min-height: 90px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #d9ddf0;
+            resize: vertical;
+            font-size: 13px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .excel-cell-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #e2e6f5;
+            background: #f8f9ff;
+            min-height: 70px;
+        }
+
+        .excel-cell-pool.empty {
+            justify-content: center;
+            align-items: center;
+            color: #7a7f9c;
+            font-size: 13px;
+        }
+
+        .excel-cell-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: #fff;
+            border: 1px solid #dfe3ff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.12);
+            cursor: grab;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            min-width: 120px;
+            max-width: 240px;
+            user-select: none;
+        }
+
+        .excel-cell-pill strong {
+            background: #eef2ff;
+            color: #4c51bf;
+            padding: 4px 7px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .excel-cell-pill .excel-cell-value {
+            font-size: 13px;
+            color: #2c3e50;
+            line-height: 1.3;
+            max-width: 180px;
+            word-break: break-word;
+        }
+
+        .excel-cell-pill.dragging {
+            opacity: 0.75;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(102, 126, 234, 0.25);
+        }
+
+        .task-drop-target {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
         .task-field {
             margin-bottom: 15px;
         }
@@ -2765,7 +2863,20 @@
                             <label>Nombre de tâches à créer :</label>
                             <input id="taskQuantity" type="number" min="1" max="50" value="1" />
                         </div>
-                        
+
+                        <div class="task-field">
+                            <label>📋 Coller des cellules Excel</label>
+                            <div class="task-paste-panel">
+                                <textarea id="taskExcelTextarea" class="task-paste-textarea" placeholder="Collez ici des cellules Excel (plusieurs lignes et colonnes)"></textarea>
+                                <div class="task-paste-actions">
+                                    <button class="btn btn-primary" type="button" onclick="parseTaskExcelCells()">🔍 Détecter les cellules</button>
+                                    <button class="btn btn-secondary" type="button" onclick="clearTaskExcelCells()">🧽 Effacer la sélection</button>
+                                </div>
+                                <div class="task-paste-help">Chaque cellule détectée peut être glissée individuellement sur un champ du formulaire.</div>
+                            </div>
+                            <div id="taskExcelCellsContainer" class="excel-cell-pool empty">Collez vos cellules puis cliquez sur "Détecter les cellules" pour les rendre déplaçables.</div>
+                        </div>
+
                         <div id="taskFieldsContainer">
                             <p style="color: #666; text-align: center; padding: 20px;">
                                 Sélectionnez un onglet pour voir les champs disponibles
@@ -3373,6 +3484,8 @@
         let activeTabName = 'creation';
         let tabCache = null;
         let pendingStatsUpdate = null;
+        let taskExcelCells = [];
+        let draggedTaskCellId = null;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -7896,12 +8009,16 @@ function updateTabsChart() {
                     
                     const label = document.createElement('label');
                     label.textContent = column;
-                    
+
                     const input = document.createElement('input');
                     input.type = getInputType(column);
                     input.placeholder = `Saisir ${column.toLowerCase()}...`;
                     input.id = `taskField_${index}`;
-                    
+                    input.addEventListener('dragover', handleTaskInputDragOver);
+                    input.addEventListener('drop', handleTaskInputDrop);
+                    input.addEventListener('dragleave', handleTaskInputDragLeave);
+                    input.addEventListener('dragexit', handleTaskInputDragLeave);
+
                     fieldDiv.appendChild(label);
                     fieldDiv.appendChild(input);
                     fieldsContainer.appendChild(fieldDiv);
@@ -7920,6 +8037,137 @@ function updateTabsChart() {
             } catch (error) {
                 console.error('Erreur mise à jour champs tâche:', error);
             }
+        }
+
+        function parseTaskExcelCells() {
+            try {
+                const textarea = document.getElementById('taskExcelTextarea');
+                if (!textarea) return;
+
+                const raw = (textarea.value || '').trim();
+                if (!raw) {
+                    taskExcelCells = [];
+                    renderTaskExcelCells();
+                    showNotification('ℹ️ Aucune donnée détectée dans le collage', 'info');
+                    return;
+                }
+
+                const rows = raw.split(/\r?\n/);
+                const cells = [];
+
+                rows.forEach(line => {
+                    line.split('\t').forEach(value => {
+                        const cleaned = value.trim();
+                        if (cleaned) {
+                            cells.push({ id: generateUniqueId(), value: cleaned });
+                        }
+                    });
+                });
+
+                taskExcelCells = cells;
+                renderTaskExcelCells();
+
+                if (cells.length) {
+                    showNotification(`✅ ${cells.length} cellule(s) prêtes au glisser-déposer`);
+                } else {
+                    showNotification('ℹ️ Aucune cellule exploitable trouvée', 'info');
+                }
+            } catch (error) {
+                console.error('Erreur analyse des cellules Excel collées:', error);
+            }
+        }
+
+        function renderTaskExcelCells() {
+            try {
+                const container = document.getElementById('taskExcelCellsContainer');
+                if (!container) return;
+
+                container.innerHTML = '';
+                if (taskExcelCells.length === 0) {
+                    container.classList.add('empty');
+                    container.textContent = 'Collez vos cellules puis lancez la détection pour les faire glisser vers les champs.';
+                    return;
+                }
+
+                container.classList.remove('empty');
+                taskExcelCells.forEach((cell, index) => {
+                    const pill = document.createElement('div');
+                    pill.className = 'excel-cell-pill';
+                    pill.draggable = true;
+                    pill.dataset.cellId = cell.id;
+                    pill.addEventListener('dragstart', handleTaskCellDragStart);
+                    pill.addEventListener('dragend', handleTaskCellDragEnd);
+
+                    const badge = document.createElement('strong');
+                    badge.textContent = `Cellule ${index + 1}`;
+                    pill.appendChild(badge);
+
+                    const value = document.createElement('div');
+                    value.className = 'excel-cell-value';
+                    value.textContent = cell.value;
+                    value.title = cell.value;
+                    pill.appendChild(value);
+
+                    container.appendChild(pill);
+                });
+            } catch (error) {
+                console.error('Erreur affichage cellules collées:', error);
+            }
+        }
+
+        function clearTaskExcelCells() {
+            try {
+                const textarea = document.getElementById('taskExcelTextarea');
+                if (textarea) {
+                    textarea.value = '';
+                }
+                taskExcelCells = [];
+                renderTaskExcelCells();
+            } catch (error) {
+                console.error('Erreur réinitialisation cellules Excel:', error);
+            }
+        }
+
+        function handleTaskCellDragStart(event) {
+            const cellId = event.currentTarget.dataset.cellId;
+            draggedTaskCellId = cellId;
+            event.dataTransfer.effectAllowed = 'copy';
+            event.dataTransfer.setData('text/plain', cellId);
+            event.currentTarget.classList.add('dragging');
+        }
+
+        function handleTaskCellDragEnd(event) {
+            draggedTaskCellId = null;
+            event.currentTarget.classList.remove('dragging');
+        }
+
+        function getDraggedTaskCellValue(event) {
+            const cellId = event.dataTransfer?.getData('text/plain') || draggedTaskCellId;
+            if (!cellId) return null;
+            const match = taskExcelCells.find(cell => cell.id === cellId);
+            return match ? match.value : null;
+        }
+
+        function handleTaskInputDragOver(event) {
+            if (!taskExcelCells.length) return;
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+            event.currentTarget.classList.add('task-drop-target');
+        }
+
+        function handleTaskInputDragLeave(event) {
+            event.currentTarget.classList.remove('task-drop-target');
+        }
+
+        function handleTaskInputDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('task-drop-target');
+            const value = getDraggedTaskCellValue(event);
+            if (value === null || value === undefined) return;
+            const input = event.currentTarget;
+            input.value = value;
+            input.dispatchEvent(new Event('input'));
+            input.focus();
         }
 
         // 📋 Import Excel par copier/coller
@@ -8704,6 +8952,7 @@ function updateTabsChart() {
                 document.getElementById('taskTargetTab').value = '';
                 const qtyInput = document.getElementById('taskQuantity');
                 if (qtyInput) qtyInput.value = 1;
+                clearTaskExcelCells();
                 updateTaskFields();
             } catch (error) {
                 console.error('Erreur effacement formulaire tâche:', error);
@@ -10102,6 +10351,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 loadAllData();
                 refreshRGSuggestions();
+                renderTaskExcelCells();
 
                 autoSaveInterval = setInterval(saveAllData, 60000); // Toutes les minutes
 
@@ -10207,6 +10457,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.exportSearchResults = exportSearchResults;
         window.goToResult = goToResult;
         window.updateTaskFields = updateTaskFields;
+        window.parseTaskExcelCells = parseTaskExcelCells;
+        window.clearTaskExcelCells = clearTaskExcelCells;
         window.transferTask = transferTask;
         window.saveTaskAsPending = saveTaskAsPending;
         window.createTaskBatch = createTaskBatch;
