@@ -1394,6 +1394,256 @@
             font-size: 14px;
         }
 
+        .excel-import {
+            border: 1px dashed #cfd8ff;
+            border-radius: 12px;
+            padding: 18px;
+            background: rgba(102, 126, 234, 0.08);
+            margin-top: 20px;
+        }
+
+        .excel-import h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .excel-paste-area {
+            width: 100%;
+            min-height: 110px;
+            border: 1px solid #cbd5ff;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            margin-bottom: 10px;
+            background: white;
+        }
+
+        .excel-import-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .excel-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .excel-preview-container {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e0e7ff;
+            padding: 12px;
+            overflow-x: auto;
+        }
+
+        .excel-preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .excel-preview-table th,
+        .excel-preview-table td {
+            border: 1px solid #edf2ff;
+            padding: 6px 8px;
+            text-align: left;
+        }
+
+        .excel-preview-table th {
+            background: #f3f5ff;
+            position: relative;
+            cursor: move;
+            user-select: none;
+        }
+
+        .drag-handle {
+            font-size: 12px;
+            color: #667eea;
+            margin-right: 6px;
+        }
+
+        .excel-preview-table th.dragging {
+            opacity: 0.6;
+            background: #e0e7ff;
+        }
+
+        .excel-preview-meta {
+            font-size: 13px;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .excel-field-hints {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .mapping-chip {
+            background: #eef2ff;
+            border: 1px solid #d7ddff;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #3c4a8c;
+        }
+
+        .mapping-chip span {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .excel-mapping-workbench {
+            margin-top: 16px;
+            border: 1px solid #dfe4ff;
+            border-radius: 12px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .excel-mapping-title {
+            font-size: 13px;
+            margin-bottom: 12px;
+            color: #2f365f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .excel-mapping-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .excel-mapping-column {
+            flex: 1;
+            min-width: 260px;
+        }
+
+        .excel-mapping-column h5 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .excel-drop-zones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .excel-drop-field {
+            border: 1px dashed #b9c2ff;
+            border-radius: 10px;
+            padding: 10px;
+            background: #f7f8ff;
+            min-height: 64px;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .excel-drop-field span {
+            display: block;
+            font-weight: 600;
+            color: #2f365f;
+            margin-bottom: 6px;
+        }
+
+        .excel-drop-field.drag-over {
+            background: #eef2ff;
+            border-color: #6b75ff;
+            box-shadow: inset 0 0 0 1px #6b75ff33;
+        }
+
+        .excel-drop-field.filled {
+            border-style: solid;
+            background: #fff;
+        }
+
+        .excel-column-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .excel-column-pool.drag-over {
+            background: #f5f6ff;
+            border-radius: 12px;
+            padding: 6px;
+        }
+
+        .excel-column-card {
+            border: 1px solid #cad1ff;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+            cursor: grab;
+            min-width: 140px;
+            flex: 1 1 180px;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .excel-column-card strong {
+            display: block;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .excel-column-card small {
+            display: block;
+            color: #5b6096;
+            font-size: 12px;
+        }
+
+        .excel-column-card.dragging {
+            opacity: 0.6;
+            transform: scale(0.97);
+            box-shadow: 0 8px 14px rgba(0, 0, 0, 0.15);
+        }
+
+        .excel-unassign-zone {
+            margin-top: 10px;
+            border: 1px dashed #ffbdbd;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            color: #c0392b;
+            font-size: 13px;
+        }
+
+        .excel-unassign-zone.drag-over {
+            background: #fff5f5;
+            border-color: #ff6b6b;
+        }
+
+        .excel-mapping-empty {
+            text-align: center;
+            padding: 15px;
+            color: #667;
+        }
+
+        .excel-preview-empty {
+            text-align: center;
+            padding: 20px;
+            color: #667;
+        }
+
         /* 🔍 SPÉCIFIQUE RECHERCHE */
         .search-results-header {
             background: #f8f9fa;
@@ -2467,7 +2717,7 @@
                                 Sélectionnez un onglet pour voir les champs disponibles
                             </p>
                         </div>
-                        
+
                         <div style="display: flex; gap: 10px; margin-top: 20px;">
                             <button class="btn btn-success" id="transferTaskBtn" onclick="transferTask()" disabled>
                                 🚀 Transférer vers l'onglet
@@ -2481,6 +2731,45 @@
                             <button class="btn btn-danger" onclick="clearTaskForm()">
                                 🗑️ Effacer formulaire
                             </button>
+                        </div>
+
+                        <div class="excel-import" id="excelImportSection">
+                            <h4>📋 Import rapide par copier/coller Excel</h4>
+                            <p style="font-size: 13px; color: #555; margin-bottom: 10px;">
+                                Collez vos lignes depuis Excel, réorganisez les colonnes par glisser-déposer puis créez automatiquement autant de tâches que de lignes importées.
+                            </p>
+                            <div class="excel-field-hints" id="excelFieldHints">
+                                <div class="excel-preview-empty" style="padding: 8px;">
+                                    Sélectionnez un onglet pour voir l'ordre attendu des colonnes.
+                                </div>
+                            </div>
+                            <textarea id="excelPasteArea" class="excel-paste-area" placeholder="GA[TAB]Date Demande[TAB]..."></textarea>
+                            <div class="excel-import-actions">
+                                <button class="btn btn-secondary" id="excelPreviewBtn" onclick="handleExcelPastePreview()">
+                                    👀 Prévisualiser
+                                </button>
+                                <button class="btn btn-danger" type="button" onclick="resetExcelImportArea()">
+                                    ♻️ Effacer l'import
+                                </button>
+                                <button class="btn btn-success" id="excelImportBtn" onclick="createTasksFromExcelImport()" disabled>
+                                    📥 Créer des tâches depuis l'import
+                                </button>
+                                <label class="excel-option">
+                                    <input type="checkbox" id="excelSkipHeader" checked onchange="updateExcelImportButtons()">
+                                    Ignorer la première ligne (entêtes)
+                                </label>
+                            </div>
+                            <div class="excel-preview-meta" id="excelPreviewMeta">Aucun aperçu pour le moment.</div>
+                            <div id="excelPreviewContainer" class="excel-preview-container">
+                                <div class="excel-preview-empty">
+                                    Collez vos données pour voir un aperçu interactif.
+                                </div>
+                            </div>
+                            <div id="excelMappingWorkbench" class="excel-mapping-workbench">
+                                <div class="excel-mapping-empty">
+                                    Sélectionnez un onglet et collez des données pour organiser vos colonnes par glisser-déposer.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3023,6 +3312,12 @@
         let completedTasks = [];
         let savedSearches = [];
         let autoSaveInterval = null;
+        let excelPreviewData = [];
+        let excelPreviewColumnOrder = [];
+        let excelPreviewDragIndex = null;
+        let excelFieldAssignments = [];
+        let excelAssignmentsTab = null;
+        let excelDraggedColumnIndex = null;
         let chartInstances = {};
         let activityLog = [];
         let activityDetailsExpanded = false;
@@ -3031,6 +3326,9 @@
         let rgChangeRegistry = {};
         let dismissedRGChanges = new Set();
         let fileDialogLock = false;
+        let activeTabName = 'creation';
+        let tabCache = null;
+        let pendingStatsUpdate = null;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -3138,6 +3436,15 @@
             updateRecentActivity();
         }
 
+        const cancelIdle = (handle) => {
+            if (!handle) return;
+            if (window.cancelIdleCallback) {
+                cancelIdleCallback(handle);
+            } else {
+                clearTimeout(handle);
+            }
+        };
+
         function toggleRGChangePanel() {
             try {
                 rgChangePanelExpanded = !rgChangePanelExpanded;
@@ -3181,22 +3488,32 @@
         }
 
         // 🔧 GESTION DES ONGLETS
-        function switchTab(tabName) {
-            try {
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
+        function getTabCache() {
+            if (tabCache) return tabCache;
 
-                const targetContent = document.getElementById(tabName);
-                const targetTab = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
-                
-                if (targetContent) targetContent.classList.add('active');
-                if (targetTab) targetTab.classList.add('active');
+            const contents = new Map();
+            document.querySelectorAll('.tab-content').forEach(content => {
+                if (content.id) {
+                    contents.set(content.id, content);
+                }
+            });
 
-                // Actions spécifiques par onglet
+            const tabs = new Map();
+            document.querySelectorAll('.tab').forEach(tab => {
+                const match = tab.getAttribute('onclick')?.match(/switchTab\('([^']+)'\)/);
+                if (match && match[1]) {
+                    tabs.set(match[1], tab);
+                }
+            });
+
+            tabCache = { contents, tabs };
+            return tabCache;
+        }
+
+        function scheduleTabStatsUpdate(tabName) {
+            cancelIdle(pendingStatsUpdate);
+
+            const runUpdate = () => {
                 if (tabName === 'statistiques') {
                     updateStatsDashboard();
                 } else if (tabName === 'baserg') {
@@ -3207,9 +3524,34 @@
                 } else if (tabName !== 'recherche') {
                     updateStats(tabName);
                 }
+            };
+
+            if (window.requestIdleCallback) {
+                pendingStatsUpdate = requestIdleCallback(runUpdate, { timeout: 120 });
+            } else {
+                pendingStatsUpdate = setTimeout(runUpdate, 16);
+            }
+        }
+
+        function switchTab(tabName) {
+            try {
+                if (tabName === activeTabName) return;
+
+                const { contents, tabs } = getTabCache();
+
+                contents.forEach((content, name) => {
+                    content.classList.toggle('active', name === tabName);
+                });
+
+                tabs.forEach((tab, name) => {
+                    tab.classList.toggle('active', name === tabName);
+                });
+
+                activeTabName = tabName;
+                scheduleTabStatsUpdate(tabName);
 
                 logActivity(`Navigation vers ${getTabDisplayName(tabName)}`, 'info');
-                
+
             } catch (error) {
                 console.error('Erreur changement onglet:', error);
                 showNotification('❌ Erreur lors du changement d\'onglet', 'error');
@@ -4382,9 +4724,41 @@ return;
 
         function expandAllTextFields() {
             try {
-                const textAreas = document.querySelectorAll('textarea.editable-textarea');
-                textAreas.forEach(autoResizeField);
-                showNotification('🪄 Les champs texte ont été ajustés pour tout afficher');
+                const textAreas = Array.from(document.querySelectorAll('textarea.editable-textarea'));
+                if (!textAreas.length) return;
+
+                const total = textAreas.length;
+                const showLoader = total > 80;
+                let processed = 0;
+
+                if (showLoader) {
+                    showProcessingOverlay('Ajustement des champs texte...', 'Préparation des champs...');
+                }
+
+                const processChunk = () => {
+                    const start = performance.now();
+
+                    while (processed < total && performance.now() - start < (showLoader ? 14 : 8)) {
+                        autoResizeField(textAreas[processed]);
+                        processed++;
+                    }
+
+                    if (showLoader) {
+                        const percent = Math.round((processed / total) * 100);
+                        updateProcessingProgress(`Ajustement des champs ${processed}/${total}`, percent);
+                    }
+
+                    if (processed < total) {
+                        requestAnimationFrame(processChunk);
+                    } else {
+                        if (showLoader) {
+                            hideProcessingOverlay();
+                        }
+                        showNotification(`🪄 ${total} champ(s) texte ajusté(s)`);
+                    }
+                };
+
+                requestAnimationFrame(processChunk);
             } catch (error) {
                 console.error('Erreur ajustement champs texte:', error);
             }
@@ -7460,12 +7834,14 @@ function updateTabsChart() {
                     transferBtn.disabled = true;
                     pendingBtn.disabled = true;
                     batchBtn.disabled = true;
+                    refreshExcelFieldHints();
+                    updateExcelImportButtons();
                     return;
                 }
-                
+
                 const columns = tabConfigs[targetTab]?.columns || [];
                 fieldsContainer.innerHTML = '';
-                
+
                 columns.forEach((column, index) => {
                     const fieldDiv = document.createElement('div');
                     fieldDiv.className = 'task-field';
@@ -7486,9 +7862,529 @@ function updateTabsChart() {
                 transferBtn.disabled = false;
                 pendingBtn.disabled = false;
                 batchBtn.disabled = !hasActiveBatch;
+                if (excelPreviewData.length && excelAssignmentsTab !== targetTab) {
+                    initializeExcelFieldAssignments(true);
+                    renderExcelMappingWorkbench();
+                }
+                refreshExcelFieldHints();
+                updateExcelImportButtons();
 
             } catch (error) {
                 console.error('Erreur mise à jour champs tâche:', error);
+            }
+        }
+
+        // 📋 Import Excel par copier/coller
+        function handleExcelPastePreview() {
+            try {
+                const targetTab = document.getElementById('taskTargetTab').value;
+                if (!targetTab) {
+                    showNotification('Sélectionnez un onglet cible avant de coller vos données.', 'warning');
+                    return;
+                }
+
+                const textarea = document.getElementById('excelPasteArea');
+                const rawValue = (textarea?.value || '').trim();
+                if (!rawValue) {
+                    showNotification('Collez des lignes copiées depuis Excel pour continuer.', 'info');
+                    return;
+                }
+
+                const rows = rawValue
+                    .split(/\r?\n/)
+                    .map(line => line.split('\t').map(cell => cell.trim()))
+                    .filter(row => row.some(cell => cell !== ''));
+
+                if (rows.length === 0) {
+                    showNotification('Impossible de détecter des données exploitables.', 'warning');
+                    return;
+                }
+
+                excelPreviewData = rows;
+                const maxColumns = rows.reduce((max, row) => Math.max(max, row.length), 0);
+                excelPreviewColumnOrder = Array.from({ length: maxColumns }, (_, index) => index);
+                initializeExcelFieldAssignments(true);
+                renderExcelPreview();
+                updateExcelImportButtons();
+
+                showNotification(`📋 ${rows.length} ligne(s) prête(s) pour import. Faites glisser les entêtes si besoin.`);
+            } catch (error) {
+                console.error('Erreur préparation import Excel:', error);
+                showNotification('❌ Erreur lors de l\'analyse des données collées', 'error');
+            }
+        }
+
+        function renderExcelPreview() {
+            const container = document.getElementById('excelPreviewContainer');
+            const meta = document.getElementById('excelPreviewMeta');
+            const targetTab = document.getElementById('taskTargetTab').value;
+
+            if (!container) return;
+
+            if (!excelPreviewData.length) {
+                container.innerHTML = '<div class="excel-preview-empty">Collez vos données pour voir un aperçu interactif.</div>';
+                if (meta) meta.textContent = 'Aucun aperçu pour le moment.';
+                refreshExcelFieldHints();
+                return;
+            }
+
+            const previewLimit = Math.min(excelPreviewData.length, 10);
+            const table = document.createElement('table');
+            table.className = 'excel-preview-table';
+
+            const thead = document.createElement('thead');
+            const headRow = document.createElement('tr');
+            excelPreviewColumnOrder.forEach((columnIndex, orderIndex) => {
+                const th = document.createElement('th');
+                th.setAttribute('draggable', 'true');
+                th.dataset.orderIndex = orderIndex;
+                const sampleValue = (excelPreviewData[0]?.[columnIndex] || '').slice(0, 25);
+                th.innerHTML = `<span class="drag-handle">⠿</span>Col ${columnIndex + 1}${sampleValue ? `<div style="font-size:11px;color:#666;">${sampleValue}</div>` : ''}`;
+                th.addEventListener('dragstart', handlePreviewDragStart);
+                th.addEventListener('dragover', handlePreviewDragOver);
+                th.addEventListener('drop', handlePreviewDrop);
+                th.addEventListener('dragend', handlePreviewDragEnd);
+                headRow.appendChild(th);
+            });
+            thead.appendChild(headRow);
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            excelPreviewData.slice(0, previewLimit).forEach(row => {
+                const tr = document.createElement('tr');
+                excelPreviewColumnOrder.forEach(columnIndex => {
+                    const td = document.createElement('td');
+                    td.textContent = row[columnIndex] || '';
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+
+            container.innerHTML = '';
+            container.appendChild(table);
+
+            if (meta) {
+                meta.textContent = `Prévisualisation de ${excelPreviewData.length} ligne(s) – affichage des ${previewLimit} premières. Faites glisser les entêtes pour modifier l'ordre.`;
+            }
+
+            refreshExcelFieldHints();
+            renderExcelMappingWorkbench();
+        }
+
+        function initializeExcelFieldAssignments(force = false) {
+            const targetTab = document.getElementById('taskTargetTab').value || null;
+            const columns = tabConfigs[targetTab]?.columns || [];
+            const hasData = excelPreviewData.length > 0;
+
+            if (!targetTab || !hasData || !columns.length) {
+                excelFieldAssignments = [];
+                excelAssignmentsTab = targetTab;
+                return;
+            }
+
+            if (!force && excelAssignmentsTab === targetTab && excelFieldAssignments.length === columns.length) {
+                return;
+            }
+
+            const totalColumns = excelPreviewData.reduce((max, row) => Math.max(max, row.length), 0);
+            const fallbackOrder = excelPreviewColumnOrder.length
+                ? [...excelPreviewColumnOrder]
+                : Array.from({ length: totalColumns }, (_, index) => index);
+
+            excelFieldAssignments = columns.map((_, index) => {
+                if (index < totalColumns) {
+                    return typeof fallbackOrder[index] === 'number' ? fallbackOrder[index] : index;
+                }
+                return null;
+            });
+            excelAssignmentsTab = targetTab;
+        }
+
+        function renderExcelMappingWorkbench() {
+            const container = document.getElementById('excelMappingWorkbench');
+            if (!container) return;
+
+            const targetTab = document.getElementById('taskTargetTab').value;
+            if (!targetTab || !excelPreviewData.length) {
+                container.innerHTML = '<div class="excel-mapping-empty">Collez vos données et choisissez un onglet pour organiser vos colonnes.</div>';
+                return;
+            }
+
+            const columns = tabConfigs[targetTab]?.columns || [];
+            if (!columns.length) {
+                container.innerHTML = '<div class="excel-mapping-empty">Aucun champ disponible pour cet onglet.</div>';
+                return;
+            }
+
+            initializeExcelFieldAssignments();
+
+            const totalColumns = excelPreviewData.reduce((max, row) => Math.max(max, row.length), 0);
+            if (!totalColumns) {
+                container.innerHTML = '<div class="excel-mapping-empty">Aucune colonne détectée dans l\'aperçu.</div>';
+                return;
+            }
+            const assignments = new Map();
+            excelFieldAssignments.forEach((columnIndex, fieldIndex) => {
+                if (typeof columnIndex === 'number') {
+                    assignments.set(columnIndex, fieldIndex);
+                }
+            });
+
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = '';
+            wrapper.className = 'excel-mapping-grid';
+
+            const targetsColumn = document.createElement('div');
+            targetsColumn.className = 'excel-mapping-column';
+            targetsColumn.innerHTML = '<h5>📋 Champs de l\'onglet</h5>';
+
+            const dropZoneList = document.createElement('div');
+            dropZoneList.className = 'excel-drop-zones';
+
+            columns.forEach((column, index) => {
+                const dropZone = document.createElement('div');
+                dropZone.className = 'excel-drop-field';
+                dropZone.dataset.fieldIndex = index;
+                dropZone.addEventListener('dragover', handleExcelFieldDragOver);
+                dropZone.addEventListener('drop', handleExcelFieldDrop);
+                dropZone.addEventListener('dragleave', handleExcelFieldDragLeave);
+
+                const label = document.createElement('span');
+                label.textContent = column;
+                dropZone.appendChild(label);
+
+                const assignedColumn = excelFieldAssignments[index];
+                if (typeof assignedColumn === 'number') {
+                    dropZone.classList.add('filled');
+                    dropZone.appendChild(buildExcelColumnCard(assignedColumn, { showAssignment: false }));
+                } else {
+                    const hint = document.createElement('small');
+                    hint.textContent = 'Déposez une colonne ici';
+                    hint.style.color = '#7a7f9c';
+                    dropZone.appendChild(hint);
+                }
+
+                dropZoneList.appendChild(dropZone);
+            });
+
+            targetsColumn.appendChild(dropZoneList);
+
+            const sourcesColumn = document.createElement('div');
+            sourcesColumn.className = 'excel-mapping-column';
+            sourcesColumn.innerHTML = '<h5>➡️ Colonnes importées</h5>';
+
+            const pool = document.createElement('div');
+            pool.className = 'excel-column-pool';
+            pool.addEventListener('dragover', handleExcelPoolDragOver);
+            pool.addEventListener('drop', handleExcelPoolDrop);
+            pool.addEventListener('dragleave', handleExcelPoolDragLeave);
+
+            for (let columnIndex = 0; columnIndex < totalColumns; columnIndex++) {
+                const assignedFieldIndex = assignments.get(columnIndex);
+                const assignmentLabel = typeof assignedFieldIndex === 'number'
+                    ? columns[assignedFieldIndex] || ''
+                    : null;
+                pool.appendChild(buildExcelColumnCard(columnIndex, {
+                    assignmentLabel
+                }));
+            }
+
+            sourcesColumn.appendChild(pool);
+
+            const unassignZone = document.createElement('div');
+            unassignZone.className = 'excel-unassign-zone';
+            unassignZone.textContent = 'Déposez une carte ici pour libérer la colonne';
+            unassignZone.addEventListener('dragover', handleExcelPoolDragOver);
+            unassignZone.addEventListener('drop', handleExcelUnassignDrop);
+            unassignZone.addEventListener('dragleave', handleExcelPoolDragLeave);
+            sourcesColumn.appendChild(unassignZone);
+
+            wrapper.appendChild(targetsColumn);
+            wrapper.appendChild(sourcesColumn);
+
+            container.innerHTML = '';
+            const title = document.createElement('div');
+            title.className = 'excel-mapping-title';
+            title.innerHTML = '🎯 Faites glisser chaque colonne importée vers le champ correspondant. Déposez dans la zone rouge pour libérer une colonne.';
+            container.appendChild(title);
+            container.appendChild(wrapper);
+        }
+
+        function buildExcelColumnCard(columnIndex, options = {}) {
+            const { assignmentLabel = null, showAssignment = true } = options;
+            const card = document.createElement('div');
+            card.className = 'excel-column-card';
+            card.draggable = true;
+            card.dataset.columnIndex = columnIndex;
+            card.addEventListener('dragstart', handleExcelColumnDragStart);
+            card.addEventListener('dragend', handleExcelColumnDragEnd);
+
+            const title = document.createElement('strong');
+            title.textContent = `Colonne ${columnIndex + 1}`;
+            card.appendChild(title);
+
+            const sample = document.createElement('small');
+            sample.textContent = getExcelColumnSample(columnIndex) || 'Valeur vide';
+            card.appendChild(sample);
+
+            if (showAssignment && assignmentLabel) {
+                const badge = document.createElement('small');
+                badge.textContent = `Affectée à ${assignmentLabel}`;
+                badge.style.color = '#2e7d32';
+                card.appendChild(badge);
+            }
+
+            return card;
+        }
+
+        function getExcelColumnSample(columnIndex) {
+            const sampleRow = excelPreviewData.find(row => (row[columnIndex] || '').trim() !== '');
+            const rawValue = sampleRow ? sampleRow[columnIndex] : (excelPreviewData[0]?.[columnIndex] || '');
+            if (!rawValue) return '';
+            return rawValue.length > 40 ? `${rawValue.slice(0, 37)}…` : rawValue;
+        }
+
+        function assignExcelColumnToField(columnIndex, fieldIndex) {
+            if (typeof columnIndex !== 'number' || typeof fieldIndex !== 'number') return;
+            excelFieldAssignments = excelFieldAssignments.map((current, idx) => {
+                if (idx === fieldIndex) return current;
+                return current === columnIndex ? null : current;
+            });
+            excelFieldAssignments[fieldIndex] = columnIndex;
+            renderExcelMappingWorkbench();
+            refreshExcelFieldHints();
+        }
+
+        function unassignExcelColumn(columnIndex) {
+            let updated = false;
+            excelFieldAssignments = excelFieldAssignments.map(value => {
+                if (value === columnIndex) {
+                    updated = true;
+                    return null;
+                }
+                return value;
+            });
+            if (updated) {
+                renderExcelMappingWorkbench();
+                refreshExcelFieldHints();
+            }
+        }
+
+        function handleExcelColumnDragStart(event) {
+            const columnIndex = Number(event.currentTarget.dataset.columnIndex);
+            excelDraggedColumnIndex = Number.isNaN(columnIndex) ? null : columnIndex;
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', `${columnIndex}`);
+            event.currentTarget.classList.add('dragging');
+        }
+
+        function handleExcelColumnDragEnd(event) {
+            event.currentTarget.classList.remove('dragging');
+            excelDraggedColumnIndex = null;
+        }
+
+        function handleExcelFieldDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function handleExcelFieldDragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleExcelFieldDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            const fieldIndex = Number(event.currentTarget.dataset.fieldIndex);
+            const columnIndex = getDraggedExcelColumnIndex(event);
+            if (Number.isNaN(fieldIndex) || columnIndex === null) {
+                return;
+            }
+            assignExcelColumnToField(columnIndex, fieldIndex);
+        }
+
+        function handleExcelPoolDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function handleExcelPoolDragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleExcelPoolDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleExcelUnassignDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            const columnIndex = getDraggedExcelColumnIndex(event);
+            if (columnIndex === null) return;
+            unassignExcelColumn(columnIndex);
+        }
+
+        function getDraggedExcelColumnIndex(event) {
+            const data = event.dataTransfer?.getData('text/plain');
+            if (data && !Number.isNaN(Number(data))) {
+                return Number(data);
+            }
+            return excelDraggedColumnIndex;
+        }
+
+        function handlePreviewDragStart(event) {
+            excelPreviewDragIndex = Number(event.currentTarget.dataset.orderIndex);
+            event.dataTransfer.effectAllowed = 'move';
+            event.currentTarget.classList.add('dragging');
+        }
+
+        function handlePreviewDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+        }
+
+        function handlePreviewDrop(event) {
+            event.preventDefault();
+            const targetOrder = Number(event.currentTarget.dataset.orderIndex);
+            if (excelPreviewDragIndex === null || excelPreviewDragIndex === targetOrder) {
+                return;
+            }
+            const [moved] = excelPreviewColumnOrder.splice(excelPreviewDragIndex, 1);
+            excelPreviewColumnOrder.splice(targetOrder, 0, moved);
+            excelPreviewDragIndex = null;
+            renderExcelPreview();
+            updateExcelImportButtons();
+        }
+
+        function handlePreviewDragEnd(event) {
+            event.currentTarget.classList.remove('dragging');
+            excelPreviewDragIndex = null;
+        }
+
+        function resetExcelImportArea() {
+            const textarea = document.getElementById('excelPasteArea');
+            if (textarea) textarea.value = '';
+            excelPreviewData = [];
+            excelPreviewColumnOrder = [];
+            excelPreviewDragIndex = null;
+            excelFieldAssignments = [];
+            excelAssignmentsTab = null;
+            renderExcelPreview();
+            updateExcelImportButtons();
+            renderExcelMappingWorkbench();
+            showNotification('♻️ Import Excel réinitialisé', 'info');
+        }
+
+        function refreshExcelFieldHints() {
+            const container = document.getElementById('excelFieldHints');
+            if (!container) return;
+
+            const targetTab = document.getElementById('taskTargetTab').value;
+            if (!targetTab) {
+                container.innerHTML = '<div class="excel-preview-empty" style="padding: 8px;">Sélectionnez un onglet pour voir l\'ordre attendu des colonnes.</div>';
+                return;
+            }
+
+            const columns = tabConfigs[targetTab]?.columns || [];
+            if (!columns.length) {
+                container.innerHTML = '<div class="excel-preview-empty" style="padding: 8px;">Aucun champ disponible pour cet onglet.</div>';
+                return;
+            }
+
+            if (excelPreviewData.length) {
+                initializeExcelFieldAssignments();
+            } else {
+                excelFieldAssignments = [];
+            }
+
+            container.innerHTML = '';
+            columns.forEach((column, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'mapping-chip';
+                const mappedIndex = typeof excelFieldAssignments[index] === 'number'
+                    ? excelFieldAssignments[index]
+                    : excelPreviewColumnOrder[index];
+                const label = typeof mappedIndex === 'number'
+                    ? `Colonne ${mappedIndex + 1}`
+                    : 'Non défini';
+                chip.innerHTML = `<span>${column}</span>${label}`;
+                container.appendChild(chip);
+            });
+        }
+
+        function updateExcelImportButtons() {
+            const importBtn = document.getElementById('excelImportBtn');
+            if (!importBtn) return;
+            const targetTab = document.getElementById('taskTargetTab').value;
+            importBtn.disabled = !(excelPreviewData.length > 0 && Boolean(targetTab));
+        }
+
+        function createTasksFromExcelImport() {
+            try {
+                const targetTab = document.getElementById('taskTargetTab').value;
+                if (!targetTab) {
+                    showNotification('Choisissez d\'abord un onglet de destination.', 'warning');
+                    return;
+                }
+                if (!excelPreviewData.length) {
+                    showNotification('Prévisualisez vos données avant de lancer l\'import.', 'info');
+                    return;
+                }
+
+                const columns = tabConfigs[targetTab]?.columns || [];
+                if (!columns.length) {
+                    showNotification('Impossible de récupérer les colonnes de destination.', 'error');
+                    return;
+                }
+
+                const skipHeader = document.getElementById('excelSkipHeader')?.checked;
+                const rows = skipHeader ? excelPreviewData.slice(1) : [...excelPreviewData];
+                const cleanRows = rows.filter(row => row.some(cell => (cell || '').trim() !== ''));
+
+                if (!cleanRows.length) {
+                    showNotification('Aucune ligne exploitable à importer.', 'warning');
+                    return;
+                }
+
+                const columnMap = columns.map((_, index) => {
+                    if (typeof excelFieldAssignments[index] === 'number') {
+                        return excelFieldAssignments[index];
+                    }
+                    if (typeof excelPreviewColumnOrder[index] === 'number') {
+                        return excelPreviewColumnOrder[index];
+                    }
+                    return index;
+                });
+
+                cleanRows.forEach(row => {
+                    const taskData = {};
+                    columns.forEach((column, columnIndex) => {
+                        const sourceIndex = columnMap[columnIndex];
+                        taskData[column] = typeof sourceIndex === 'number' ? (row[sourceIndex] ?? '') : '';
+                    });
+
+                    pendingTasks.push({
+                        id: generateUniqueId(),
+                        targetTab,
+                        targetTabName: getTabDisplayName(targetTab),
+                        data: taskData,
+                        createdAt: new Date(),
+                        priority: 'Normale',
+                        summary: generateTaskSummary(taskData)
+                    });
+                });
+
+                updatePendingTasksDisplay();
+                updateTasksStats();
+                saveAllData();
+
+                showNotification(`📥 ${cleanRows.length} tâche(s) ajoutée(s) depuis l'import Excel`);
+                logActivity(`${cleanRows.length} tâche(s) importée(s) pour ${getTabDisplayName(targetTab)}`, 'success');
+            } catch (error) {
+                console.error('Erreur création tâches importées:', error);
+                showNotification('❌ Erreur lors de l\'import des tâches', 'error');
             }
         }
 
