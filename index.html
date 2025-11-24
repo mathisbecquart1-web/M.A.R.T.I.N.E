@@ -1243,6 +1243,49 @@
             font-weight: 600;
         }
 
+        .monthly-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .monthly-controls label {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .monthly-highlight {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+            margin: 14px 0;
+        }
+
+        .mail-preview-box {
+            background: linear-gradient(135deg, rgba(102,126,234,0.08), rgba(118,75,162,0.08));
+            border: 1px solid rgba(102,126,234,0.18);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .mail-preview-box ul {
+            padding-left: 18px;
+            margin: 8px 0;
+        }
+
+        .mail-preview-box li {
+            margin-bottom: 4px;
+        }
+
+        .monthly-table-note {
+            color: #666;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
         .activity-list {
             display: flex;
             flex-direction: column;
@@ -1896,6 +1939,7 @@
         <button class="tab" onclick="switchTab('pni')">🧾 PNI</button>
         <button class="tab" onclick="switchTab('baserg')">🗂️ Base RG & UT</button>
         <button class="tab" onclick="switchTab('taches')">📝 Tâches à faire</button>
+        <button class="tab" onclick="switchTab('statsmensuelles')">📆 Stats mensuelles</button>
         <button class="tab" onclick="switchTab('statistiques')">📊 Statistiques</button>
         <button class="tab" onclick="switchTab('recherche')">🔍 Recherche</button>
     </div>
@@ -3072,6 +3116,95 @@
             </div>
         </div>
 
+        <!-- ONGLET STATS MENSUELLES -->
+        <div id="statsmensuelles" class="tab-content">
+            <div class="stats-actions">
+                <div class="fun-badge">Camemberts mensuels prêts à partager</div>
+                <div class="monthly-controls">
+                    <label for="monthlyMonthPicker">Mois analysé</label>
+                    <input type="month" id="monthlyMonthPicker" onchange="refreshMonthlyStats()">
+                    <button class="btn btn-secondary btn-compact" onclick="setCurrentMonth()">📅 Mois actuel</button>
+                    <button class="btn btn-secondary btn-compact" onclick="refreshMonthlyStats(true)">🔄 Rafraîchir</button>
+                    <button class="btn btn-excel" onclick="exportMonthlyReport()">📧 Export e-mail</button>
+                </div>
+            </div>
+
+            <div class="stats-dashboard">
+                <div class="stats-card">
+                    <h3>📆 Résumé du mois <span id="monthlyPeriodLabel"></span></h3>
+                    <div class="monthly-highlight">
+                        <div>
+                            <div class="preview-stat-number" id="monthlyTotal">0</div>
+                            <div class="preview-stat-label">Entrées détectées</div>
+                        </div>
+                        <div>
+                            <div class="preview-stat-number success" id="monthlyProcessed">0</div>
+                            <div class="preview-stat-label">Traitées</div>
+                        </div>
+                        <div>
+                            <div class="preview-stat-number warning" id="monthlyPending">0</div>
+                            <div class="preview-stat-label">En attente</div>
+                        </div>
+                        <div>
+                            <div class="preview-stat-number" id="monthlyRate">0%</div>
+                            <div class="preview-stat-label">Taux d'achèvement</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="monthlyProgressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="monthly-table-note" id="monthlyTotalsNote">En attente de données mensuelles.</div>
+                </div>
+
+                <div class="stats-card">
+                    <h3>🥧 Camembert par statut</h3>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="monthlyStatusChart"></canvas>
+                    </div>
+                    <div class="stats-empty-search" id="monthlyStatusEmpty" style="display: none;">Aucune donnée pour ce mois.</div>
+                </div>
+
+                <div class="stats-card">
+                    <h3>🥧 Camembert par onglet traité</h3>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="monthlyTabsChart"></canvas>
+                    </div>
+                    <div class="stats-empty-search" id="monthlyTabsEmpty" style="display: none;">Aucun traitement enregistré sur le mois.</div>
+                </div>
+
+                <div class="stats-card">
+                    <h3>📨 Résumé prêt à coller</h3>
+                    <div class="mail-preview-box" id="monthlyMailPreview">
+                        Saisissez un mois pour générer un résumé e-mail prêt à partager.
+                    </div>
+                    <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary btn-compact" onclick="copyMonthlySummary()">📋 Copier le résumé</button>
+                        <button class="btn btn-primary btn-compact" onclick="refreshMonthlyStats()">🔄 Actualiser le résumé</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container" style="margin-top: 20px;">
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 200px;">Onglet</th>
+                            <th style="width: 120px;">Traités</th>
+                            <th style="width: 120px;">En attente</th>
+                            <th style="width: 120px;">Total</th>
+                            <th style="width: 120px;">Taux</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monthlyBreakdownBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #666;">Aucune donnée à afficher pour ce mois.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="monthly-table-note">Les lignes sont filtrées selon la date de traitement ou, à défaut, la date de demande du mois sélectionné.</div>
+            </div>
+        </div>
+
         <!-- ONGLET STATISTIQUES -->
         <div id="statistiques" class="tab-content">
             <div class="stats-actions">
@@ -3566,6 +3699,7 @@
         let activeTabName = 'creation';
         let tabCache = null;
         let pendingStatsUpdate = null;
+        let pendingMonthlyUpdate = null;
         let taskExcelCells = [];
         let draggedTaskCellId = null;
         let rowSelections = {};
@@ -3768,6 +3902,8 @@
             const runUpdate = () => {
                 if (tabName === 'statistiques') {
                     updateStatsDashboard();
+                } else if (tabName === 'statsmensuelles') {
+                    refreshMonthlyStats();
                 } else if (tabName === 'baserg') {
                     updateRGUsageStats();
                     updateUTUsageStats();
@@ -5706,6 +5842,8 @@ return;
                     renderPendingList(tabName);
                 }
 
+                scheduleMonthlyStatsRefresh();
+
             } catch (error) {
                 console.error('Erreur mise à jour statistiques:', error);
             }
@@ -7244,6 +7382,8 @@ return;
 
                 filterStatsCards(document.getElementById('statsSearch')?.value || '');
 
+                scheduleMonthlyStatsRefresh();
+
             } catch (error) {
                 console.error('Erreur mise à jour dashboard statistiques:', error);
             }
@@ -7560,7 +7700,313 @@ return;
             }
         }
 
-function updateTabsChart() {
+        function getCurrentMonthKey() {
+            const now = new Date();
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function getRowMonthKey(tabName, inputs) {
+            try {
+                const columns = tabConfigs[tabName]?.columns || [];
+                const dateTraitementIndex = columns.indexOf('Date Traitement');
+                const dateDemandeIndex = columns.indexOf('Date Demande');
+
+                let rawDate = '';
+
+                if (dateTraitementIndex >= 0 && inputs[dateTraitementIndex]?.value) {
+                    rawDate = inputs[dateTraitementIndex].value;
+                } else if (dateDemandeIndex >= 0 && inputs[dateDemandeIndex]?.value) {
+                    rawDate = inputs[dateDemandeIndex].value;
+                }
+
+                const date = reviveDate(rawDate);
+                if (!date) return null;
+
+                return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            } catch (error) {
+                console.error('Erreur récupération mois de la ligne:', error);
+                return null;
+            }
+        }
+
+        function isRowProcessedForStats(tabName, inputs) {
+            if (['verifbaux', 'pni'].includes(tabName)) {
+                const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
+                const traiteValue = inputs[traiteIndex] ? inputs[traiteIndex].value.toLowerCase() : '';
+                return traiteValue === 'oui';
+            }
+
+            const dateTraitementIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
+            return dateTraitementIndex >= 0 && inputs[dateTraitementIndex] && !!inputs[dateTraitementIndex].value;
+        }
+
+        function collectMonthlyTabStats(monthKey) {
+            const result = { monthKey, perTab: [], total: 0, processed: 0, pending: 0 };
+
+            if (!monthKey) return result;
+
+            Object.keys(tabConfigs).forEach(tabName => {
+                if (['baserg', 'baseut'].includes(tabName)) return;
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                const rows = tbody.querySelectorAll('tr');
+                let tabTotal = 0;
+                let tabProcessed = 0;
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const hasData = Array.from(inputs).some(input => (input.value || '').trim() !== '');
+                    if (!hasData) return;
+
+                    const rowMonth = getRowMonthKey(tabName, inputs);
+                    if (!rowMonth || rowMonth !== monthKey) return;
+
+                    tabTotal++;
+                    if (isRowProcessedForStats(tabName, inputs)) {
+                        tabProcessed++;
+                    }
+                });
+
+                if (tabTotal > 0) {
+                    const tabPending = Math.max(tabTotal - tabProcessed, 0);
+                    result.perTab.push({
+                        tabName,
+                        total: tabTotal,
+                        processed: tabProcessed,
+                        pending: tabPending,
+                        rate: tabTotal > 0 ? Math.round((tabProcessed / tabTotal) * 100) : 0
+                    });
+
+                    result.total += tabTotal;
+                    result.processed += tabProcessed;
+                }
+            });
+
+            result.pending = Math.max(result.total - result.processed, 0);
+            return result;
+        }
+
+        function renderMonthlyBreakdown(perTabStats = []) {
+            const body = document.getElementById('monthlyBreakdownBody');
+            if (!body) return;
+
+            body.innerHTML = '';
+
+            if (!perTabStats.length) {
+                body.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #666;">Aucune donnée à afficher pour ce mois.</td></tr>';
+                return;
+            }
+
+            perTabStats
+                .slice()
+                .sort((a, b) => b.total - a.total)
+                .forEach(stat => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${getTabIcon(stat.tabName)} ${getTabDisplayName(stat.tabName)}</td>
+                        <td>${stat.processed}</td>
+                        <td>${stat.pending}</td>
+                        <td>${stat.total}</td>
+                        <td>${stat.rate}%</td>
+                    `;
+                    body.appendChild(row);
+                });
+        }
+
+        function renderMonthlyCharts(stats) {
+            try {
+                const statusCtx = document.getElementById('monthlyStatusChart');
+                const tabsCtx = document.getElementById('monthlyTabsChart');
+                const statusEmpty = document.getElementById('monthlyStatusEmpty');
+                const tabsEmpty = document.getElementById('monthlyTabsEmpty');
+
+                const hasStatusData = (stats.processed + stats.pending) > 0;
+                if (chartInstances.monthlyStatusChart) {
+                    chartInstances.monthlyStatusChart.destroy();
+                    chartInstances.monthlyStatusChart = null;
+                }
+
+                if (statusEmpty) statusEmpty.style.display = hasStatusData ? 'none' : 'block';
+
+                if (hasStatusData && statusCtx && window.Chart) {
+                    chartInstances.monthlyStatusChart = new Chart(statusCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Traitées', 'En attente'],
+                            datasets: [{
+                                data: [stats.processed, stats.pending],
+                                backgroundColor: ['#28a745', '#ffc107'],
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom' } }
+                        }
+                    });
+                }
+
+                const processedPerTab = (stats.perTab || []).filter(stat => stat.processed > 0);
+                if (chartInstances.monthlyTabsChart) {
+                    chartInstances.monthlyTabsChart.destroy();
+                    chartInstances.monthlyTabsChart = null;
+                }
+
+                if (tabsEmpty) tabsEmpty.style.display = processedPerTab.length ? 'none' : 'block';
+
+                if (tabsCtx && processedPerTab.length && window.Chart) {
+                    chartInstances.monthlyTabsChart = new Chart(tabsCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: processedPerTab.map(stat => getTabDisplayName(stat.tabName)),
+                            datasets: [{
+                                data: processedPerTab.map(stat => stat.processed),
+                                backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b'],
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'right' } }
+                        }
+                    });
+                }
+
+            } catch (error) {
+                console.error('Erreur graphiques mensuels:', error);
+            }
+        }
+
+        function formatMonthPeriod(monthKey) {
+            if (!monthKey) return 'Période non définie';
+            const [year, month] = monthKey.split('-').map(Number);
+            const date = new Date(year, (month || 1) - 1, 1);
+            return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+        }
+
+        function renderMonthlyMailPreview(stats) {
+            const preview = document.getElementById('monthlyMailPreview');
+            if (!preview) return;
+
+            if (!stats || !stats.total) {
+                preview.textContent = 'Aucune activité détectée pour ce mois. Collez ou importez des données pour générer un récapitulatif.';
+                return;
+            }
+
+            const monthLabel = formatMonthPeriod(stats.monthKey);
+            const rate = stats.total > 0 ? Math.round((stats.processed / stats.total) * 100) : 0;
+            const topTabs = stats.perTab
+                .slice()
+                .sort((a, b) => b.processed - a.processed)
+                .slice(0, 3)
+                .map(stat => `${getTabDisplayName(stat.tabName)} : ${stat.processed} traité(s)`);
+
+            preview.innerHTML = `
+                <strong>Rapport mensuel ${monthLabel}</strong>
+                <ul>
+                    <li>${stats.processed} traité(s) / ${stats.total} entrée(s) (${rate}% de complétion)</li>
+                    <li>${stats.pending} en attente actuellement</li>
+                    <li>Top onglets actifs : ${topTabs.length ? topTabs.join(' • ') : 'aucun traitement ce mois'}</li>
+                </ul>
+                <div style="font-size: 12px; color: #555;">Ce bloc est prêt à être collé dans un e-mail ou un chat.</div>
+            `;
+        }
+
+        function refreshMonthlyStats(forceReset = false) {
+            try {
+                const monthInput = document.getElementById('monthlyMonthPicker');
+                if (!monthInput) return;
+
+                let monthKey = monthInput.value;
+                if (!monthKey || forceReset) {
+                    monthKey = getCurrentMonthKey();
+                    monthInput.value = monthKey;
+                }
+
+                const stats = collectMonthlyTabStats(monthKey);
+                const rate = stats.total > 0 ? Math.round((stats.processed / stats.total) * 100) : 0;
+                const monthLabel = formatMonthPeriod(monthKey);
+
+                const periodLabel = document.getElementById('monthlyPeriodLabel');
+                if (periodLabel) periodLabel.textContent = stats.total ? `(${monthLabel})` : '';
+
+                document.getElementById('monthlyTotal').textContent = stats.total;
+                document.getElementById('monthlyProcessed').textContent = stats.processed;
+                document.getElementById('monthlyPending').textContent = stats.pending;
+                document.getElementById('monthlyRate').textContent = rate + '%';
+
+                const progressFill = document.getElementById('monthlyProgressFill');
+                if (progressFill) progressFill.style.width = `${rate}%`;
+
+                const totalsNote = document.getElementById('monthlyTotalsNote');
+                if (totalsNote) {
+                    totalsNote.textContent = stats.total
+                        ? `${stats.processed} traité(s) sur ${stats.total} pour ${monthLabel}`
+                        : 'Aucune activité sur cette période.';
+                }
+
+                renderMonthlyBreakdown(stats.perTab);
+                renderMonthlyCharts(stats);
+                renderMonthlyMailPreview(stats);
+
+            } catch (error) {
+                console.error('Erreur mise à jour stats mensuelles:', error);
+            }
+        }
+
+        function scheduleMonthlyStatsRefresh() {
+            cancelIdle(pendingMonthlyUpdate);
+            const runRefresh = () => refreshMonthlyStats();
+            if (window.requestIdleCallback) {
+                pendingMonthlyUpdate = requestIdleCallback(runRefresh, { timeout: 150 });
+            } else {
+                pendingMonthlyUpdate = setTimeout(runRefresh, 25);
+            }
+        }
+
+        function setCurrentMonth() {
+            try {
+                const monthInput = document.getElementById('monthlyMonthPicker');
+                if (!monthInput) return;
+
+                monthInput.value = getCurrentMonthKey();
+                refreshMonthlyStats();
+            } catch (error) {
+                console.error('Erreur sélection mois courant:', error);
+            }
+        }
+
+        function copyMonthlySummary() {
+            try {
+                const preview = document.getElementById('monthlyMailPreview');
+                if (!preview) return;
+
+                const text = (preview.innerText || '').trim();
+                if (!text) {
+                    showNotification('ℹ️ Aucun résumé mensuel à copier', 'info');
+                    return;
+                }
+
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        showNotification('📋 Résumé mensuel copié, prêt à coller dans un mail');
+                    })
+                    .catch(() => {
+                        showNotification('❌ Impossible de copier le résumé', 'error');
+                    });
+
+            } catch (error) {
+                console.error('Erreur copie résumé mensuel:', error);
+            }
+        }
+
+        function updateTabsChart() {
             try {
                 const ctx = document.getElementById('tabsChart');
                 if (!ctx) return;
@@ -10547,6 +10993,83 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        function exportMonthlyReport() {
+            try {
+                refreshMonthlyStats();
+
+                const monthValue = document.getElementById('monthlyMonthPicker')?.value || getCurrentMonthKey();
+                const monthLabel = formatMonthPeriod(monthValue);
+                const container = document.getElementById('statsmensuelles');
+
+                if (!container) {
+                    showNotification('❌ Onglet stats mensuelles introuvable', 'error');
+                    return;
+                }
+
+                const clone = container.cloneNode(true);
+                const originalCanvases = container.querySelectorAll('canvas');
+                const clonedCanvases = clone.querySelectorAll('canvas');
+
+                originalCanvases.forEach((canvas, index) => {
+                    const clonedCanvas = clonedCanvases[index];
+                    if (!clonedCanvas) return;
+
+                    try {
+                        const img = document.createElement('img');
+                        img.src = canvas.toDataURL('image/png');
+                        img.alt = canvas.getAttribute('aria-label') || 'Graphique mensuel';
+                        img.style.width = '100%';
+                        img.style.maxWidth = '100%';
+                        img.style.display = 'block';
+                        img.style.margin = '10px auto';
+                        clonedCanvas.replaceWith(img);
+                    } catch (e) {
+                        console.error('Conversion du graphique mensuel échouée', e);
+                    }
+                });
+
+                const styleBlocks = Array.from(document.querySelectorAll('style'))
+                    .map(style => style.innerHTML)
+                    .join('\n');
+
+                const exportHtml = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport mensuel MARTINE</title>
+    <style>${styleBlocks}</style>
+</head>
+<body style="background: white;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+        <h1 style="margin-bottom: 8px; color: #2c3e50;">Rapport mensuel MARTINE</h1>
+        <div style="margin-bottom: 14px; color: #555; font-size: 14px;">Période : ${monthLabel} • Généré le ${new Date().toLocaleString('fr-FR')}</div>
+        <div style="margin-bottom: 12px; color: #666; font-size: 13px;">Rapport prêt à être transmis par e-mail (peut être collé directement dans un message).</div>
+        ${clone.innerHTML}
+    </div>
+</body>
+</html>`;
+
+                const blob = new Blob([exportHtml], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const safeMonth = monthValue || 'periode';
+                const fileName = `MARTINE_Stats_Mensuelles_${safeMonth}.html`;
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                showNotification(`📧 Rapport mensuel exporté (${fileName})`);
+                logActivity('Export HTML des stats mensuelles', 'success');
+
+            } catch (error) {
+                console.error('Erreur export rapport mensuel:', error);
+                showNotification('❌ Erreur lors de l\'export mensuel', 'error');
+            }
+        }
+
         // 💾 SAUVEGARDE ET RESTAURATION COMPLÈTE
         function scheduleIdleTask(callback) {
             if (window.requestIdleCallback) {
@@ -10914,6 +11437,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 setupFileDropZones();
                 updateStatsDashboard();
+                setCurrentMonth();
+                refreshMonthlyStats();
 
                 showNotification('🚀 MARTINE - Tous onglets fonctionnels', 'success');
                 showSaveStatus('💾 Application prête - Auto-sauvegarde activée');
@@ -10989,6 +11514,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.exportToExcel = exportToExcel;
         window.exportAllToExcel = exportAllToExcel;
         window.exportStatsReport = exportStatsReport;
+        window.exportMonthlyReport = exportMonthlyReport;
         window.clearAll = clearAll;
         window.triggerFileInput = triggerFileInput;
         window.handleFileImport = handleFileImport;
@@ -11011,6 +11537,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.exportSearchResults = exportSearchResults;
         window.goToResult = goToResult;
         window.updateTaskFields = updateTaskFields;
+        window.refreshMonthlyStats = refreshMonthlyStats;
+        window.copyMonthlySummary = copyMonthlySummary;
+        window.setCurrentMonth = setCurrentMonth;
         window.parseTaskExcelCells = parseTaskExcelCells;
         window.clearTaskExcelCells = clearTaskExcelCells;
         window.transferTask = transferTask;
