@@ -3007,11 +3007,12 @@
                             <th style="width: 180px;">Onglet destination</th>
                             <th style="width: 320px;">Résumé</th>
                             <th style="width: 200px;">Terminé le</th>
+                            <th style="width: 120px;">Action</th>
                         </tr>
                     </thead>
                     <tbody id="completedTasksTableBody">
                         <tr>
-                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">📭 Aucune tâche terminée pour le moment.</td>
+                            <td colspan="5" style="text-align: center; padding: 30px; color: #666;">📭 Aucune tâche terminée pour le moment.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -9003,7 +9004,7 @@ function updateTabsChart() {
                 if (completedTasks.length === 0) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">📭 Aucune tâche terminée pour le moment.</td>
+                            <td colspan="5" style="text-align: center; padding: 30px; color: #666;">📭 Aucune tâche terminée pour le moment.</td>
                         </tr>
                     `;
                     return;
@@ -9026,6 +9027,9 @@ function updateTabsChart() {
                         <td>${getTabIcon(task.targetTab)} ${destination}</td>
                         <td>${renderCompactSummaryCell(task.summary)}</td>
                         <td>${formatCompletionDate(completionDate)}<div style="font-size: 12px; color: #666; margin-top: 4px;">${origin}</div></td>
+                        <td>
+                            <button class="btn btn-danger btn-compact" aria-label="Supprimer cette tâche" title="Supprimer cette tâche" data-task-id="${task.id || ''}">🗑️</button>
+                        </td>
                     `;
 
                     const goToTask = () => navigateToTask(task);
@@ -9041,6 +9045,14 @@ function updateTabsChart() {
                             goToTask();
                         }
                     });
+
+                    const deleteButton = row.querySelector('button[data-task-id]');
+                    if (deleteButton) {
+                        deleteButton.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            deleteCompletedTask(task.id);
+                        });
+                    }
 
                     tbody.appendChild(row);
                 });
@@ -9410,6 +9422,28 @@ function updateTabsChart() {
             } catch (error) {
                 console.error('Erreur suppression tâche:', error);
                 showNotification('❌ Erreur lors de la suppression de tâche', 'error');
+            }
+        }
+
+        function deleteCompletedTask(taskId) {
+            try {
+                const task = completedTasks.find(t => t.id === taskId);
+                if (!task) return;
+
+                if (!confirm('Supprimer cette tâche de l\'historique ?')) {
+                    return;
+                }
+
+                completedTasks = completedTasks.filter(t => t.id !== taskId);
+                updateTasksStats();
+                saveAllData();
+
+                const destination = task.targetTabName || getTabDisplayName(task.targetTab);
+                showNotification(`🗑️ Tâche retirée de l'historique (${destination})`);
+                logActivity(`Tâche supprimée de l'historique (${destination})`, 'warning');
+            } catch (error) {
+                console.error('Erreur suppression tâche terminée:', error);
+                showNotification('❌ Erreur lors de la suppression de l\'historique', 'error');
             }
         }
 
