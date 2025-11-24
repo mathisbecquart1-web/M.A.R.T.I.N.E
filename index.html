@@ -2753,56 +2753,6 @@
                             </button>
                         </div>
 
-                        <div class="excel-import" id="excelImportSection">
-                            <div class="excel-import-layout">
-                                <div class="excel-import-form">
-                                    <div>
-                                        <h4>📋 Import rapide par copier/coller Excel</h4>
-                                        <p style="font-size: 13px; color: #555; margin-bottom: 10px;">
-                                            Collez vos lignes depuis Excel, réorganisez les colonnes par glisser-déposer puis créez automatiquement autant de tâches que de lignes importées.
-                                        </p>
-                                    </div>
-                                    <div class="excel-field-hints" id="excelFieldHints">
-                                        <div class="excel-preview-empty" style="padding: 8px;">
-                                            Sélectionnez un onglet pour voir l'ordre attendu des colonnes.
-                                        </div>
-                                    </div>
-                                    <textarea id="excelPasteArea" class="excel-paste-area" placeholder="GA[TAB]Date Demande[TAB]..."></textarea>
-                                    <div class="excel-import-actions">
-                                        <button class="btn btn-secondary" id="excelPreviewBtn" onclick="handleExcelPastePreview()">
-                                            👀 Prévisualiser
-                                        </button>
-                                        <button class="btn btn-danger" type="button" onclick="resetExcelImportArea()">
-                                            ♻️ Effacer l'import
-                                        </button>
-                                        <button class="btn btn-success" id="excelImportBtn" onclick="createTasksFromExcelImport()" disabled>
-                                            📥 Créer des tâches depuis l'import
-                                        </button>
-                                        <button class="btn btn-secondary" id="excelBatchImportBtn" onclick="addImportToBatch()" disabled>
-                                            📦 Ajouter l'import au lot actif
-                                        </button>
-                                        <label class="excel-option">
-                                            <input type="checkbox" id="excelSkipHeader" checked onchange="updateExcelImportButtons()">
-                                            Ignorer la première ligne (entêtes)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="excel-preview-panel">
-                                    <div class="excel-preview-panel-header">
-                                        <h5>Tableau de prévisualisation</h5>
-                                        <span class="excel-preview-helper">Restez sur le formulaire tout en parcourant vos lignes importées.</span>
-                                    </div>
-                                    <div class="excel-preview-meta" id="excelPreviewMeta">Aucun aperçu pour le moment.</div>
-                                    <div class="excel-preview-scroll">
-                                        <div id="excelPreviewContainer" class="excel-preview-container">
-                                            <div class="excel-preview-empty">
-                                                Collez vos données pour voir un aperçu interactif.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -2895,6 +2845,28 @@
                             <td colspan="6" style="text-align: center; padding: 40px; color: #666;">
                                 📝 Aucune tâche en attente. Créez une nouvelle tâche ci-dessus !
                             </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-container" style="margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; flex-wrap: wrap;">
+                    <h4 style="margin: 0;">📜 Historique des tâches terminées</h4>
+                    <div style="font-size: 12px; color: #666;">Les tâches exécutées sont conservées avec leur date et heure d'envoi.</div>
+                </div>
+                <table id="completedTasksTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th style="width: 180px;">Onglet destination</th>
+                            <th style="width: 320px;">Résumé</th>
+                            <th style="width: 200px;">Terminé le</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completedTasksTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">📭 Aucune tâche terminée pour le moment.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -8709,8 +8681,57 @@ function updateTabsChart() {
                     summary.push(`${field}: ${taskData[field]}`);
                 }
             });
-            
+
             return summary.join(' | ') || 'Tâche sans détails spécifiques';
+        }
+
+        function formatCompletionDate(dateValue) {
+            const dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue || Date.now());
+            const datePart = dateObj.toLocaleDateString('fr-FR');
+            const timePart = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            return `${datePart} · ${timePart}`;
+        }
+
+        function updateCompletedTasksHistory() {
+            try {
+                const tbody = document.getElementById('completedTasksTableBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+
+                if (completedTasks.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">📭 Aucune tâche terminée pour le moment.</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                const sortedTasks = [...completedTasks].sort((a, b) => {
+                    const aDate = a.completedAt ? new Date(a.completedAt) : new Date(a.createdAt || Date.now());
+                    const bDate = b.completedAt ? new Date(b.completedAt) : new Date(b.createdAt || Date.now());
+                    return bDate - aDate;
+                });
+
+                sortedTasks.forEach((task, index) => {
+                    const completionDate = task.completedAt ? new Date(task.completedAt) : new Date();
+                    const row = document.createElement('tr');
+                    const destination = task.targetTabName || getTabDisplayName(task.targetTab);
+                    const origin = task.sourceBatch ? `Lot : ${task.sourceBatch}` : 'Tâche unique';
+
+                    row.innerHTML = `
+                        <td class="row-number">${index + 1}</td>
+                        <td>${getTabIcon(task.targetTab)} ${destination}</td>
+                        <td style="font-size: 13px;">${task.summary || 'Tâche sans détails spécifiques'}</td>
+                        <td>${formatCompletionDate(completionDate)}<div style="font-size: 12px; color: #666; margin-top: 4px;">${origin}</div></td>
+                    `;
+
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Erreur mise à jour historique tâches:', error);
+            }
         }
 
         function updatePendingTasksDisplay() {
@@ -8956,7 +8977,9 @@ function updateTabsChart() {
                 document.getElementById('completedTasksCount').textContent = completedCount;
                 document.getElementById('totalTasksCount').textContent = totalCount;
                 document.getElementById('tasksProgress').style.width = completionRate + '%';
-                
+
+                updateCompletedTasksHistory();
+
             } catch (error) {
                 console.error('Erreur mise à jour stats tâches:', error);
             }
