@@ -9001,21 +9001,40 @@ function updateTabsChart() {
 
                 const columns = tabConfigs[targetTab]?.columns || [];
                 const taskData = [];
+                const taskDataObject = {};
                 const quantity = getTaskQuantity();
 
                 columns.forEach((column, index) => {
                     const input = document.getElementById(`taskField_${index}`);
-                    taskData.push(input ? input.value : '');
+                    const value = input ? input.value : '';
+                    taskData.push(value);
+                    taskDataObject[column] = value;
                 });
 
                 const fragment = document.createDocumentFragment();
                 for (let i = 0; i < quantity; i++) {
+                    const taskId = generateUniqueId();
+                    const timestamp = new Date();
+
                     addRowWithData(targetTab, taskData, {
                         fragment,
                         skipStats: true,
                         skipLog: true,
                         skipFocus: true,
-                        skipValidation: true
+                        skipValidation: true,
+                        rowId: taskId
+                    });
+
+                    completedTasks.push({
+                        id: taskId,
+                        targetTab,
+                        targetTabName: getTabDisplayName(targetTab),
+                        data: { ...taskDataObject },
+                        createdAt: timestamp,
+                        completedAt: timestamp,
+                        priority: 'Normale',
+                        summary: generateTaskSummary(taskDataObject),
+                        status: 'completed'
                     });
                 }
 
@@ -9025,6 +9044,7 @@ function updateTabsChart() {
                 }
 
                 updateStats(targetTab);
+                updateTasksStats();
                 saveAllData();
 
                 clearTaskForm();
