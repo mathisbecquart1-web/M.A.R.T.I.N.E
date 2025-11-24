@@ -1451,6 +1451,25 @@
             word-break: break-word;
         }
 
+        .task-table tbody tr.clickable-row {
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .task-table tbody tr.clickable-row:hover {
+            background: #f3f4ff;
+        }
+
+        .task-table tbody tr.highlight-task {
+            animation: taskHighlight 1.4s ease;
+        }
+
+        @keyframes taskHighlight {
+            0% { background-color: #fff7e6; }
+            50% { background-color: #ffe0b3; }
+            100% { background-color: transparent; }
+        }
+
         .excel-import {
             border: 1px dashed #cfd8ff;
             border-radius: 12px;
@@ -4955,12 +4974,16 @@ return;
         }
 
         function addRowWithData(tabName, data, options = {}) {
-            const { fragment = null, skipStats = false, skipLog = false, skipFocus = false, skipValidation = false } = options;
+            const { fragment = null, skipStats = false, skipLog = false, skipFocus = false, skipValidation = false, rowId = null } = options;
             try {
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) return;
 
                 const row = buildRowElement(tabName, data, { skipValidation });
+
+                if (rowId) {
+                    row.dataset.taskId = rowId;
+                }
 
                 if (fragment) {
                     fragment.appendChild(row);
@@ -8756,6 +8779,20 @@ function updateTabsChart() {
                         <td>${formatCompletionDate(completionDate)}<div style="font-size: 12px; color: #666; margin-top: 4px;">${origin}</div></td>
                     `;
 
+                    const goToTask = () => navigateToTask(task);
+                    row.classList.add('clickable-row');
+                    row.dataset.taskId = task.id || '';
+                    row.dataset.targetTab = task.targetTab || '';
+                    row.tabIndex = 0;
+                    row.setAttribute('role', 'button');
+                    row.addEventListener('click', goToTask);
+                    row.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            goToTask();
+                        }
+                    });
+
                     tbody.appendChild(row);
                 });
             } catch (error) {
@@ -8939,7 +8976,7 @@ function updateTabsChart() {
                 const columns = tabConfigs[task.targetTab]?.columns || [];
                 const taskDataArray = columns.map(column => task.data[column] || '');
 
-                addRowWithData(task.targetTab, taskDataArray);
+                addRowWithData(task.targetTab, taskDataArray, { rowId: task.id });
                 updateStats(task.targetTab);
 
                 completedTasks.push({
@@ -8995,6 +9032,37 @@ function updateTabsChart() {
             }
         }
 
+        function navigateToTask(task) {
+            try {
+                if (!task || !task.targetTab) return;
+
+                const previousTab = activeTabName;
+                switchTab(task.targetTab);
+
+                const tabChanged = previousTab !== task.targetTab;
+
+                const focusRow = () => {
+                    const tableBody = document.getElementById(`${task.targetTab}TableBody`);
+                    if (!tableBody) return;
+
+                    const targetRow = tableBody.querySelector(`tr[data-task-id="${task.id}"]`) || tableBody.querySelector('tr:last-child');
+                    if (!targetRow) return;
+
+                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targetRow.classList.add('highlight-task');
+                    setTimeout(() => targetRow.classList.remove('highlight-task'), 1400);
+                };
+
+                if (tabChanged) {
+                    setTimeout(focusRow, 120);
+                } else {
+                    focusRow();
+                }
+            } catch (error) {
+                console.error('Erreur navigation vers la tâche:', error);
+            }
+        }
+
         function updateTasksStats() {
             try {
                 const pendingCount = pendingTasks.length;
@@ -9022,8 +9090,8 @@ function updateTabsChart() {
                 const columns = tabConfigs[task.targetTab]?.columns || [];
                 const taskDataArray = columns.map(column => task.data[column] || '');
                 
-                addRowWithData(task.targetTab, taskDataArray);
-                
+                addRowWithData(task.targetTab, taskDataArray, { rowId: task.id });
+
                 // Déplacer vers les tâches complétées
                 completedTasks.push({
                     ...task,
@@ -9114,7 +9182,7 @@ function updateTabsChart() {
                     const columns = tabConfigs[task.targetTab]?.columns || [];
                     const taskDataArray = columns.map(column => task.data[column] || '');
                     
-                    addRowWithData(task.targetTab, taskDataArray);
+                    addRowWithData(task.targetTab, taskDataArray, { rowId: task.id });
                     updateStats(task.targetTab);
                     
                     completedTasks.push({
