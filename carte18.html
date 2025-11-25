@@ -412,6 +412,9 @@
   <script>
     // ---- CONSTANTES ----
     const STORAGE_KEY = 'batimentsAppState_v2';
+    const DB_NAME = 'BatimentsDataDB';
+    const DB_STORE = 'datasets';
+    const DB_VERSION = 1;
     const PREFERRED_FILTER_FIELDS = ['Type', 'type', 'Categorie', 'Catégorie'];
     const MAX_LIST_ITEMS = 200; // max dans la liste à droite pour éviter de tuer le DOM
     let searchDebounce = null;
@@ -429,6 +432,8 @@
     let activeFilterValue = 'ALL';
     let searchText = '';
     let selectedBuildingIndex = null;
+
+    let dbPromise = null;
 
     // ---- UTIL ----
     function showMessage(text, isError = false) {
@@ -472,6 +477,91 @@
 
     function clearSavedState() {
       localStorage.removeItem(STORAGE_KEY);
+    }
+
+    // ---- PERSISTANCE INDEXEDDB ----
+    function getDb() {
+      if (dbPromise) return dbPromise;
+
+      dbPromise = new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onerror = (event) => {
+          console.error('IndexedDB error', event);
+          reject(event);
+        };
+
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains(DB_STORE)) {
+            db.createObjectStore(DB_STORE);
+          }
+        };
+
+        request.onsuccess = (event) => {
+          resolve(event.target.result);
+        };
+      });
+
+      return dbPromise;
+    }
+
+    function saveDatasetToIndexedDB(rows) {
+      return getDb().then((db) => {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction([DB_STORE], 'readwrite');
+          const store = tx.objectStore(DB_STORE);
+          const payload = { rows, savedAt: Date.now() };
+          const req = store.put(payload, 'latest');
+
+          req.onsuccess = () => resolve(true);
+          req.onerror = (event) => {
+            console.error('Erreur sauvegarde IndexedDB', event);
+            reject(event);
+          };
+        });
+      }).catch((err) => {
+        console.error('IndexedDB indisponible', err);
+      });
+    }
+
+    function loadDatasetFromIndexedDB() {
+      return getDb().then((db) => {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction([DB_STORE], 'readonly');
+          const store = tx.objectStore(DB_STORE);
+          const req = store.get('latest');
+
+          req.onsuccess = (event) => {
+            resolve(event.target.result || null);
+          };
+          req.onerror = (event) => {
+            console.error('Erreur lecture IndexedDB', event);
+            reject(event);
+          };
+        });
+      }).catch((err) => {
+        console.error('IndexedDB indisponible', err);
+        return null;
+      });
+    }
+
+    function clearDatasetFromIndexedDB() {
+      return getDb().then((db) => {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction([DB_STORE], 'readwrite');
+          const store = tx.objectStore(DB_STORE);
+          const req = store.delete('latest');
+
+          req.onsuccess = () => resolve(true);
+          req.onerror = (event) => {
+            console.error('Erreur suppression IndexedDB', event);
+            reject(event);
+          };
+        });
+      }).catch((err) => {
+        console.error('IndexedDB indisponible', err);
+      });
     }
 
     // ---- CARTE ----
@@ -575,6 +665,7 @@
 
       showMessage('Données chargées : ' + allBuildings.length + ' bâtiments.', false);
       saveStateToLocalStorage();
+      saveDatasetToIndexedDB(allBuildings);
     }
 
     function handleCsvData(results) {
@@ -964,6 +1055,35 @@
         currentBase = saved.currentBase || 'realistic';
         setBaseLayer(currentBase);
       }
+
+      loadDatasetFromIndexedDB().then((payload) => {
+        if (!payload || !payload.rows || !payload.rows.length) {
+          showMessage('Importez un fichier CSV/Excel pour commencer.', false);
+          return;
+        }
+
+        allBuildings = payload.rows;
+        activeFilterField = (saved && saved.activeFilterField) || guessFilterFieldFromBuildings(allBuildings);
+        activeFilterValue = (saved && saved.activeFilterValue) || 'ALL';
+        searchText = (saved && saved.searchText) || '';
+        selectedBuildingIndex = saved && saved.selectedBuildingIndex != null
+          ? saved.selectedBuildingIndex
+          : null;
+
+        document.getElementById('search-input').value = searchText;
+
+        rebuildFiltersUI();
+        applyFiltersAndSearch();
+
+        if (saved && saved.mapCenter && saved.mapZoom && map) {
+          map.setView([saved.mapCenter.lat, saved.mapCenter.lng], saved.mapZoom);
+        }
+
+        if (selectedBuildingIndex != null) updateBuildingDetails();
+        showMessage('Données restaurées automatiquement (' + allBuildings.length + ' bâtiments).', false);
+      }).catch(() => {
+        showMessage('Importez un fichier CSV/Excel pour commencer.', false);
+      });
 
       const fileInput = document.getElementById('file-input');
       fileInput.addEventListener('change', (e) => {
