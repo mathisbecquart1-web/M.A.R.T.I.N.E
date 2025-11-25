@@ -3966,6 +3966,9 @@
         let activeTabName = 'creation';
         let tabCache = null;
         let pendingStatsUpdate = null;
+        let pendingStatsFrame = null;
+        let statsUpdateQueue = new Set();
+        let pendingSaveHandle = null;
         let pendingMonthlyUpdate = null;
         let taskExcelCells = [];
         let draggedTaskCellId = null;
@@ -4101,6 +4104,48 @@
                 clearTimeout(handle);
             }
         };
+
+        function queueSaveAllData() {
+            cancelIdle(pendingSaveHandle);
+
+            const runSave = () => {
+                pendingSaveHandle = null;
+                saveAllData();
+            };
+
+            if (window.requestIdleCallback) {
+                pendingSaveHandle = requestIdleCallback(runSave, { timeout: 200 });
+            } else {
+                pendingSaveHandle = setTimeout(runSave, 80);
+            }
+        }
+
+        function flushQueuedSaveAllData() {
+            if (pendingSaveHandle) {
+                cancelIdle(pendingSaveHandle);
+                pendingSaveHandle = null;
+            }
+            saveAllData();
+        }
+
+        function queueStatsUpdate(tabName) {
+            if (!tabName) return;
+            statsUpdateQueue.add(tabName);
+            if (pendingStatsFrame) return;
+
+            const runUpdates = () => {
+                pendingStatsFrame = null;
+                const tabs = Array.from(statsUpdateQueue);
+                statsUpdateQueue.clear();
+                tabs.forEach(name => updateStats(name));
+            };
+
+            if (window.requestAnimationFrame) {
+                pendingStatsFrame = requestAnimationFrame(runUpdates);
+            } else {
+                pendingStatsFrame = setTimeout(runUpdates, 16);
+            }
+        }
 
         function toggleRGChangePanel() {
             try {
@@ -5536,7 +5581,7 @@ return;
                             const dateInput = inputs[dateIndex];
                             if (input.value.toLowerCase() === 'oui' && dateInput && !dateInput.value) {
                                 dateInput.value = formatDateKey(new Date());
-                                saveAllData();
+                                queueSaveAllData();
                             }
                         }
                     });
@@ -5557,8 +5602,8 @@ return;
                     autoResizeField(input);
                     applySmartSuggestion(input, column);
                     validateInputInRealTime(input, column, tabName);
-                    saveAllData();
-                    updateStats(tabName);
+                    queueSaveAllData();
+                    queueStatsUpdate(tabName);
                 });
 
                 if (!skipValidation) {
@@ -5908,7 +5953,7 @@ return;
                         refreshRowSelections(tabName);
                     }
                     updateStats(tabName);
-                    saveAllData();
+                    queueSaveAllData();
                     showNotification('🗑️ Ligne supprimée');
                     logActivity(`Ligne supprimée dans ${getTabDisplayName(tabName)}`, 'warning');
                 }
@@ -5937,7 +5982,7 @@ return;
                 selection.clear();
                 refreshRowSelections(tabName);
                 updateStats(tabName);
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification('🗑️ Sélection supprimée');
                 logActivity(`Sélection supprimée dans ${getTabDisplayName(tabName)}`, 'warning');
@@ -6005,7 +6050,7 @@ return;
                 if (recalculated > 0) {
                     showNotification(`🔄 ${recalculated} différence(s) de surface recalculée(s)`);
                     updateStats('modifsurface');
-                    saveAllData();
+                    queueSaveAllData();
                 }
                 
             } catch (error) {
@@ -6813,7 +6858,7 @@ return;
                 const refreshedInsights = getRGChangeInsights();
                 updateRGChangeWidget(refreshedInsights);
                 updateStatChips(getTabStatistics().general, refreshedInsights, getQualityCounts());
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification(`✅ UT-BAT ${normalized} retiré des doublons après vérification`);
             } catch (error) {
@@ -7268,8 +7313,8 @@ return;
                 addColumnSuggestion('Nom de RG', nomInput.value);
             }
 
-            saveAllData();
-            updateStats(tabName);
+            queueSaveAllData();
+            queueStatsUpdate(tabName);
             hideRGSuggestionPanel();
 
             return match;
@@ -8337,7 +8382,7 @@ return;
 
                 renderMissionCalendar();
                 renderMissionList();
-                saveAllData();
+                queueSaveAllData();
                 showNotification('✅ Mission ajoutée au calendrier');
 
             } catch (error) {
@@ -8352,14 +8397,14 @@ return;
                 : mission);
             renderMissionCalendar();
             renderMissionList();
-            saveAllData();
+            queueSaveAllData();
         }
 
         function deleteMission(id) {
             missions = missions.filter(mission => mission.id !== id);
             renderMissionCalendar();
             renderMissionList();
-            saveAllData();
+            queueSaveAllData();
             showNotification('🗑️ Mission supprimée');
         }
 
@@ -8386,11 +8431,11 @@ return;
 
                 titleInput.value = '';
                 if (notesInput) notesInput.value = '';
-                if (statusInput) statusInput.value = 'planned';
+            if (statusInput) statusInput.value = 'planned';
 
-                renderMissionNotebook();
-                saveAllData();
-                showNotification('✅ Mission ajoutée au cahier');
+            renderMissionNotebook();
+            queueSaveAllData();
+            showNotification('✅ Mission ajoutée au cahier');
             } catch (error) {
                 console.error('Erreur ajout cahier missions:', error);
                 showNotification('❌ Impossible d\'ajouter au cahier', 'error');
@@ -8402,13 +8447,13 @@ return;
                 ? { ...note, status: note.status === 'done' ? 'planned' : 'done' }
                 : note);
             renderMissionNotebook();
-            saveAllData();
+            queueSaveAllData();
         }
 
         function deleteNotebookMission(id) {
             missionNotebook = missionNotebook.filter(note => note.id !== id);
             renderMissionNotebook();
-            saveAllData();
+            queueSaveAllData();
             showNotification('🗑️ Mission retirée du cahier');
         }
 
@@ -9236,10 +9281,10 @@ return;
                     createdAt: new Date(),
                     resultCount: searchResults.length
                 };
-                
+
                 savedSearches.push(savedSearch);
                 updateSavedSearchesDisplay();
-                saveAllData();
+                queueSaveAllData();
                 
                 showNotification(`💾 Recherche "${searchName}" sauvegardée`);
                 
@@ -9319,7 +9364,7 @@ return;
                 if (confirm('Supprimer cette recherche sauvegardée ?')) {
                     savedSearches = savedSearches.filter(s => s.id !== searchId);
                     updateSavedSearchesDisplay();
-                    saveAllData();
+                    queueSaveAllData();
                     showNotification('🗑️ Recherche sauvegardée supprimée');
                 }
             } catch (error) {
@@ -10084,7 +10129,7 @@ return;
 
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification(`📥 ${cleanRows.length} tâche(s) ajoutée(s) depuis l'import Excel`);
                 logActivity(`${cleanRows.length} tâche(s) importée(s) pour ${getTabDisplayName(targetTab)}`, 'success');
@@ -10155,7 +10200,7 @@ return;
 
                 updateStats(targetTab);
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 clearTaskForm();
 
@@ -10196,7 +10241,7 @@ return;
                 }
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 clearTaskForm();
 
@@ -10232,7 +10277,7 @@ return;
                 updateBatchSelectors();
                 updateTaskBatchDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 if (nameInput) nameInput.value = '';
 
@@ -10250,7 +10295,7 @@ return;
             taskDrafts = activeBatch ? activeBatch.tasks : [];
             updateTaskBatchDisplay();
             updateTaskFields();
-            saveAllData();
+            queueSaveAllData();
         }
 
         function updateBatchSelectors() {
@@ -10308,7 +10353,7 @@ return;
                 updateBatchSelectors();
                 updateTaskBatchDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification('🗑️ Lot supprimé');
                 logActivity(`Lot supprimé (${batch.name})`, 'warning');
@@ -10353,7 +10398,7 @@ return;
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 clearTaskForm();
 
@@ -10505,7 +10550,7 @@ return;
                 });
 
                 updateStats(tabName);
-                saveAllData();
+                queueSaveAllData();
                 showNotification(`✏️ Mise à jour en masse appliquée sur ${maxUpdates} ligne(s)`);
                 logActivity(`Mise à jour en masse dans ${getTabDisplayName(tabName)}`, 'success');
 
@@ -10737,7 +10782,7 @@ return;
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
             } catch (error) {
                 console.error('Erreur suppression tâche du lot:', error);
                 showNotification('❌ Erreur lors de la suppression du lot', 'error');
@@ -10771,7 +10816,7 @@ return;
                 activeBatch.tasks = activeBatch.tasks.filter(t => t.id !== taskId);
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification('✏️ Tâche du lot chargée pour modification');
             } catch (error) {
@@ -10809,7 +10854,7 @@ return;
 
                 updateTaskBatchDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification(`🚀 Tâche créée depuis le lot vers ${task.targetTabName}`);
                 logActivity(`Tâche du lot exécutée (${task.targetTabName})`, 'success');
@@ -10839,7 +10884,7 @@ return;
                 updateTaskBatchDisplay();
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification(`✅ ${addedCount} tâche(s) ajoutée(s) en attente`);
                 logActivity(`${addedCount} tâche(s) ajoutée(s) depuis le lot`, 'success');
@@ -10920,11 +10965,11 @@ return;
                 });
                 
                 pendingTasks = pendingTasks.filter(t => t.id !== taskId);
-                
+
                 updateStats(task.targetTab);
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
                 
                 showNotification(`✅ Tâche exécutée vers ${task.targetTabName}`);
                 logActivity(`Tâche exécutée vers ${task.targetTabName}`, 'success');
@@ -10974,7 +11019,7 @@ return;
                     pendingTasks = pendingTasks.filter(t => t.id !== taskId);
                     updatePendingTasksDisplay();
                     updateTasksStats();
-                    saveAllData();
+                    queueSaveAllData();
                     showNotification('🗑️ Tâche supprimée');
                     logActivity('Tâche supprimée', 'warning');
                 }
@@ -10995,7 +11040,7 @@ return;
 
                 completedTasks = completedTasks.filter(t => t.id !== taskId);
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 const destination = task.targetTabName || getTabDisplayName(task.targetTab);
                 showNotification(`🗑️ Tâche retirée de l'historique (${destination})`);
@@ -11039,7 +11084,7 @@ return;
                 pendingTasks = [];
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
                 
                 showNotification(`🚀 ${executed} tâche(s) exécutée(s) avec succès`);
                 logActivity(`${executed} tâches exécutées en lot`, 'success');
@@ -11065,7 +11110,7 @@ return;
                 pendingTasks = [];
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
                 
                 showNotification(`🗑️ ${count} tâche(s) supprimée(s)`);
                 logActivity(`${count} tâches supprimées`, 'warning');
@@ -11176,7 +11221,7 @@ return;
 
                 addRowWithData('pni', mappedData, { skipLog: true });
                 updateStats('pni');
-                saveAllData();
+                queueSaveAllData();
                 showNotification('📋 Ligne copiée vers PNI');
             } catch (error) {
                 console.error('Erreur lors de la copie vers PNI:', error);
@@ -11244,10 +11289,10 @@ return;
                         marked++;
                     }
                 });
-                
+
                 if (marked > 0) {
                     updateStats('verifbaux');
-                    saveAllData();
+                    queueSaveAllData();
                     showNotification(`✅ ${marked} ligne(s) marquée(s) comme OK`);
                 } else {
                     showNotification('ℹ️ Aucune ligne vide à marquer', 'info');
@@ -12002,7 +12047,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMissionNotebook();
             renderMissionCalendar();
             rebuildColumnSuggestions();
-            saveAllData();
+            queueSaveAllData();
         }
 
         function reviveDate(value) {
@@ -12017,19 +12062,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (confirm && !window.confirm(`Êtes-vous sûr de vouloir effacer toutes les données de l'onglet ${getTabDisplayName(tabName)} ?`)) {
                     return;
                 }
-                
+
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (tbody) {
                     tbody.innerHTML = '';
                     rowCounters[tabName] = 0;
                     clearRowSelections(tabName);
                     updateStats(tabName);
-                    saveAllData();
-                    
-                    if (confirm) {
-                        showNotification(`🗑️ Toutes les données de ${getTabDisplayName(tabName)} ont été effacées`);
-                        logActivity(`Données effacées dans ${getTabDisplayName(tabName)}`, 'warning');
-                    }
+                    queueSaveAllData();
+                }
+
+                if (confirm) {
+                    showNotification(`🗑️ Toutes les données de ${getTabDisplayName(tabName)} ont été effacées`);
+                    logActivity(`Données effacées dans ${getTabDisplayName(tabName)}`, 'warning');
                 }
             } catch (error) {
                 console.error('Erreur effacement:', error);
@@ -12044,10 +12089,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 refreshRGSuggestions();
                 renderTaskExcelCells();
 
-                autoSaveInterval = setInterval(saveAllData, 60000); // Toutes les minutes
+                autoSaveInterval = setInterval(flushQueuedSaveAllData, 60000); // Toutes les minutes
 
                 window.addEventListener('beforeunload', () => {
-                    saveAllData();
+                    flushQueuedSaveAllData();
                 });
 
                 setupFileDropZones();
