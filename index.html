@@ -10690,9 +10690,27 @@ return;
                         if (colIndex < 0) return;
                         const input = inputs[colIndex];
                         if (!input) return;
-                        const newValue = rowsData[rowIdx]?.[idx] ?? '';
-                        input.value = newValue;
+
+                        const columnName = tabConfigs[tabName]?.columns?.[colIndex] || '';
+                        const pastedRaw = rowsData[rowIdx]?.[idx] ?? '';
+                        const normalized = pastedRaw.toString().trim().toLowerCase();
+
+                        let valueToApply = pastedRaw;
+                        if (columnName === 'Traité') {
+                            if (['oui', 'o', 'traite', 'traité', 'x'].includes(normalized)) {
+                                valueToApply = 'Oui';
+                            } else if (['non', 'n'].includes(normalized)) {
+                                valueToApply = 'Non';
+                            } else {
+                                valueToApply = '';
+                            }
+                        }
+
+                        input.value = valueToApply;
                         input.dispatchEvent(new Event('input', { bubbles: true }));
+                        if (input.tagName === 'SELECT') {
+                            input.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
                     });
                 });
 
