@@ -316,6 +316,15 @@
         return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
     }
 
+    function makeId() {
+        try {
+            if (crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+        } catch (_) {
+            // ignore
+        }
+        return 'bat-' + Date.now().toString(36) + '-' + Math.random().toString(16).slice(2);
+    }
+
     function normalizeRecords(records) {
         const normalized = [];
         let ignored = 0;
@@ -328,7 +337,7 @@
             const { lat, lon } = coords;
             const meta = { ...obj };
             const title = meta.Nom || meta.nom || meta.Name || meta.Titre || meta['Libellé'] || meta.Building || `Bâtiment #${normalized.length + 1}`;
-            normalized.push({ id: crypto.randomUUID(), lat, lon, title, meta });
+            normalized.push({ id: makeId(), lat, lon, title, meta });
         });
         return { normalized, ignored, hint };
     }
@@ -584,8 +593,21 @@
     }
 
     /** ÉVÈNEMENTS **/
-    els.importBtn.addEventListener('click', () => els.fileInput.click());
-    els.fileInput.addEventListener('change', e => importFile(e.target.files[0]));
+    els.importBtn.addEventListener('click', () => {
+        try {
+            els.fileInput.click();
+        } catch (err) {
+            setStatus('Sélection de fichier impossible : ' + err.message, 'error');
+        }
+    });
+    els.fileInput.addEventListener('change', e => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+            importFile(file);
+        } else {
+            setStatus('Aucun fichier sélectionné.', 'error');
+        }
+    });
     els.sampleBtn.addEventListener('click', loadSample);
     els.resetBtn.addEventListener('click', resetAll);
     els.search.addEventListener('input', e => search(e.target.value));
@@ -597,8 +619,13 @@
 
     // Restaurer si possible sinon charger un échantillon minimal
     if (!restore()) {
-        setStatus('Aucune autosauvegarde trouvée. Exemple chargé pour tester.');
-        loadSample();
+        try {
+            setStatus('Aucune autosauvegarde trouvée. Exemple chargé pour tester.');
+            loadSample();
+        } catch (err) {
+            console.error(err);
+            setStatus('Impossible de charger l\'exemple : ' + err.message, 'error');
+        }
     } else {
         setStatus('Données restaurées depuis l\'autosauvegarde.', 'good');
     }
