@@ -2133,6 +2133,7 @@
             <button class="btn btn-primary" onclick="importCompleteBackup()">📥 Importer Sauvegarde</button>
             <input type="file" id="backupFileInput" accept="application/json" style="display: none;" onchange="handleBackupImport()">
             <button class="btn btn-primary" id="expandTextButton" aria-pressed="false" onclick="toggleExpandAllText()">🪄 Afficher tout le texte</button>
+            <button class="btn btn-success" id="normalizeTextButton" onclick="normalizeAllTextContent()">⚡ Réguler tout le texte</button>
         </div>
     </div>
 
@@ -4291,14 +4292,31 @@
             updateProcessingProgress(progressText, 0);
         }
 
-        function updateProcessingProgress(progressText, percentage) {
+        function updateProcessingProgress(progressText, percentage, etaMs) {
             const text = document.getElementById('processingText');
             const bar = document.getElementById('processingProgressBar');
 
-            if (text && progressText) text.textContent = progressText;
+            if (text && progressText) {
+                let label = progressText;
+                if (typeof etaMs === 'number' && isFinite(etaMs) && etaMs >= 0) {
+                    label += ` • Temps restant estimé : ${formatDuration(etaMs)}`;
+                }
+                text.textContent = label;
+            }
             if (bar && typeof percentage === 'number') {
                 bar.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
             }
+        }
+
+        function formatDuration(ms) {
+            if (!isFinite(ms) || ms < 0) return '';
+            const totalSeconds = Math.max(0, Math.round(ms / 1000));
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            if (minutes > 0) {
+                return `${minutes}m${seconds.toString().padStart(2, '0')}s`;
+            }
+            return `${seconds}s`;
         }
 
         function hideProcessingOverlay() {
@@ -5541,6 +5559,77 @@ return;
                 requestAnimationFrame(processChunk);
             } catch (error) {
                 console.error('Erreur ajustement champs texte:', error);
+            }
+        }
+
+        function normalizeTextValue(value = '') {
+            const lines = value.split(/\r?\n/).map(line => line.replace(/[ \t]+/g, ' ').trim());
+            return lines.join('\n').trim();
+        }
+
+        let normalizeInProgress = false;
+
+        function normalizeAllTextContent() {
+            if (normalizeInProgress) return;
+            try {
+                const fields = Array.from(document.querySelectorAll('input.editable, textarea.editable, textarea.editable-textarea'));
+                if (!fields.length) {
+                    showNotification('ℹ️ Aucun champ texte à réguler');
+                    return;
+                }
+
+                normalizeInProgress = true;
+                const total = fields.length;
+                let processed = 0;
+                let modified = 0;
+                const startTime = performance.now();
+
+                showProcessingOverlay('Optimisation des textes...', 'Préparation des champs...');
+
+                const schedule = window.requestIdleCallback
+                    ? (cb) => requestIdleCallback(cb, { timeout: 80 })
+                    : (cb) => setTimeout(cb, 0);
+
+                const processChunk = () => {
+                    const budgetStart = performance.now();
+                    const budget = 14;
+
+                    while (processed < total && performance.now() - budgetStart < budget) {
+                        const field = fields[processed];
+                        const normalized = normalizeTextValue(field.value || '');
+                        if (normalized !== (field.value || '')) {
+                            field.value = normalized;
+                            modified++;
+                        }
+
+                        if (field.tagName === 'TEXTAREA') {
+                            autoResizeField(field, { useCache: true });
+                        }
+
+                        processed++;
+                    }
+
+                    const progress = Math.round((processed / total) * 100);
+                    const elapsed = performance.now() - startTime;
+                    const eta = processed > 0 ? ((elapsed / processed) * (total - processed)) : null;
+                    updateProcessingProgress(`Régulation des champs ${processed}/${total}`, progress, eta);
+
+                    if (processed < total) {
+                        schedule(processChunk);
+                    } else {
+                        hideProcessingOverlay();
+                        showNotification(`✅ Texte régulé sur ${modified}/${total} champ(s)`);
+                        queueSaveAllData();
+                        normalizeInProgress = false;
+                    }
+                };
+
+                requestAnimationFrame(processChunk);
+            } catch (error) {
+                console.error('Erreur lors de la régulation des textes:', error);
+                hideProcessingOverlay();
+                normalizeInProgress = false;
+                showNotification('❌ Impossible de réguler les textes', 'error');
             }
         }
 
@@ -12283,6 +12372,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.exportStatsReport = exportStatsReport;
         window.exportMonthlyReport = exportMonthlyReport;
         window.toggleExpandAllText = toggleExpandAllText;
+        window.normalizeAllTextContent = normalizeAllTextContent;
         window.clearAll = clearAll;
         window.triggerFileInput = triggerFileInput;
         window.handleFileImport = handleFileImport;
