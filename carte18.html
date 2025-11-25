@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Carte interactive des bâtiments (gros volume)</title>
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <!-- MarkerCluster CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+  />
+
+  <!-- PapaParse (CSV) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <!-- SheetJS (Excel) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 10px 16px;
+      background: #1f2933;
+      color: #f9fafb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    header .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    #map { flex: 2; min-width: 0; }
+
+    #sidebar {
+      flex: 1;
+      min-width: 320px;
+      max-width: 450px;
+      border-left: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      background: #f9fafb;
+    }
+
+    #sidebar-section {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    #sidebar-section h2 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .field-group {
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    input[type="file"],
+    input[type="text"],
+    select,
+    button {
+      font-size: 13px;
+    }
+
+    input[type="text"],
+    select {
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+    }
+
+    button {
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid #4b5563;
+      background: #111827;
+      color: #f9fafb;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    button.secondary {
+      background: #f3f4f6;
+      color: #111827;
+      border-color: #d1d5db;
+    }
+
+    button:hover { background: #374151; color: #f9fafb; }
+    button.secondary:hover { background: #e5e7eb; }
+
+    #messages {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+      min-height: 16px;
+    }
+
+    #filters {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    #results-info {
+      font-size: 12px;
+      color: #4b5563;
+      margin-top: 4px;
+    }
+
+    #building-details {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    #building-details h3 {
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    #building-details p {
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    #building-details .empty {
+      font-size: 13px;
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    #building-list {
+      max-height: 160px;
+      overflow-y: auto;
+      margin-top: 8px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 6px;
+      font-size: 12px;
+    }
+
+    .building-item {
+      padding: 4px 6px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .building-item:hover { background: #e5e7eb; }
+
+    .building-item.selected {
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    #no-results {
+      font-size: 12px;
+      color: #b91c1c;
+      margin-top: 4px;
+    }
+
+    .leaflet-container { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Carte interactive des bâtiments (50 000+)</h1>
+    <div class="controls">
+      <button id="basemap-toggle" class="secondary">Mode carte : réaliste</button>
+      <button id="reset-state" class="secondary">Réinitialiser les filtres</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="map"></div>
+
+    <aside id="sidebar">
+      <div id="sidebar-section">
+        <h2>Données & recherche</h2>
+
+        <div class="field-group">
+          <label for="file-input">Importer un CSV ou Excel (.xlsx/.xls)</label>
+          <input id="file-input" type="file" accept=".csv,.xls,.xlsx" />
+          <div id="messages"></div>
+        </div>
+
+        <div class="field-group">
+          <label for="search-input">Recherche globale</label>
+          <input id="search-input" type="text" placeholder="Nom, adresse, ville, type..." />
+        </div>
+
+        <div id="filters"></div>
+
+        <div id="results-info"></div>
+        <div id="no-results" style="display:none;">Aucun bâtiment trouvé.</div>
+
+        <button id="fit-all" style="margin-top:8px;">Voir tous les bâtiments visibles</button>
+
+        <div id="building-list"></div>
+      </div>
+
+      <div id="building-details">
+        <p class="empty">
+          Sélectionnez un bâtiment sur la carte pour afficher ses détails.
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <!-- MarkerCluster JS -->
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <script>
+    // ---- CONSTANTES ----
+    const STORAGE_KEY = 'batimentsAppState_v2';
+    const PREFERRED_FILTER_FIELDS = ['Type', 'type', 'Categorie', 'Catégorie'];
+    const MAX_LIST_ITEMS = 200; // max dans la liste à droite pour éviter de tuer le DOM
+    let searchDebounce = null;
+
+    // ---- ÉTAT GLOBAL ----
+    let map;
+    let baseLayers = {};
+    let currentBase = 'realistic';
+
+    let clusterGroup;
+    let allBuildings = [];
+    let filteredBuildings = [];
+
+    let activeFilterField = null;
+    let activeFilterValue = 'ALL';
+    let searchText = '';
+    let selectedBuildingIndex = null;
+
+    // ---- UTIL ----
+    function showMessage(text, isError = false) {
+      const el = document.getElementById('messages');
+      el.textContent = text || '';
+      el.style.color = isError ? '#b91c1c' : '#6b7280';
+    }
+
+    function saveStateToLocalStorage() {
+      try {
+        const mapCenter = map ? map.getCenter() : null;
+        const mapZoom = map ? map.getZoom() : null;
+
+        const state = {
+          // IMPORTANT : on NE stocke PAS les 50 000 lignes
+          activeFilterField,
+          activeFilterValue,
+          searchText,
+          selectedBuildingIndex,
+          currentBase,
+          mapCenter: mapCenter ? { lat: mapCenter.lat, lng: mapCenter.lng } : null,
+          mapZoom
+        };
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error('Erreur sauvegarde localStorage', e);
+      }
+    }
+
+    function loadStateFromLocalStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (e) {
+        console.error('Erreur lecture localStorage', e);
+        return null;
+      }
+    }
+
+    function clearSavedState() {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    // ---- CARTE ----
+    function initMap() {
+      map = L.map('map', {
+        center: [46.8, 2.5],
+        zoom: 6,
+        preferCanvas: true
+      });
+
+      const realistic = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+      });
+
+      const schematic = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap, style HOT'
+      });
+
+      baseLayers = { realistic, schematic };
+      realistic.addTo(map);
+
+      clusterGroup = L.markerClusterGroup();
+      map.addLayer(clusterGroup);
+    }
+
+    function setBaseLayer(mode) {
+      if (!map) return;
+      Object.values(baseLayers).forEach(layer => {
+        if (map.hasLayer(layer)) map.removeLayer(layer);
+      });
+
+      if (mode === 'schematic') {
+        baseLayers.schematic.addTo(map);
+      } else {
+        baseLayers.realistic.addTo(map);
+      }
+
+      currentBase = mode;
+      const btn = document.getElementById('basemap-toggle');
+      btn.textContent = mode === 'schematic'
+        ? 'Mode carte : schématique'
+        : 'Mode carte : réaliste';
+
+      saveStateToLocalStorage();
+    }
+
+    // ---- DONNÉES / EXCEL / CSV ----
+    function guessFilterFieldFromBuildings(buildings) {
+      if (!buildings || !buildings.length) return null;
+      const sample = buildings[0];
+      const keys = Object.keys(sample);
+      const candidates = keys.filter(k => !['Lat','Lon','lat','lon','latitude','longitude'].includes(k));
+
+      for (const preferred of PREFERRED_FILTER_FIELDS) {
+        if (candidates.includes(preferred)) return preferred;
+      }
+      for (const key of candidates) {
+        if (typeof sample[key] === 'string') return key;
+      }
+      return null;
+    }
+
+    function handleRowsData(data) {
+      if (!data.length) {
+        showMessage('Le fichier est vide ou incorrect.', true);
+        return;
+      }
+
+      const firstRow = data[0];
+      const hasLon = 'Lon' in firstRow || 'lon' in firstRow;
+      const hasLat = 'Lat' in firstRow || 'lat' in firstRow;
+      if (!hasLon || !hasLat) {
+        showMessage('Le fichier doit contenir des colonnes "Lon" et "Lat".', true);
+        return;
+      }
+
+      const buildings = [];
+      data.forEach((row) => {
+        const lon = parseFloat(row.Lon ?? row.lon);
+        const lat = parseFloat(row.Lat ?? row.lat);
+        if (isNaN(lon) || isNaN(lat)) return;
+        const building = { ...row, Lon: lon, Lat: lat };
+        buildings.push(building);
+      });
+
+      if (!buildings.length) {
+        showMessage('Aucune ligne valide avec Lon/Lat.', true);
+        return;
+      }
+
+      allBuildings = buildings;
+      activeFilterField = guessFilterFieldFromBuildings(allBuildings);
+      activeFilterValue = 'ALL';
+      searchText = '';
+      selectedBuildingIndex = null;
+
+      rebuildFiltersUI();
+      applyFiltersAndSearch();
+
+      showMessage('Données chargées : ' + allBuildings.length + ' bâtiments.', false);
+      saveStateToLocalStorage();
+    }
+
+    function handleCsvData(results) {
+      const data = results.data || [];
+      handleRowsData(data);
+    }
+
+    function loadCsvFromFile(file) {
+      if (!file) return;
+      showMessage('Chargement du fichier CSV...', false);
+
+      Papa.parse(file, {
+        header: true,
+        dynamicTyping: false,
+        skipEmptyLines: true,
+        complete: (results) => handleCsvData(results),
+        error: (error) => {
+          console.error(error);
+          showMessage('Erreur lecture CSV.', true);
+        }
+      });
+    }
+
+    function loadExcelFile(file) {
+      if (!file) return;
+      showMessage('Chargement du fichier Excel...', false);
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[firstSheetName];
+          const rows = XLSX.utils.sheet_to_json(sheet);
+          handleRowsData(rows);
+        } catch (err) {
+          console.error(err);
+          showMessage('Erreur lecture Excel.', true);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // ---- FILTRES & RECHERCHE ----
+    function applyFiltersAndSearch() {
+      if (!allBuildings.length) {
+        filteredBuildings = [];
+        updateMapMarkers();
+        updateResultsInfo();
+        updateBuildingList();
+        updateNoResults();
+        return;
+      }
+
+      const text = (searchText || '').trim().toLowerCase();
+      filteredBuildings = allBuildings.filter((b) => {
+        if (activeFilterField && activeFilterValue && activeFilterValue !== 'ALL') {
+          if (String(b[activeFilterField]) !== activeFilterValue) return false;
+        }
+
+        if (text.length > 0) {
+          let found = false;
+          for (const [key, value] of Object.entries(b)) {
+            if (['Lon','Lat','lon','lat'].includes(key)) continue;
+            if (value == null) continue;
+            const s = String(value).toLowerCase();
+            if (s.includes(text)) { found = true; break; }
+          }
+          if (!found) return false;
+        }
+
+        return true;
+      });
+
+      updateMapMarkers();
+      updateResultsInfo();
+      updateBuildingList();
+      updateNoResults();
+      saveStateToLocalStorage();
+    }
+
+    function rebuildFiltersUI() {
+      const filtersDiv = document.getElementById('filters');
+      filtersDiv.innerHTML = '';
+
+      if (!allBuildings.length || !activeFilterField) return;
+
+      const label = document.createElement('label');
+      label.textContent = 'Filtrer par "' + activeFilterField + '"';
+
+      const select = document.createElement('select');
+      select.id = 'filter-select';
+
+      const optAll = document.createElement('option');
+      optAll.value = 'ALL';
+      optAll.textContent = 'Tous';
+      select.appendChild(optAll);
+
+      const valuesSet = new Set();
+      allBuildings.forEach((b) => {
+        const val = b[activeFilterField];
+        if (val != null && val !== '') valuesSet.add(String(val));
+      });
+
+      Array.from(valuesSet).sort().forEach((val) => {
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = val;
+        select.appendChild(opt);
+      });
+
+      select.value = activeFilterValue || 'ALL';
+
+      select.addEventListener('change', () => {
+        activeFilterValue = select.value;
+        applyFiltersAndSearch();
+      });
+
+      const container = document.createElement('div');
+      container.className = 'field-group';
+      container.appendChild(label);
+      container.appendChild(select);
+      filtersDiv.appendChild(container);
+    }
+
+    function updateResultsInfo() {
+      const el = document.getElementById('results-info');
+      if (!filteredBuildings.length) { el.textContent = ''; return; }
+      el.textContent = filteredBuildings.length + ' bâtiment(s) correspondant(s).';
+    }
+
+    function updateNoResults() {
+      const el = document.getElementById('no-results');
+      if (!allBuildings.length) { el.style.display = 'none'; return; }
+      el.style.display = filteredBuildings.length ? 'none' : 'block';
+    }
+
+    // ---- MARQUEURS & CLUSTER ----
+    function updateMapMarkers() {
+      clusterGroup.clearLayers();
+
+      if (!map || !filteredBuildings.length) return;
+
+      const bounds = [];
+      filteredBuildings.forEach((b, index) => {
+        const lat = b.Lat ?? b.lat;
+        const lon = b.Lon ?? b.lon;
+        if (typeof lat !== 'number' || typeof lon !== 'number') return;
+
+        const marker = L.marker([lat, lon]);
+        marker.on('click', () => {
+          const globalIndex = allBuildings.indexOf(b);
+          if (globalIndex !== -1) selectBuilding(globalIndex, true);
+        });
+
+        clusterGroup.addLayer(marker);
+        bounds.push([lat, lon]);
+      });
+
+      if (bounds.length) {
+        const group = L.featureGroup(
+          bounds.map(([la, lo]) => L.marker([la, lo]))
+        );
+        map.fitBounds(group.getBounds(), { padding: [20, 20] });
+      }
+    }
+
+    function fitAllVisible() {
+      if (!map || !clusterGroup.getLayers().length) return;
+      const bounds = clusterGroup.getBounds();
+      map.fitBounds(bounds, { padding: [20, 20] });
+    }
+
+    // ---- LISTE & DÉTAILS ----
+    function buildBuildingLabel(b) {
+      const parts = [];
+      if (b.Nom || b.nom || b["NomBatiment"]) {
+        parts.push(b.Nom || b.nom || b["NomBatiment"]);
+      }
+      if (b.Adresse || b.adresse) parts.push(b.Adresse || b.adresse);
+      if (b.Ville || b.ville) parts.push(b.Ville || b.ville);
+      if (activeFilterField && b[activeFilterField]) {
+        parts.push('(' + String(b[activeFilterField]) + ')');
+      }
+      return parts.length ? parts.join(' - ') : 'Bâtiment';
+    }
+
+    function updateBuildingList() {
+      const listDiv = document.getElementById('building-list');
+      listDiv.innerHTML = '';
+
+      if (!filteredBuildings.length) return;
+
+      const total = filteredBuildings.length;
+      const count = Math.min(total, MAX_LIST_ITEMS);
+
+      if (total > MAX_LIST_ITEMS) {
+        const info = document.createElement('div');
+        info.style.fontSize = '11px';
+        info.style.color = '#6b7280';
+        info.textContent = `Affichage des ${count} premiers résultats sur ${total}. Utilisez la recherche / les filtres pour affiner.`;
+        listDiv.appendChild(info);
+      }
+
+      const slice = filteredBuildings.slice(0, count);
+      slice.forEach((b) => {
+        const globalIndex = allBuildings.indexOf(b);
+        const item = document.createElement('div');
+        item.className = 'building-item';
+        item.textContent = buildBuildingLabel(b);
+
+        if (selectedBuildingIndex === globalIndex) {
+          item.classList.add('selected');
+        }
+
+        item.addEventListener('click', () => {
+          selectBuilding(globalIndex, true);
+        });
+
+        listDiv.appendChild(item);
+      });
+    }
+
+    function selectBuilding(globalIndex, centerOnMap = false) {
+      if (
+        globalIndex == null ||
+        globalIndex < 0 ||
+        globalIndex >= allBuildings.length
+      ) {
+        selectedBuildingIndex = null;
+      } else {
+        selectedBuildingIndex = globalIndex;
+      }
+
+      updateBuildingDetails();
+      updateBuildingList();
+      saveStateToLocalStorage();
+
+      if (centerOnMap && selectedBuildingIndex != null) {
+        const b = allBuildings[selectedBuildingIndex];
+        const lat = b.Lat ?? b.lat;
+        const lon = b.Lon ?? b.lon;
+        if (!isNaN(lat) && !isNaN(lon) && map) {
+          map.setView([lat, lon], Math.max(map.getZoom(), 16));
+        }
+      }
+    }
+
+    function updateBuildingDetails() {
+      const container = document.getElementById('building-details');
+      container.innerHTML = '';
+
+      if (
+        selectedBuildingIndex == null ||
+        selectedBuildingIndex < 0 ||
+        selectedBuildingIndex >= allBuildings.length
+      ) {
+        const p = document.createElement('p');
+        p.className = 'empty';
+        p.textContent = 'Sélectionnez un bâtiment sur la carte pour afficher ses détails.';
+        container.appendChild(p);
+        return;
+      }
+
+      const b = allBuildings[selectedBuildingIndex];
+
+      const title = document.createElement('h3');
+      title.textContent = buildBuildingLabel(b);
+      container.appendChild(title);
+
+      const keys = Object.keys(b);
+      keys.forEach((key) => {
+        const value = b[key];
+        const p = document.createElement('p');
+        p.innerHTML = '<strong>' + key + ' :</strong> ' + (value == null ? '' : value);
+        container.appendChild(p);
+      });
+    }
+
+    // ---- RESET / RESTORE ----
+    function resetFiltersAndSearch() {
+      activeFilterValue = 'ALL';
+      searchText = '';
+      selectedBuildingIndex = null;
+
+      document.getElementById('search-input').value = '';
+      rebuildFiltersUI();
+      applyFiltersAndSearch();
+      updateBuildingDetails();
+      showMessage('Filtres et recherche réinitialisés.', false);
+      clearSavedState();
+    }
+
+    function restoreFromSavedState(saved) {
+      activeFilterField = saved.activeFilterField || activeFilterField;
+      activeFilterValue = saved.activeFilterValue || 'ALL';
+      searchText = saved.searchText || '';
+      selectedBuildingIndex =
+        saved.selectedBuildingIndex != null ? saved.selectedBuildingIndex : null;
+      currentBase = saved.currentBase || 'realistic';
+
+      document.getElementById('search-input').value = searchText;
+
+      rebuildFiltersUI();
+      applyFiltersAndSearch();
+
+      if (saved.mapCenter && saved.mapZoom && map) {
+        map.setView([saved.mapCenter.lat, saved.mapCenter.lng], saved.mapZoom);
+      }
+
+      if (selectedBuildingIndex != null) updateBuildingDetails();
+      setBaseLayer(currentBase);
+    }
+
+    // ---- DOM READY ----
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+
+      const saved = loadStateFromLocalStorage();
+      if (saved) {
+        // On ne peut restaurer complètement qu'après import,
+        // donc là on restaure juste le mode de carte et on attend les données.
+        currentBase = saved.currentBase || 'realistic';
+        setBaseLayer(currentBase);
+      }
+
+      const fileInput = document.getElementById('file-input');
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const name = file.name.toLowerCase();
+
+        if (name.endsWith('.csv')) {
+          loadCsvFromFile(file);
+        } else if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+          loadExcelFile(file);
+        } else {
+          showMessage('Format non supporté. Utilisez CSV ou Excel.', true);
+        }
+      });
+
+      const searchInput = document.getElementById('search-input');
+      searchInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        if (searchDebounce) clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(() => {
+          searchText = value;
+          applyFiltersAndSearch();
+        }, 300);
+      });
+
+      const toggleBtn = document.getElementById('basemap-toggle');
+      toggleBtn.addEventListener('click', () => {
+        const newMode = currentBase === 'realistic' ? 'schematic' : 'realistic';
+        setBaseLayer(newMode);
+      });
+
+      const resetBtn = document.getElementById('reset-state');
+      resetBtn.addEventListener('click', () => {
+        resetFiltersAndSearch();
+      });
+
+      const fitBtn = document.getElementById('fit-all');
+      fitBtn.addEventListener('click', () => {
+        fitAllVisible();
+      });
+    });
+  </script>
+</body>
+</html>
+
