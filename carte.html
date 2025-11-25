@@ -267,6 +267,11 @@
             progressBar.style.width = `${clamped}%`;
         }
 
+        function resetProgressWithMessage(message = 'Prêt à importer vos données.') {
+            setStatus(message);
+            setProgress(0, false);
+        }
+
         // Fonction pour ajouter un marqueur
         function addMarker(building) {
             const marker = L.marker([building.lat, building.lng], { title: building.nom })
@@ -330,9 +335,9 @@
             }
 
             const filteredBuildings = buildingsData.filter(building =>
-                building.nom.toLowerCase().includes(query) ||
-                building.proprietaire.toLowerCase().includes(query) ||
-                building.adresse.toLowerCase().includes(query)
+                (building.nom || '').toLowerCase().includes(query) ||
+                (building.proprietaire || '').toLowerCase().includes(query) ||
+                (building.adresse || '').toLowerCase().includes(query)
             );
 
             if (filteredBuildings.length === 0) {
@@ -361,7 +366,7 @@
             const extension = file.name.split('.').pop().toLowerCase();
             const reader = new FileReader();
 
-            setStatus('Lecture du fichier en cours...');
+            setStatus(`Lecture du fichier « ${file.name} »...`);
             setProgress(5, true);
 
             reader.onload = function(e) {
@@ -378,9 +383,10 @@
                         processImportedData(data);
                     } else {
                         alert('Format non supporté. Veuillez importer un CSV, JSON ou Excel.');
-                        setProgress(0, false);
+                        resetProgressWithMessage();
                     }
                 } catch (error) {
+                    console.error(error);
                     setStatus('Erreur lors de l\'import.');
                     setProgress(0, false);
                     alert('Erreur lors de l\'import: ' + error.message);
@@ -417,6 +423,10 @@
             }
 
             if (normalizedLat === null || normalizedLng === null) {
+                return null;
+            }
+
+            if (!Number.isFinite(normalizedLat) || !Number.isFinite(normalizedLng)) {
                 return null;
             }
 
@@ -465,7 +475,9 @@
         // Conversion d'une valeur en nombre en gérant les virgules décimales
         function parseNumericValue(value) {
             if (value === undefined || value === null) return null;
-            const normalized = String(value).replace(',', '.');
+            const normalized = String(value)
+                .replace(/\s+/g, '')
+                .replace(',', '.');
             const number = parseFloat(normalized);
             return Number.isNaN(number) ? null : number;
         }
@@ -484,6 +496,7 @@
             buildingIdCounter = 1;
             resetMarkersLayer();
             buildingsData = [];
+            let skipped = 0;
 
             const chunkSize = 350;
             let index = 0;
@@ -494,6 +507,8 @@
                     const normalized = normalizeBuilding(rows[i]);
                     if (normalized) {
                         buildingsData.push(normalized);
+                    } else {
+                        skipped++;
                     }
                 }
                 index = end;
@@ -508,7 +523,8 @@
                     setProgress(55, true);
                     placeMarkersInChunks(buildingsData, () => {
                         persistBuildings();
-                        alert(`${buildingsData.length} bâtiments importés avec succès!`);
+                        const summary = `${buildingsData.length} bâtiments importés${skipped ? `, ${skipped} ignorés (coordonnées manquantes)` : ''}`;
+                        alert(`${summary}!`);
                         setStatus('Import terminé.');
                         setProgress(100, true);
                         setTimeout(() => setProgress(0, false), 800);
@@ -522,6 +538,12 @@
         function placeMarkersInChunks(items, onDone) {
             const chunkSize = 800;
             let index = 0;
+
+            if (!items || items.length === 0) {
+                resetProgressWithMessage('Aucune donnée valide à afficher.');
+                if (onDone) onDone();
+                return;
+            }
 
             function addChunk() {
                 const batch = [];
@@ -644,6 +666,7 @@
             }
         }));
 
+        resetProgressWithMessage();
         const restored = loadPersistedBuildings();
         if (!restored) {
             buildingsData = exempleData;
