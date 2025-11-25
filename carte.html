@@ -5,110 +5,235 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carte Interactive Hauts-de-France & Normandie</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        body { margin: 0; font-family: Arial, sans-serif; }
-        #map { height: 70vh; width: 100%; }
-        #search-panel { 
-            padding: 20px; 
-            background: #f4f4f4; 
-            border-bottom: 1px solid #ddd; 
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        :root {
+            --bg: #0f172a;
+            --panel: #ffffff;
+            --accent: #2563eb;
+            --accent-dark: #1d4ed8;
+            --muted: #64748b;
+            --border: #e2e8f0;
         }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.15), transparent 30%),
+                        radial-gradient(circle at 80% 0%, rgba(14, 165, 233, 0.12), transparent 25%),
+                        #0b1224;
+            color: #0f172a;
+        }
+
+        #search-panel {
+            padding: 18px 24px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.22);
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .title-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-right: 16px;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 12px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #0f172a;
+        }
+
         .search-container {
             display: flex;
             gap: 10px;
             align-items: center;
+            flex: 1;
+            min-width: 280px;
         }
+
         #search-input {
             flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
         }
+
         .btn {
-            padding: 10px 20px;
-            background: #007cba;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             cursor: pointer;
+            font-weight: 700;
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
         }
-        .btn:hover { background: #005a87; }
-        #file-input { margin-left: 10px; }
+
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35); }
+        .btn:active { transform: translateY(0); }
+
+        #file-input { display: none; }
+
+        #status-message {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #map { height: 72vh; width: 100%; border-top: 1px solid rgba(255, 255, 255, 0.4); }
+
         #details-panel {
-            padding: 15px 20px;
-            background: #fdfdfd;
-            border-top: 1px solid #ddd;
+            padding: 16px 20px 22px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 -10px 24px rgba(15, 23, 42, 0.2);
         }
+
         #details-panel h3 {
-            margin-top: 0;
+            margin: 0 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #0f172a;
         }
+
         #details-content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 8px 16px;
+            gap: 10px 16px;
         }
+
         .detail-item {
-            background: #f7f9fb;
-            padding: 8px 10px;
-            border-radius: 4px;
-            border: 1px solid #e3e6ea;
+            background: #fff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
         }
+
         .detail-label {
-            font-weight: bold;
+            font-weight: 700;
             display: block;
             margin-bottom: 4px;
+            color: #0f172a;
         }
+
         .btn-small {
-            padding: 6px 10px;
+            padding: 8px 12px;
             font-size: 0.9em;
+            width: 100%;
+            margin-top: 8px;
         }
-        #status-message {
-            margin-top: 10px;
-            color: #555;
-            font-size: 0.95em;
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.15);
+            display: inline-block;
         }
     </style>
 </head>
 <body>
     <div id="search-panel">
-        <div class="search-container">
-            <input type="text" id="search-input" placeholder="Rechercher un bâtiment ou propriétaire...">
-            <button class="btn" onclick="searchBuildings()">Rechercher</button>
-            <input type="file" id="file-input" accept=".csv,.json,.xlsx,.xls" onchange="importData(event)">
-            <button class="btn" onclick="document.getElementById('file-input').click()">Importer données</button>
+        <div class="toolbar">
+            <div class="title-block">
+                <div class="badge">Carte Bâtiments</div>
+                <h1>Hauts-de-France &amp; Normandie</h1>
+            </div>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Rechercher un bâtiment ou propriétaire...">
+                <button class="btn" onclick="searchBuildings()">Rechercher</button>
+                <input type="file" id="file-input" accept=".csv,.json,.xlsx,.xls" onchange="importData(event)">
+                <button class="btn" onclick="document.getElementById('file-input').click()">Importer données</button>
+            </div>
         </div>
-        <div id="status-message"></div>
+        <div id="status-message"><span class="status-dot"></span><span id="status-text"></span></div>
     </div>
     <div id="map"></div>
     <div id="details-panel">
-        <h3 id="details-title">Fiche bâtiment</h3>
+        <h3 id="details-title">📄 Fiche bâtiment</h3>
         <div id="details-content">Sélectionnez un bâtiment pour afficher ses informations.</div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     <script>
         // Initialisation de la carte centrée sur les régions
         const map = L.map('map').setView([49.5, 2.8], 8);
-        
+
         // Ajout de la couche de tuiles OpenStreetMap
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
+        const clusterOptions = {
+            chunkedLoading: true,
+            chunkDelay: 35,
+            chunkInterval: 150,
+            maxClusterRadius: 55,
+            spiderfyOnMaxZoom: true,
+            removeOutsideVisibleBounds: true,
+            chunkProgress: (processed, total) => {
+                const percent = Math.min(100, Math.round((processed / total) * 100));
+                setStatus(`Placement des marqueurs... ${processed}/${total} (${percent}%)`);
+            }
+        };
+
         // Stockage des données de bâtiments
         let buildingsData = [];
         let buildingIdCounter = 1;
-        let markersLayer = L.layerGroup().addTo(map);
-        const statusEl = document.getElementById('status-message');
+        let markersLayer = L.markerClusterGroup(clusterOptions).addTo(map);
+        const markerIndex = new Map();
+        const statusTextEl = document.getElementById('status-text');
+
+        function resetMarkersLayer() {
+            map.removeLayer(markersLayer);
+            markerIndex.clear();
+            markersLayer = L.markerClusterGroup(clusterOptions).addTo(map);
+        }
 
         function setStatus(message) {
-            statusEl.textContent = message || '';
+            statusTextEl.textContent = message || 'Prêt à importer vos données.';
         }
 
         // Fonction pour ajouter un marqueur
         function addMarker(building) {
-            const marker = L.marker([building.lat, building.lng])
+            const marker = L.marker([building.lat, building.lng], { title: building.nom })
                 .bindPopup(`
                     <strong>${building.nom}</strong><br>
                     Propriétaire: ${building.proprietaire || '—'}<br>
@@ -117,26 +242,43 @@
                     <button class="btn btn-small" onclick="showBuildingDetails(${building.id})">Fiche du bâtiment</button>
                 `);
             markersLayer.addLayer(marker);
+            markerIndex.set(building.id, marker);
             return marker;
         }
 
         // Fonction de recherche
         function searchBuildings() {
             const query = document.getElementById('search-input').value.toLowerCase();
-            markersLayer.clearLayers();
-            
-            const filteredBuildings = buildingsData.filter(building => 
+            if (!query) {
+                setStatus('Affichage de tous les bâtiments.');
+                if (markersLayer.getLayers().length > 0) {
+                    map.fitBounds(L.featureGroup(markersLayer.getLayers()).getBounds());
+                }
+                return;
+            }
+
+            const filteredBuildings = buildingsData.filter(building =>
                 building.nom.toLowerCase().includes(query) ||
                 building.proprietaire.toLowerCase().includes(query) ||
                 building.adresse.toLowerCase().includes(query)
             );
 
-            filteredBuildings.forEach(building => addMarker(building));
-            
-            if (filteredBuildings.length > 0) {
-                const group = new L.featureGroup(markersLayer.getLayers());
-                map.fitBounds(group.getBounds());
+            if (filteredBuildings.length === 0) {
+                setStatus('Aucun bâtiment trouvé.');
+                return;
             }
+
+            const markers = filteredBuildings
+                .map(building => markerIndex.get(building.id))
+                .filter(Boolean);
+
+            if (markers.length === 0) return;
+
+            const group = new L.featureGroup(markers);
+            map.fitBounds(group.getBounds());
+
+            const first = markers[0];
+            markersLayer.zoomToShowLayer(first, () => first.openPopup());
         }
 
         // Fonction d'import de données
@@ -214,7 +356,7 @@
                 type: baseType ? String(baseType).trim() : '',
                 lat: normalizedLat,
                 lng: normalizedLng,
-                details: {}
+                details: {},
             };
 
             Object.keys(item).forEach(key => {
@@ -260,7 +402,7 @@
 
             setStatus('Normalisation des lignes en cours...');
             buildingIdCounter = 1;
-            markersLayer.clearLayers();
+            resetMarkersLayer();
             buildingsData = [];
 
             const chunkSize = 400;
@@ -292,22 +434,24 @@
         }
 
         function placeMarkersInChunks(items, onDone) {
-            const chunkSize = 400;
+            const chunkSize = 800;
             let index = 0;
 
             function addChunk() {
+                const batch = [];
                 const end = Math.min(index + chunkSize, items.length);
                 for (let i = index; i < end; i++) {
-                    addMarker(items[i]);
+                    batch.push(addMarker(items[i]));
                 }
                 index = end;
 
                 if (index < items.length) {
-                    setStatus(`Placement des marqueurs... ${index}/${items.length}`);
-                    setTimeout(addChunk, 0);
+                    setStatus(`Préparation des marqueurs... ${index}/${items.length}`);
+                    (window.requestIdleCallback || window.setTimeout)(addChunk, 0);
                 } else {
-                    if (items.length > 0) {
-                        const group = new L.featureGroup(markersLayer.getLayers());
+                    const layers = markersLayer.getLayers();
+                    if (layers.length > 0) {
+                        const group = new L.featureGroup(layers);
                         map.fitBounds(group.getBounds());
                     }
                     if (onDone) onDone();
@@ -412,6 +556,7 @@
         // Chargement des données d'exemple
         buildingsData = exempleData;
         exempleData.forEach(building => addMarker(building));
+        setStatus('Prêt à importer vos données.');
     </script>
 </body>
 </html>
