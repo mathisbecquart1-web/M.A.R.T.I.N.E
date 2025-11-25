@@ -1286,6 +1286,143 @@
             margin-top: 8px;
         }
 
+        .missions-layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 16px;
+        }
+
+        .mission-card {
+            background: rgba(255,255,255,0.92);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px 16px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .mission-card h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .mission-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .mission-form input,
+        .mission-form textarea,
+        .mission-form select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #dfe3ff;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .mission-toolbar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 8px 0 4px;
+        }
+
+        .mission-view-toggle {
+            display: inline-flex;
+            border: 1px solid #dfe3ff;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f8f9ff;
+        }
+
+        .mission-view-toggle button {
+            border: none;
+            background: transparent;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 700;
+            color: #445;
+        }
+
+        .mission-view-toggle button.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+
+        .mission-calendar {
+            display: grid;
+            gap: 10px;
+        }
+
+        .mission-calendar.month-view {
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+        }
+
+        .mission-day {
+            border: 1px solid #eef2ff;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mission-day.today {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+        }
+
+        .mission-day .day-label {
+            font-weight: 800;
+            color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .mission-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: #f5f7ff;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .mission-chip.done {
+            background: #e7f9ed;
+            border-color: #c4f1d4;
+            color: #1b7f3f;
+        }
+
+        .mission-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .mission-list-item {
+            padding: 10px 12px;
+            border: 1px solid #eef2ff;
+            border-radius: 10px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mission-actions {
+            display: flex;
+            gap: 6px;
+        }
+
         .activity-list {
             display: flex;
             flex-direction: column;
@@ -1938,6 +2075,7 @@
         <button class="tab" onclick="switchTab('verifbaux')">✅ Vérification baux</button>
         <button class="tab" onclick="switchTab('pni')">🧾 PNI</button>
         <button class="tab" onclick="switchTab('baserg')">🗂️ Base RG & UT</button>
+        <button class="tab" onclick="switchTab('missions')">🗓️ Missions</button>
         <button class="tab" onclick="switchTab('taches')">📝 Tâches à faire</button>
         <button class="tab" onclick="switchTab('statsmensuelles')">📆 Stats mensuelles</button>
         <button class="tab" onclick="switchTab('statistiques')">📊 Statistiques</button>
@@ -2637,6 +2775,7 @@
                             <th style="width: 150px;">Nom du Bâtiment</th>
                             <th style="width: 100px;">Région</th>
                             <th style="width: 200px;">Commentaire</th>
+                            <th style="width: 140px;">Date Vérification</th>
                             <th style="width: 100px;">Traité</th>
                             <th style="width: 70px;">Action</th>
                         </tr>
@@ -2933,6 +3072,53 @@
                 <div class="stats-item">✅ Utilisés: <span id="baseutUsedRows">0</span></div>
                 <div class="stats-item">⚠️ Non utilisés: <span id="baseutUnusedRows">0</span></div>
                 <div class="stats-item">🔍 Taux d'utilisation: <span id="baseutUsageRate">0%</span></div>
+            </div>
+        </div>
+
+        <!-- ONGLET MISSIONS -->
+        <div id="missions" class="tab-content">
+            <div class="missions-layout">
+                <div class="mission-card">
+                    <h3>🗓️ Ajouter une mission</h3>
+                    <form class="mission-form" onsubmit="addMission(event)">
+                        <input type="text" id="missionTitle" placeholder="Titre de la mission" required>
+                        <textarea id="missionNotes" rows="3" placeholder="Détails, contexte ou livrables"></textarea>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="date" id="missionDate" required>
+                            <input type="time" id="missionTime" style="max-width: 140px;" aria-label="Heure">
+                        </div>
+                        <select id="missionStatus">
+                            <option value="planned">🕒 À faire</option>
+                            <option value="in_progress">🚧 En cours</option>
+                            <option value="done">✅ Terminé</option>
+                        </select>
+                        <button type="submit" class="btn btn-success">➕ Enregistrer la mission</button>
+                    </form>
+
+                    <div style="margin-top: 16px;">
+                        <h4 style="color:#2c3e50;">🗒️ Carnet rapide</h4>
+                        <div id="missionList" class="mission-list"></div>
+                    </div>
+                </div>
+
+                <div class="mission-card" style="min-height: 420px;">
+                    <div class="mission-toolbar">
+                        <div class="mission-view-toggle">
+                            <button type="button" id="missionViewDay" onclick="changeMissionView('day')">Jour</button>
+                            <button type="button" id="missionViewWeek" onclick="changeMissionView('week')">Semaine</button>
+                            <button type="button" id="missionViewMonth" class="active" onclick="changeMissionView('month')">Mois</button>
+                        </div>
+                        <input type="month" id="missionMonthPicker" onchange="setMissionFocusFromInput(this.value)">
+                        <input type="date" id="missionFocusDate" onchange="setMissionFocusFromInput(this.value)">
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn btn-secondary btn-compact" type="button" onclick="shiftMissionWindow(-1)">⬅️ Préc.</button>
+                            <button class="btn btn-secondary btn-compact" type="button" onclick="resetMissionFocus()">📍 Aujourd'hui</button>
+                            <button class="btn btn-secondary btn-compact" type="button" onclick="shiftMissionWindow(1)">Suiv. ➡️</button>
+                        </div>
+                    </div>
+
+                    <div id="missionCalendar" class="mission-calendar month-view"></div>
+                </div>
             </div>
         </div>
 
@@ -3592,7 +3778,7 @@
                 icon: '📐'
             },
             verifbaux: {
-                columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'État', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Traité'],
+                columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'État', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Date Vérification', 'Traité'],
                 displayName: 'Vérification baux',
                 icon: '✅'
             },
@@ -3715,6 +3901,9 @@
         };
         let suppressRowClickSelection = false;
         let bulkEditTab = null;
+        let missions = [];
+        let missionView = 'month';
+        let missionFocusDate = new Date();
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -5255,6 +5444,20 @@ return;
 
                 if (tabName === 'modifsurface' && (column === '-' || column === '+')) {
                     input.addEventListener('input', () => calculateSurfaceDifference(row));
+                }
+
+                if (tabName === 'verifbaux' && column === 'Traité') {
+                    input.addEventListener('change', () => {
+                        const dateIndex = columns.indexOf('Date Vérification');
+                        if (dateIndex >= 0) {
+                            const inputs = row.querySelectorAll('input, textarea, select');
+                            const dateInput = inputs[dateIndex];
+                            if (input.value.toLowerCase() === 'oui' && dateInput && !dateInput.value) {
+                                dateInput.value = formatDateKey(new Date());
+                                saveAllData();
+                            }
+                        }
+                    });
                 }
 
                 if (column === 'RG' || column === 'Code RG') {
@@ -7710,11 +7913,14 @@ return;
                 const columns = tabConfigs[tabName]?.columns || [];
                 const dateTraitementIndex = columns.indexOf('Date Traitement');
                 const dateDemandeIndex = columns.indexOf('Date Demande');
+                const dateVerificationIndex = columns.indexOf('Date Vérification');
 
                 let rawDate = '';
 
                 if (dateTraitementIndex >= 0 && inputs[dateTraitementIndex]?.value) {
                     rawDate = inputs[dateTraitementIndex].value;
+                } else if (dateVerificationIndex >= 0 && inputs[dateVerificationIndex]?.value) {
+                    rawDate = inputs[dateVerificationIndex].value;
                 } else if (dateDemandeIndex >= 0 && inputs[dateDemandeIndex]?.value) {
                     rawDate = inputs[dateDemandeIndex].value;
                 }
@@ -7957,6 +8163,234 @@ return;
 
             } catch (error) {
                 console.error('Erreur mise à jour stats mensuelles:', error);
+            }
+        }
+
+        // 🗓️ MISSIONS & CALENDRIER
+        function formatDateKey(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function syncMissionInputs() {
+            const dateInput = document.getElementById('missionFocusDate');
+            const monthInput = document.getElementById('missionMonthPicker');
+            if (dateInput) dateInput.value = formatDateKey(missionFocusDate);
+            if (monthInput) monthInput.value = `${missionFocusDate.getFullYear()}-${String(missionFocusDate.getMonth() + 1).padStart(2, '0')}`;
+
+            ['missionViewDay', 'missionViewWeek', 'missionViewMonth'].forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (!btn) return;
+                btn.classList.toggle('active', btnId.toLowerCase().includes(missionView));
+            });
+        }
+
+        function changeMissionView(view) {
+            missionView = view;
+            syncMissionInputs();
+            renderMissionCalendar();
+        }
+
+        function setMissionFocusFromInput(value) {
+            if (!value) return;
+            const parsed = value.length === 7 ? new Date(`${value}-01`) : new Date(value);
+            if (isNaN(parsed.getTime())) return;
+            missionFocusDate = parsed;
+            syncMissionInputs();
+            renderMissionCalendar();
+        }
+
+        function shiftMissionWindow(delta) {
+            const focus = new Date(missionFocusDate);
+            if (missionView === 'day') {
+                focus.setDate(focus.getDate() + delta);
+            } else if (missionView === 'week') {
+                focus.setDate(focus.getDate() + delta * 7);
+            } else {
+                focus.setMonth(focus.getMonth() + delta);
+            }
+            missionFocusDate = focus;
+            syncMissionInputs();
+            renderMissionCalendar();
+        }
+
+        function resetMissionFocus() {
+            missionFocusDate = new Date();
+            syncMissionInputs();
+            renderMissionCalendar();
+        }
+
+        function addMission(event) {
+            try {
+                event.preventDefault();
+                const titleInput = document.getElementById('missionTitle');
+                const notesInput = document.getElementById('missionNotes');
+                const dateInput = document.getElementById('missionDate');
+                const timeInput = document.getElementById('missionTime');
+                const statusInput = document.getElementById('missionStatus');
+
+                if (!titleInput || !dateInput) return;
+                if (!titleInput.value.trim() || !dateInput.value) {
+                    showNotification('❌ Titre et date sont requis pour enregistrer une mission', 'error');
+                    return;
+                }
+
+                const dateStr = dateInput.value;
+                const timeStr = timeInput?.value || '09:00';
+                const dueAt = new Date(`${dateStr}T${timeStr}`);
+
+                missions.push({
+                    id: generateUniqueId(),
+                    title: titleInput.value.trim(),
+                    notes: notesInput?.value || '',
+                    status: statusInput?.value || 'planned',
+                    dueAt,
+                    createdAt: new Date()
+                });
+
+                titleInput.value = '';
+                if (notesInput) notesInput.value = '';
+                dateInput.value = '';
+                if (timeInput) timeInput.value = '';
+                if (statusInput) statusInput.value = 'planned';
+
+                renderMissionCalendar();
+                renderMissionList();
+                saveAllData();
+                showNotification('✅ Mission ajoutée au calendrier');
+
+            } catch (error) {
+                console.error('Erreur ajout mission:', error);
+                showNotification('❌ Impossible d\'ajouter la mission', 'error');
+            }
+        }
+
+        function toggleMissionStatus(id) {
+            missions = missions.map(mission => mission.id === id
+                ? { ...mission, status: mission.status === 'done' ? 'planned' : 'done' }
+                : mission);
+            renderMissionCalendar();
+            renderMissionList();
+            saveAllData();
+        }
+
+        function deleteMission(id) {
+            missions = missions.filter(mission => mission.id !== id);
+            renderMissionCalendar();
+            renderMissionList();
+            saveAllData();
+            showNotification('🗑️ Mission supprimée');
+        }
+
+        function getMissionsByDate(date) {
+            const key = formatDateKey(date);
+            return missions.filter(mission => formatDateKey(mission.dueAt) === key);
+        }
+
+        function renderMissionList() {
+            const container = document.getElementById('missionList');
+            if (!container) return;
+
+            const sorted = missions
+                .slice()
+                .sort((a, b) => a.dueAt - b.dueAt);
+
+            if (sorted.length === 0) {
+                container.innerHTML = '<div style="color:#666;">Aucune mission enregistrée.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            sorted.forEach(mission => {
+                const item = document.createElement('div');
+                item.className = 'mission-list-item';
+
+                item.innerHTML = `
+                    <div>
+                        <div style="font-weight:700; color:#2c3e50;">${mission.title}</div>
+                        <div style="font-size:12px; color:#666;">${mission.dueAt.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'short' })} ${mission.dueAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
+                        ${mission.notes ? `<div style="font-size:13px; color:#555;">${escapeHtml(mission.notes)}</div>` : ''}
+                    </div>
+                    <div class="mission-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="toggleMissionStatus('${mission.id}')">${mission.status === 'done' ? '↩️ Replanifier' : '✅ Terminer'}</button>
+                        <button class="btn btn-danger btn-compact" onclick="deleteMission('${mission.id}')">🗑️</button>
+                    </div>
+                `;
+
+                container.appendChild(item);
+            });
+        }
+
+        function renderDayColumn(date, label) {
+            const dayDiv = document.createElement('div');
+            const isToday = formatDateKey(date) === formatDateKey(new Date());
+            dayDiv.className = `mission-day ${isToday ? 'today' : ''}`;
+
+            const missionsForDay = getMissionsByDate(date);
+            const labelNode = document.createElement('div');
+            labelNode.className = 'day-label';
+            labelNode.innerHTML = `<span>${label}</span><span>${date.getDate()}</span>`;
+            dayDiv.appendChild(labelNode);
+
+            if (missionsForDay.length === 0) {
+                const empty = document.createElement('div');
+                empty.style.color = '#999';
+                empty.style.fontSize = '12px';
+                empty.textContent = 'Aucune mission';
+                dayDiv.appendChild(empty);
+            } else {
+                missionsForDay.sort((a,b) => a.dueAt - b.dueAt).forEach(mission => {
+                    const chip = document.createElement('div');
+                    chip.className = `mission-chip ${mission.status === 'done' ? 'done' : ''}`;
+                    chip.innerHTML = `${mission.status === 'done' ? '✅' : '🕒'} ${mission.dueAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} · ${mission.title}`;
+                    chip.title = mission.notes || '';
+                    chip.onclick = () => toggleMissionStatus(mission.id);
+                    dayDiv.appendChild(chip);
+                });
+            }
+
+            return dayDiv;
+        }
+
+        function renderMissionCalendar() {
+            const container = document.getElementById('missionCalendar');
+            if (!container) return;
+
+            container.className = `mission-calendar ${missionView}-view`;
+            container.innerHTML = '';
+            container.style.gridTemplateColumns = missionView === 'day'
+                ? '1fr'
+                : missionView === 'week'
+                    ? 'repeat(7, minmax(0, 1fr))'
+                    : 'repeat(7, minmax(0, 1fr))';
+
+            if (missions.some(m => !(m.dueAt instanceof Date))) {
+                missions = missions.map(m => ({ ...m, dueAt: reviveDate(m.dueAt) || new Date() }));
+            }
+
+            if (missionView === 'day') {
+                container.appendChild(renderDayColumn(missionFocusDate, missionFocusDate.toLocaleDateString('fr-FR', { weekday: 'long' })));
+            } else if (missionView === 'week') {
+                const start = new Date(missionFocusDate);
+                const day = start.getDay();
+                const diff = (day + 6) % 7; // Lundi = 0
+                start.setDate(start.getDate() - diff);
+                for (let i = 0; i < 7; i++) {
+                    const current = new Date(start);
+                    current.setDate(start.getDate() + i);
+                    container.appendChild(renderDayColumn(current, current.toLocaleDateString('fr-FR', { weekday: 'short' })));
+                }
+            } else {
+                const monthStart = new Date(missionFocusDate.getFullYear(), missionFocusDate.getMonth(), 1);
+                const startDay = (monthStart.getDay() + 6) % 7;
+                const cursor = new Date(monthStart);
+                cursor.setDate(cursor.getDate() - startDay);
+                const totalCells = 42;
+                for (let i = 0; i < totalCells; i++) {
+                    const current = new Date(cursor);
+                    const label = current.toLocaleDateString('fr-FR', { weekday: 'short' });
+                    container.appendChild(renderDayColumn(current, label));
+                    cursor.setDate(cursor.getDate() + 1);
+                }
             }
         }
 
@@ -11091,6 +11525,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeBatchId: activeBatchId,
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
+                    missions: missions,
                     activityLog: activityLog,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
@@ -11169,6 +11604,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeBatchId: activeBatchId,
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
+                    missions: missions,
                     activityLog: activityLog,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
@@ -11347,6 +11783,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 createdAt: reviveDate(search.createdAt) || new Date()
             }));
 
+            missions = (data.missions || []).map(mission => ({
+                ...mission,
+                dueAt: reviveDate(mission.dueAt) || new Date(),
+                createdAt: reviveDate(mission.createdAt) || new Date(),
+                status: mission.status || 'planned'
+            }));
+
             activityLog = (data.activityLog || []).map(entry => ({
                 ...entry,
                 timestamp: reviveDate(entry.timestamp) || new Date()
@@ -11386,6 +11829,8 @@ document.addEventListener('DOMContentLoaded', () => {
             updateTasksStats();
             updateSavedSearchesDisplay();
             updateRecentActivity();
+            renderMissionList();
+            renderMissionCalendar();
             rebuildColumnSuggestions();
             saveAllData();
         }
@@ -11439,6 +11884,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateStatsDashboard();
                 setCurrentMonth();
                 refreshMonthlyStats();
+                resetMissionFocus();
+                renderMissionList();
+                renderMissionCalendar();
 
                 showNotification('🚀 MARTINE - Tous onglets fonctionnels', 'success');
                 showSaveStatus('💾 Application prête - Auto-sauvegarde activée');
@@ -11564,6 +12012,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.buildRGDatabase = buildRGDatabase;
         window.buildUTDatabase = buildUTDatabase;
         window.recalculateAllSurfaces = recalculateAllSurfaces;
+        window.addMission = addMission;
+        window.changeMissionView = changeMissionView;
+        window.setMissionFocusFromInput = setMissionFocusFromInput;
+        window.shiftMissionWindow = shiftMissionWindow;
+        window.resetMissionFocus = resetMissionFocus;
         window.exportCompleteBackup = exportCompleteBackup;
         window.importCompleteBackup = importCompleteBackup;
         window.handleBackupImport = handleBackupImport;
