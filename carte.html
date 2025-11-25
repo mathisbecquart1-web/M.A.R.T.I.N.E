@@ -118,30 +118,85 @@
 
         // Traitement des données importées
         function processImportedData(data) {
-            buildingsData = data.filter(item => item.lat && item.lng);
+            const cleanedData = data
+                .map(item => ({
+                    ...item,
+                    lat: parseNumberValue(item.lat),
+                    lng: parseNumberValue(item.lng)
+                }))
+                .filter(item => Number.isFinite(item.lat) && Number.isFinite(item.lng));
+
+            buildingsData = cleanedData;
             markersLayer.clearLayers();
-            
+
             buildingsData.forEach(building => addMarker(building));
             alert(`${buildingsData.length} bâtiments importés avec succès!`);
         }
 
-        // Parser CSV simple
+        // Parser CSV évolué (détection du séparateur + support des virgules décimales)
         function parseCSV(csv) {
-            const lines = csv.split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
+            const lines = csv.split('\n').filter(line => line.trim());
+            if (lines.length === 0) return [];
+
+            const delimiter = detectDelimiter(lines[0]);
+            const headers = lines[0].split(delimiter).map(h => h.trim());
             const data = [];
-            
+
             for (let i = 1; i < lines.length; i++) {
-                if (lines[i].trim()) {
-                    const values = lines[i].split(',').map(v => v.trim());
-                    const item = {};
-                    headers.forEach((header, index) => {
-                        item[header] = values[index] || '';
-                    });
-                    data.push(item);
-                }
+                const values = lines[i].split(delimiter).map(v => v.trim());
+                const item = {};
+
+                headers.forEach((header, index) => {
+                    item[header] = values[index] || '';
+                });
+
+                normalizeCoordinates(item, values);
+                data.push(item);
             }
             return data;
+        }
+
+        // Détection du séparateur (tabulation, point-virgule ou virgule)
+        function detectDelimiter(line) {
+            if (line.includes('\t')) return '\t';
+            if (line.includes(';')) return ';';
+            return ',';
+        }
+
+        // Normalisation des coordonnées (lat/lng) avec support des virgules décimales
+        function normalizeCoordinates(item, rawValues) {
+            const latKeys = ['lat', 'latitude'];
+            const lngKeys = ['lng', 'lon', 'long', 'longitude'];
+
+            latKeys.forEach(key => {
+                if (item[key] !== undefined) item.lat = parseNumberValue(item[key]);
+            });
+            lngKeys.forEach(key => {
+                if (item[key] !== undefined) item.lng = parseNumberValue(item[key]);
+            });
+
+            // Si aucune clé standard n'est trouvée, on tente de récupérer les 2 dernières valeurs numériques
+            if (item.lat === undefined || item.lng === undefined) {
+                const numericValues = rawValues
+                    .map(val => parseNumberValue(val))
+                    .filter(val => typeof val === 'number');
+
+                if (numericValues.length >= 2) {
+                    // On suppose que la dernière valeur est la latitude et l'avant-dernière la longitude
+                    item.lng = numericValues[numericValues.length - 2];
+                    item.lat = numericValues[numericValues.length - 1];
+                }
+            }
+        }
+
+        // Conversion sécurisée d'une valeur vers un nombre (support virgule décimale)
+        function parseNumberValue(value) {
+            if (value === null || value === undefined) return null;
+            if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+
+            const cleaned = String(value).trim().replace(/\s+/g, '').replace(',', '.');
+            const number = Number(cleaned);
+            return Number.isFinite(number) ? number : null;
         }
 
         // Données d'exemple
