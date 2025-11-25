@@ -815,6 +815,11 @@
             color: white;
         }
 
+        .btn-primary.toggle-active {
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.35), 0 6px 18px rgba(0,0,0,0.15);
+            filter: saturate(1.05);
+        }
+
         .btn-success {
             background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
@@ -2127,7 +2132,7 @@
             <button class="btn btn-primary" onclick="exportCompleteBackup()">📤 Télécharger Sauvegarde</button>
             <button class="btn btn-primary" onclick="importCompleteBackup()">📥 Importer Sauvegarde</button>
             <input type="file" id="backupFileInput" accept="application/json" style="display: none;" onchange="handleBackupImport()">
-            <button class="btn btn-primary" onclick="expandAllTextFields()">🪄 Afficher tout le texte</button>
+            <button class="btn btn-primary" id="expandTextButton" aria-pressed="false" onclick="toggleExpandAllText()">🪄 Afficher tout le texte</button>
         </div>
     </div>
 
@@ -3989,6 +3994,7 @@
         let missionNotebook = [];
         let missionView = 'month';
         let missionFocusDate = new Date();
+        let autoExpandTextEnabled = false;
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -5423,29 +5429,68 @@ return;
         // 📊 GESTION DES TABLEAUX
         function autoResizeField(field) {
             if (field.tagName === 'TEXTAREA') {
+                const previousHeight = field.style.height;
                 field.style.height = 'auto';
-                field.style.height = Math.max(field.scrollHeight, 38) + 'px';
+                const desiredHeight = Math.max(field.scrollHeight, 38) + 'px';
+
+                if (previousHeight === desiredHeight) {
+                    field.style.height = previousHeight;
+                    return;
+                }
+
+                field.style.height = desiredHeight;
             }
         }
 
-        function expandAllTextFields() {
+        function expandAllTextFields(options = {}) {
+            const { silent = false, prioritizeTab = 'verifbaux' } = options;
             try {
-                const textAreas = Array.from(document.querySelectorAll('textarea.editable-textarea'));
-                if (!textAreas.length) return;
+                const allTextAreas = Array.from(document.querySelectorAll('textarea.editable-textarea'));
+                if (!allTextAreas.length) return;
 
-                const total = textAreas.length;
-                const showLoader = total > 80;
+                const orderedTextAreas = [];
+                const seen = new Set();
+                const pushAreas = (areas = []) => {
+                    areas.forEach(area => {
+                        if (!seen.has(area)) {
+                            seen.add(area);
+                            orderedTextAreas.push(area);
+                        }
+                    });
+                };
+
+                const activeTabContent = document.querySelector('.tab-content.active');
+                if (activeTabContent) {
+                    pushAreas(Array.from(activeTabContent.querySelectorAll('textarea.editable-textarea')));
+                }
+
+                if (prioritizeTab) {
+                    const prioritizedTab = document.getElementById(prioritizeTab);
+                    if (prioritizedTab) {
+                        pushAreas(Array.from(prioritizedTab.querySelectorAll('textarea.editable-textarea')));
+                    }
+                }
+
+                pushAreas(allTextAreas);
+
+                const total = orderedTextAreas.length;
+                const showLoader = total > 120 && !silent;
                 let processed = 0;
 
                 if (showLoader) {
                     showProcessingOverlay('Ajustement des champs texte...', 'Préparation des champs...');
                 }
 
+                const schedule = window.requestIdleCallback
+                    ? (cb) => requestIdleCallback(cb, { timeout: 120 })
+                    : (cb) => setTimeout(cb, 0);
+
                 const processChunk = () => {
                     const start = performance.now();
+                    const budget = showLoader ? 12 : 7;
 
-                    while (processed < total && performance.now() - start < (showLoader ? 14 : 8)) {
-                        autoResizeField(textAreas[processed]);
+                    while (processed < total && performance.now() - start < budget) {
+                        autoResizeField(orderedTextAreas[processed]);
                         processed++;
                     }
 
@@ -5455,12 +5500,14 @@ return;
                     }
 
                     if (processed < total) {
-                        requestAnimationFrame(processChunk);
+                        schedule(processChunk);
                     } else {
                         if (showLoader) {
                             hideProcessingOverlay();
                         }
-                        showNotification(`🪄 ${total} champ(s) texte ajusté(s)`);
+                        if (!silent) {
+                            showNotification(`🪄 ${total} champ(s) texte ajusté(s)`);
+                        }
                     }
                 };
 
@@ -5468,6 +5515,28 @@ return;
             } catch (error) {
                 console.error('Erreur ajustement champs texte:', error);
             }
+        }
+
+        function updateExpandTextButton() {
+            const btn = document.getElementById('expandTextButton');
+            if (!btn) return;
+
+            btn.textContent = autoExpandTextEnabled
+                ? '🪄 Affichage texte auto (activé)'
+                : '🪄 Afficher tout le texte';
+            btn.setAttribute('aria-pressed', autoExpandTextEnabled ? 'true' : 'false');
+            btn.classList.toggle('toggle-active', autoExpandTextEnabled);
+        }
+
+        function toggleExpandAllText() {
+            autoExpandTextEnabled = !autoExpandTextEnabled;
+            updateExpandTextButton();
+            expandAllTextFields({ prioritizeTab: 'verifbaux', silent: autoExpandTextEnabled });
+            queueSaveAllData();
+
+            showNotification(autoExpandTextEnabled
+                ? '🪄 Affichage complet mémorisé pour les prochaines sessions'
+                : '📏 Affichage compact mémorisé pour les prochaines sessions');
         }
 
         function createEditableField(column, tabName, value = '') {
@@ -11734,6 +11803,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     missions: missions,
                     missionNotebook: missionNotebook,
                     activityLog: activityLog,
+                    autoExpandTextEnabled: autoExpandTextEnabled,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -11814,6 +11884,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     missions: missions,
                     missionNotebook: missionNotebook,
                     activityLog: activityLog,
+                    autoExpandTextEnabled: autoExpandTextEnabled,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -11943,6 +12014,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             rgDatabase = data.rgDatabase || {};
             dismissedRGChanges = new Set(data.dismissedRGChanges || []);
+            autoExpandTextEnabled = Boolean(data.autoExpandTextEnabled);
+            updateExpandTextButton();
             refreshRGSuggestions();
 
             pendingTasks = (data.pendingTasks || []).map(task => ({
@@ -12047,6 +12120,9 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMissionNotebook();
             renderMissionCalendar();
             rebuildColumnSuggestions();
+            if (autoExpandTextEnabled) {
+                scheduleIdleTask(() => expandAllTextFields({ prioritizeTab: 'verifbaux', silent: true }));
+            }
             queueSaveAllData();
         }
 
@@ -12085,6 +12161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 🔧 INITIALISATION COMPLÈTE
         function initializeApp() {
             try {
+                updateExpandTextButton();
                 loadAllData();
                 refreshRGSuggestions();
                 renderTaskExcelCells();
@@ -12178,6 +12255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.exportAllToExcel = exportAllToExcel;
         window.exportStatsReport = exportStatsReport;
         window.exportMonthlyReport = exportMonthlyReport;
+        window.toggleExpandAllText = toggleExpandAllText;
         window.clearAll = clearAll;
         window.triggerFileInput = triggerFileInput;
         window.handleFileImport = handleFileImport;
