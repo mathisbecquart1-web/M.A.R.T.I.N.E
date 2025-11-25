@@ -5573,8 +5573,37 @@ return;
                 }
             };
 
+            const getAllEditableFields = () => {
+                const selector = [
+                    'textarea',
+                    'input[type="text"]',
+                    'input[type="search"]',
+                    'input[type="email"]',
+                    'input[type="tel"]',
+                    'input[type="url"]',
+                    'input[type="number"]',
+                    'input[type="date"]',
+                    'input[type="time"]',
+                    'input[type="datetime-local"]',
+                    'input:not([type])',
+                    '[contenteditable="true"]'
+                ].join(',');
+
+                const raw = Array.from(document.querySelectorAll(selector));
+                return raw.filter(el => {
+                    if (!el) return false;
+                    const tag = el.tagName;
+                    if (tag === 'INPUT') {
+                        const type = (el.getAttribute('type') || 'text').toLowerCase();
+                        const blocked = ['button', 'submit', 'reset', 'checkbox', 'radio', 'range', 'color', 'file', 'hidden'];
+                        if (blocked.includes(type)) return false;
+                    }
+                    return true;
+                });
+            };
+
             try {
-                const fields = Array.from(document.querySelectorAll('textarea.editable-textarea, input.editable'));
+                const fields = getAllEditableFields();
 
                 if (!fields.length) {
                     finalize({ success: false, message: 'ℹ️ Aucun champ texte à réguler' });
@@ -5604,14 +5633,32 @@ return;
                     : (cb) => setTimeout(cb, 0);
 
                 const identifyField = (field) => {
-                    const tab = field.closest('.tab-content');
-                    const row = field.closest('tr');
-                    const column = field.closest('td');
+                    const tab = field.closest?.('.tab-content');
+                    const row = field.closest?.('tr');
+                    const column = field.closest?.('td');
                     return {
                         tab: tab?.id || 'global',
-                        rowId: row?.getAttribute('data-row-id') || row?.getAttribute('data-row') || '',
-                        column: column?.getAttribute('data-column') || field.name || field.placeholder || 'champ'
+                        rowId: row?.getAttribute?.('data-row-id') || row?.getAttribute?.('data-row') || '',
+                        column: column?.getAttribute?.('data-column') || field.name || field.placeholder || 'champ'
                     };
+                };
+
+                const setFieldValue = (field, normalized) => {
+                    if (!field) return;
+                    if (field.hasAttribute('contenteditable')) {
+                        if (field.textContent !== normalized) {
+                            field.textContent = normalized;
+                            return true;
+                        }
+                        return false;
+                    }
+
+                    const current = (field.value || '').toString();
+                    if (current !== normalized) {
+                        field.value = normalized;
+                        return true;
+                    }
+                    return false;
                 };
 
                 const processChunk = () => {
@@ -5620,11 +5667,12 @@ return;
 
                         while (processed < total && count < chunkSize) {
                             const field = fields[processed];
-                            const currentValue = (field?.value || '').toString();
-                            const normalized = normalizeTextValue(currentValue);
+                            const rawValue = field?.hasAttribute?.('contenteditable')
+                                ? field.textContent || ''
+                                : (field?.value || '').toString();
+                            const normalized = normalizeTextValue(rawValue);
 
-                            if (normalized !== currentValue) {
-                                field.value = normalized;
+                            if (setFieldValue(field, normalized)) {
                                 modified++;
                                 changedFieldsLog.push(identifyField(field));
                             }
