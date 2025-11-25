@@ -246,6 +246,14 @@
         els.status.innerHTML = text;
     }
 
+    function setBusy(isBusy) {
+        els.importBtn.setAttribute('aria-busy', isBusy ? 'true' : 'false');
+        els.importBtn.style.opacity = isBusy ? '0.7' : '1';
+        els.sampleBtn.disabled = isBusy;
+        els.resetBtn.disabled = isBusy;
+        els.fileInput.disabled = isBusy;
+    }
+
     function showProgress(percent) {
         els.progressOuter.style.display = 'block';
         els.progressInner.style.width = `${Math.min(100, Math.max(0, percent))}%`;
@@ -391,6 +399,19 @@
         setStatus('Prêt pour un nouveau chargement.');
     }
 
+    function beginImport(label = 'fichier') {
+        cluster.clearLayers();
+        state.indexedById.clear();
+        state.features = [];
+        state.ignored = 0;
+        state.coordHint = '–';
+        updateStats();
+        renderDetails(null);
+        showProgress(2);
+        setBusy(true);
+        setStatus(`Import de ${label} en cours...`);
+    }
+
     function updateStats() {
         els.statCount.textContent = state.features.length.toLocaleString('fr-FR');
         els.statIgnored.textContent = state.ignored.toLocaleString('fr-FR');
@@ -400,8 +421,7 @@
 
     async function importFile(file) {
         if (!file) return;
-        setStatus(`Lecture de "${file.name}" ...`);
-        showProgress(4);
+        beginImport(file.name);
         try {
             const buffer = await readBuffer(file);
             let records = [];
@@ -432,6 +452,7 @@
             hideProgress();
         } finally {
             els.fileInput.value = '';
+            setBusy(false);
         }
     }
 
@@ -455,7 +476,11 @@
             try {
                 workbook = XLSX.read(buffer, { type: 'array' });
             } catch (fallbackErr) {
-                throw new Error('Décodage Excel impossible : ' + fallbackErr.message);
+                try {
+                    workbook = XLSX.read(buffer, { type: 'binary' });
+                } catch (binaryErr) {
+                    throw new Error('Décodage Excel impossible : ' + binaryErr.message);
+                }
             }
         }
         const sheetName = workbook.SheetNames[0];
@@ -503,10 +528,13 @@
         if (!normalized.length) {
             setStatus('Aucune coordonnée valide détectée dans le fichier.', 'error');
             hideProgress();
+            cluster.clearLayers();
             state.features = [];
             state.ignored = records.length;
             state.coordHint = '–';
+            state.source = sourceLabel;
             updateStats();
+            setBusy(false);
             return;
         }
         state.features = normalized;
@@ -557,6 +585,7 @@
         updateStats();
         persist();
         fitToData();
+        setBusy(false);
     }
 
     function fitToData() {
