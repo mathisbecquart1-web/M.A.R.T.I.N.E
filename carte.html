@@ -41,7 +41,7 @@
         <div class="search-container">
             <input type="text" id="search-input" placeholder="Rechercher un bâtiment ou propriétaire...">
             <button class="btn" onclick="searchBuildings()">Rechercher</button>
-            <input type="file" id="file-input" accept=".csv,.json" onchange="importData(event)">
+            <input type="file" id="file-input" accept=".csv,.json,.txt" onchange="importData(event)">
             <button class="btn" onclick="document.getElementById('file-input').click()">Importer données</button>
         </div>
     </div>
@@ -61,13 +61,73 @@
         let buildingsData = [];
         let markersLayer = L.layerGroup().addTo(map);
 
+        function parseNumber(value) {
+            if (typeof value === 'number') return value;
+            if (!value) return null;
+
+            const normalized = value.toString().replace(',', '.');
+            const parsed = parseFloat(normalized);
+
+            return isNaN(parsed) ? null : parsed;
+        }
+
+        function extractCoordinates(item) {
+            const coordinateKeys = ['coordonnees', 'coordinates', 'coords'];
+
+            for (const key of coordinateKeys) {
+                if (item[key]) {
+                    const matches = item[key].toString().match(/-?\d+(?:[.,]\d+)?/g);
+                    if (matches && matches.length >= 2) {
+                        const lng = parseNumber(matches[matches.length - 2]);
+                        const lat = parseNumber(matches[matches.length - 1]);
+
+                        if (lat !== null && lng !== null) {
+                            return { lat, lng };
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        function normalizeBuilding(entry) {
+            const building = { ...entry };
+
+            const latKeys = ['lat', 'latitude'];
+            const lngKeys = ['lng', 'lon', 'longitude'];
+
+            if (building.lat === undefined) {
+                const latKey = latKeys.find(key => entry[key] !== undefined);
+                if (latKey) building.lat = entry[latKey];
+            }
+
+            if (building.lng === undefined) {
+                const lngKey = lngKeys.find(key => entry[key] !== undefined);
+                if (lngKey) building.lng = entry[lngKey];
+            }
+
+            if (building.lat === undefined || building.lng === undefined) {
+                const coords = extractCoordinates(entry);
+                if (coords) {
+                    building.lat = coords.lat;
+                    building.lng = coords.lng;
+                }
+            }
+
+            building.lat = parseNumber(building.lat);
+            building.lng = parseNumber(building.lng);
+
+            return building;
+        }
+
         // Fonction pour ajouter un marqueur
         function addMarker(building) {
             const marker = L.marker([building.lat, building.lng])
                 .bindPopup(`
-                    <strong>${building.nom}</strong><br>
-                    Propriétaire: ${building.proprietaire}<br>
-                    Adresse: ${building.adresse}<br>
+                    <strong>${building.nom || 'Bâtiment'}</strong><br>
+                    Propriétaire: ${building.proprietaire || 'Non précisé'}<br>
+                    Adresse: ${building.adresse || 'Non précisée'}<br>
                     Type: ${building.type || 'Non spécifié'}
                 `);
             markersLayer.addLayer(marker);
@@ -79,10 +139,10 @@
             const query = document.getElementById('search-input').value.toLowerCase();
             markersLayer.clearLayers();
             
-            const filteredBuildings = buildingsData.filter(building => 
-                building.nom.toLowerCase().includes(query) ||
-                building.proprietaire.toLowerCase().includes(query) ||
-                building.adresse.toLowerCase().includes(query)
+            const filteredBuildings = buildingsData.filter(building =>
+                (building.nom || '').toLowerCase().includes(query) ||
+                (building.proprietaire || '').toLowerCase().includes(query) ||
+                (building.adresse || '').toLowerCase().includes(query)
             );
 
             filteredBuildings.forEach(building => addMarker(building));
@@ -104,7 +164,7 @@
                     if (file.name.endsWith('.json')) {
                         const data = JSON.parse(e.target.result);
                         processImportedData(data);
-                    } else if (file.name.endsWith('.csv')) {
+                    } else if (file.name.endsWith('.csv') || file.name.endsWith('.txt')) {
                         const csv = e.target.result;
                         const data = parseCSV(csv);
                         processImportedData(data);
@@ -118,22 +178,32 @@
 
         // Traitement des données importées
         function processImportedData(data) {
-            buildingsData = data.filter(item => item.lat && item.lng);
+            buildingsData = data.map(normalizeBuilding)
+                .filter(item => typeof item.lat === 'number' && typeof item.lng === 'number');
             markersLayer.clearLayers();
-            
+
             buildingsData.forEach(building => addMarker(building));
             alert(`${buildingsData.length} bâtiments importés avec succès!`);
         }
 
         // Parser CSV simple
         function parseCSV(csv) {
-            const lines = csv.split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
+            const lines = csv.split('\n').filter(Boolean);
+            if (lines.length === 0) return [];
+
+            const delimiterCandidates = [',', ';', '\t'];
+            const delimiter = delimiterCandidates.reduce((best, current) => {
+                const currentCount = (lines[0].match(new RegExp(current, 'g')) || []).length;
+                const bestCount = (lines[0].match(new RegExp(best, 'g')) || []).length;
+                return currentCount > bestCount ? current : best;
+            }, ',');
+
+            const headers = lines[0].split(delimiter).map(h => h.trim());
             const data = [];
-            
+
             for (let i = 1; i < lines.length; i++) {
                 if (lines[i].trim()) {
-                    const values = lines[i].split(',').map(v => v.trim());
+                    const values = lines[i].split(delimiter).map(v => v.trim());
                     const item = {};
                     headers.forEach((header, index) => {
                         item[header] = values[index] || '';
