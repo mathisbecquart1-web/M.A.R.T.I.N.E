@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carte Interactive Hauts-de-France & Normandie</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         body { margin: 0; font-family: Arial, sans-serif; }
         #map { height: 70vh; width: 100%; }
@@ -34,6 +35,34 @@
         }
         .btn:hover { background: #005a87; }
         #file-input { margin-left: 10px; }
+        #details-panel {
+            padding: 15px 20px;
+            background: #fdfdfd;
+            border-top: 1px solid #ddd;
+        }
+        #details-panel h3 {
+            margin-top: 0;
+        }
+        #details-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 8px 16px;
+        }
+        .detail-item {
+            background: #f7f9fb;
+            padding: 8px 10px;
+            border-radius: 4px;
+            border: 1px solid #e3e6ea;
+        }
+        .detail-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .btn-small {
+            padding: 6px 10px;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -41,11 +70,15 @@
         <div class="search-container">
             <input type="text" id="search-input" placeholder="Rechercher un bâtiment ou propriétaire...">
             <button class="btn" onclick="searchBuildings()">Rechercher</button>
-            <input type="file" id="file-input" accept=".csv,.json" onchange="importData(event)">
+            <input type="file" id="file-input" accept=".csv,.json,.xlsx,.xls" onchange="importData(event)">
             <button class="btn" onclick="document.getElementById('file-input').click()">Importer données</button>
         </div>
     </div>
     <div id="map"></div>
+    <div id="details-panel">
+        <h3 id="details-title">Fiche bâtiment</h3>
+        <div id="details-content">Sélectionnez un bâtiment pour afficher ses informations.</div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -59,6 +92,7 @@
 
         // Stockage des données de bâtiments
         let buildingsData = [];
+        let buildingIdCounter = 1;
         let markersLayer = L.layerGroup().addTo(map);
 
         // Fonction pour ajouter un marqueur
@@ -68,7 +102,8 @@
                     <strong>${building.nom}</strong><br>
                     Propriétaire: ${building.proprietaire}<br>
                     Adresse: ${building.adresse}<br>
-                    Type: ${building.type || 'Non spécifié'}
+                    Type: ${building.type || 'Non spécifié'}<br>
+                    <button class="btn btn-small" onclick="showBuildingDetails(${building.id})">Fiche du bâtiment</button>
                 `);
             markersLayer.addLayer(marker);
             return marker;
@@ -98,22 +133,34 @@
             const file = event.target.files[0];
             if (!file) return;
 
+            const extension = file.name.split('.').pop().toLowerCase();
             const reader = new FileReader();
+
             reader.onload = function(e) {
                 try {
-                    if (file.name.endsWith('.json')) {
+                    if (extension === 'json') {
                         const data = JSON.parse(e.target.result);
                         processImportedData(data);
-                    } else if (file.name.endsWith('.csv')) {
+                    } else if (extension === 'csv') {
                         const csv = e.target.result;
                         const data = parseCSV(csv);
                         processImportedData(data);
+                    } else if (extension === 'xlsx' || extension === 'xls') {
+                        const data = parseExcel(e.target.result);
+                        processImportedData(data);
+                    } else {
+                        alert('Format non supporté. Veuillez importer un CSV, JSON ou Excel.');
                     }
                 } catch (error) {
                     alert('Erreur lors de l\'import: ' + error.message);
                 }
             };
-            reader.readAsText(file);
+
+            if (extension === 'xlsx' || extension === 'xls') {
+                reader.readAsArrayBuffer(file);
+            } else {
+                reader.readAsText(file);
+            }
         }
 
         // Normalisation d'un bâtiment : repère les coordonnées même si les champs sont nommés différemment
@@ -140,14 +187,25 @@
                 return null;
             }
 
-            return {
+            const building = {
+                id: buildingIdCounter++,
                 nom: item.nom || item.name || 'Bâtiment',
                 proprietaire: item.proprietaire || item.owner || '',
                 adresse: item.adresse || item.address || '',
                 type: item.type || item.categorie || '',
                 lat: normalizedLat,
                 lng: normalizedLng,
+                details: {}
             };
+
+            Object.keys(item).forEach(key => {
+                building.details[key] = item[key];
+            });
+
+            building.details.latitude = normalizedLat;
+            building.details.longitude = normalizedLng;
+
+            return building;
         }
 
         // Récupère une coordonnée à partir d'une liste de clés potentielles
@@ -185,10 +243,31 @@
             alert(`${buildingsData.length} bâtiments importés avec succès!`);
         }
 
+        function showBuildingDetails(buildingId) {
+            const building = buildingsData.find(b => b.id === buildingId);
+            if (!building) return;
+
+            const title = document.getElementById('details-title');
+            const content = document.getElementById('details-content');
+            title.textContent = building.nom;
+
+            const entries = Object.entries(building.details)
+                .map(([key, value]) => ({ key, value }));
+
+            content.innerHTML = entries
+                .map(entry => `
+                    <div class="detail-item">
+                        <span class="detail-label">${entry.key}</span>
+                        <span>${entry.value}</span>
+                    </div>
+                `)
+                .join('');
+        }
+
         // Détection du séparateur utilisé dans le fichier
         function detectDelimiter(line) {
             if (line.includes(';')) return ';';
-            if (line.includes('	')) return '	';
+            if (line.includes('\t')) return '\t';
             if (line.includes('|')) return '|';
             return ',';
         }
@@ -215,6 +294,14 @@
             return data;
         }
 
+        // Lecture de la première feuille Excel et conversion en objets
+        function parseExcel(arrayBuffer) {
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[firstSheetName];
+            return XLSX.utils.sheet_to_json(sheet, { defval: '' });
+        }
+
         // Données d'exemple
         const exempleData = [
             {
@@ -233,7 +320,15 @@
                 lng: 1.0940,
                 type: "Monument historique"
             }
-        ];
+        ].map((building, index) => ({
+            ...building,
+            id: buildingIdCounter++,
+            details: {
+                ...building,
+                latitude: building.lat,
+                longitude: building.lng
+            }
+        }));
 
         // Chargement des données d'exemple
         buildingsData = exempleData;
