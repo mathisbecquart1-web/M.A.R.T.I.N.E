@@ -815,11 +815,6 @@
             color: white;
         }
 
-        .btn-primary.toggle-active {
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.35), 0 6px 18px rgba(0,0,0,0.15);
-            filter: saturate(1.05);
-        }
-
         .btn-success {
             background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
@@ -2132,7 +2127,6 @@
             <button class="btn btn-primary" onclick="exportCompleteBackup()">📤 Télécharger Sauvegarde</button>
             <button class="btn btn-primary" onclick="importCompleteBackup()">📥 Importer Sauvegarde</button>
             <input type="file" id="backupFileInput" accept="application/json" style="display: none;" onchange="handleBackupImport()">
-            <button class="btn btn-primary" id="expandTextButton" aria-pressed="false" onclick="toggleExpandAllText()">🪄 Afficher tout le texte</button>
             <button class="btn btn-success" id="normalizeTextButton" onclick="normalizeAllTextContent()">⚡ Réguler tout le texte</button>
         </div>
     </div>
@@ -3995,7 +3989,6 @@
         let missionNotebook = [];
         let missionView = 'month';
         let missionFocusDate = new Date();
-        let autoExpandTextEnabled = false;
         const textAreaExpansionCache = new WeakMap();
 
         // Initialisation des compteurs
@@ -4264,14 +4257,6 @@
                 scheduleTabStatsUpdate(tabName);
                 refreshRowSelections(tabName);
                 updateBulkSelectionInfo(tabName);
-
-                if (autoExpandTextEnabled) {
-                    scheduleIdleTask(() => expandAllTextFields({
-                        prioritizeTab: tabName,
-                        silent: true,
-                        useCache: true
-                    }));
-                }
 
                 logActivity(`Navigation vers ${getTabDisplayName(tabName)}`, 'info');
 
@@ -5561,7 +5546,9 @@ return;
         function normalizeAllTextContent() {
             if (normalizeInProgress) return;
             try {
-                const fields = Array.from(document.querySelectorAll('input.editable, textarea.editable, textarea.editable-textarea'));
+                const fields = Array.from(document.querySelectorAll('textarea.editable-textarea, input.editable'))
+                    .filter(field => !field.disabled);
+
                 if (!fields.length) {
                     showNotification('ℹ️ Aucun champ texte à réguler');
                     return;
@@ -5582,61 +5569,71 @@ return;
                     turboMode ? 'Turbo régulation des textes...' : 'Optimisation des textes...',
                     'Préparation des champs...'
                 );
+                updateProcessingProgress(`Régulation des champs 0/${total}`, 0);
 
                 const schedule = window.requestIdleCallback
                     ? (cb) => requestIdleCallback(cb, { timeout: turboMode ? 40 : 120 })
                     : (cb) => setTimeout(cb, 0);
 
                 const processChunk = () => {
-                    let count = 0;
+                    try {
+                        let count = 0;
 
-                    while (processed < total && count < chunkSize) {
-                        const field = fields[processed];
-                        const normalized = normalizeTextValue(field.value || '');
-                        if (normalized !== (field.value || '')) {
-                            field.value = normalized;
-                            modified++;
+                        while (processed < total && count < chunkSize) {
+                            const field = fields[processed];
+                            const currentValue = field.value || '';
+                            const normalized = normalizeTextValue(currentValue);
+                            if (normalized !== currentValue) {
+                                field.value = normalized;
+                                modified++;
+                            }
+
+                            if (field.tagName === 'TEXTAREA' && (processed % resizeStride === 0)) {
+                                autoResizeField(field, { useCache: true });
+                            }
+
+                            processed++;
+                            count++;
                         }
 
-                        if (field.tagName === 'TEXTAREA' && (processed % resizeStride === 0)) {
-                            autoResizeField(field, { useCache: true });
+                        const now = performance.now();
+                        if (now - lastUpdate > 80 || processed === total) {
+                            const elapsed = now - startTime;
+                            const remaining = total - processed;
+                            const throughput = processed > 0 ? processed / elapsed : 0;
+                            const eta = throughput > 0 ? (remaining / throughput) : null;
+                            if (isFinite(eta)) {
+                                etaSamples.push(eta);
+                                if (etaSamples.length > 5) etaSamples.shift();
+                            }
+                            const smoothEta = etaSamples.length
+                                ? etaSamples.reduce((a, b) => a + b, 0) / etaSamples.length
+                                : null;
+
+                            const progress = Math.round((processed / total) * 100);
+                            updateProcessingProgress(
+                                `Régulation des champs ${processed}/${total}`,
+                                progress,
+                                smoothEta ? smoothEta * 1000 : null
+                            );
+                            lastUpdate = now;
                         }
 
-                        processed++;
-                        count++;
-                    }
-
-                    const now = performance.now();
-                    if (now - lastUpdate > 80 || processed === total) {
-                        const elapsed = now - startTime;
-                        const remaining = total - processed;
-                        const throughput = processed > 0 ? processed / elapsed : 0;
-                        const eta = throughput > 0 ? (remaining / throughput) : null;
-                        if (isFinite(eta)) {
-                            etaSamples.push(eta);
-                            if (etaSamples.length > 5) etaSamples.shift();
+                        if (processed < total) {
+                            schedule(processChunk);
+                        } else {
+                            updateProcessingProgress(`Régulation des champs ${total}/${total}`, 100, 0);
+                            hideProcessingOverlay();
+                            showNotification(`✅ Texte régulé sur ${modified}/${total} champ(s)`);
+                            queueSaveAllData();
+                            normalizeInProgress = false;
+                            expandAllTextFields({ prioritizeTab: 'verifbaux', silent: true, useCache: true });
                         }
-                        const smoothEta = etaSamples.length
-                            ? etaSamples.reduce((a, b) => a + b, 0) / etaSamples.length
-                            : null;
-
-                        const progress = Math.round((processed / total) * 100);
-                        updateProcessingProgress(
-                            `Régulation des champs ${processed}/${total}`,
-                            progress,
-                            smoothEta ? smoothEta * 1000 : null
-                        );
-                        lastUpdate = now;
-                    }
-
-                    if (processed < total) {
-                        schedule(processChunk);
-                    } else {
+                    } catch (chunkError) {
+                        console.error('Erreur lors de la régulation des textes:', chunkError);
                         hideProcessingOverlay();
-                        showNotification(`✅ Texte régulé sur ${modified}/${total} champ(s)`);
-                        queueSaveAllData();
                         normalizeInProgress = false;
-                        expandAllTextFields({ prioritizeTab: 'verifbaux', silent: true, useCache: true });
+                        showNotification('❌ Impossible de réguler les textes', 'error');
                     }
                 };
 
@@ -5647,28 +5644,6 @@ return;
                 normalizeInProgress = false;
                 showNotification('❌ Impossible de réguler les textes', 'error');
             }
-        }
-
-        function updateExpandTextButton() {
-            const btn = document.getElementById('expandTextButton');
-            if (!btn) return;
-
-            btn.textContent = autoExpandTextEnabled
-                ? '🪄 Affichage texte auto (activé)'
-                : '🪄 Afficher tout le texte';
-            btn.setAttribute('aria-pressed', autoExpandTextEnabled ? 'true' : 'false');
-            btn.classList.toggle('toggle-active', autoExpandTextEnabled);
-        }
-
-        function toggleExpandAllText() {
-            autoExpandTextEnabled = !autoExpandTextEnabled;
-            updateExpandTextButton();
-            expandAllTextFields({ prioritizeTab: 'verifbaux', silent: autoExpandTextEnabled, useCache: true });
-            queueSaveAllData();
-
-            showNotification(autoExpandTextEnabled
-                ? '🪄 Affichage complet mémorisé pour les prochaines sessions'
-                : '📏 Affichage compact mémorisé pour les prochaines sessions');
         }
 
         function createEditableField(column, tabName, value = '') {
@@ -11935,7 +11910,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     missions: missions,
                     missionNotebook: missionNotebook,
                     activityLog: activityLog,
-                    autoExpandTextEnabled: autoExpandTextEnabled,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -12016,7 +11990,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     missions: missions,
                     missionNotebook: missionNotebook,
                     activityLog: activityLog,
-                    autoExpandTextEnabled: autoExpandTextEnabled,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -12146,8 +12119,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             rgDatabase = data.rgDatabase || {};
             dismissedRGChanges = new Set(data.dismissedRGChanges || []);
-            autoExpandTextEnabled = Boolean(data.autoExpandTextEnabled);
-            updateExpandTextButton();
             refreshRGSuggestions();
 
             pendingTasks = (data.pendingTasks || []).map(task => ({
@@ -12252,9 +12223,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMissionNotebook();
             renderMissionCalendar();
             rebuildColumnSuggestions();
-            if (autoExpandTextEnabled) {
-                scheduleIdleTask(() => expandAllTextFields({ prioritizeTab: 'verifbaux', silent: true, useCache: true }));
-            }
             queueSaveAllData();
         }
 
@@ -12293,7 +12261,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // 🔧 INITIALISATION COMPLÈTE
         function initializeApp() {
             try {
-                updateExpandTextButton();
                 loadAllData();
                 refreshRGSuggestions();
                 renderTaskExcelCells();
@@ -12387,7 +12354,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.exportAllToExcel = exportAllToExcel;
         window.exportStatsReport = exportStatsReport;
         window.exportMonthlyReport = exportMonthlyReport;
-        window.toggleExpandAllText = toggleExpandAllText;
         window.normalizeAllTextContent = normalizeAllTextContent;
         window.clearAll = clearAll;
         window.triggerFileInput = triggerFileInput;
