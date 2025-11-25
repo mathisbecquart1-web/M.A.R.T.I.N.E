@@ -116,30 +116,101 @@
             reader.readAsText(file);
         }
 
+        // Normalisation d'un bâtiment : repère les coordonnées même si les champs sont nommés différemment
+        function normalizeBuilding(item) {
+            const lat = findCoordinate(item, ['lat', 'latitude', 'y', 'coordy']);
+            const lng = findCoordinate(item, ['lng', 'lon', 'longitude', 'x', 'coordx']);
+
+            let normalizedLat = lat;
+            let normalizedLng = lng;
+
+            // Si aucune correspondance explicite, on tente de récupérer les deux dernières valeurs numériques
+            if (normalizedLat === null || normalizedLng === null) {
+                const numericValues = Object.values(item)
+                    .map(parseNumericValue)
+                    .filter(value => value !== null);
+
+                if (numericValues.length >= 2) {
+                    normalizedLat = numericValues[numericValues.length - 1];
+                    normalizedLng = numericValues[numericValues.length - 2];
+                }
+            }
+
+            if (normalizedLat === null || normalizedLng === null) {
+                return null;
+            }
+
+            return {
+                nom: item.nom || item.name || 'Bâtiment',
+                proprietaire: item.proprietaire || item.owner || '',
+                adresse: item.adresse || item.address || '',
+                type: item.type || item.categorie || '',
+                lat: normalizedLat,
+                lng: normalizedLng,
+            };
+        }
+
+        // Récupère une coordonnée à partir d'une liste de clés potentielles
+        function findCoordinate(item, possibleKeys) {
+            for (const key of possibleKeys) {
+                const matchingKey = Object.keys(item).find(
+                    k => k.toLowerCase() === key.toLowerCase()
+                );
+
+                if (matchingKey) {
+                    const value = parseNumericValue(item[matchingKey]);
+                    if (value !== null) return value;
+                }
+            }
+            return null;
+        }
+
+        // Conversion d'une valeur en nombre en gérant les virgules décimales
+        function parseNumericValue(value) {
+            if (value === undefined || value === null) return null;
+            const normalized = String(value).replace(',', '.');
+            const number = parseFloat(normalized);
+            return Number.isNaN(number) ? null : number;
+        }
+
         // Traitement des données importées
         function processImportedData(data) {
-            buildingsData = data.filter(item => item.lat && item.lng);
+            buildingsData = data
+                .map(normalizeBuilding)
+                .filter(item => item && item.lat !== null && item.lng !== null);
+
             markersLayer.clearLayers();
-            
+
             buildingsData.forEach(building => addMarker(building));
             alert(`${buildingsData.length} bâtiments importés avec succès!`);
         }
 
-        // Parser CSV simple
+        // Détection du séparateur utilisé dans le fichier
+        function detectDelimiter(line) {
+            if (line.includes(';')) return ';';
+            if (line.includes('	')) return '	';
+            if (line.includes('|')) return '|';
+            return ',';
+        }
+
+        // Parser CSV amélioré : accepte ;, tabulations ou virgules et les décimales françaises
         function parseCSV(csv) {
-            const lines = csv.split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
+            const lines = csv.split(/\r?\n/).filter(line => line.trim());
+            if (lines.length === 0) return [];
+
+            const delimiter = detectDelimiter(lines[0]);
+            const headers = lines[0].split(delimiter).map(h => h.trim());
             const data = [];
-            
+
             for (let i = 1; i < lines.length; i++) {
-                if (lines[i].trim()) {
-                    const values = lines[i].split(',').map(v => v.trim());
-                    const item = {};
-                    headers.forEach((header, index) => {
-                        item[header] = values[index] || '';
-                    });
-                    data.push(item);
-                }
+                const values = lines[i].split(delimiter).map(v => v.trim());
+                const item = {};
+                headers.forEach((header, index) => {
+                    const value = values[index] || '';
+                    const numericValue = parseNumericValue(value);
+                    item[header] = numericValue !== null ? numericValue : value;
+                });
+                data.push(item);
             }
             return data;
         }
