@@ -815,6 +815,11 @@
             color: white;
         }
 
+        .btn-primary.toggle-active {
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.35), 0 6px 18px rgba(0,0,0,0.15);
+            filter: saturate(1.05);
+        }
+
         .btn-success {
             background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
@@ -1243,6 +1248,243 @@
             font-weight: 600;
         }
 
+        .monthly-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .monthly-controls label {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .monthly-highlight {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+            margin: 14px 0;
+        }
+
+        .mail-preview-box {
+            background: linear-gradient(135deg, rgba(102,126,234,0.08), rgba(118,75,162,0.08));
+            border: 1px solid rgba(102,126,234,0.18);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .mail-preview-box ul {
+            padding-left: 18px;
+            margin: 8px 0;
+        }
+
+        .mail-preview-box li {
+            margin-bottom: 4px;
+        }
+
+        .monthly-table-note {
+            color: #666;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .missions-layout {
+            display: grid;
+            grid-template-columns: minmax(330px, 380px) 1fr;
+            gap: 16px;
+        }
+
+        .mission-card {
+            background: rgba(255,255,255,0.92);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px 16px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .mission-card h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .mission-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .mission-form input,
+        .mission-form textarea,
+        .mission-form select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #dfe3ff;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .mission-toolbar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 8px 0 4px;
+        }
+
+        .mission-view-toggle {
+            display: inline-flex;
+            border: 1px solid #dfe3ff;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f8f9ff;
+        }
+
+        .mission-view-toggle button {
+            border: none;
+            background: transparent;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 700;
+            color: #445;
+        }
+
+        .mission-view-toggle button.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+
+        .mission-calendar {
+            display: grid;
+            gap: 10px;
+        }
+
+        .mission-calendar.month-view {
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+        }
+
+        .mission-day {
+            border: 1px solid #eef2ff;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mission-day.today {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+        }
+
+        .mission-day .day-label {
+            font-weight: 800;
+            color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .mission-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: #f5f7ff;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .mission-chip.done {
+            background: #e7f9ed;
+            border-color: #c4f1d4;
+            color: #1b7f3f;
+        }
+
+        .mission-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .mission-list-item {
+            padding: 10px 12px;
+            border: 1px solid #eef2ff;
+            border-radius: 10px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mission-notebook-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .mission-notebook-item {
+            padding: 10px 12px;
+            border: 1px dashed #d7ddf7;
+            border-radius: 10px;
+            background: #fafbff;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .mission-notebook-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mission-notebook-title {
+            font-weight: 700;
+            color: #2c3e50;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .mission-notebook-notes {
+            font-size: 12px;
+            color: #4b5563;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .mission-notebook-actions {
+            display: inline-flex;
+            gap: 6px;
+        }
+
+        .mission-note-snippet {
+            font-size: 12px;
+            color: #4b5563;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .mission-actions {
+            display: flex;
+            gap: 6px;
+        }
+
         .activity-list {
             display: flex;
             flex-direction: column;
@@ -1416,6 +1658,104 @@
             margin-bottom: 20px;
         }
 
+        .task-paste-panel {
+            border: 1px dashed #cdd4ff;
+            background: #fff;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .task-paste-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .task-paste-actions .btn {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .task-paste-help {
+            color: #6c757d;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .task-paste-textarea {
+            width: 100%;
+            min-height: 90px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #d9ddf0;
+            resize: vertical;
+            font-size: 13px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .excel-cell-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #e2e6f5;
+            background: #f8f9ff;
+            min-height: 70px;
+        }
+
+        .excel-cell-pool.empty {
+            justify-content: center;
+            align-items: center;
+            color: #7a7f9c;
+            font-size: 13px;
+        }
+
+        .excel-cell-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: #fff;
+            border: 1px solid #dfe3ff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.12);
+            cursor: grab;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            min-width: 120px;
+            max-width: 240px;
+            user-select: none;
+        }
+
+        .excel-cell-pill strong {
+            background: #eef2ff;
+            color: #4c51bf;
+            padding: 4px 7px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .excel-cell-pill .excel-cell-value {
+            font-size: 13px;
+            color: #2c3e50;
+            line-height: 1.3;
+            max-width: 180px;
+            word-break: break-word;
+        }
+
+        .excel-cell-pill.dragging {
+            opacity: 0.75;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(102, 126, 234, 0.25);
+        }
+
+        .task-drop-target {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
         .task-field {
             margin-bottom: 15px;
         }
@@ -1434,6 +1774,92 @@
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 14px;
+        }
+
+        .task-table {
+            table-layout: fixed;
+        }
+
+        .task-summary-cell {
+            font-size: 12px;
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 180px;
+        }
+
+        .task-table td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 220px;
+        }
+
+        .task-table tbody tr.clickable-row {
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .task-table tbody tr.clickable-row:hover {
+            background: #f3f4ff;
+        }
+
+        .task-table tbody tr.highlight-task {
+            animation: taskHighlight 1.4s ease;
+        }
+
+        .bulk-edit-meta {
+            font-size: 13px;
+            color: #4b5563;
+            margin-top: 6px;
+        }
+
+        .bulk-edit-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .bulk-edit-grid label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .bulk-edit-grid select,
+        .bulk-edit-grid textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #d9ddf0;
+            font-size: 13px;
+            resize: vertical;
+        }
+
+        .bulk-edit-grid select[multiple] {
+            min-height: 140px;
+        }
+
+        .bulk-edit-helper {
+            background: #f8f9ff;
+            border: 1px dashed #dfe3ff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #4b5563;
+            margin-bottom: 10px;
+        }
+
+        @keyframes taskHighlight {
+            0% { background-color: #fff7e6; }
+            50% { background-color: #ffe0b3; }
+            100% { background-color: transparent; }
         }
 
         .excel-import {
@@ -1706,7 +2132,7 @@
             <button class="btn btn-primary" onclick="exportCompleteBackup()">📤 Télécharger Sauvegarde</button>
             <button class="btn btn-primary" onclick="importCompleteBackup()">📥 Importer Sauvegarde</button>
             <input type="file" id="backupFileInput" accept="application/json" style="display: none;" onchange="handleBackupImport()">
-            <button class="btn btn-primary" onclick="expandAllTextFields()">🪄 Afficher tout le texte</button>
+            <button class="btn btn-primary" id="expandTextButton" aria-pressed="false" onclick="toggleExpandAllText()">🪄 Afficher tout le texte</button>
         </div>
     </div>
 
@@ -1719,7 +2145,9 @@
         <button class="tab" onclick="switchTab('verifbaux')">✅ Vérification baux</button>
         <button class="tab" onclick="switchTab('pni')">🧾 PNI</button>
         <button class="tab" onclick="switchTab('baserg')">🗂️ Base RG & UT</button>
+        <button class="tab" onclick="switchTab('missions')">🗓️ Missions</button>
         <button class="tab" onclick="switchTab('taches')">📝 Tâches à faire</button>
+        <button class="tab" onclick="switchTab('statsmensuelles')">📆 Stats mensuelles</button>
         <button class="tab" onclick="switchTab('statistiques')">📊 Statistiques</button>
         <button class="tab" onclick="switchTab('recherche')">🔍 Recherche</button>
     </div>
@@ -1798,6 +2226,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('creation')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('creation')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('creation')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('creation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('creation')">🗑️ Effacer tout</button>
@@ -1917,6 +2346,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('modification')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('modification')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modification')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('modification')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modification')">🗑️ Effacer tout</button>
@@ -2036,6 +2466,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('resiliation')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('resiliation')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('resiliation')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('resiliation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('resiliation')">🗑️ Effacer tout</button>
@@ -2153,6 +2584,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('autremodif')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('autremodif')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('autremodif')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('autremodif')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('autremodif')">🗑️ Effacer tout</button>
@@ -2267,6 +2699,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('modifsurface')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('modifsurface')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modifsurface')">📊 Exporter Excel</button>
                 <button class="btn btn-warning" onclick="recalculateAllSurfaces()">🔄 Recalculer toutes les différences</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('modifsurface')">🗑️ Supprimer sélection</button>
@@ -2389,6 +2822,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('verifbaux')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('verifbaux')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('verifbaux')">📊 Exporter Excel</button>
                 <button class="btn btn-warning" onclick="validateAllBauxStates()">🔍 Valider tous les états</button>
                 <button class="btn btn-success" onclick="markAllAsOK()">✅ Marquer sélection OK</button>
@@ -2411,6 +2845,7 @@
                             <th style="width: 150px;">Nom du Bâtiment</th>
                             <th style="width: 100px;">Région</th>
                             <th style="width: 200px;">Commentaire</th>
+                            <th style="width: 140px;">Date Vérification</th>
                             <th style="width: 100px;">Traité</th>
                             <th style="width: 70px;">Action</th>
                         </tr>
@@ -2480,6 +2915,7 @@
             <!-- CONTRÔLES -->
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('pni')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('pni')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('pni')">📊 Exporter Excel</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('pni')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('pni')">🗑️ Effacer tout</button>
@@ -2643,6 +3079,8 @@
             <div class="controls">
                 <button class="btn btn-primary" onclick="addRow('baserg')">➕ Ajouter code RG</button>
                 <button class="btn btn-primary" onclick="addRow('baseut')">➕ Ajouter code UT</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('baserg')">✏️ Mise à jour RG en masse</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('baseut')">✏️ Mise à jour UT en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('baserg')">📊 Exporter Base RG</button>
                 <button class="btn btn-excel" onclick="exportToExcel('baseut')">📊 Exporter Base UT</button>
                 <button class="btn btn-warning" onclick="validateAllRGCodes()">🔍 Vérifier codes RG dans tous les onglets</button>
@@ -2707,6 +3145,69 @@
             </div>
         </div>
 
+        <!-- ONGLET MISSIONS -->
+        <div id="missions" class="tab-content">
+            <div class="missions-layout">
+                <div class="mission-card">
+                    <h3>🗓️ Ajouter une mission</h3>
+                    <form class="mission-form" onsubmit="addMission(event)">
+                        <input type="text" id="missionTitle" placeholder="Titre de la mission" required>
+                        <textarea id="missionNotes" rows="3" placeholder="Détails, contexte ou livrables"></textarea>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="date" id="missionDate" required>
+                            <input type="time" id="missionTime" style="max-width: 140px;" aria-label="Heure">
+                        </div>
+                        <select id="missionStatus">
+                            <option value="planned">🕒 À faire</option>
+                            <option value="in_progress">🚧 En cours</option>
+                            <option value="done">✅ Terminé</option>
+                        </select>
+                        <button type="submit" class="btn btn-success">➕ Enregistrer la mission</button>
+                    </form>
+
+                    <div style="margin-top: 16px;">
+                        <h4 style="color:#2c3e50;">🗒️ Carnet rapide</h4>
+                        <div id="missionList" class="mission-list"></div>
+                    </div>
+                </div>
+
+                <div class="mission-card" style="min-height: 420px;">
+                    <div class="mission-toolbar">
+                        <div class="mission-view-toggle">
+                            <button type="button" id="missionViewDay" onclick="changeMissionView('day')">Jour</button>
+                            <button type="button" id="missionViewWeek" onclick="changeMissionView('week')">Semaine</button>
+                            <button type="button" id="missionViewMonth" class="active" onclick="changeMissionView('month')">Mois</button>
+                        </div>
+                        <input type="month" id="missionMonthPicker" onchange="setMissionFocusFromInput(this.value)">
+                        <input type="date" id="missionFocusDate" onchange="setMissionFocusFromInput(this.value)">
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn btn-secondary btn-compact" type="button" onclick="shiftMissionWindow(-1)">⬅️ Préc.</button>
+                            <button class="btn btn-secondary btn-compact" type="button" onclick="resetMissionFocus()">📍 Aujourd'hui</button>
+                            <button class="btn btn-secondary btn-compact" type="button" onclick="shiftMissionWindow(1)">Suiv. ➡️</button>
+                        </div>
+                    </div>
+
+                    <div id="missionCalendar" class="mission-calendar month-view"></div>
+                </div>
+
+                <div class="mission-card" style="grid-column: 1 / -1;">
+                    <h3>📒 Cahier des missions (sans date)</h3>
+                    <form class="mission-form" onsubmit="addNotebookMission(event)">
+                        <input type="text" id="notebookTitle" placeholder="Intitulé de la mission" required>
+                        <textarea id="notebookNotes" rows="3" placeholder="Notes libres ou éléments à suivre"></textarea>
+                        <select id="notebookStatus">
+                            <option value="planned">🕒 À faire</option>
+                            <option value="in_progress">🚧 En cours</option>
+                            <option value="done">✅ Terminé</option>
+                        </select>
+                        <button type="submit" class="btn btn-secondary">➕ Ajouter au cahier</button>
+                    </form>
+
+                    <div class="mission-notebook-list" id="missionNotebookList"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- ONGLET TÂCHES À FAIRE -->
         <div id="taches" class="tab-content">
             <div class="stats-dashboard task-layout">
@@ -2731,7 +3232,20 @@
                             <label>Nombre de tâches à créer :</label>
                             <input id="taskQuantity" type="number" min="1" max="50" value="1" />
                         </div>
-                        
+
+                        <div class="task-field">
+                            <label>📋 Coller des cellules Excel</label>
+                            <div class="task-paste-panel">
+                                <textarea id="taskExcelTextarea" class="task-paste-textarea" placeholder="Collez ici des cellules Excel (plusieurs lignes et colonnes)"></textarea>
+                                <div class="task-paste-actions">
+                                    <button class="btn btn-primary" type="button" onclick="parseTaskExcelCells()">🔍 Détecter les cellules</button>
+                                    <button class="btn btn-secondary" type="button" onclick="clearTaskExcelCells()">🧽 Effacer la sélection</button>
+                                </div>
+                                <div class="task-paste-help">Chaque cellule détectée peut être glissée individuellement sur un champ du formulaire.</div>
+                            </div>
+                            <div id="taskExcelCellsContainer" class="excel-cell-pool empty">Collez vos cellules puis cliquez sur "Détecter les cellules" pour les rendre déplaçables.</div>
+                        </div>
+
                         <div id="taskFieldsContainer">
                             <p style="color: #666; text-align: center; padding: 20px;">
                                 Sélectionnez un onglet pour voir les champs disponibles
@@ -2753,56 +3267,6 @@
                             </button>
                         </div>
 
-                        <div class="excel-import" id="excelImportSection">
-                            <div class="excel-import-layout">
-                                <div class="excel-import-form">
-                                    <div>
-                                        <h4>📋 Import rapide par copier/coller Excel</h4>
-                                        <p style="font-size: 13px; color: #555; margin-bottom: 10px;">
-                                            Collez vos lignes depuis Excel, réorganisez les colonnes par glisser-déposer puis créez automatiquement autant de tâches que de lignes importées.
-                                        </p>
-                                    </div>
-                                    <div class="excel-field-hints" id="excelFieldHints">
-                                        <div class="excel-preview-empty" style="padding: 8px;">
-                                            Sélectionnez un onglet pour voir l'ordre attendu des colonnes.
-                                        </div>
-                                    </div>
-                                    <textarea id="excelPasteArea" class="excel-paste-area" placeholder="GA[TAB]Date Demande[TAB]..."></textarea>
-                                    <div class="excel-import-actions">
-                                        <button class="btn btn-secondary" id="excelPreviewBtn" onclick="handleExcelPastePreview()">
-                                            👀 Prévisualiser
-                                        </button>
-                                        <button class="btn btn-danger" type="button" onclick="resetExcelImportArea()">
-                                            ♻️ Effacer l'import
-                                        </button>
-                                        <button class="btn btn-success" id="excelImportBtn" onclick="createTasksFromExcelImport()" disabled>
-                                            📥 Créer des tâches depuis l'import
-                                        </button>
-                                        <button class="btn btn-secondary" id="excelBatchImportBtn" onclick="addImportToBatch()" disabled>
-                                            📦 Ajouter l'import au lot actif
-                                        </button>
-                                        <label class="excel-option">
-                                            <input type="checkbox" id="excelSkipHeader" checked onchange="updateExcelImportButtons()">
-                                            Ignorer la première ligne (entêtes)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="excel-preview-panel">
-                                    <div class="excel-preview-panel-header">
-                                        <h5>Tableau de prévisualisation</h5>
-                                        <span class="excel-preview-helper">Restez sur le formulaire tout en parcourant vos lignes importées.</span>
-                                    </div>
-                                    <div class="excel-preview-meta" id="excelPreviewMeta">Aucun aperçu pour le moment.</div>
-                                    <div class="excel-preview-scroll">
-                                        <div id="excelPreviewContainer" class="excel-preview-container">
-                                            <div class="excel-preview-empty">
-                                                Collez vos données pour voir un aperçu interactif.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -2859,7 +3323,7 @@
                         <button class="btn btn-excel" onclick="exportActiveBatch()">📤 Exporter ce lot</button>
                     </div>
                 </div>
-                <table>
+                <table class="task-table">
                     <thead>
                         <tr>
                             <th style="width: 40px;">#</th>
@@ -2879,7 +3343,7 @@
 
             <!-- TABLEAU DES TÂCHES EN ATTENTE -->
             <div class="table-container">
-                <table id="tachesTable">
+                <table id="tachesTable" class="task-table">
                     <thead>
                         <tr>
                             <th style="width: 40px;">#</th>
@@ -2898,6 +3362,118 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div class="table-container" style="margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; flex-wrap: wrap;">
+                    <h4 style="margin: 0;">📜 Historique des tâches terminées</h4>
+                    <div style="font-size: 12px; color: #666;">Les tâches exécutées sont conservées avec leur date et heure d'envoi.</div>
+                </div>
+                <table id="completedTasksTable" class="task-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th style="width: 180px;">Onglet destination</th>
+                            <th style="width: 320px;">Résumé</th>
+                            <th style="width: 200px;">Terminé le</th>
+                            <th style="width: 120px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completedTasksTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 30px; color: #666;">📭 Aucune tâche terminée pour le moment.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ONGLET STATS MENSUELLES -->
+        <div id="statsmensuelles" class="tab-content">
+            <div class="stats-actions">
+                <div class="fun-badge">Camemberts mensuels prêts à partager</div>
+                <div class="monthly-controls">
+                    <label for="monthlyMonthPicker">Mois analysé</label>
+                    <input type="month" id="monthlyMonthPicker" onchange="refreshMonthlyStats()">
+                    <button class="btn btn-secondary btn-compact" onclick="setCurrentMonth()">📅 Mois actuel</button>
+                    <button class="btn btn-secondary btn-compact" onclick="refreshMonthlyStats(true)">🔄 Rafraîchir</button>
+                    <button class="btn btn-excel" onclick="exportMonthlyReport()">📧 Export e-mail</button>
+                </div>
+            </div>
+
+            <div class="stats-dashboard">
+                <div class="stats-card">
+                    <h3>📆 Résumé du mois <span id="monthlyPeriodLabel"></span></h3>
+                    <div class="monthly-highlight">
+                        <div>
+                            <div class="preview-stat-number" id="monthlyTotal">0</div>
+                            <div class="preview-stat-label">Entrées détectées</div>
+                        </div>
+                        <div>
+                            <div class="preview-stat-number success" id="monthlyProcessed">0</div>
+                            <div class="preview-stat-label">Traitées</div>
+                        </div>
+                        <div>
+                            <div class="preview-stat-number warning" id="monthlyPending">0</div>
+                            <div class="preview-stat-label">En attente</div>
+                        </div>
+                        <div>
+                            <div class="preview-stat-number" id="monthlyRate">0%</div>
+                            <div class="preview-stat-label">Taux d'achèvement</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="monthlyProgressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="monthly-table-note" id="monthlyTotalsNote">En attente de données mensuelles.</div>
+                </div>
+
+                <div class="stats-card">
+                    <h3>🥧 Camembert par statut</h3>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="monthlyStatusChart"></canvas>
+                    </div>
+                    <div class="stats-empty-search" id="monthlyStatusEmpty" style="display: none;">Aucune donnée pour ce mois.</div>
+                </div>
+
+                <div class="stats-card">
+                    <h3>🥧 Camembert par onglet traité</h3>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="monthlyTabsChart"></canvas>
+                    </div>
+                    <div class="stats-empty-search" id="monthlyTabsEmpty" style="display: none;">Aucun traitement enregistré sur le mois.</div>
+                </div>
+
+                <div class="stats-card">
+                    <h3>📨 Résumé prêt à coller</h3>
+                    <div class="mail-preview-box" id="monthlyMailPreview">
+                        Saisissez un mois pour générer un résumé e-mail prêt à partager.
+                    </div>
+                    <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary btn-compact" onclick="copyMonthlySummary()">📋 Copier le résumé</button>
+                        <button class="btn btn-primary btn-compact" onclick="refreshMonthlyStats()">🔄 Actualiser le résumé</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container" style="margin-top: 20px;">
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 200px;">Onglet</th>
+                            <th style="width: 120px;">Traités</th>
+                            <th style="width: 120px;">En attente</th>
+                            <th style="width: 120px;">Total</th>
+                            <th style="width: 120px;">Taux</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monthlyBreakdownBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #666;">Aucune donnée à afficher pour ce mois.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="monthly-table-note">Les lignes sont filtrées selon la date de traitement ou, à défaut, la date de demande du mois sélectionné.</div>
             </div>
         </div>
 
@@ -3224,7 +3800,35 @@
         </div>
     </div>
 
-    
+    <!-- MISE À JOUR MASSIVE VIA COLLAGE EXCEL -->
+    <div class="preview-modal" id="bulkEditModal">
+        <div class="preview-content">
+            <div class="preview-header">
+                <h3 id="bulkEditTitle">✏️ Mise à jour en masse</h3>
+                <button class="close-preview" onclick="closeBulkUpdateModal()">×</button>
+            </div>
+            <div class="bulk-edit-helper" id="bulkEditHelper">Sélectionnez les lignes à modifier (Ctrl/Cmd + clic), choisissez les colonnes concernées puis collez vos valeurs depuis Excel.</div>
+            <div class="bulk-edit-grid">
+                <div>
+                    <label for="bulkEditColumns">Colonnes à modifier (ordre = colonnes collées)</label>
+                    <select id="bulkEditColumns" multiple></select>
+                    <div class="bulk-edit-meta" id="bulkEditSelectionInfo"></div>
+                </div>
+                <div>
+                    <label for="bulkEditPaste">Collage Excel</label>
+                    <textarea id="bulkEditPaste" rows="8" placeholder="Collez ici vos cellules Excel (une ligne par ligne sélectionnée)"></textarea>
+                    <div class="bulk-edit-meta" id="bulkEditPasteMeta"></div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-success" onclick="applyBulkUpdate()">✅ Appliquer aux lignes sélectionnées</button>
+                <button class="btn btn-secondary" onclick="resetBulkUpdateArea()">🧽 Réinitialiser</button>
+                <button class="btn btn-danger" onclick="closeBulkUpdateModal()">❌ Fermer</button>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- CRÉDIT PRODUCTEUR -->
     <div class="producer-credit">
@@ -3260,7 +3864,7 @@
                 icon: '📐'
             },
             verifbaux: {
-                columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'État', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Traité'],
+                columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'État', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Date Vérification', 'Traité'],
                 displayName: 'Vérification baux',
                 icon: '✅'
             },
@@ -3367,6 +3971,31 @@
         let activeTabName = 'creation';
         let tabCache = null;
         let pendingStatsUpdate = null;
+        let pendingStatsFrame = null;
+        let statsUpdateQueue = new Set();
+        let pendingSaveHandle = null;
+        let pendingMonthlyUpdate = null;
+        let taskExcelCells = [];
+        let draggedTaskCellId = null;
+        let rowSelections = {};
+        let dragSelectionState = {
+            active: false,
+            tab: null,
+            anchorRow: null,
+            baseSelection: new Set(),
+            didDrag: false,
+            scrollContainer: null,
+            autoScrollVelocity: 0,
+            autoScrollFrame: null
+        };
+        let suppressRowClickSelection = false;
+        let bulkEditTab = null;
+        let missions = [];
+        let missionNotebook = [];
+        let missionView = 'month';
+        let missionFocusDate = new Date();
+        let autoExpandTextEnabled = false;
+        const textAreaExpansionCache = new WeakMap();
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -3483,6 +4112,48 @@
             }
         };
 
+        function queueSaveAllData() {
+            cancelIdle(pendingSaveHandle);
+
+            const runSave = () => {
+                pendingSaveHandle = null;
+                saveAllData();
+            };
+
+            if (window.requestIdleCallback) {
+                pendingSaveHandle = requestIdleCallback(runSave, { timeout: 200 });
+            } else {
+                pendingSaveHandle = setTimeout(runSave, 80);
+            }
+        }
+
+        function flushQueuedSaveAllData() {
+            if (pendingSaveHandle) {
+                cancelIdle(pendingSaveHandle);
+                pendingSaveHandle = null;
+            }
+            saveAllData();
+        }
+
+        function queueStatsUpdate(tabName) {
+            if (!tabName) return;
+            statsUpdateQueue.add(tabName);
+            if (pendingStatsFrame) return;
+
+            const runUpdates = () => {
+                pendingStatsFrame = null;
+                const tabs = Array.from(statsUpdateQueue);
+                statsUpdateQueue.clear();
+                tabs.forEach(name => updateStats(name));
+            };
+
+            if (window.requestAnimationFrame) {
+                pendingStatsFrame = requestAnimationFrame(runUpdates);
+            } else {
+                pendingStatsFrame = setTimeout(runUpdates, 16);
+            }
+        }
+
         function toggleRGChangePanel() {
             try {
                 rgChangePanelExpanded = !rgChangePanelExpanded;
@@ -3554,6 +4225,8 @@
             const runUpdate = () => {
                 if (tabName === 'statistiques') {
                     updateStatsDashboard();
+                } else if (tabName === 'statsmensuelles') {
+                    refreshMonthlyStats();
                 } else if (tabName === 'baserg') {
                     updateRGUsageStats();
                     updateUTUsageStats();
@@ -3587,6 +4260,16 @@
 
                 activeTabName = tabName;
                 scheduleTabStatsUpdate(tabName);
+                refreshRowSelections(tabName);
+                updateBulkSelectionInfo(tabName);
+
+                if (autoExpandTextEnabled) {
+                    scheduleIdleTask(() => expandAllTextFields({
+                        prioritizeTab: tabName,
+                        silent: true,
+                        useCache: true
+                    }));
+                }
 
                 logActivity(`Navigation vers ${getTabDisplayName(tabName)}`, 'info');
 
@@ -4753,31 +5436,87 @@ return;
         }
 
         // 📊 GESTION DES TABLEAUX
-        function autoResizeField(field) {
+        function autoResizeField(field, { useCache = false } = {}) {
             if (field.tagName === 'TEXTAREA') {
+                const signature = useCache
+                    ? `${field.value || ''}::${field.clientWidth || field.offsetWidth || 0}`
+                    : null;
+
+                if (useCache && signature) {
+                    const cached = textAreaExpansionCache.get(field);
+                    if (cached && cached.signature === signature) {
+                        return;
+                    }
+                }
+
+                const previousHeight = field.style.height;
                 field.style.height = 'auto';
-                field.style.height = Math.max(field.scrollHeight, 38) + 'px';
+                const desiredHeight = Math.max(field.scrollHeight, 38) + 'px';
+
+                if (previousHeight === desiredHeight) {
+                    field.style.height = previousHeight;
+                } else {
+                    field.style.height = desiredHeight;
+                }
+
+                if (useCache && signature) {
+                    textAreaExpansionCache.set(field, {
+                        signature,
+                        height: field.style.height
+                    });
+                }
             }
         }
 
-        function expandAllTextFields() {
+        function expandAllTextFields(options = {}) {
+            const { silent = false, prioritizeTab = 'verifbaux', useCache = false } = options;
             try {
-                const textAreas = Array.from(document.querySelectorAll('textarea.editable-textarea'));
-                if (!textAreas.length) return;
+                const allTextAreas = Array.from(document.querySelectorAll('textarea.editable-textarea'));
+                if (!allTextAreas.length) return;
 
-                const total = textAreas.length;
-                const showLoader = total > 80;
+                const orderedTextAreas = [];
+                const seen = new Set();
+                const pushAreas = (areas = []) => {
+                    areas.forEach(area => {
+                        if (!seen.has(area)) {
+                            seen.add(area);
+                            orderedTextAreas.push(area);
+                        }
+                    });
+                };
+
+                const activeTabContent = document.querySelector('.tab-content.active');
+                if (activeTabContent) {
+                    pushAreas(Array.from(activeTabContent.querySelectorAll('textarea.editable-textarea')));
+                }
+
+                if (prioritizeTab) {
+                    const prioritizedTab = document.getElementById(prioritizeTab);
+                    if (prioritizedTab) {
+                        pushAreas(Array.from(prioritizedTab.querySelectorAll('textarea.editable-textarea')));
+                    }
+                }
+
+                pushAreas(allTextAreas);
+
+                const total = orderedTextAreas.length;
+                const showLoader = total > 120 && !silent;
                 let processed = 0;
 
                 if (showLoader) {
                     showProcessingOverlay('Ajustement des champs texte...', 'Préparation des champs...');
                 }
 
+                const schedule = window.requestIdleCallback
+                    ? (cb) => requestIdleCallback(cb, { timeout: 120 })
+                    : (cb) => setTimeout(cb, 0);
+
                 const processChunk = () => {
                     const start = performance.now();
+                    const budget = showLoader ? 12 : 7;
 
-                    while (processed < total && performance.now() - start < (showLoader ? 14 : 8)) {
-                        autoResizeField(textAreas[processed]);
+                    while (processed < total && performance.now() - start < budget) {
+                        autoResizeField(orderedTextAreas[processed], { useCache });
                         processed++;
                     }
 
@@ -4787,12 +5526,14 @@ return;
                     }
 
                     if (processed < total) {
-                        requestAnimationFrame(processChunk);
+                        schedule(processChunk);
                     } else {
                         if (showLoader) {
                             hideProcessingOverlay();
                         }
-                        showNotification(`🪄 ${total} champ(s) texte ajusté(s)`);
+                        if (!silent) {
+                            showNotification(`🪄 ${total} champ(s) texte ajusté(s)`);
+                        }
                     }
                 };
 
@@ -4800,6 +5541,28 @@ return;
             } catch (error) {
                 console.error('Erreur ajustement champs texte:', error);
             }
+        }
+
+        function updateExpandTextButton() {
+            const btn = document.getElementById('expandTextButton');
+            if (!btn) return;
+
+            btn.textContent = autoExpandTextEnabled
+                ? '🪄 Affichage texte auto (activé)'
+                : '🪄 Afficher tout le texte';
+            btn.setAttribute('aria-pressed', autoExpandTextEnabled ? 'true' : 'false');
+            btn.classList.toggle('toggle-active', autoExpandTextEnabled);
+        }
+
+        function toggleExpandAllText() {
+            autoExpandTextEnabled = !autoExpandTextEnabled;
+            updateExpandTextButton();
+            expandAllTextFields({ prioritizeTab: 'verifbaux', silent: autoExpandTextEnabled, useCache: true });
+            queueSaveAllData();
+
+            showNotification(autoExpandTextEnabled
+                ? '🪄 Affichage complet mémorisé pour les prochaines sessions'
+                : '📏 Affichage compact mémorisé pour les prochaines sessions');
         }
 
         function createEditableField(column, tabName, value = '') {
@@ -4846,10 +5609,25 @@ return;
             const rowNum = ++rowCounters[tabName];
 
             const row = document.createElement('tr');
+            const rowId = options.rowId || generateUniqueId();
+            row.dataset.rowId = rowId;
+            row.dataset.tab = tabName;
+            row.addEventListener('click', (event) => {
+                if (event.ctrlKey || event.metaKey) {
+                    event.preventDefault();
+                    handleRowSelection(event, row, tabName);
+                }
+            });
+            row.addEventListener('mousedown', (event) => beginRowDragSelection(event, row, tabName));
+            row.addEventListener('mouseenter', (event) => continueRowDragSelection(event, row, tabName));
 
             const numberCell = document.createElement('td');
             numberCell.className = 'row-number';
             numberCell.textContent = rowNum;
+            numberCell.title = 'Ctrl/Cmd + clic ou glisser pour sélectionner plusieurs lignes';
+            numberCell.addEventListener('mousedown', (event) => beginRowDragSelection(event, row, tabName));
+            numberCell.addEventListener('mouseenter', (event) => continueRowDragSelection(event, row, tabName));
+            numberCell.addEventListener('click', (event) => handleRowSelection(event, row, tabName));
             row.appendChild(numberCell);
 
             columns.forEach((column, index) => {
@@ -4890,6 +5668,20 @@ return;
                     input.addEventListener('input', () => calculateSurfaceDifference(row));
                 }
 
+                if (tabName === 'verifbaux' && column === 'Traité') {
+                    input.addEventListener('change', () => {
+                        const dateIndex = columns.indexOf('Date Vérification');
+                        if (dateIndex >= 0) {
+                            const inputs = row.querySelectorAll('input, textarea, select');
+                            const dateInput = inputs[dateIndex];
+                            if (input.value.toLowerCase() === 'oui' && dateInput && !dateInput.value) {
+                                dateInput.value = formatDateKey(new Date());
+                                queueSaveAllData();
+                            }
+                        }
+                    });
+                }
+
                 if (column === 'RG' || column === 'Code RG') {
                     setupRGAutoCompletion(input, row, tabName);
                 } else if (column === 'Nom de RG') {
@@ -4905,8 +5697,8 @@ return;
                     autoResizeField(input);
                     applySmartSuggestion(input, column);
                     validateInputInRealTime(input, column, tabName);
-                    saveAllData();
-                    updateStats(tabName);
+                    queueSaveAllData();
+                    queueStatsUpdate(tabName);
                 });
 
                 if (!skipValidation) {
@@ -4968,12 +5760,16 @@ return;
         }
 
         function addRowWithData(tabName, data, options = {}) {
-            const { fragment = null, skipStats = false, skipLog = false, skipFocus = false, skipValidation = false } = options;
+            const { fragment = null, skipStats = false, skipLog = false, skipFocus = false, skipValidation = false, rowId = null } = options;
             try {
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (!tbody) return;
 
                 const row = buildRowElement(tabName, data, { skipValidation });
+
+                if (rowId) {
+                    row.dataset.taskId = rowId;
+                }
 
                 if (fragment) {
                     fragment.appendChild(row);
@@ -5011,6 +5807,215 @@ return;
             }
         }
 
+        function getRowSelectionSet(tabName) {
+            if (!rowSelections[tabName]) {
+                rowSelections[tabName] = new Set();
+            }
+            return rowSelections[tabName];
+        }
+
+        function stopDragAutoScroll() {
+            dragSelectionState.autoScrollVelocity = 0;
+            if (dragSelectionState.autoScrollFrame) {
+                cancelAnimationFrame(dragSelectionState.autoScrollFrame);
+                dragSelectionState.autoScrollFrame = null;
+            }
+        }
+
+        function setDragAutoScroll(velocity) {
+            dragSelectionState.autoScrollVelocity = velocity;
+            if (dragSelectionState.autoScrollFrame) return;
+
+            const step = () => {
+                if (!dragSelectionState.active || !dragSelectionState.scrollContainer || dragSelectionState.autoScrollVelocity === 0) {
+                    dragSelectionState.autoScrollFrame = null;
+                    return;
+                }
+
+                dragSelectionState.scrollContainer.scrollTop += dragSelectionState.autoScrollVelocity;
+                dragSelectionState.autoScrollFrame = requestAnimationFrame(step);
+            };
+
+            dragSelectionState.autoScrollFrame = requestAnimationFrame(step);
+        }
+
+        function handleDragSelectionMouseMove(event) {
+            try {
+                if (!dragSelectionState.active) return;
+
+                const container = dragSelectionState.scrollContainer;
+                if (container) {
+                    const rect = container.getBoundingClientRect();
+                    const threshold = 50;
+                    let velocity = 0;
+
+                    if (event.clientY < rect.top + threshold) {
+                        velocity = -Math.min(20, (rect.top + threshold) - event.clientY);
+                    } else if (event.clientY > rect.bottom - threshold) {
+                        velocity = Math.min(20, event.clientY - (rect.bottom - threshold));
+                    }
+
+                    if (velocity !== 0) {
+                        setDragAutoScroll(velocity);
+                    } else {
+                        stopDragAutoScroll();
+                    }
+                }
+
+                const hoveredRow = document.elementFromPoint(event.clientX, event.clientY)?.closest('tbody tr[data-row-id]');
+                if (!hoveredRow) return;
+
+                const hoveredTab = hoveredRow.dataset.tab || hoveredRow.closest('table')?.id?.replace('Table', '');
+                if (hoveredTab !== dragSelectionState.tab) return;
+
+                updateDragSelection(hoveredRow, hoveredTab);
+            } catch (error) {
+                console.error('Erreur suivi de sélection glissée:', error);
+            }
+        }
+
+        function beginRowDragSelection(event, row, tabName) {
+            try {
+                if (event.button !== 0) return;
+                if (event.target.closest('input, textarea, select, button')) return;
+
+                event.preventDefault();
+                const selection = getRowSelectionSet(tabName);
+
+                dragSelectionState.active = true;
+                dragSelectionState.tab = tabName;
+                dragSelectionState.anchorRow = row;
+                dragSelectionState.baseSelection = (event.ctrlKey || event.metaKey)
+                    ? new Set(selection)
+                    : new Set();
+                dragSelectionState.didDrag = false;
+                dragSelectionState.scrollContainer = row.closest('.table-container');
+
+                selection.clear();
+                dragSelectionState.baseSelection.forEach(id => selection.add(id));
+                if (row.dataset.rowId) {
+                    selection.add(row.dataset.rowId);
+                }
+                refreshRowSelections(tabName);
+                updateBulkSelectionInfo(tabName);
+                suppressRowClickSelection = true;
+                setTimeout(() => suppressRowClickSelection = false, 0);
+
+                document.addEventListener('mouseup', endRowDragSelection, { once: true });
+                document.addEventListener('mousemove', handleDragSelectionMouseMove);
+            } catch (error) {
+                console.error('Erreur démarrage sélection glissée:', error);
+            }
+        }
+
+        function updateDragSelection(row, tabName) {
+            try {
+                if (!dragSelectionState.active || dragSelectionState.tab !== tabName) return;
+
+                const tbody = row.closest('tbody');
+                if (!tbody) return;
+
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const anchorIndex = rows.indexOf(dragSelectionState.anchorRow);
+                const currentIndex = rows.indexOf(row);
+                if (anchorIndex === -1 || currentIndex === -1) return;
+
+                if (anchorIndex !== currentIndex) {
+                    dragSelectionState.didDrag = true;
+                }
+
+                const selection = getRowSelectionSet(tabName);
+                selection.clear();
+                dragSelectionState.baseSelection.forEach(id => selection.add(id));
+
+                const [start, end] = anchorIndex < currentIndex
+                    ? [anchorIndex, currentIndex]
+                    : [currentIndex, anchorIndex];
+
+                for (let i = start; i <= end; i++) {
+                    const id = rows[i]?.dataset.rowId;
+                    if (id) selection.add(id);
+                }
+
+                refreshRowSelections(tabName);
+                updateBulkSelectionInfo(tabName);
+            } catch (error) {
+                console.error('Erreur mise à jour sélection glissée:', error);
+            }
+        }
+
+        function continueRowDragSelection(event, row, tabName) {
+            if (!dragSelectionState.active || dragSelectionState.tab !== tabName) return;
+            updateDragSelection(row, tabName);
+        }
+
+        function endRowDragSelection() {
+            try {
+                if (!dragSelectionState.active) return;
+
+                if (dragSelectionState.didDrag) {
+                    suppressRowClickSelection = true;
+                    setTimeout(() => suppressRowClickSelection = false, 0);
+                }
+
+                dragSelectionState.active = false;
+                dragSelectionState.tab = null;
+                dragSelectionState.anchorRow = null;
+                dragSelectionState.baseSelection = new Set();
+                dragSelectionState.didDrag = false;
+                dragSelectionState.scrollContainer = null;
+                stopDragAutoScroll();
+                document.removeEventListener('mousemove', handleDragSelectionMouseMove);
+            } catch (error) {
+                console.error('Erreur fin sélection glissée:', error);
+            }
+        }
+
+        function handleRowSelection(event, row, tabName) {
+            try {
+                if (suppressRowClickSelection) return;
+
+                const rowId = row.dataset.rowId;
+                if (!rowId) return;
+
+                const selection = getRowSelectionSet(tabName);
+                const multi = event.ctrlKey || event.metaKey;
+
+                if (!multi) {
+                    selection.clear();
+                }
+
+                if (selection.has(rowId)) {
+                    selection.delete(rowId);
+                } else {
+                    selection.add(rowId);
+                }
+
+                refreshRowSelections(tabName);
+                updateBulkSelectionInfo(tabName);
+            } catch (error) {
+                console.error('Erreur sélection de ligne:', error);
+            }
+        }
+
+        function refreshRowSelections(tabName) {
+            const tbody = document.getElementById(`${tabName}TableBody`);
+            const selection = getRowSelectionSet(tabName);
+            if (!tbody) return;
+
+            tbody.querySelectorAll('tr').forEach(tr => {
+                const isSelected = selection.has(tr.dataset.rowId);
+                tr.classList.toggle('row-selected', isSelected);
+            });
+        }
+
+        function clearRowSelections(tabName) {
+            const selection = getRowSelectionSet(tabName);
+            selection.clear();
+            refreshRowSelections(tabName);
+            updateBulkSelectionInfo(tabName);
+        }
+
         function validateInputInRealTime(input, columnName, tabName) {
             try {
                 const value = input.value;
@@ -5037,14 +6042,48 @@ return;
             try {
                 if (confirm('Êtes-vous sûr de vouloir supprimer cette ligne ?')) {
                     row.remove();
+                    const selection = getRowSelectionSet(tabName);
+                    if (selection.has(row.dataset.rowId)) {
+                        selection.delete(row.dataset.rowId);
+                        refreshRowSelections(tabName);
+                    }
                     updateStats(tabName);
-                    saveAllData();
+                    queueSaveAllData();
                     showNotification('🗑️ Ligne supprimée');
                     logActivity(`Ligne supprimée dans ${getTabDisplayName(tabName)}`, 'warning');
                 }
             } catch (error) {
                 console.error('Erreur suppression ligne:', error);
                 showNotification('❌ Erreur lors de la suppression', 'error');
+            }
+        }
+
+        function deleteSelectedRows(tabName) {
+            try {
+                const selection = getRowSelectionSet(tabName);
+                if (!selection.size) {
+                    showNotification('ℹ️ Aucune ligne sélectionnée', 'info');
+                    return;
+                }
+
+                if (!confirm(`Supprimer les ${selection.size} ligne(s) sélectionnée(s) ?`)) return;
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                selection.forEach(rowId => {
+                    const row = tbody?.querySelector(`tr[data-row-id="${rowId}"]`);
+                    if (row) row.remove();
+                });
+
+                selection.clear();
+                refreshRowSelections(tabName);
+                updateStats(tabName);
+                queueSaveAllData();
+
+                showNotification('🗑️ Sélection supprimée');
+                logActivity(`Sélection supprimée dans ${getTabDisplayName(tabName)}`, 'warning');
+            } catch (error) {
+                console.error('Erreur suppression sélection:', error);
+                showNotification('❌ Erreur lors de la suppression de la sélection', 'error');
             }
         }
 
@@ -5106,7 +6145,7 @@ return;
                 if (recalculated > 0) {
                     showNotification(`🔄 ${recalculated} différence(s) de surface recalculée(s)`);
                     updateStats('modifsurface');
-                    saveAllData();
+                    queueSaveAllData();
                 }
                 
             } catch (error) {
@@ -5227,6 +6266,8 @@ return;
                 if (document.getElementById(`${tabName}PendingList`)) {
                     renderPendingList(tabName);
                 }
+
+                scheduleMonthlyStatsRefresh();
 
             } catch (error) {
                 console.error('Erreur mise à jour statistiques:', error);
@@ -5912,7 +6953,7 @@ return;
                 const refreshedInsights = getRGChangeInsights();
                 updateRGChangeWidget(refreshedInsights);
                 updateStatChips(getTabStatistics().general, refreshedInsights, getQualityCounts());
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification(`✅ UT-BAT ${normalized} retiré des doublons après vérification`);
             } catch (error) {
@@ -6367,8 +7408,8 @@ return;
                 addColumnSuggestion('Nom de RG', nomInput.value);
             }
 
-            saveAllData();
-            updateStats(tabName);
+            queueSaveAllData();
+            queueStatsUpdate(tabName);
             hideRGSuggestionPanel();
 
             return match;
@@ -6766,6 +7807,8 @@ return;
 
                 filterStatsCards(document.getElementById('statsSearch')?.value || '');
 
+                scheduleMonthlyStatsRefresh();
+
             } catch (error) {
                 console.error('Erreur mise à jour dashboard statistiques:', error);
             }
@@ -7082,7 +8125,623 @@ return;
             }
         }
 
-function updateTabsChart() {
+        function getCurrentMonthKey() {
+            const now = new Date();
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function getRowMonthKey(tabName, inputs) {
+            try {
+                const columns = tabConfigs[tabName]?.columns || [];
+                const dateTraitementIndex = columns.indexOf('Date Traitement');
+                const dateDemandeIndex = columns.indexOf('Date Demande');
+                const dateVerificationIndex = columns.indexOf('Date Vérification');
+
+                let rawDate = '';
+
+                if (dateTraitementIndex >= 0 && inputs[dateTraitementIndex]?.value) {
+                    rawDate = inputs[dateTraitementIndex].value;
+                } else if (dateVerificationIndex >= 0 && inputs[dateVerificationIndex]?.value) {
+                    rawDate = inputs[dateVerificationIndex].value;
+                } else if (dateDemandeIndex >= 0 && inputs[dateDemandeIndex]?.value) {
+                    rawDate = inputs[dateDemandeIndex].value;
+                }
+
+                const date = reviveDate(rawDate);
+                if (!date) return null;
+
+                return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            } catch (error) {
+                console.error('Erreur récupération mois de la ligne:', error);
+                return null;
+            }
+        }
+
+        function isRowProcessedForStats(tabName, inputs) {
+            if (['verifbaux', 'pni'].includes(tabName)) {
+                const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
+                const traiteValue = inputs[traiteIndex] ? inputs[traiteIndex].value.toLowerCase() : '';
+                return traiteValue === 'oui';
+            }
+
+            const dateTraitementIndex = tabConfigs[tabName].columns.indexOf('Date Traitement');
+            return dateTraitementIndex >= 0 && inputs[dateTraitementIndex] && !!inputs[dateTraitementIndex].value;
+        }
+
+        function collectMonthlyTabStats(monthKey) {
+            const result = { monthKey, perTab: [], total: 0, processed: 0, pending: 0 };
+
+            if (!monthKey) return result;
+
+            Object.keys(tabConfigs).forEach(tabName => {
+                if (['baserg', 'baseut'].includes(tabName)) return;
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                const rows = tbody.querySelectorAll('tr');
+                let tabTotal = 0;
+                let tabProcessed = 0;
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const hasData = Array.from(inputs).some(input => (input.value || '').trim() !== '');
+                    if (!hasData) return;
+
+                    const rowMonth = getRowMonthKey(tabName, inputs);
+                    if (!rowMonth || rowMonth !== monthKey) return;
+
+                    tabTotal++;
+                    if (isRowProcessedForStats(tabName, inputs)) {
+                        tabProcessed++;
+                    }
+                });
+
+                if (tabTotal > 0) {
+                    const tabPending = Math.max(tabTotal - tabProcessed, 0);
+                    result.perTab.push({
+                        tabName,
+                        total: tabTotal,
+                        processed: tabProcessed,
+                        pending: tabPending,
+                        rate: tabTotal > 0 ? Math.round((tabProcessed / tabTotal) * 100) : 0
+                    });
+
+                    result.total += tabTotal;
+                    result.processed += tabProcessed;
+                }
+            });
+
+            result.pending = Math.max(result.total - result.processed, 0);
+            return result;
+        }
+
+        function renderMonthlyBreakdown(perTabStats = []) {
+            const body = document.getElementById('monthlyBreakdownBody');
+            if (!body) return;
+
+            body.innerHTML = '';
+
+            if (!perTabStats.length) {
+                body.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #666;">Aucune donnée à afficher pour ce mois.</td></tr>';
+                return;
+            }
+
+            perTabStats
+                .slice()
+                .sort((a, b) => b.total - a.total)
+                .forEach(stat => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${getTabIcon(stat.tabName)} ${getTabDisplayName(stat.tabName)}</td>
+                        <td>${stat.processed}</td>
+                        <td>${stat.pending}</td>
+                        <td>${stat.total}</td>
+                        <td>${stat.rate}%</td>
+                    `;
+                    body.appendChild(row);
+                });
+        }
+
+        function renderMonthlyCharts(stats) {
+            try {
+                const statusCtx = document.getElementById('monthlyStatusChart');
+                const tabsCtx = document.getElementById('monthlyTabsChart');
+                const statusEmpty = document.getElementById('monthlyStatusEmpty');
+                const tabsEmpty = document.getElementById('monthlyTabsEmpty');
+
+                const hasStatusData = (stats.processed + stats.pending) > 0;
+                if (chartInstances.monthlyStatusChart) {
+                    chartInstances.monthlyStatusChart.destroy();
+                    chartInstances.monthlyStatusChart = null;
+                }
+
+                if (statusEmpty) statusEmpty.style.display = hasStatusData ? 'none' : 'block';
+
+                if (hasStatusData && statusCtx && window.Chart) {
+                    chartInstances.monthlyStatusChart = new Chart(statusCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Traitées', 'En attente'],
+                            datasets: [{
+                                data: [stats.processed, stats.pending],
+                                backgroundColor: ['#28a745', '#ffc107'],
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom' } }
+                        }
+                    });
+                }
+
+                const processedPerTab = (stats.perTab || []).filter(stat => stat.processed > 0);
+                if (chartInstances.monthlyTabsChart) {
+                    chartInstances.monthlyTabsChart.destroy();
+                    chartInstances.monthlyTabsChart = null;
+                }
+
+                if (tabsEmpty) tabsEmpty.style.display = processedPerTab.length ? 'none' : 'block';
+
+                if (tabsCtx && processedPerTab.length && window.Chart) {
+                    chartInstances.monthlyTabsChart = new Chart(tabsCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: processedPerTab.map(stat => getTabDisplayName(stat.tabName)),
+                            datasets: [{
+                                data: processedPerTab.map(stat => stat.processed),
+                                backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b'],
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'right' } }
+                        }
+                    });
+                }
+
+            } catch (error) {
+                console.error('Erreur graphiques mensuels:', error);
+            }
+        }
+
+        function formatMonthPeriod(monthKey) {
+            if (!monthKey) return 'Période non définie';
+            const [year, month] = monthKey.split('-').map(Number);
+            const date = new Date(year, (month || 1) - 1, 1);
+            return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+        }
+
+        function renderMonthlyMailPreview(stats) {
+            const preview = document.getElementById('monthlyMailPreview');
+            if (!preview) return;
+
+            if (!stats || !stats.total) {
+                preview.textContent = 'Aucune activité détectée pour ce mois. Collez ou importez des données pour générer un récapitulatif.';
+                return;
+            }
+
+            const monthLabel = formatMonthPeriod(stats.monthKey);
+            const rate = stats.total > 0 ? Math.round((stats.processed / stats.total) * 100) : 0;
+            const topTabs = stats.perTab
+                .slice()
+                .sort((a, b) => b.processed - a.processed)
+                .slice(0, 3)
+                .map(stat => `${getTabDisplayName(stat.tabName)} : ${stat.processed} traité(s)`);
+
+            preview.innerHTML = `
+                <strong>Rapport mensuel ${monthLabel}</strong>
+                <ul>
+                    <li>${stats.processed} traité(s) / ${stats.total} entrée(s) (${rate}% de complétion)</li>
+                    <li>${stats.pending} en attente actuellement</li>
+                    <li>Top onglets actifs : ${topTabs.length ? topTabs.join(' • ') : 'aucun traitement ce mois'}</li>
+                </ul>
+                <div style="font-size: 12px; color: #555;">Ce bloc est prêt à être collé dans un e-mail ou un chat.</div>
+            `;
+        }
+
+        function refreshMonthlyStats(forceReset = false) {
+            try {
+                const monthInput = document.getElementById('monthlyMonthPicker');
+                if (!monthInput) return;
+
+                let monthKey = monthInput.value;
+                if (!monthKey || forceReset) {
+                    monthKey = getCurrentMonthKey();
+                    monthInput.value = monthKey;
+                }
+
+                const stats = collectMonthlyTabStats(monthKey);
+                const rate = stats.total > 0 ? Math.round((stats.processed / stats.total) * 100) : 0;
+                const monthLabel = formatMonthPeriod(monthKey);
+
+                const periodLabel = document.getElementById('monthlyPeriodLabel');
+                if (periodLabel) periodLabel.textContent = stats.total ? `(${monthLabel})` : '';
+
+                document.getElementById('monthlyTotal').textContent = stats.total;
+                document.getElementById('monthlyProcessed').textContent = stats.processed;
+                document.getElementById('monthlyPending').textContent = stats.pending;
+                document.getElementById('monthlyRate').textContent = rate + '%';
+
+                const progressFill = document.getElementById('monthlyProgressFill');
+                if (progressFill) progressFill.style.width = `${rate}%`;
+
+                const totalsNote = document.getElementById('monthlyTotalsNote');
+                if (totalsNote) {
+                    totalsNote.textContent = stats.total
+                        ? `${stats.processed} traité(s) sur ${stats.total} pour ${monthLabel}`
+                        : 'Aucune activité sur cette période.';
+                }
+
+                renderMonthlyBreakdown(stats.perTab);
+                renderMonthlyCharts(stats);
+                renderMonthlyMailPreview(stats);
+
+            } catch (error) {
+                console.error('Erreur mise à jour stats mensuelles:', error);
+            }
+        }
+
+        // 🗓️ MISSIONS & CALENDRIER
+        function formatDateKey(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function syncMissionInputs() {
+            const dateInput = document.getElementById('missionFocusDate');
+            const monthInput = document.getElementById('missionMonthPicker');
+            if (dateInput) dateInput.value = formatDateKey(missionFocusDate);
+            if (monthInput) monthInput.value = `${missionFocusDate.getFullYear()}-${String(missionFocusDate.getMonth() + 1).padStart(2, '0')}`;
+
+            ['missionViewDay', 'missionViewWeek', 'missionViewMonth'].forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (!btn) return;
+                btn.classList.toggle('active', btnId.toLowerCase().includes(missionView));
+            });
+        }
+
+        function changeMissionView(view) {
+            missionView = view;
+            syncMissionInputs();
+            renderMissionCalendar();
+        }
+
+        function setMissionFocusFromInput(value) {
+            if (!value) return;
+            const parsed = value.length === 7 ? new Date(`${value}-01`) : new Date(value);
+            if (isNaN(parsed.getTime())) return;
+            missionFocusDate = parsed;
+            syncMissionInputs();
+            renderMissionCalendar();
+        }
+
+        function shiftMissionWindow(delta) {
+            const focus = new Date(missionFocusDate);
+            if (missionView === 'day') {
+                focus.setDate(focus.getDate() + delta);
+            } else if (missionView === 'week') {
+                focus.setDate(focus.getDate() + delta * 7);
+            } else {
+                focus.setMonth(focus.getMonth() + delta);
+            }
+            missionFocusDate = focus;
+            syncMissionInputs();
+            renderMissionCalendar();
+        }
+
+        function resetMissionFocus() {
+            missionFocusDate = new Date();
+            syncMissionInputs();
+            renderMissionCalendar();
+        }
+
+        function addMission(event) {
+            try {
+                event.preventDefault();
+                const titleInput = document.getElementById('missionTitle');
+                const notesInput = document.getElementById('missionNotes');
+                const dateInput = document.getElementById('missionDate');
+                const timeInput = document.getElementById('missionTime');
+                const statusInput = document.getElementById('missionStatus');
+
+                if (!titleInput || !dateInput) return;
+                if (!titleInput.value.trim() || !dateInput.value) {
+                    showNotification('❌ Titre et date sont requis pour enregistrer une mission', 'error');
+                    return;
+                }
+
+                const dateStr = dateInput.value;
+                const timeStr = timeInput?.value || '09:00';
+                const dueAt = new Date(`${dateStr}T${timeStr}`);
+
+                missions.push({
+                    id: generateUniqueId(),
+                    title: titleInput.value.trim(),
+                    notes: notesInput?.value || '',
+                    status: statusInput?.value || 'planned',
+                    dueAt,
+                    createdAt: new Date()
+                });
+
+                titleInput.value = '';
+                if (notesInput) notesInput.value = '';
+                dateInput.value = '';
+                if (timeInput) timeInput.value = '';
+                if (statusInput) statusInput.value = 'planned';
+
+                renderMissionCalendar();
+                renderMissionList();
+                queueSaveAllData();
+                showNotification('✅ Mission ajoutée au calendrier');
+
+            } catch (error) {
+                console.error('Erreur ajout mission:', error);
+                showNotification('❌ Impossible d\'ajouter la mission', 'error');
+            }
+        }
+
+        function toggleMissionStatus(id) {
+            missions = missions.map(mission => mission.id === id
+                ? { ...mission, status: mission.status === 'done' ? 'planned' : 'done' }
+                : mission);
+            renderMissionCalendar();
+            renderMissionList();
+            queueSaveAllData();
+        }
+
+        function deleteMission(id) {
+            missions = missions.filter(mission => mission.id !== id);
+            renderMissionCalendar();
+            renderMissionList();
+            queueSaveAllData();
+            showNotification('🗑️ Mission supprimée');
+        }
+
+        function addNotebookMission(event) {
+            try {
+                event.preventDefault();
+                const titleInput = document.getElementById('notebookTitle');
+                const notesInput = document.getElementById('notebookNotes');
+                const statusInput = document.getElementById('notebookStatus');
+
+                if (!titleInput || !titleInput.value.trim()) {
+                    showNotification('❌ Le cahier nécessite un titre', 'error');
+                    return;
+                }
+
+                missionNotebook.unshift({
+                    id: generateUniqueId(),
+                    title: titleInput.value.trim(),
+                    notes: notesInput?.value || '',
+                    status: statusInput?.value || 'planned',
+                    createdAt: new Date(),
+                    source: 'notebook'
+                });
+
+                titleInput.value = '';
+                if (notesInput) notesInput.value = '';
+            if (statusInput) statusInput.value = 'planned';
+
+            renderMissionNotebook();
+            queueSaveAllData();
+            showNotification('✅ Mission ajoutée au cahier');
+            } catch (error) {
+                console.error('Erreur ajout cahier missions:', error);
+                showNotification('❌ Impossible d\'ajouter au cahier', 'error');
+            }
+        }
+
+        function toggleNotebookStatus(id) {
+            missionNotebook = missionNotebook.map(note => note.id === id
+                ? { ...note, status: note.status === 'done' ? 'planned' : 'done' }
+                : note);
+            renderMissionNotebook();
+            queueSaveAllData();
+        }
+
+        function deleteNotebookMission(id) {
+            missionNotebook = missionNotebook.filter(note => note.id !== id);
+            renderMissionNotebook();
+            queueSaveAllData();
+            showNotification('🗑️ Mission retirée du cahier');
+        }
+
+        function getMissionsByDate(date) {
+            const key = formatDateKey(date);
+            return missions.filter(mission => formatDateKey(mission.dueAt) === key);
+        }
+
+        function renderMissionList() {
+            const container = document.getElementById('missionList');
+            if (!container) return;
+
+            const sorted = missions
+                .slice()
+                .sort((a, b) => a.dueAt - b.dueAt);
+
+            if (sorted.length === 0) {
+                container.innerHTML = '<div style="color:#666;">Aucune mission enregistrée.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            sorted.forEach(mission => {
+                const item = document.createElement('div');
+                item.className = 'mission-list-item';
+
+                item.innerHTML = `
+                    <div style="min-width:0;">
+                        <div style="font-weight:700; color:#2c3e50;">${mission.title}</div>
+                        <div style="font-size:12px; color:#666;">${mission.dueAt.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'short' })} ${mission.dueAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
+                        ${mission.notes ? `<div class="mission-note-snippet" title="${escapeHtml(mission.notes)}">${escapeHtml(mission.notes)}</div>` : ''}
+                    </div>
+                    <div class="mission-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="toggleMissionStatus('${mission.id}')">${mission.status === 'done' ? '↩️ Replanifier' : '✅ Terminer'}</button>
+                        <button class="btn btn-danger btn-compact" onclick="deleteMission('${mission.id}')">🗑️</button>
+                    </div>
+                `;
+
+                container.appendChild(item);
+            });
+        }
+
+        function renderMissionNotebook() {
+            const container = document.getElementById('missionNotebookList');
+            if (!container) return;
+
+            if (missionNotebook.length === 0) {
+                container.innerHTML = '<div style="color:#666;">Aucune mission dans le cahier.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            missionNotebook.forEach(note => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'mission-notebook-item';
+
+                wrapper.innerHTML = `
+                    <div class="mission-notebook-meta">
+                        <div class="mission-notebook-title" title="${escapeHtml(note.title)}">${escapeHtml(note.title)}</div>
+                        ${note.notes ? `<div class="mission-notebook-notes" title="${escapeHtml(note.notes)}">${escapeHtml(note.notes)}</div>` : '<div class="mission-notebook-notes" style="color:#9ca3af;">Pas de note</div>'}
+                        <div style="font-size:11px; color:#6b7280;">${note.status === 'done' ? '✅ Terminé' : note.status === 'in_progress' ? '🚧 En cours' : '🕒 À faire'} · ajouté le ${new Date(note.createdAt).toLocaleDateString('fr-FR')}</div>
+                    </div>
+                    <div class="mission-notebook-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="toggleNotebookStatus('${note.id}')">${note.status === 'done' ? '↩️ Reprendre' : '✅ Terminer'}</button>
+                        <button class="btn btn-danger btn-compact" onclick="deleteNotebookMission('${note.id}')">🗑️</button>
+                    </div>
+                `;
+
+                container.appendChild(wrapper);
+            });
+        }
+
+        function renderDayColumn(date, label) {
+            const dayDiv = document.createElement('div');
+            const isToday = formatDateKey(date) === formatDateKey(new Date());
+            dayDiv.className = `mission-day ${isToday ? 'today' : ''}`;
+
+            const missionsForDay = getMissionsByDate(date);
+            const labelNode = document.createElement('div');
+            labelNode.className = 'day-label';
+            labelNode.innerHTML = `<span>${label}</span><span>${date.getDate()}</span>`;
+            dayDiv.appendChild(labelNode);
+
+            if (missionsForDay.length === 0) {
+                const empty = document.createElement('div');
+                empty.style.color = '#999';
+                empty.style.fontSize = '12px';
+                empty.textContent = 'Aucune mission';
+                dayDiv.appendChild(empty);
+            } else {
+                missionsForDay.sort((a,b) => a.dueAt - b.dueAt).forEach(mission => {
+                    const chip = document.createElement('div');
+                    chip.className = `mission-chip ${mission.status === 'done' ? 'done' : ''}`;
+                    chip.innerHTML = `${mission.status === 'done' ? '✅' : '🕒'} ${mission.dueAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} · ${mission.title}`;
+                    chip.title = mission.notes || '';
+                    chip.onclick = () => toggleMissionStatus(mission.id);
+                    dayDiv.appendChild(chip);
+                });
+            }
+
+            return dayDiv;
+        }
+
+        function renderMissionCalendar() {
+            const container = document.getElementById('missionCalendar');
+            if (!container) return;
+
+            container.className = `mission-calendar ${missionView}-view`;
+            container.innerHTML = '';
+            container.style.gridTemplateColumns = missionView === 'day'
+                ? '1fr'
+                : missionView === 'week'
+                    ? 'repeat(7, minmax(0, 1fr))'
+                    : 'repeat(7, minmax(0, 1fr))';
+
+            if (missions.some(m => !(m.dueAt instanceof Date))) {
+                missions = missions.map(m => ({ ...m, dueAt: reviveDate(m.dueAt) || new Date() }));
+            }
+
+            if (missionView === 'day') {
+                container.appendChild(renderDayColumn(missionFocusDate, missionFocusDate.toLocaleDateString('fr-FR', { weekday: 'long' })));
+            } else if (missionView === 'week') {
+                const start = new Date(missionFocusDate);
+                const day = start.getDay();
+                const diff = (day + 6) % 7; // Lundi = 0
+                start.setDate(start.getDate() - diff);
+                for (let i = 0; i < 7; i++) {
+                    const current = new Date(start);
+                    current.setDate(start.getDate() + i);
+                    container.appendChild(renderDayColumn(current, current.toLocaleDateString('fr-FR', { weekday: 'short' })));
+                }
+            } else {
+                const monthStart = new Date(missionFocusDate.getFullYear(), missionFocusDate.getMonth(), 1);
+                const startDay = (monthStart.getDay() + 6) % 7;
+                const cursor = new Date(monthStart);
+                cursor.setDate(cursor.getDate() - startDay);
+                const totalCells = 42;
+                for (let i = 0; i < totalCells; i++) {
+                    const current = new Date(cursor);
+                    const label = current.toLocaleDateString('fr-FR', { weekday: 'short' });
+                    container.appendChild(renderDayColumn(current, label));
+                    cursor.setDate(cursor.getDate() + 1);
+                }
+            }
+        }
+
+        function scheduleMonthlyStatsRefresh() {
+            cancelIdle(pendingMonthlyUpdate);
+            const runRefresh = () => refreshMonthlyStats();
+            if (window.requestIdleCallback) {
+                pendingMonthlyUpdate = requestIdleCallback(runRefresh, { timeout: 150 });
+            } else {
+                pendingMonthlyUpdate = setTimeout(runRefresh, 25);
+            }
+        }
+
+        function setCurrentMonth() {
+            try {
+                const monthInput = document.getElementById('monthlyMonthPicker');
+                if (!monthInput) return;
+
+                monthInput.value = getCurrentMonthKey();
+                refreshMonthlyStats();
+            } catch (error) {
+                console.error('Erreur sélection mois courant:', error);
+            }
+        }
+
+        function copyMonthlySummary() {
+            try {
+                const preview = document.getElementById('monthlyMailPreview');
+                if (!preview) return;
+
+                const text = (preview.innerText || '').trim();
+                if (!text) {
+                    showNotification('ℹ️ Aucun résumé mensuel à copier', 'info');
+                    return;
+                }
+
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        showNotification('📋 Résumé mensuel copié, prêt à coller dans un mail');
+                    })
+                    .catch(() => {
+                        showNotification('❌ Impossible de copier le résumé', 'error');
+                    });
+
+            } catch (error) {
+                console.error('Erreur copie résumé mensuel:', error);
+            }
+        }
+
+        function updateTabsChart() {
             try {
                 const ctx = document.getElementById('tabsChart');
                 if (!ctx) return;
@@ -7717,10 +9376,10 @@ function updateTabsChart() {
                     createdAt: new Date(),
                     resultCount: searchResults.length
                 };
-                
+
                 savedSearches.push(savedSearch);
                 updateSavedSearchesDisplay();
-                saveAllData();
+                queueSaveAllData();
                 
                 showNotification(`💾 Recherche "${searchName}" sauvegardée`);
                 
@@ -7800,7 +9459,7 @@ function updateTabsChart() {
                 if (confirm('Supprimer cette recherche sauvegardée ?')) {
                     savedSearches = savedSearches.filter(s => s.id !== searchId);
                     updateSavedSearchesDisplay();
-                    saveAllData();
+                    queueSaveAllData();
                     showNotification('🗑️ Recherche sauvegardée supprimée');
                 }
             } catch (error) {
@@ -7886,12 +9545,16 @@ function updateTabsChart() {
                     
                     const label = document.createElement('label');
                     label.textContent = column;
-                    
+
                     const input = document.createElement('input');
                     input.type = getInputType(column);
                     input.placeholder = `Saisir ${column.toLowerCase()}...`;
                     input.id = `taskField_${index}`;
-                    
+                    input.addEventListener('dragover', handleTaskInputDragOver);
+                    input.addEventListener('drop', handleTaskInputDrop);
+                    input.addEventListener('dragleave', handleTaskInputDragLeave);
+                    input.addEventListener('dragexit', handleTaskInputDragLeave);
+
                     fieldDiv.appendChild(label);
                     fieldDiv.appendChild(input);
                     fieldsContainer.appendChild(fieldDiv);
@@ -7910,6 +9573,137 @@ function updateTabsChart() {
             } catch (error) {
                 console.error('Erreur mise à jour champs tâche:', error);
             }
+        }
+
+        function parseTaskExcelCells() {
+            try {
+                const textarea = document.getElementById('taskExcelTextarea');
+                if (!textarea) return;
+
+                const raw = (textarea.value || '').trim();
+                if (!raw) {
+                    taskExcelCells = [];
+                    renderTaskExcelCells();
+                    showNotification('ℹ️ Aucune donnée détectée dans le collage', 'info');
+                    return;
+                }
+
+                const rows = raw.split(/\r?\n/);
+                const cells = [];
+
+                rows.forEach(line => {
+                    line.split('\t').forEach(value => {
+                        const cleaned = value.trim();
+                        if (cleaned) {
+                            cells.push({ id: generateUniqueId(), value: cleaned });
+                        }
+                    });
+                });
+
+                taskExcelCells = cells;
+                renderTaskExcelCells();
+
+                if (cells.length) {
+                    showNotification(`✅ ${cells.length} cellule(s) prêtes au glisser-déposer`);
+                } else {
+                    showNotification('ℹ️ Aucune cellule exploitable trouvée', 'info');
+                }
+            } catch (error) {
+                console.error('Erreur analyse des cellules Excel collées:', error);
+            }
+        }
+
+        function renderTaskExcelCells() {
+            try {
+                const container = document.getElementById('taskExcelCellsContainer');
+                if (!container) return;
+
+                container.innerHTML = '';
+                if (taskExcelCells.length === 0) {
+                    container.classList.add('empty');
+                    container.textContent = 'Collez vos cellules puis lancez la détection pour les faire glisser vers les champs.';
+                    return;
+                }
+
+                container.classList.remove('empty');
+                taskExcelCells.forEach((cell, index) => {
+                    const pill = document.createElement('div');
+                    pill.className = 'excel-cell-pill';
+                    pill.draggable = true;
+                    pill.dataset.cellId = cell.id;
+                    pill.addEventListener('dragstart', handleTaskCellDragStart);
+                    pill.addEventListener('dragend', handleTaskCellDragEnd);
+
+                    const badge = document.createElement('strong');
+                    badge.textContent = `Cellule ${index + 1}`;
+                    pill.appendChild(badge);
+
+                    const value = document.createElement('div');
+                    value.className = 'excel-cell-value';
+                    value.textContent = cell.value;
+                    value.title = cell.value;
+                    pill.appendChild(value);
+
+                    container.appendChild(pill);
+                });
+            } catch (error) {
+                console.error('Erreur affichage cellules collées:', error);
+            }
+        }
+
+        function clearTaskExcelCells() {
+            try {
+                const textarea = document.getElementById('taskExcelTextarea');
+                if (textarea) {
+                    textarea.value = '';
+                }
+                taskExcelCells = [];
+                renderTaskExcelCells();
+            } catch (error) {
+                console.error('Erreur réinitialisation cellules Excel:', error);
+            }
+        }
+
+        function handleTaskCellDragStart(event) {
+            const cellId = event.currentTarget.dataset.cellId;
+            draggedTaskCellId = cellId;
+            event.dataTransfer.effectAllowed = 'copy';
+            event.dataTransfer.setData('text/plain', cellId);
+            event.currentTarget.classList.add('dragging');
+        }
+
+        function handleTaskCellDragEnd(event) {
+            draggedTaskCellId = null;
+            event.currentTarget.classList.remove('dragging');
+        }
+
+        function getDraggedTaskCellValue(event) {
+            const cellId = event.dataTransfer?.getData('text/plain') || draggedTaskCellId;
+            if (!cellId) return null;
+            const match = taskExcelCells.find(cell => cell.id === cellId);
+            return match ? match.value : null;
+        }
+
+        function handleTaskInputDragOver(event) {
+            if (!taskExcelCells.length) return;
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+            event.currentTarget.classList.add('task-drop-target');
+        }
+
+        function handleTaskInputDragLeave(event) {
+            event.currentTarget.classList.remove('task-drop-target');
+        }
+
+        function handleTaskInputDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('task-drop-target');
+            const value = getDraggedTaskCellValue(event);
+            if (value === null || value === undefined) return;
+            const input = event.currentTarget;
+            input.value = value;
+            input.dispatchEvent(new Event('input'));
+            input.focus();
         }
 
         // 📋 Import Excel par copier/coller
@@ -8430,7 +10224,7 @@ function updateTabsChart() {
 
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification(`📥 ${cleanRows.length} tâche(s) ajoutée(s) depuis l'import Excel`);
                 logActivity(`${cleanRows.length} tâche(s) importée(s) pour ${getTabDisplayName(targetTab)}`, 'success');
@@ -8457,21 +10251,40 @@ function updateTabsChart() {
 
                 const columns = tabConfigs[targetTab]?.columns || [];
                 const taskData = [];
+                const taskDataObject = {};
                 const quantity = getTaskQuantity();
 
                 columns.forEach((column, index) => {
                     const input = document.getElementById(`taskField_${index}`);
-                    taskData.push(input ? input.value : '');
+                    const value = input ? input.value : '';
+                    taskData.push(value);
+                    taskDataObject[column] = value;
                 });
 
                 const fragment = document.createDocumentFragment();
                 for (let i = 0; i < quantity; i++) {
+                    const taskId = generateUniqueId();
+                    const timestamp = new Date();
+
                     addRowWithData(targetTab, taskData, {
                         fragment,
                         skipStats: true,
                         skipLog: true,
                         skipFocus: true,
-                        skipValidation: true
+                        skipValidation: true,
+                        rowId: taskId
+                    });
+
+                    completedTasks.push({
+                        id: taskId,
+                        targetTab,
+                        targetTabName: getTabDisplayName(targetTab),
+                        data: { ...taskDataObject },
+                        createdAt: timestamp,
+                        completedAt: timestamp,
+                        priority: 'Normale',
+                        summary: generateTaskSummary(taskDataObject),
+                        status: 'completed'
                     });
                 }
 
@@ -8481,7 +10294,8 @@ function updateTabsChart() {
                 }
 
                 updateStats(targetTab);
-                saveAllData();
+                updateTasksStats();
+                queueSaveAllData();
 
                 clearTaskForm();
 
@@ -8522,7 +10336,7 @@ function updateTabsChart() {
                 }
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 clearTaskForm();
 
@@ -8557,7 +10371,8 @@ function updateTabsChart() {
 
                 updateBatchSelectors();
                 updateTaskBatchDisplay();
-                saveAllData();
+                updateTasksStats();
+                queueSaveAllData();
 
                 if (nameInput) nameInput.value = '';
 
@@ -8575,7 +10390,7 @@ function updateTabsChart() {
             taskDrafts = activeBatch ? activeBatch.tasks : [];
             updateTaskBatchDisplay();
             updateTaskFields();
-            saveAllData();
+            queueSaveAllData();
         }
 
         function updateBatchSelectors() {
@@ -8632,7 +10447,8 @@ function updateTabsChart() {
 
                 updateBatchSelectors();
                 updateTaskBatchDisplay();
-                saveAllData();
+                updateTasksStats();
+                queueSaveAllData();
 
                 showNotification('🗑️ Lot supprimé');
                 logActivity(`Lot supprimé (${batch.name})`, 'warning');
@@ -8676,7 +10492,8 @@ function updateTabsChart() {
                 }
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
-                saveAllData();
+                updateTasksStats();
+                queueSaveAllData();
 
                 clearTaskForm();
 
@@ -8694,9 +10511,148 @@ function updateTabsChart() {
                 document.getElementById('taskTargetTab').value = '';
                 const qtyInput = document.getElementById('taskQuantity');
                 if (qtyInput) qtyInput.value = 1;
+                clearTaskExcelCells();
                 updateTaskFields();
             } catch (error) {
                 console.error('Erreur effacement formulaire tâche:', error);
+            }
+        }
+
+        function openBulkUpdateModal(tabName) {
+            try {
+                bulkEditTab = tabName || activeTabName;
+                const modal = document.getElementById('bulkEditModal');
+                const title = document.getElementById('bulkEditTitle');
+                const columnsSelect = document.getElementById('bulkEditColumns');
+
+                if (!modal || !columnsSelect) return;
+
+                const columns = tabConfigs[bulkEditTab]?.columns || [];
+                columnsSelect.innerHTML = '';
+                columns.forEach(column => {
+                    const option = document.createElement('option');
+                    option.value = column;
+                    option.textContent = column;
+                    columnsSelect.appendChild(option);
+                });
+
+                if (title) {
+                    title.textContent = `✏️ Mise à jour en masse – ${getTabDisplayName(bulkEditTab)}`;
+                }
+
+                resetBulkUpdateArea();
+                updateBulkSelectionInfo(bulkEditTab);
+
+                modal.classList.add('show');
+            } catch (error) {
+                console.error('Erreur ouverture modal mise à jour en masse:', error);
+            }
+        }
+
+        function closeBulkUpdateModal() {
+            const modal = document.getElementById('bulkEditModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function resetBulkUpdateArea() {
+            const paste = document.getElementById('bulkEditPaste');
+            const meta = document.getElementById('bulkEditPasteMeta');
+            if (paste) paste.value = '';
+            if (meta) meta.textContent = '';
+        }
+
+        function parseBulkPaste() {
+            try {
+                const paste = document.getElementById('bulkEditPaste');
+                const raw = (paste?.value || '').trim();
+                if (!raw) return [];
+
+                return raw.split(/\r?\n/)
+                    .map(line => line.split('\t'))
+                    .filter(row => row.some(cell => (cell || '').trim() !== ''));
+            } catch (error) {
+                console.error('Erreur analyse collage en masse:', error);
+                return [];
+            }
+        }
+
+        function updateBulkSelectionInfo(tabName) {
+            const info = document.getElementById('bulkEditSelectionInfo');
+            const helper = document.getElementById('bulkEditHelper');
+            const selection = getRowSelectionSet(tabName || bulkEditTab || activeTabName);
+            const count = selection.size;
+
+            if (info) {
+                info.textContent = count
+                    ? `${count} ligne(s) sélectionnée(s) prête(s) pour la mise à jour`
+                    : 'Aucune ligne sélectionnée pour cet onglet.';
+            }
+
+            if (helper) {
+                helper.textContent = 'Sélectionnez les lignes à modifier (Ctrl/Cmd + clic), choisissez les colonnes concernées puis collez vos valeurs depuis Excel.';
+            }
+
+            refreshRowSelections(tabName || bulkEditTab || activeTabName);
+        }
+
+        function applyBulkUpdate() {
+            try {
+                const tabName = bulkEditTab || activeTabName;
+                const columnsSelect = document.getElementById('bulkEditColumns');
+                const selection = getRowSelectionSet(tabName);
+                const rowsData = parseBulkPaste();
+                const pasteMeta = document.getElementById('bulkEditPasteMeta');
+
+                if (!selection.size) {
+                    showNotification('ℹ️ Sélectionnez au moins une ligne avant d\'appliquer', 'info');
+                    return;
+                }
+
+                const chosenColumns = Array.from(columnsSelect?.selectedOptions || []).map(opt => opt.value);
+                if (!chosenColumns.length) {
+                    showNotification('ℹ️ Choisissez les colonnes à modifier', 'info');
+                    return;
+                }
+
+                if (!rowsData.length) {
+                    showNotification('ℹ️ Collez des données Excel à appliquer', 'info');
+                    return;
+                }
+
+                if (pasteMeta) {
+                    pasteMeta.textContent = `${rowsData.length} ligne(s) détectée(s) · ${rowsData[0]?.length || 0} colonne(s)`;
+                }
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                const maxUpdates = Math.min(selection.size, rowsData.length);
+                const columnIndexes = chosenColumns.map(col => tabConfigs[tabName]?.columns.indexOf(col));
+
+                const selectedRowIds = Array.from(selection).slice(0, maxUpdates);
+                selectedRowIds.forEach((rowId, rowIdx) => {
+                    const row = tbody.querySelector(`tr[data-row-id="${rowId}"]`);
+                    if (!row) return;
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    columnIndexes.forEach((colIndex, idx) => {
+                        if (colIndex < 0) return;
+                        const input = inputs[colIndex];
+                        if (!input) return;
+                        const newValue = rowsData[rowIdx]?.[idx] ?? '';
+                        input.value = newValue;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                    });
+                });
+
+                updateStats(tabName);
+                queueSaveAllData();
+                showNotification(`✏️ Mise à jour en masse appliquée sur ${maxUpdates} ligne(s)`);
+                logActivity(`Mise à jour en masse dans ${getTabDisplayName(tabName)}`, 'success');
+
+                closeBulkUpdateModal();
+            } catch (error) {
+                console.error('Erreur application mise à jour en masse:', error);
+                showNotification('❌ Erreur lors de la mise à jour en masse', 'error');
             }
         }
 
@@ -8709,8 +10665,96 @@ function updateTabsChart() {
                     summary.push(`${field}: ${taskData[field]}`);
                 }
             });
-            
+
             return summary.join(' | ') || 'Tâche sans détails spécifiques';
+        }
+
+        function formatCompletionDate(dateValue) {
+            const dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue || Date.now());
+            const datePart = dateObj.toLocaleDateString('fr-FR');
+            const timePart = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            return `${datePart} · ${timePart}`;
+        }
+
+        function escapeHtml(text = '') {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderCompactSummaryCell(summary, fallback = 'Tâche sans détails spécifiques') {
+            const safeText = escapeHtml(summary || fallback);
+            return `<div class="task-summary-cell" title="${safeText}">${safeText}</div>`;
+        }
+
+        function updateCompletedTasksHistory() {
+            try {
+                const tbody = document.getElementById('completedTasksTableBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+
+                if (completedTasks.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 30px; color: #666;">📭 Aucune tâche terminée pour le moment.</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                const sortedTasks = [...completedTasks].sort((a, b) => {
+                    const aDate = a.completedAt ? new Date(a.completedAt) : new Date(a.createdAt || Date.now());
+                    const bDate = b.completedAt ? new Date(b.completedAt) : new Date(b.createdAt || Date.now());
+                    return bDate - aDate;
+                });
+
+                sortedTasks.forEach((task, index) => {
+                    const completionDate = task.completedAt ? new Date(task.completedAt) : new Date();
+                    const row = document.createElement('tr');
+                    const destination = task.targetTabName || getTabDisplayName(task.targetTab);
+                    const origin = task.sourceBatch ? `Lot : ${task.sourceBatch}` : 'Tâche unique';
+
+                    row.innerHTML = `
+                        <td class="row-number">${index + 1}</td>
+                        <td>${getTabIcon(task.targetTab)} ${destination}</td>
+                        <td>${renderCompactSummaryCell(task.summary)}</td>
+                        <td>${formatCompletionDate(completionDate)}<div style="font-size: 12px; color: #666; margin-top: 4px;">${origin}</div></td>
+                        <td>
+                            <button class="btn btn-danger btn-compact" aria-label="Supprimer cette tâche" title="Supprimer cette tâche" data-task-id="${task.id || ''}">🗑️</button>
+                        </td>
+                    `;
+
+                    const goToTask = () => navigateToTask(task);
+                    row.classList.add('clickable-row');
+                    row.dataset.taskId = task.id || '';
+                    row.dataset.targetTab = task.targetTab || '';
+                    row.tabIndex = 0;
+                    row.setAttribute('role', 'button');
+                    row.addEventListener('click', goToTask);
+                    row.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            goToTask();
+                        }
+                    });
+
+                    const deleteButton = row.querySelector('button[data-task-id]');
+                    if (deleteButton) {
+                        deleteButton.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            deleteCompletedTask(task.id);
+                        });
+                    }
+
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Erreur mise à jour historique tâches:', error);
+            }
         }
 
         function updatePendingTasksDisplay() {
@@ -8739,7 +10783,7 @@ function updateTabsChart() {
                     row.innerHTML = `
                         <td class="row-number">${index + 1}</td>
                         <td>${getTabIcon(task.targetTab)} ${task.targetTabName}</td>
-                        <td style="font-size: 13px;">${task.summary}</td>
+                        <td>${renderCompactSummaryCell(task.summary)}</td>
                         <td>${createdDate}</td>
                         <td><span style="color: #667eea;">${task.priority}</span></td>
                         <td>
@@ -8805,7 +10849,7 @@ function updateTabsChart() {
                     row.innerHTML = `
                         <td class="row-number">${index + 1}</td>
                         <td>${getTabIcon(task.targetTab)} ${task.targetTabName}</td>
-                        <td style="font-size: 13px;">${task.summary}</td>
+                        <td>${renderCompactSummaryCell(task.summary)}</td>
                         <td>${createdDate}</td>
                         <td>
                             <button class="btn btn-success" style="padding: 4px 8px; font-size: 11px; margin-right: 4px;" onclick="createTaskFromBatch('${task.id}')">🚀 Créer</button>
@@ -8832,7 +10876,8 @@ function updateTabsChart() {
                 activeBatch.tasks = activeBatch.tasks.filter(task => task.id !== taskId);
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
-                saveAllData();
+                updateTasksStats();
+                queueSaveAllData();
             } catch (error) {
                 console.error('Erreur suppression tâche du lot:', error);
                 showNotification('❌ Erreur lors de la suppression du lot', 'error');
@@ -8866,7 +10911,7 @@ function updateTabsChart() {
                 activeBatch.tasks = activeBatch.tasks.filter(t => t.id !== taskId);
                 taskDrafts = activeBatch.tasks;
                 updateTaskBatchDisplay();
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification('✏️ Tâche du lot chargée pour modification');
             } catch (error) {
@@ -8889,7 +10934,7 @@ function updateTabsChart() {
                 const columns = tabConfigs[task.targetTab]?.columns || [];
                 const taskDataArray = columns.map(column => task.data[column] || '');
 
-                addRowWithData(task.targetTab, taskDataArray);
+                addRowWithData(task.targetTab, taskDataArray, { rowId: task.id });
                 updateStats(task.targetTab);
 
                 completedTasks.push({
@@ -8904,7 +10949,7 @@ function updateTabsChart() {
 
                 updateTaskBatchDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification(`🚀 Tâche créée depuis le lot vers ${task.targetTabName}`);
                 logActivity(`Tâche du lot exécutée (${task.targetTabName})`, 'success');
@@ -8934,7 +10979,7 @@ function updateTabsChart() {
                 updateTaskBatchDisplay();
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
 
                 showNotification(`✅ ${addedCount} tâche(s) ajoutée(s) en attente`);
                 logActivity(`${addedCount} tâche(s) ajoutée(s) depuis le lot`, 'success');
@@ -8945,18 +10990,53 @@ function updateTabsChart() {
             }
         }
 
+        function navigateToTask(task) {
+            try {
+                if (!task || !task.targetTab) return;
+
+                const previousTab = activeTabName;
+                switchTab(task.targetTab);
+
+                const tabChanged = previousTab !== task.targetTab;
+
+                const focusRow = () => {
+                    const tableBody = document.getElementById(`${task.targetTab}TableBody`);
+                    if (!tableBody) return;
+
+                    const targetRow = tableBody.querySelector(`tr[data-task-id="${task.id}"]`) || tableBody.querySelector('tr:last-child');
+                    if (!targetRow) return;
+
+                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targetRow.classList.add('highlight-task');
+                    setTimeout(() => targetRow.classList.remove('highlight-task'), 1400);
+                };
+
+                if (tabChanged) {
+                    setTimeout(focusRow, 120);
+                } else {
+                    focusRow();
+                }
+            } catch (error) {
+                console.error('Erreur navigation vers la tâche:', error);
+            }
+        }
+
         function updateTasksStats() {
             try {
                 const pendingCount = pendingTasks.length;
                 const completedCount = completedTasks.length;
-                const totalCount = pendingCount + completedCount;
+                const lotTasksCount = taskBatches.reduce((sum, batch) => sum + (batch.tasks?.length || 0), 0);
+                const totalCount = pendingCount + completedCount + lotTasksCount;
                 const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-                
+
                 document.getElementById('pendingTasksCount').textContent = pendingCount;
                 document.getElementById('completedTasksCount').textContent = completedCount;
+                document.getElementById('lotTasksCount').textContent = lotTasksCount;
                 document.getElementById('totalTasksCount').textContent = totalCount;
                 document.getElementById('tasksProgress').style.width = completionRate + '%';
-                
+
+                updateCompletedTasksHistory();
+
             } catch (error) {
                 console.error('Erreur mise à jour stats tâches:', error);
             }
@@ -8970,8 +11050,8 @@ function updateTabsChart() {
                 const columns = tabConfigs[task.targetTab]?.columns || [];
                 const taskDataArray = columns.map(column => task.data[column] || '');
                 
-                addRowWithData(task.targetTab, taskDataArray);
-                
+                addRowWithData(task.targetTab, taskDataArray, { rowId: task.id });
+
                 // Déplacer vers les tâches complétées
                 completedTasks.push({
                     ...task,
@@ -8980,11 +11060,11 @@ function updateTabsChart() {
                 });
                 
                 pendingTasks = pendingTasks.filter(t => t.id !== taskId);
-                
+
                 updateStats(task.targetTab);
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
                 
                 showNotification(`✅ Tâche exécutée vers ${task.targetTabName}`);
                 logActivity(`Tâche exécutée vers ${task.targetTabName}`, 'success');
@@ -9034,13 +11114,35 @@ function updateTabsChart() {
                     pendingTasks = pendingTasks.filter(t => t.id !== taskId);
                     updatePendingTasksDisplay();
                     updateTasksStats();
-                    saveAllData();
+                    queueSaveAllData();
                     showNotification('🗑️ Tâche supprimée');
                     logActivity('Tâche supprimée', 'warning');
                 }
             } catch (error) {
                 console.error('Erreur suppression tâche:', error);
                 showNotification('❌ Erreur lors de la suppression de tâche', 'error');
+            }
+        }
+
+        function deleteCompletedTask(taskId) {
+            try {
+                const task = completedTasks.find(t => t.id === taskId);
+                if (!task) return;
+
+                if (!confirm('Supprimer cette tâche de l\'historique ?')) {
+                    return;
+                }
+
+                completedTasks = completedTasks.filter(t => t.id !== taskId);
+                updateTasksStats();
+                queueSaveAllData();
+
+                const destination = task.targetTabName || getTabDisplayName(task.targetTab);
+                showNotification(`🗑️ Tâche retirée de l'historique (${destination})`);
+                logActivity(`Tâche supprimée de l'historique (${destination})`, 'warning');
+            } catch (error) {
+                console.error('Erreur suppression tâche terminée:', error);
+                showNotification('❌ Erreur lors de la suppression de l\'historique', 'error');
             }
         }
 
@@ -9062,7 +11164,7 @@ function updateTabsChart() {
                     const columns = tabConfigs[task.targetTab]?.columns || [];
                     const taskDataArray = columns.map(column => task.data[column] || '');
                     
-                    addRowWithData(task.targetTab, taskDataArray);
+                    addRowWithData(task.targetTab, taskDataArray, { rowId: task.id });
                     updateStats(task.targetTab);
                     
                     completedTasks.push({
@@ -9077,7 +11179,7 @@ function updateTabsChart() {
                 pendingTasks = [];
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
                 
                 showNotification(`🚀 ${executed} tâche(s) exécutée(s) avec succès`);
                 logActivity(`${executed} tâches exécutées en lot`, 'success');
@@ -9103,7 +11205,7 @@ function updateTabsChart() {
                 pendingTasks = [];
                 updatePendingTasksDisplay();
                 updateTasksStats();
-                saveAllData();
+                queueSaveAllData();
                 
                 showNotification(`🗑️ ${count} tâche(s) supprimée(s)`);
                 logActivity(`${count} tâches supprimées`, 'warning');
@@ -9214,7 +11316,7 @@ function updateTabsChart() {
 
                 addRowWithData('pni', mappedData, { skipLog: true });
                 updateStats('pni');
-                saveAllData();
+                queueSaveAllData();
                 showNotification('📋 Ligne copiée vers PNI');
             } catch (error) {
                 console.error('Erreur lors de la copie vers PNI:', error);
@@ -9282,10 +11384,10 @@ function updateTabsChart() {
                         marked++;
                     }
                 });
-                
+
                 if (marked > 0) {
                     updateStats('verifbaux');
-                    saveAllData();
+                    queueSaveAllData();
                     showNotification(`✅ ${marked} ligne(s) marquée(s) comme OK`);
                 } else {
                     showNotification('ℹ️ Aucune ligne vide à marquer', 'info');
@@ -9626,6 +11728,83 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        function exportMonthlyReport() {
+            try {
+                refreshMonthlyStats();
+
+                const monthValue = document.getElementById('monthlyMonthPicker')?.value || getCurrentMonthKey();
+                const monthLabel = formatMonthPeriod(monthValue);
+                const container = document.getElementById('statsmensuelles');
+
+                if (!container) {
+                    showNotification('❌ Onglet stats mensuelles introuvable', 'error');
+                    return;
+                }
+
+                const clone = container.cloneNode(true);
+                const originalCanvases = container.querySelectorAll('canvas');
+                const clonedCanvases = clone.querySelectorAll('canvas');
+
+                originalCanvases.forEach((canvas, index) => {
+                    const clonedCanvas = clonedCanvases[index];
+                    if (!clonedCanvas) return;
+
+                    try {
+                        const img = document.createElement('img');
+                        img.src = canvas.toDataURL('image/png');
+                        img.alt = canvas.getAttribute('aria-label') || 'Graphique mensuel';
+                        img.style.width = '100%';
+                        img.style.maxWidth = '100%';
+                        img.style.display = 'block';
+                        img.style.margin = '10px auto';
+                        clonedCanvas.replaceWith(img);
+                    } catch (e) {
+                        console.error('Conversion du graphique mensuel échouée', e);
+                    }
+                });
+
+                const styleBlocks = Array.from(document.querySelectorAll('style'))
+                    .map(style => style.innerHTML)
+                    .join('\n');
+
+                const exportHtml = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport mensuel MARTINE</title>
+    <style>${styleBlocks}</style>
+</head>
+<body style="background: white;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+        <h1 style="margin-bottom: 8px; color: #2c3e50;">Rapport mensuel MARTINE</h1>
+        <div style="margin-bottom: 14px; color: #555; font-size: 14px;">Période : ${monthLabel} • Généré le ${new Date().toLocaleString('fr-FR')}</div>
+        <div style="margin-bottom: 12px; color: #666; font-size: 13px;">Rapport prêt à être transmis par e-mail (peut être collé directement dans un message).</div>
+        ${clone.innerHTML}
+    </div>
+</body>
+</html>`;
+
+                const blob = new Blob([exportHtml], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const safeMonth = monthValue || 'periode';
+                const fileName = `MARTINE_Stats_Mensuelles_${safeMonth}.html`;
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                showNotification(`📧 Rapport mensuel exporté (${fileName})`);
+                logActivity('Export HTML des stats mensuelles', 'success');
+
+            } catch (error) {
+                console.error('Erreur export rapport mensuel:', error);
+                showNotification('❌ Erreur lors de l\'export mensuel', 'error');
+            }
+        }
+
         // 💾 SAUVEGARDE ET RESTAURATION COMPLÈTE
         function scheduleIdleTask(callback) {
             if (window.requestIdleCallback) {
@@ -9647,7 +11826,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeBatchId: activeBatchId,
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
+                    missions: missions,
+                    missionNotebook: missionNotebook,
                     activityLog: activityLog,
+                    autoExpandTextEnabled: autoExpandTextEnabled,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -9725,7 +11907,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeBatchId: activeBatchId,
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
+                    missions: missions,
+                    missionNotebook: missionNotebook,
                     activityLog: activityLog,
+                    autoExpandTextEnabled: autoExpandTextEnabled,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -9855,6 +12040,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             rgDatabase = data.rgDatabase || {};
             dismissedRGChanges = new Set(data.dismissedRGChanges || []);
+            autoExpandTextEnabled = Boolean(data.autoExpandTextEnabled);
+            updateExpandTextButton();
             refreshRGSuggestions();
 
             pendingTasks = (data.pendingTasks || []).map(task => ({
@@ -9903,6 +12090,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 createdAt: reviveDate(search.createdAt) || new Date()
             }));
 
+            missions = (data.missions || []).map(mission => ({
+                ...mission,
+                dueAt: reviveDate(mission.dueAt) || new Date(),
+                createdAt: reviveDate(mission.createdAt) || new Date(),
+                status: mission.status || 'planned'
+            }));
+
+            missionNotebook = (data.missionNotebook || []).map(note => ({
+                ...note,
+                createdAt: reviveDate(note.createdAt) || new Date(),
+                status: note.status || 'planned'
+            }));
+
             activityLog = (data.activityLog || []).map(entry => ({
                 ...entry,
                 timestamp: reviveDate(entry.timestamp) || new Date()
@@ -9942,8 +12142,14 @@ document.addEventListener('DOMContentLoaded', () => {
             updateTasksStats();
             updateSavedSearchesDisplay();
             updateRecentActivity();
+            renderMissionList();
+            renderMissionNotebook();
+            renderMissionCalendar();
             rebuildColumnSuggestions();
-            saveAllData();
+            if (autoExpandTextEnabled) {
+                scheduleIdleTask(() => expandAllTextFields({ prioritizeTab: 'verifbaux', silent: true, useCache: true }));
+            }
+            queueSaveAllData();
         }
 
         function reviveDate(value) {
@@ -9958,18 +12164,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (confirm && !window.confirm(`Êtes-vous sûr de vouloir effacer toutes les données de l'onglet ${getTabDisplayName(tabName)} ?`)) {
                     return;
                 }
-                
+
                 const tbody = document.getElementById(`${tabName}TableBody`);
                 if (tbody) {
                     tbody.innerHTML = '';
                     rowCounters[tabName] = 0;
+                    clearRowSelections(tabName);
                     updateStats(tabName);
-                    saveAllData();
-                    
-                    if (confirm) {
-                        showNotification(`🗑️ Toutes les données de ${getTabDisplayName(tabName)} ont été effacées`);
-                        logActivity(`Données effacées dans ${getTabDisplayName(tabName)}`, 'warning');
-                    }
+                    queueSaveAllData();
+                }
+
+                if (confirm) {
+                    showNotification(`🗑️ Toutes les données de ${getTabDisplayName(tabName)} ont été effacées`);
+                    logActivity(`Données effacées dans ${getTabDisplayName(tabName)}`, 'warning');
                 }
             } catch (error) {
                 console.error('Erreur effacement:', error);
@@ -9980,17 +12187,24 @@ document.addEventListener('DOMContentLoaded', () => {
         // 🔧 INITIALISATION COMPLÈTE
         function initializeApp() {
             try {
+                updateExpandTextButton();
                 loadAllData();
                 refreshRGSuggestions();
+                renderTaskExcelCells();
 
-                autoSaveInterval = setInterval(saveAllData, 60000); // Toutes les minutes
+                autoSaveInterval = setInterval(flushQueuedSaveAllData, 60000); // Toutes les minutes
 
                 window.addEventListener('beforeunload', () => {
-                    saveAllData();
+                    flushQueuedSaveAllData();
                 });
 
                 setupFileDropZones();
                 updateStatsDashboard();
+                setCurrentMonth();
+                refreshMonthlyStats();
+                resetMissionFocus();
+                renderMissionList();
+                renderMissionCalendar();
 
                 showNotification('🚀 MARTINE - Tous onglets fonctionnels', 'success');
                 showSaveStatus('💾 Application prête - Auto-sauvegarde activée');
@@ -10062,9 +12276,12 @@ document.addEventListener('DOMContentLoaded', () => {
         window.switchTab = switchTab;
         window.addRow = addRow;
         window.deleteRow = deleteRow;
+        window.deleteSelectedRows = deleteSelectedRows;
         window.exportToExcel = exportToExcel;
         window.exportAllToExcel = exportAllToExcel;
         window.exportStatsReport = exportStatsReport;
+        window.exportMonthlyReport = exportMonthlyReport;
+        window.toggleExpandAllText = toggleExpandAllText;
         window.clearAll = clearAll;
         window.triggerFileInput = triggerFileInput;
         window.handleFileImport = handleFileImport;
@@ -10087,6 +12304,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.exportSearchResults = exportSearchResults;
         window.goToResult = goToResult;
         window.updateTaskFields = updateTaskFields;
+        window.refreshMonthlyStats = refreshMonthlyStats;
+        window.copyMonthlySummary = copyMonthlySummary;
+        window.setCurrentMonth = setCurrentMonth;
+        window.parseTaskExcelCells = parseTaskExcelCells;
+        window.clearTaskExcelCells = clearTaskExcelCells;
         window.transferTask = transferTask;
         window.saveTaskAsPending = saveTaskAsPending;
         window.createTaskBatch = createTaskBatch;
@@ -10109,6 +12331,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.buildRGDatabase = buildRGDatabase;
         window.buildUTDatabase = buildUTDatabase;
         window.recalculateAllSurfaces = recalculateAllSurfaces;
+        window.addMission = addMission;
+        window.changeMissionView = changeMissionView;
+        window.setMissionFocusFromInput = setMissionFocusFromInput;
+        window.shiftMissionWindow = shiftMissionWindow;
+        window.resetMissionFocus = resetMissionFocus;
         window.exportCompleteBackup = exportCompleteBackup;
         window.importCompleteBackup = importCompleteBackup;
         window.handleBackupImport = handleBackupImport;
@@ -10117,6 +12344,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.focusRGChange = focusRGChange;
         window.exportRGChange = exportRGChange;
         window.exportRGChanges = exportRGChanges;
+        window.openBulkUpdateModal = openBulkUpdateModal;
+        window.closeBulkUpdateModal = closeBulkUpdateModal;
+        window.applyBulkUpdate = applyBulkUpdate;
     </script>
 </body>
 </html>
