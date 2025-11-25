@@ -5488,7 +5488,9 @@ return;
         }
 
         function expandAllTextFields(options = {}) {
-            const { silent = false, prioritizeTab = 'verifbaux', useCache = false } = options;
+            const { silent = true, prioritizeTab = 'verifbaux', useCache = true } = options;
+
+            if (normalizeInProgress) return;
             try {
                 const allTextAreas = Array.from(document.querySelectorAll('textarea.editable-textarea'));
                 if (!allTextAreas.length) return;
@@ -5519,12 +5521,7 @@ return;
                 pushAreas(allTextAreas);
 
                 const total = orderedTextAreas.length;
-                const showLoader = total > 120 && !silent;
                 let processed = 0;
-
-                if (showLoader) {
-                    showProcessingOverlay('Ajustement des champs texte...', 'Préparation des champs...');
-                }
 
                 const schedule = window.requestIdleCallback
                     ? (cb) => requestIdleCallback(cb, { timeout: 120 })
@@ -5532,24 +5529,16 @@ return;
 
                 const processChunk = () => {
                     const start = performance.now();
-                    const budget = showLoader ? 12 : 7;
+                    const budget = 7;
 
                     while (processed < total && performance.now() - start < budget) {
                         autoResizeField(orderedTextAreas[processed], { useCache });
                         processed++;
                     }
 
-                    if (showLoader) {
-                        const percent = Math.round((processed / total) * 100);
-                        updateProcessingProgress(`Ajustement des champs ${processed}/${total}`, percent);
-                    }
-
                     if (processed < total) {
                         schedule(processChunk);
                     } else {
-                        if (showLoader) {
-                            hideProcessingOverlay();
-                        }
                         if (!silent) {
                             showNotification(`🪄 ${total} champ(s) texte ajusté(s)`);
                         }
@@ -5584,8 +5573,8 @@ return;
                 let modified = 0;
                 const startTime = performance.now();
                 const turboMode = total > 2000;
-                const chunkSize = turboMode ? 4000 : 800;
-                const resizeStride = turboMode ? 8 : 2;
+                const chunkSize = turboMode ? 12000 : 2000;
+                const resizeStride = turboMode ? 24 : 6;
                 let lastUpdate = startTime;
                 const etaSamples = [];
 
@@ -5647,6 +5636,7 @@ return;
                         showNotification(`✅ Texte régulé sur ${modified}/${total} champ(s)`);
                         queueSaveAllData();
                         normalizeInProgress = false;
+                        expandAllTextFields({ prioritizeTab: 'verifbaux', silent: true, useCache: true });
                     }
                 };
 
