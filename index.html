@@ -2127,7 +2127,7 @@
             <button class="btn btn-primary" onclick="exportCompleteBackup()">📤 Télécharger Sauvegarde</button>
             <button class="btn btn-primary" onclick="importCompleteBackup()">📥 Importer Sauvegarde</button>
             <input type="file" id="backupFileInput" accept="application/json" style="display: none;" onchange="handleBackupImport()">
-            <button class="btn btn-success" id="normalizeTextButton" onclick="normalizeAllTextContent()">⚡ Réguler tout le texte</button>
+            <button class="btn btn-success" id="adjustTextAreasButton" onclick="adjustAllTextAreas()">↕️ Ajuster toutes les zones de texte</button>
         </div>
     </div>
 
@@ -5472,13 +5472,31 @@ return;
             }
         }
 
-        function expandAllTextFields(options = {}) {
-            const { silent = true, prioritizeTab = 'verifbaux', useCache = true } = options;
+        let adjustInProgress = false;
 
-            if (normalizeInProgress) return;
+        function adjustAllTextAreas(options = {}) {
+            if (adjustInProgress) return;
+
+            const { prioritizeTab = 'verifbaux', useCache = true } = options;
+            const button = document.getElementById('adjustTextAreasButton');
+            button?.setAttribute('disabled', 'disabled');
+
+            const finalize = ({ success, message }) => {
+                hideProcessingOverlay();
+                adjustInProgress = false;
+                button?.removeAttribute('disabled');
+
+                if (message) {
+                    showNotification(message, success ? 'success' : 'error');
+                }
+            };
+
             try {
                 const allTextAreas = Array.from(document.querySelectorAll('textarea.editable-textarea'));
-                if (!allTextAreas.length) return;
+                if (!allTextAreas.length) {
+                    finalize({ success: false, message: 'ℹ️ Aucun champ texte à ajuster' });
+                    return;
+                }
 
                 const orderedTextAreas = [];
                 const seen = new Set();
@@ -5507,204 +5525,38 @@ return;
 
                 const total = orderedTextAreas.length;
                 let processed = 0;
-
-                const schedule = window.requestIdleCallback
-                    ? (cb) => requestIdleCallback(cb, { timeout: 120 })
-                    : (cb) => setTimeout(cb, 0);
-
-                const processChunk = () => {
-                    const start = performance.now();
-                    const budget = 7;
-
-                    while (processed < total && performance.now() - start < budget) {
-                        autoResizeField(orderedTextAreas[processed], { useCache });
-                        processed++;
-                    }
-
-                    if (processed < total) {
-                        schedule(processChunk);
-                    } else {
-                        if (!silent) {
-                            showNotification(`🪄 ${total} champ(s) texte ajusté(s)`);
-                        }
-                    }
-                };
-
-                requestAnimationFrame(processChunk);
-            } catch (error) {
-                console.error('Erreur ajustement champs texte:', error);
-            }
-        }
-
-        function normalizeTextValue(value = '') {
-            if (value === null || value === undefined) return '';
-
-            const unified = value
-                .toString()
-                .replace(/\u00A0/g, ' ')
-                .replace(/[“”«»]/g, '"')
-                .replace(/[‘’]/g, "'")
-                .replace(/\s*([:;,!?])\s*/g, '$1 ');
-
-            const lines = unified
-                .split(/\r?\n/)
-                .map(line => line.replace(/\s{2,}/g, ' ').trim());
-
-            return lines.join('\n').trim();
-        }
-
-        let normalizeInProgress = false;
-
-        function normalizeAllTextContent() {
-            if (normalizeInProgress) return;
-
-            const button = document.getElementById('normalizeTextButton');
-            button?.setAttribute('disabled', 'disabled');
-
-            const finalize = ({ success, message }) => {
-                hideProcessingOverlay();
-                normalizeInProgress = false;
-                button?.removeAttribute('disabled');
-
-                if (success) {
-                    showNotification(message || '✅ Texte régulé');
-                } else {
-                    showNotification(message || '❌ Impossible de réguler les textes', 'error');
-                }
-            };
-
-            const getAllEditableFields = () => {
-                const selector = [
-                    'textarea',
-                    'input[type="text"]',
-                    'input[type="search"]',
-                    'input[type="email"]',
-                    'input[type="tel"]',
-                    'input[type="url"]',
-                    'input[type="number"]',
-                    'input[type="date"]',
-                    'input[type="time"]',
-                    'input[type="datetime-local"]',
-                    'input:not([type])',
-                    '[contenteditable="true"]'
-                ].join(',');
-
-                const raw = Array.from(document.querySelectorAll(selector));
-                return raw.filter(el => {
-                    if (!el) return false;
-                    const tag = el.tagName;
-                    if (tag === 'INPUT') {
-                        const type = (el.getAttribute('type') || 'text').toLowerCase();
-                        const blocked = ['button', 'submit', 'reset', 'checkbox', 'radio', 'range', 'color', 'file', 'hidden'];
-                        if (blocked.includes(type)) return false;
-                    }
-                    return true;
-                });
-            };
-
-            try {
-                const fields = getAllEditableFields();
-
-                if (!fields.length) {
-                    finalize({ success: false, message: 'ℹ️ Aucun champ texte à réguler' });
-                    return;
-                }
-
-                normalizeInProgress = true;
-
-                const total = fields.length;
-                let processed = 0;
-                let modified = 0;
+                let lastUpdate = performance.now();
                 const startTime = performance.now();
-                const turboMode = total > 5000;
-                const chunkSize = turboMode ? 8000 : 2000;
-                const resizeStride = turboMode ? 24 : 6;
-                let lastUpdate = startTime;
-                const etaSamples = [];
-                const changedFieldsLog = [];
 
-                showProcessingOverlay(
-                    'Régulation globale des textes...',
-                    `Régulation des champs 0/${total}`
-                );
+                adjustInProgress = true;
+                showProcessingOverlay('Ajustement des zones de texte...', `Ajustement des champs 0/${total}`);
 
                 const schedule = window.requestIdleCallback
-                    ? (cb) => requestIdleCallback(cb, { timeout: turboMode ? 30 : 80 })
+                    ? (cb) => requestIdleCallback(cb, { timeout: 80 })
                     : (cb) => setTimeout(cb, 0);
-
-                const identifyField = (field) => {
-                    const tab = field.closest?.('.tab-content');
-                    const row = field.closest?.('tr');
-                    const column = field.closest?.('td');
-                    return {
-                        tab: tab?.id || 'global',
-                        rowId: row?.getAttribute?.('data-row-id') || row?.getAttribute?.('data-row') || '',
-                        column: column?.getAttribute?.('data-column') || field.name || field.placeholder || 'champ'
-                    };
-                };
-
-                const setFieldValue = (field, normalized) => {
-                    if (!field) return;
-                    if (field.hasAttribute('contenteditable')) {
-                        if (field.textContent !== normalized) {
-                            field.textContent = normalized;
-                            return true;
-                        }
-                        return false;
-                    }
-
-                    const current = (field.value || '').toString();
-                    if (current !== normalized) {
-                        field.value = normalized;
-                        return true;
-                    }
-                    return false;
-                };
 
                 const processChunk = () => {
                     try {
-                        let count = 0;
+                        const chunkBudget = 12;
+                        const chunkStart = performance.now();
 
-                        while (processed < total && count < chunkSize) {
-                            const field = fields[processed];
-                            const rawValue = field?.hasAttribute?.('contenteditable')
-                                ? field.textContent || ''
-                                : (field?.value || '').toString();
-                            const normalized = normalizeTextValue(rawValue);
-
-                            if (setFieldValue(field, normalized)) {
-                                modified++;
-                                changedFieldsLog.push(identifyField(field));
-                            }
-
-                            if (field?.tagName === 'TEXTAREA' && (processed % resizeStride === 0)) {
-                                autoResizeField(field, { useCache: true });
-                            }
-
+                        while (processed < total && performance.now() - chunkStart < chunkBudget) {
+                            autoResizeField(orderedTextAreas[processed], { useCache });
                             processed++;
-                            count++;
                         }
 
                         const now = performance.now();
                         const shouldUpdate = (now - lastUpdate > 80) || processed === total;
                         if (shouldUpdate) {
+                            const progress = Math.round((processed / total) * 100);
                             const elapsed = now - startTime;
                             const remaining = total - processed;
                             const throughput = processed > 0 ? processed / elapsed : 0;
-                            const eta = throughput > 0 ? (remaining / throughput) : null;
-                            if (isFinite(eta)) {
-                                etaSamples.push(eta);
-                                if (etaSamples.length > 8) etaSamples.shift();
-                            }
-                            const smoothEta = etaSamples.length
-                                ? etaSamples.reduce((a, b) => a + b, 0) / etaSamples.length
-                                : null;
-
-                            const progress = Math.round((processed / total) * 100);
+                            const etaMs = throughput > 0 ? (remaining / throughput) : null;
                             updateProcessingProgress(
-                                `Régulation des champs ${processed}/${total}`,
+                                `Ajustement des champs ${processed}/${total}`,
                                 progress,
-                                smoothEta ? smoothEta * 1000 : null
+                                etaMs
                             );
                             lastUpdate = now;
                         }
@@ -5712,29 +5564,19 @@ return;
                         if (processed < total) {
                             schedule(processChunk);
                         } else {
-                            updateProcessingProgress(`Régulation des champs ${total}/${total}`, 100, 0);
-                            expandAllTextFields({ prioritizeTab: 'verifbaux', silent: true, useCache: true });
-                            flushQueuedSaveAllData();
-
-                            if (changedFieldsLog.length) {
-                                console.table?.(changedFieldsLog.slice(0, 100));
-                            }
-
-                            finalize({
-                                success: true,
-                                message: `✅ Texte régulé sur ${modified}/${total} champ(s)`
-                            });
+                            updateProcessingProgress(`Ajustement des champs ${total}/${total}` , 100, 0);
+                            finalize({ success: true, message: `✅ Zones de texte ajustées (${total})` });
                         }
                     } catch (chunkError) {
-                        console.error('Erreur lors de la régulation des textes:', chunkError);
-                        finalize({ success: false, message: '❌ Impossible de réguler les textes' });
+                        console.error('Erreur lors de l\'ajustement des textes:', chunkError);
+                        finalize({ success: false, message: '❌ Impossible d\'ajuster les zones de texte' });
                     }
                 };
 
                 requestAnimationFrame(processChunk);
             } catch (error) {
-                console.error('Erreur lors de la régulation des textes:', error);
-                finalize({ success: false, message: '❌ Impossible de réguler les textes' });
+                console.error('Erreur ajustement champs texte:', error);
+                finalize({ success: false, message: '❌ Impossible d\'ajuster les zones de texte' });
             }
         }
 
@@ -12446,7 +12288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.exportAllToExcel = exportAllToExcel;
         window.exportStatsReport = exportStatsReport;
         window.exportMonthlyReport = exportMonthlyReport;
-        window.normalizeAllTextContent = normalizeAllTextContent;
+        window.adjustAllTextAreas = adjustAllTextAreas;
         window.clearAll = clearAll;
         window.triggerFileInput = triggerFileInput;
         window.handleFileImport = handleFileImport;
