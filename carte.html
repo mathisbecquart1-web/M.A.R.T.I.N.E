@@ -369,6 +369,31 @@
         return match ? Number(match[0].replace(',', '.')) : NaN;
     }
 
+    function extractNumbers(value) {
+        if (typeof value === 'number') return [value];
+        if (typeof value !== 'string') return [];
+        return value.replace(/[,;]/g, ' ')
+            .split(/\s+/)
+            .map(parseNumber)
+            .filter(v => !Number.isNaN(v));
+    }
+
+    function bestLatLon(numbers) {
+        let best = null;
+        const consider = (lat, lon, score) => {
+            if (isValidLatLon(lat, lon) && (!best || score > best.score)) {
+                best = { lat, lon, score };
+            }
+        };
+        for (let i = 0; i < numbers.length - 1; i++) {
+            const a = numbers[i];
+            const b = numbers[i + 1];
+            consider(a, b, 3);
+            consider(b, a, 2); // cas inversé
+        }
+        return best ? { lat: best.lat, lon: best.lon } : null;
+    }
+
     function detectCoords(obj) {
         const keys = Object.keys(obj || {});
         const coordNames = [
@@ -388,21 +413,14 @@
         }
 
         for (const key of keys) {
-            const value = obj[key];
-            if (typeof value === 'string' && value.match(/\d/)) {
-                const parts = value.replace(/[,;]/g, ' ').split(/\s+/).filter(Boolean).map(v => parseNumber(v));
-                if (parts.length >= 2) {
-                    for (let i = 0; i < parts.length - 1; i++) {
-                        if (isValidLatLon(parts[i], parts[i+1])) return { lat: parts[i], lon: parts[i+1], hint: key };
-                    }
-                }
-            }
+            const nums = extractNumbers(obj[key]);
+            const pair = bestLatLon(nums);
+            if (pair) return { ...pair, hint: key };
         }
 
         const values = keys.map(k => parseNumber(obj[k])).filter(v => !Number.isNaN(v));
-        for (let i = 0; i < values.length - 1; i++) {
-            if (isValidLatLon(values[i], values[i+1])) return { lat: values[i], lon: values[i+1], hint: 'pair auto' };
-        }
+        const fallback = bestLatLon(values);
+        if (fallback) return { ...fallback, hint: 'pair auto' };
         return null;
     }
 
@@ -547,6 +565,7 @@
             let sourceLabel = file.name;
             const lower = file.name.toLowerCase();
             if (lower.endsWith('.xlsx') || lower.endsWith('.xls')) {
+                if (typeof XLSX === 'undefined') throw new Error('Bibliothèque Excel absente ou bloquée. Vérifiez votre connexion.');
                 setStatus('Décodage Excel en cours...');
                 const { records: excelRows, sheetName } = decodeExcel(buffer);
                 records = excelRows;
