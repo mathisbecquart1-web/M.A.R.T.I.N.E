@@ -3,723 +3,572 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carte Interactive Hauts-de-France & Normandie</title>
+    <title>Atlas Bâtiments - Import & Carte</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
         :root {
-            --bg: #0f172a;
-            --panel: #ffffff;
-            --accent: #2563eb;
-            --accent-dark: #1d4ed8;
-            --muted: #64748b;
-            --border: #e2e8f0;
+            --bg: #0b1224;
+            --panel: #0f172a;
+            --card: #111b32;
+            --muted: #cbd5e1;
+            --accent: #60a5fa;
+            --accent-strong: #3b82f6;
+            --border: #1f2a44;
+            --good: #10b981;
+            --warn: #f59e0b;
         }
-
         * { box-sizing: border-box; }
-
         body {
             margin: 0;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.15), transparent 30%),
-                        radial-gradient(circle at 80% 0%, rgba(14, 165, 233, 0.12), transparent 25%),
-                        #0b1224;
-            color: #0f172a;
+            background: radial-gradient(circle at 10% 20%, rgba(96, 165, 250, 0.14), transparent 35%),
+                        radial-gradient(circle at 85% 10%, rgba(59, 130, 246, 0.2), transparent 30%),
+                        linear-gradient(180deg, #0b1224 0%, #0b1224 32%, #0f172a 100%);
+            color: #e2e8f0;
         }
-
-        #search-panel {
-            padding: 18px 24px;
-            background: rgba(255, 255, 255, 0.9);
+        header {
+            background: rgba(10, 18, 36, 0.8);
+            border-bottom: 1px solid var(--border);
             backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.22);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
-
-        .toolbar {
+        .bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
+            padding: 16px 22px;
             align-items: center;
         }
-
-        .title-block {
+        .brand {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-right: 16px;
         }
-
-        .badge {
-            padding: 6px 10px;
+        .logo {
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
-            background: rgba(37, 99, 235, 0.1);
-            color: var(--accent);
-            font-weight: 700;
-            font-size: 0.9em;
-            letter-spacing: 0.5px;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 1.25rem;
-            color: #0f172a;
-        }
-
-        .search-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex: 1;
-            min-width: 280px;
-        }
-
-        #search-input {
-            flex: 1;
-            padding: 12px 14px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: #fff;
-            box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
-        }
-
-        .btn {
-            padding: 12px 16px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            background: linear-gradient(145deg, #2563eb 0%, #0ea5e9 100%);
+            display: grid;
+            place-items: center;
             color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.35);
+        }
+        h1 { margin: 0; font-size: 1.25rem; }
+        .pill {
+            background: rgba(59, 130, 246, 0.14);
+            color: #cde4ff;
+            padding: 6px 10px;
+            border-radius: 999px;
             font-weight: 700;
-            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+            font-size: 0.85rem;
+            border: 1px solid rgba(96, 165, 250, 0.35);
+        }
+        .actions { display: flex; gap: 8px; flex: 1; align-items: center; min-width: 280px; flex-wrap: wrap; }
+        .field {
+            display: flex;
+            align-items: center;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            gap: 10px;
+            flex: 1;
+            min-width: 240px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+        }
+        .field input { width: 100%; background: transparent; border: none; color: #e2e8f0; font-size: 0.98rem; outline: none; }
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
+            cursor: pointer;
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
             transition: transform 0.1s ease, box-shadow 0.2s ease;
         }
-
-        .btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35); }
+        .btn.secondary { background: #1f2937; box-shadow: none; border: 1px solid var(--border); }
+        .btn:hover { transform: translateY(-1px); }
         .btn:active { transform: translateY(0); }
-
         #file-input { display: none; }
-
-        #status-message {
-            margin-top: 8px;
-            color: var(--muted);
-            font-size: 0.95em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #progress-container {
-            position: relative;
-            margin-top: 10px;
-            height: 8px;
-            background: rgba(226, 232, 240, 0.8);
-            border-radius: 999px;
-            overflow: hidden;
-            box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
-            display: none;
-        }
-
-        #progress-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--accent), var(--accent-dark));
-            transition: width 0.2s ease;
-        }
-
-        #map { height: 72vh; width: 100%; border-top: 1px solid rgba(255, 255, 255, 0.4); }
-
-        #details-panel {
-            padding: 16px 20px 22px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(8px);
-            border-top: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 -10px 24px rgba(15, 23, 42, 0.2);
-        }
-
-        #details-panel h3 {
-            margin: 0 0 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #0f172a;
-        }
-
-        #details-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 10px 16px;
-        }
-
-        .detail-item {
-            background: #fff;
-            padding: 10px 12px;
-            border-radius: 10px;
+        main { display: grid; grid-template-columns: 2.2fr 1fr; gap: 12px; padding: 16px 16px 18px; }
+        #map { height: 78vh; width: 100%; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 32px rgba(0,0,0,0.28); }
+        .side-panel { background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 32px rgba(0,0,0,0.32); }
+        .card {
+            background: var(--card);
             border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
         }
-
-        .detail-label {
-            font-weight: 700;
-            display: block;
-            margin-bottom: 4px;
-            color: #0f172a;
-        }
-
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 0.9em;
-            width: 100%;
-            margin-top: 8px;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--accent);
-            box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.15);
-            display: inline-block;
-        }
+        .card h3 { margin: 0 0 8px; display: flex; align-items: center; gap: 8px; font-size: 1rem; color: #e2e8f0; }
+        .muted { color: var(--muted); font-size: 0.95rem; }
+        #status { display: flex; align-items: center; gap: 10px; }
+        #progress-outer { width: 100%; height: 10px; border-radius: 999px; background: #0b1326; border: 1px solid var(--border); overflow: hidden; display: none; }
+        #progress-inner { height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #22d3ee); transition: width 0.15s ease; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+        .stat { padding: 10px 12px; border-radius: 12px; background: rgba(96, 165, 250, 0.06); border: 1px solid var(--border); }
+        .stat strong { display: block; color: #e2e8f0; font-size: 1.05rem; }
+        .stat span { color: var(--muted); font-size: 0.9rem; }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+        .detail { padding: 10px 12px; border-radius: 12px; background: #0c162d; border: 1px solid var(--border); word-break: break-word; }
+        .detail label { display: block; color: var(--muted); font-size: 0.82rem; margin-bottom: 4px; }
+        .detail .value { color: #e2e8f0; font-weight: 700; font-size: 0.98rem; }
+        .empty { text-align: center; padding: 20px; color: var(--muted); }
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip { background: #0c162d; border: 1px solid var(--border); padding: 8px 10px; border-radius: 999px; color: #cbd5e1; font-weight: 700; font-size: 0.9rem; }
+        .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #a7f3d0; padding: 6px 10px; border-radius: 999px; font-weight: 700; }
+        .errors { color: #fecdd3; font-weight: 700; }
+        @media (max-width: 1024px) { main { grid-template-columns: 1fr; } #map { height: 64vh; } }
     </style>
 </head>
 <body>
-    <div id="search-panel">
-        <div class="toolbar">
-            <div class="title-block">
-                <div class="badge">Carte Bâtiments</div>
-                <h1>Hauts-de-France &amp; Normandie</h1>
-            </div>
-            <div class="search-container">
-                <input type="text" id="search-input" placeholder="Rechercher un bâtiment ou propriétaire...">
-                <button class="btn" onclick="searchBuildings()">Rechercher</button>
-                <input type="file" id="file-input" accept=".csv,.json,.xlsx,.xls" onchange="importData(event)">
-                <button class="btn" onclick="document.getElementById('file-input').click()">Importer données</button>
+<header>
+    <div class="bar">
+        <div class="brand">
+            <div class="logo">BF</div>
+            <div>
+                <h1>Atlas Bâtiments</h1>
+                <div class="pill">Import Excel / CSV / JSON + Autosauvegarde</div>
             </div>
         </div>
-        <div id="status-message"><span class="status-dot"></span><span id="status-text"></span></div>
-        <div id="progress-container"><div id="progress-bar"></div></div>
+        <div class="actions">
+            <div class="field">
+                <svg width="18" height="18" fill="none" stroke="#9fb3ce" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><line x1="12" y1="12" x2="17" y2="17"/></svg>
+                <input id="search-input" placeholder="Rechercher un bâtiment (nom, propriétaire, ville...)" />
+            </div>
+            <button class="btn" id="import-btn">Importer un fichier</button>
+            <input type="file" id="file-input" accept=".xlsx,.xls,.csv,.json" />
+            <button class="btn secondary" id="sample-btn">Charger un exemple</button>
+            <button class="btn secondary" id="reset-btn">Réinitialiser</button>
+        </div>
     </div>
+</header>
+<main>
     <div id="map"></div>
-    <div id="details-panel">
-        <h3 id="details-title">📄 Fiche bâtiment</h3>
-        <div id="details-content">Sélectionnez un bâtiment pour afficher ses informations.</div>
+    <div class="side-panel">
+        <div class="card" id="status-card">
+            <h3>État de l'import</h3>
+            <div id="status" class="muted">Prêt pour un nouveau chargement.</div>
+            <div id="progress-outer"><div id="progress-inner"></div></div>
+        </div>
+        <div class="card">
+            <h3>Statistiques</h3>
+            <div class="stats">
+                <div class="stat"><strong id="stat-count">0</strong><span>Bâtiments placés</span></div>
+                <div class="stat"><strong id="stat-ignored">0</strong><span>Lignes ignorées</span></div>
+                <div class="stat"><strong id="stat-coords">–</strong><span>Colonnes coordonnées détectées</span></div>
+                <div class="stat"><strong id="stat-source">–</strong><span>Source chargée</span></div>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Détails du bâtiment</h3>
+            <div id="details" class="muted empty">Cliquez sur un marqueur ou recherchez un bâtiment pour afficher sa fiche.</div>
+        </div>
     </div>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script>
+(() => {
+    const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([49.5, 2.5], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-    <script>
-        // Initialisation de la carte centrée sur les régions
-        const map = L.map('map').setView([49.5, 2.8], 8);
+    const cluster = L.markerClusterGroup({
+        chunkedLoading: true,
+        chunkProgress: updateChunkProgress,
+        maxClusterRadius: 60,
+        disableClusteringAtZoom: 16
+    });
+    map.addLayer(cluster);
 
-        // Ajout de la couche de tuiles OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+    const state = {
+        features: [],
+        indexedById: new Map(),
+        ignored: 0,
+        coordHint: '–',
+        source: 'aucune',
+    };
 
-        const clusterOptions = {
-            chunkedLoading: true,
-            chunkDelay: 35,
-            chunkInterval: 150,
-            maxClusterRadius: 55,
-            spiderfyOnMaxZoom: true,
-            removeOutsideVisibleBounds: true,
-            chunkProgress: (processed, total) => {
-                const percent = Math.min(100, Math.round((processed / total) * 100));
-                setStatus(`Placement des marqueurs... ${processed}/${total} (${percent}%)`);
-            }
-        };
+    const els = {
+        fileInput: document.getElementById('file-input'),
+        importBtn: document.getElementById('import-btn'),
+        sampleBtn: document.getElementById('sample-btn'),
+        resetBtn: document.getElementById('reset-btn'),
+        search: document.getElementById('search-input'),
+        status: document.getElementById('status'),
+        progressOuter: document.getElementById('progress-outer'),
+        progressInner: document.getElementById('progress-inner'),
+        statCount: document.getElementById('stat-count'),
+        statIgnored: document.getElementById('stat-ignored'),
+        statCoords: document.getElementById('stat-coords'),
+        statSource: document.getElementById('stat-source'),
+        details: document.getElementById('details'),
+    };
 
-        // Stockage des données de bâtiments
-        let buildingsData = [];
-        let buildingIdCounter = 1;
-        let markersLayer = L.markerClusterGroup(clusterOptions).addTo(map);
-        const markerIndex = new Map();
-        const statusTextEl = document.getElementById('status-text');
-        const progressContainer = document.getElementById('progress-container');
-        const progressBar = document.getElementById('progress-bar');
-        const STORAGE_KEY = 'carte-batiments-v1';
+    const STORAGE_KEY = 'atlas-batiments-v2';
 
-        function resetMarkersLayer() {
-            map.removeLayer(markersLayer);
-            markerIndex.clear();
-            markersLayer = L.markerClusterGroup(clusterOptions).addTo(map);
+    const SAMPLE = {
+        source: 'Échantillon (JSON)',
+        records: [
+            { Nom: 'Mairie d\'Amiens', Ville: 'Amiens', Proprietaire: 'Ville', Latitude: 49.8941, Longitude: 2.2958 },
+            { Nom: 'Collège Pierre et Marie Curie', Ville: 'Abbeville', Proprietaire: 'Département', Latitude: 50.1052, Longitude: 1.8369 },
+            { Nom: 'Lycée Jean Rostand', Ville: 'Rouen', Proprietaire: 'Région', Latitude: 49.4447, Longitude: 1.0989 },
+            { Nom: 'Centre administratif', Ville: 'Calais', Proprietaire: 'État', Latitude: 50.9481, Longitude: 1.8564 },
+            { Nom: 'Maison des Services', Ville: 'Cherbourg', Proprietaire: 'Communauté Urbaine', Latitude: 49.6361, Longitude: -1.6244 },
+        ]
+    };
+
+    /** UTILITAIRES **/
+    function setStatus(text, tone = 'muted') {
+        els.status.className = tone === 'error' ? 'errors' : (tone === 'good' ? 'badge' : 'muted');
+        els.status.innerHTML = text;
+    }
+
+    function showProgress(percent) {
+        els.progressOuter.style.display = 'block';
+        els.progressInner.style.width = `${Math.min(100, Math.max(0, percent))}%`;
+    }
+
+    function hideProgress() {
+        els.progressOuter.style.display = 'none';
+        els.progressInner.style.width = '0%';
+    }
+
+    function updateChunkProgress(processed, total, elapsed) {
+        const speed = processed / (elapsed || 1);
+        const remaining = total - processed;
+        const eta = remaining / (speed || 1);
+        const percent = Math.min(100, (processed / total) * 100);
+        showProgress(percent);
+        setStatus(`Placement des marqueurs : ${processed}/${total} (~${eta.toFixed(0)} ms restants)`, 'muted');
+    }
+
+    function parseNumber(val) {
+        if (val === null || val === undefined) return NaN;
+        if (typeof val === 'number') return val;
+        if (typeof val !== 'string') return NaN;
+        const cleaned = val.trim().replace(/\s+/g, ' ').replace(',', '.');
+        const parsed = Number(cleaned);
+        if (!Number.isNaN(parsed)) return parsed;
+        // try to extract first numeric block
+        const match = cleaned.match(/-?\d+(?:[\.,]\d+)?/);
+        return match ? Number(match[0].replace(',', '.')) : NaN;
+    }
+
+    function detectCoords(obj) {
+        const keys = Object.keys(obj || {});
+        const numericPairs = [];
+        const coordNames = [
+            ['lat','latitude','y','coordy','northing','nord','lat\u00E9tude','latitud'],
+            ['lon','lng','longitude','x','coordx','easting','est','long','long\u00E9tude','longitud']
+        ];
+        let latKey = null, lonKey = null;
+        for (const key of keys) {
+            const lower = key.toLowerCase().replace(/\s+/g, '');
+            if (coordNames[0].some(k => lower.includes(k))) latKey = key;
+            if (coordNames[1].some(k => lower.includes(k))) lonKey = key;
+        }
+        if (latKey && lonKey) {
+            const lat = parseNumber(obj[latKey]);
+            const lon = parseNumber(obj[lonKey]);
+            if (isValidLatLon(lat, lon)) return { lat, lon, hint: `${latKey} / ${lonKey}` };
         }
 
-        function setStatus(message) {
-            statusTextEl.textContent = message || 'Prêt à importer vos données.';
-        }
-
-        function setProgress(percent, active = true) {
-            const clamped = Math.max(0, Math.min(100, Math.round(percent)));
-            if (!active) {
-                progressContainer.style.display = 'none';
-                progressBar.style.width = '0%';
-                return;
-            }
-            progressContainer.style.display = 'block';
-            progressBar.style.width = `${clamped}%`;
-        }
-
-        function resetProgressWithMessage(message = 'Prêt à importer vos données.') {
-            setStatus(message);
-            setProgress(0, false);
-        }
-
-        // Fonction pour ajouter un marqueur
-        function addMarker(building) {
-            const marker = L.marker([building.lat, building.lng], { title: building.nom })
-                .bindPopup(`
-                    <strong>${building.nom}</strong><br>
-                    Propriétaire: ${building.proprietaire || '—'}<br>
-                    Adresse: ${building.adresse || '—'}<br>
-                    Type: ${building.type || 'Non spécifié'}<br>
-                    <button class="btn btn-small" onclick="showBuildingDetails(${building.id})">Fiche du bâtiment</button>
-                `);
-            markersLayer.addLayer(marker);
-            markerIndex.set(building.id, marker);
-            return marker;
-        }
-
-        function persistBuildings() {
-            try {
-                const payload = {
-                    buildings: buildingsData,
-                    nextId: buildingIdCounter
-                };
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-            } catch (e) {
-                console.warn('Impossible de sauvegarder localement', e);
-            }
-        }
-
-        function loadPersistedBuildings() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (!raw) return false;
-                const saved = JSON.parse(raw);
-                if (!saved || !Array.isArray(saved.buildings) || saved.buildings.length === 0) return false;
-
-                buildingIdCounter = saved.nextId || (Math.max(...saved.buildings.map(b => b.id || 0)) + 1);
-                buildingsData = saved.buildings;
-                resetMarkersLayer();
-                setStatus(`Restauration de ${buildingsData.length} bâtiments sauvegardés...`);
-                setProgress(10, true);
-                placeMarkersInChunks(buildingsData, () => {
-                    setStatus('Bâtiments restaurés depuis l\'autosauvegarde.');
-                    setProgress(100);
-                    setTimeout(() => setProgress(0, false), 600);
-                });
-                return true;
-            } catch (e) {
-                console.warn('Aucune autosauvegarde valide détectée', e);
-                return false;
-            }
-        }
-
-        // Fonction de recherche
-        function searchBuildings() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            if (!query) {
-                setStatus('Affichage de tous les bâtiments.');
-                if (markersLayer.getLayers().length > 0) {
-                    map.fitBounds(L.featureGroup(markersLayer.getLayers()).getBounds());
-                }
-                return;
-            }
-
-            const filteredBuildings = buildingsData.filter(building =>
-                (building.nom || '').toLowerCase().includes(query) ||
-                (building.proprietaire || '').toLowerCase().includes(query) ||
-                (building.adresse || '').toLowerCase().includes(query)
-            );
-
-            if (filteredBuildings.length === 0) {
-                setStatus('Aucun bâtiment trouvé.');
-                return;
-            }
-
-            const markers = filteredBuildings
-                .map(building => markerIndex.get(building.id))
-                .filter(Boolean);
-
-            if (markers.length === 0) return;
-
-            const group = new L.featureGroup(markers);
-            map.fitBounds(group.getBounds());
-
-            const first = markers[0];
-            markersLayer.zoomToShowLayer(first, () => first.openPopup());
-        }
-
-        // Fonction d'import de données
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const extension = file.name.split('.').pop().toLowerCase();
-            const reader = new FileReader();
-
-            setStatus(`Lecture du fichier « ${file.name} »...`);
-            setProgress(5, true);
-
-            reader.onerror = () => {
-                setStatus('Lecture du fichier impossible.');
-                setProgress(0, false);
-                alert('Impossible de lire le fichier. Veuillez réessayer.');
-            };
-
-            reader.onload = function(e) {
-                try {
-                    if (extension === 'json') {
-                        const data = JSON.parse(e.target.result);
-                        processImportedData(data);
-                    } else if (extension === 'csv') {
-                        const csv = e.target.result;
-                        const data = parseCSV(csv);
-                        processImportedData(data);
-                    } else if (extension === 'xlsx' || extension === 'xls') {
-                        setStatus('Décodage Excel...');
-                        const data = parseExcel(e.target.result);
-                        processImportedData(data);
-                    } else {
-                        alert('Format non supporté. Veuillez importer un CSV, JSON ou Excel.');
-                        resetProgressWithMessage();
+        // try combined coordinate cell
+        for (const key of keys) {
+            const value = obj[key];
+            if (typeof value === 'string' && value.match(/\d/)) {
+                const parts = value.replace(/[,;]/g, ' ').split(/\s+/).filter(Boolean).map(v => parseNumber(v));
+                if (parts.length >= 2) {
+                    for (let i = 0; i < parts.length - 1; i++) {
+                        if (isValidLatLon(parts[i], parts[i+1])) return { lat: parts[i+1], lon: parts[i], hint: key };
                     }
-                } catch (error) {
-                    console.error('Erreur d\'import', error);
-                    setStatus('Erreur lors de l\'import.');
-                    setProgress(0, false);
-                    alert('Erreur lors de l\'import: ' + error.message);
                 }
-            };
+            }
+        }
 
-            if (extension === 'xlsx' || extension === 'xls') {
-                reader.readAsArrayBuffer(file);
+        // fallback: find any numeric pairs
+        const values = keys.map(k => parseNumber(obj[k])).filter(v => !Number.isNaN(v));
+        for (let i = 0; i < values.length - 1; i++) {
+            if (isValidLatLon(values[i], values[i+1])) return { lat: values[i], lon: values[i+1], hint: 'pair auto' };
+        }
+        return null;
+    }
+
+    function isValidLatLon(lat, lon) {
+        return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+    }
+
+    function normalizeRecords(records) {
+        const normalized = [];
+        let ignored = 0;
+        let hint = 'aucune';
+        records.forEach((row, idx) => {
+            const obj = Array.isArray(row) ? row.reduce((acc, val, i) => { acc[`col_${i+1}`] = val; return acc; }, {}) : row;
+            const coords = detectCoords(obj);
+            if (!coords) { ignored++; return; }
+            hint = coords.hint || hint;
+            const { lat, lon } = coords;
+            const meta = { ...obj };
+            const title = meta.Nom || meta.nom || meta.Name || meta.Titre || meta['Libellé'] || meta.Building || `Bâtiment #${normalized.length + 1}`;
+            normalized.push({ id: crypto.randomUUID(), lat, lon, title, meta });
+        });
+        return { normalized, ignored, hint };
+    }
+
+    function buildPopup(feature) {
+        const parts = [ `<strong>${feature.title}</strong>` ];
+        const keys = Object.keys(feature.meta || {});
+        if (keys.length) {
+            parts.push('<div style="margin-top:6px;font-size:12px;line-height:1.4">');
+            keys.forEach(k => {
+                const v = feature.meta[k];
+                if (v === undefined || v === null || v === '') return;
+                parts.push(`<div><span style=\"color:#9ca3af\">${k} :</span> ${v}</div>`);
+            });
+            parts.push('</div>');
+        }
+        parts.push('<button class="btn" style="margin-top:8px;width:100%" onclick="window.showDetails(\'' + feature.id + '\')">Fiche complète</button>');
+        return parts.join('');
+    }
+
+    function renderDetails(feature) {
+        if (!feature) {
+            els.details.className = 'muted empty';
+            els.details.innerHTML = 'Cliquez sur un marqueur ou recherchez un bâtiment pour afficher sa fiche.';
+            return;
+        }
+        els.details.className = '';
+        const entries = Object.entries(feature.meta || {});
+        if (!entries.length) {
+            els.details.innerHTML = '<div class="muted empty">Aucune information supplémentaire.</div>';
+            return;
+        }
+        els.details.innerHTML = `<div class="chips"><div class="chip">${feature.title}</div><div class="chip">${feature.lat.toFixed(5)}, ${feature.lon.toFixed(5)}</div></div>` +
+            '<div class="detail-grid">' + entries.map(([k,v]) => `<div class="detail"><label>${k}</label><div class="value">${v}</div></div>`).join('') + '</div>';
+    }
+
+    function clearMap() {
+        cluster.clearLayers();
+        state.features = [];
+        state.indexedById.clear();
+        state.ignored = 0;
+        state.coordHint = '–';
+        updateStats();
+        renderDetails(null);
+        hideProgress();
+        setStatus('Prêt pour un nouveau chargement.');
+    }
+
+    function updateStats() {
+        els.statCount.textContent = state.features.length.toLocaleString('fr-FR');
+        els.statIgnored.textContent = state.ignored.toLocaleString('fr-FR');
+        els.statCoords.textContent = state.coordHint;
+        els.statSource.textContent = state.source;
+    }
+
+    async function importFile(file) {
+        if (!file) return;
+        setStatus(`Lecture de "${file.name}" ...`);
+        showProgress(4);
+        try {
+            const buffer = await file.arrayBuffer();
+            let records = [];
+            const lower = file.name.toLowerCase();
+            if (lower.endsWith('.xlsx') || lower.endsWith('.xls')) {
+                setStatus('Décodage Excel en cours...');
+                const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                if (!sheetName) throw new Error('Aucun onglet détecté.');
+                const sheet = workbook.Sheets[sheetName];
+                records = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+            } else if (lower.endsWith('.csv')) {
+                const text = new TextDecoder('utf-8').decode(buffer);
+                records = parseCSV(text);
+            } else if (lower.endsWith('.json')) {
+                const text = new TextDecoder('utf-8').decode(buffer);
+                const parsed = JSON.parse(text);
+                records = Array.isArray(parsed) ? parsed : (parsed.data || parsed.records || []);
             } else {
-                reader.readAsText(file);
+                throw new Error('Format non supporté. Utilisez .xlsx .xls .csv ou .json');
             }
-
-            event.target.value = '';
+            if (!records || !records.length) throw new Error('Aucune donnée exploitable trouvée.');
+            await handleRecords(records, file.name);
+        } catch (err) {
+            console.error(err);
+            setStatus(`Erreur d'import : ${err.message}`, 'error');
+            hideProgress();
+        } finally {
+            els.fileInput.value = '';
         }
+    }
 
-        // Normalisation d'un bâtiment : repère les coordonnées même si les champs sont nommés différemment
-        function normalizeBuilding(item) {
-            const lat = findCoordinate(item, ['lat', 'latitude', 'y', 'coordy']);
-            const lng = findCoordinate(item, ['lng', 'lon', 'longitude', 'x', 'coordx']);
+    function parseCSV(text) {
+        const rows = text.replace(/^\ufeff/, '').split(/\r?\n/).filter(r => r.trim().length);
+        if (!rows.length) return [];
+        const delimiter = detectDelimiter(rows[0]);
+        const headers = rows[0].split(delimiter).map(h => h.trim());
+        return rows.slice(1).map(line => {
+            const cols = line.split(delimiter).map(c => c.trim());
+            const obj = {};
+            headers.forEach((h, i) => obj[h || `col_${i+1}`] = cols[i] ?? '');
+            return obj;
+        });
+    }
 
-            let normalizedLat = lat;
-            let normalizedLng = lng;
+    function detectDelimiter(sample) {
+        const delimiters = [';','\t','|',','];
+        const scores = delimiters.map(d => ({ d, count: sample.split(d).length }));
+        scores.sort((a,b) => b.count - a.count);
+        return scores[0].d;
+    }
 
-            // Si aucune correspondance explicite, on tente de récupérer les deux dernières valeurs numériques
-            if (normalizedLat === null || normalizedLng === null) {
-                const numericValues = Object.values(item)
-                    .map(parseNumericValue)
-                    .filter(value => value !== null);
+    async function handleRecords(records, sourceLabel) {
+        setStatus('Normalisation des coordonnées...');
+        showProgress(12);
+        const { normalized, ignored, hint } = normalizeRecords(records);
+        state.features = normalized;
+        state.ignored = ignored;
+        state.coordHint = hint;
+        state.source = sourceLabel;
+        updateStats();
 
-                if (numericValues.length >= 2) {
-                    normalizedLat = numericValues[numericValues.length - 1];
-                    normalizedLng = numericValues[numericValues.length - 2];
-                }
-            }
+        await placeMarkers(normalized);
+        finalizeImport();
+    }
 
-            if (normalizedLat === null || normalizedLng === null) {
-                return null;
-            }
-
-            if (!Number.isFinite(normalizedLat) || !Number.isFinite(normalizedLng)) {
-                return null;
-            }
-
-            const baseName = item.nom || item.name || item.Nom || item.libelle || item.label;
-            const baseOwner = item.proprietaire || item.owner || item.Proprietaire || item.gestionnaire;
-            const baseAddress = item.adresse || item.address || item.Adresse || item.localisation;
-            const baseType = item.type || item.categorie || item.Type || item.catégorie;
-
-            const building = {
-                id: buildingIdCounter++,
-                nom: (baseName && String(baseName).trim()) || `Bâtiment ${buildingIdCounter - 1}`,
-                proprietaire: baseOwner ? String(baseOwner).trim() : '',
-                adresse: baseAddress ? String(baseAddress).trim() : '',
-                type: baseType ? String(baseType).trim() : '',
-                lat: normalizedLat,
-                lng: normalizedLng,
-                details: {},
-            };
-
-            Object.keys(item).forEach(key => {
-                const value = item[key];
-                building.details[key] = value === undefined || value === null ? '' : value;
-            });
-
-            building.details.latitude = normalizedLat;
-            building.details.longitude = normalizedLng;
-
-            return building;
+    async function placeMarkers(features) {
+        cluster.clearLayers();
+        state.indexedById.clear();
+        if (!features.length) {
+            setStatus('Aucun bâtiment placé (0 coordonnées valides).', 'error');
+            hideProgress();
+            return;
         }
-
-        // Récupère une coordonnée à partir d'une liste de clés potentielles
-        function findCoordinate(item, possibleKeys) {
-            const normalizeKey = (k) => k
-                .toString()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/[\s_\-\.]+/g, '')
-                .toLowerCase();
-
-            const normalizedCandidates = possibleKeys.map(normalizeKey);
-
-            for (const rawKey of Object.keys(item)) {
-                const key = normalizeKey(rawKey);
-                if (normalizedCandidates.some(candidate => key === candidate || key.includes(candidate))) {
-                    const value = parseNumericValue(item[rawKey]);
-                    if (value !== null) return value;
-                }
-            }
-            return null;
-        }
-
-        // Conversion d'une valeur en nombre en gérant les virgules décimales
-        function parseNumericValue(value) {
-            if (value === undefined || value === null) return null;
-            const normalized = String(value)
-                .replace(/\s+/g, '')
-                .replace(',', '.');
-            const number = parseFloat(normalized);
-            return Number.isNaN(number) ? null : number;
-        }
-
-        // Traitement des données importées (asynchrone pour éviter les blocages)
-        function processImportedData(data) {
-            const rows = Array.isArray(data) ? data : Object.values(data || {});
-            if (!rows || rows.length === 0) {
-                setStatus('Aucune donnée détectée.');
-                setProgress(0, false);
-                return;
-            }
-
-            setStatus('Normalisation des lignes en cours...');
-            setProgress(12, true);
-            buildingIdCounter = 1;
-            resetMarkersLayer();
-            buildingsData = [];
-            let skipped = 0;
-
-            const chunkSize = 350;
+        return new Promise(resolve => {
+            const chunkSize = 500;
             let index = 0;
-
-            function normalizeChunk() {
-                const end = Math.min(index + chunkSize, rows.length);
-                for (let i = index; i < end; i++) {
-                    const normalized = normalizeBuilding(rows[i]);
-                    if (normalized) {
-                        buildingsData.push(normalized);
-                    } else {
-                        skipped++;
-                    }
-                }
-                index = end;
-
-                if (index < rows.length) {
-                    const percent = 12 + Math.round((index / rows.length) * 40);
-                    setStatus(`Normalisation... ${index}/${rows.length}`);
-                    setProgress(percent, true);
-                    setTimeout(normalizeChunk, 0);
-                } else {
-                    setStatus(`Placement des marqueurs (${buildingsData.length} bâtiments)...`);
-                    setProgress(55, true);
-                    placeMarkersInChunks(buildingsData, () => {
-                        persistBuildings();
-                        const summary = `${buildingsData.length} bâtiments importés${skipped ? `, ${skipped} ignorés (coordonnées manquantes)` : ''}`;
-                        alert(`${summary}!`);
-                        setStatus('Import terminé.');
-                        setProgress(100, true);
-                        setTimeout(() => setProgress(0, false), 800);
-                    });
-                }
-            }
-
-            normalizeChunk();
-        }
-
-        function placeMarkersInChunks(items, onDone) {
-            const chunkSize = 800;
-            let index = 0;
-
-            if (!items || items.length === 0) {
-                resetProgressWithMessage('Aucune donnée valide à afficher.');
-                if (onDone) onDone();
-                return;
-            }
-
-            function addChunk() {
-                const batch = [];
-                const end = Math.min(index + chunkSize, items.length);
-                for (let i = index; i < end; i++) {
-                    batch.push(addMarker(items[i]));
-                }
-                index = end;
-
-                if (index < items.length) {
-                    setStatus(`Préparation des marqueurs... ${index}/${items.length}`);
-                    const percent = 55 + Math.round((index / items.length) * 40);
-                    setProgress(percent, true);
-                    (window.requestIdleCallback || window.setTimeout)(addChunk, 0);
-                } else {
-                    const layers = markersLayer.getLayers();
-                    if (layers.length > 0) {
-                        const group = new L.featureGroup(layers);
-                        map.fitBounds(group.getBounds());
-                    }
-                    setProgress(95, true);
-                    if (onDone) onDone();
-                }
-            }
-
-            addChunk();
-        }
-
-        function showBuildingDetails(buildingId) {
-            const building = buildingsData.find(b => b.id === buildingId);
-            if (!building) return;
-
-            const title = document.getElementById('details-title');
-            const content = document.getElementById('details-content');
-            title.textContent = building.nom;
-
-            const entries = Object.entries(building.details)
-                .map(([key, value]) => ({ key, value }));
-
-            if (entries.length === 0) {
-                content.textContent = 'Aucune information disponible pour ce bâtiment.';
-                return;
-            }
-
-            content.innerHTML = entries
-                .map(entry => `
-                    <div class="detail-item">
-                        <span class="detail-label">${entry.key}</span>
-                        <span>${entry.value}</span>
-                    </div>
-                `)
-                .join('');
-        }
-
-        // Détection du séparateur utilisé dans le fichier
-        function detectDelimiter(line) {
-            if (line.includes(';')) return ';';
-            if (line.includes('\t')) return '\t';
-            if (line.includes('|')) return '|';
-            return ',';
-        }
-
-        // Parser CSV amélioré : accepte ;, tabulations ou virgules et les décimales françaises
-        function parseCSV(csv) {
-            const lines = csv.split(/\r?\n/).filter(line => line.trim());
-            if (lines.length === 0) return [];
-
-            const delimiter = detectDelimiter(lines[0]);
-            const headers = lines[0]
-                .split(delimiter)
-                .map(h => h.replace(/\uFEFF/g, '').trim());
-            const data = [];
-
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(delimiter).map(v => v.trim());
-                const item = {};
-                headers.forEach((header, index) => {
-                    const value = values[index] || '';
-                    const numericValue = parseNumericValue(value);
-                    item[header] = numericValue !== null ? numericValue : value;
+            function step() {
+                const slice = features.slice(index, index + chunkSize);
+                slice.forEach(f => {
+                    const marker = L.marker([f.lat, f.lon]);
+                    marker.bindPopup(buildPopup(f));
+                    marker.on('click', () => renderDetails(f));
+                    cluster.addLayer(marker);
+                    state.indexedById.set(f.id, f);
                 });
-                data.push(item);
-            }
-            return data;
-        }
-
-        // Lecture de la première feuille Excel et conversion en objets
-        function parseExcel(arrayBuffer) {
-            try {
-                if (!arrayBuffer) {
-                    throw new Error('Données Excel introuvables.');
+                index += chunkSize;
+                showProgress(Math.min(100, (index / features.length) * 100));
+                if (index < features.length) {
+                    requestAnimationFrame(step);
+                } else {
+                    resolve();
                 }
-
-                const data = arrayBuffer instanceof Uint8Array ? arrayBuffer : new Uint8Array(arrayBuffer);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheetName = workbook.SheetNames && workbook.SheetNames[0];
-                if (!firstSheetName) {
-                    throw new Error('Le fichier Excel ne contient aucune feuille lisible.');
-                }
-
-                const sheet = workbook.Sheets[firstSheetName];
-                const rows = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
-                if (rows && rows.length > 0) {
-                    return rows;
-                }
-
-                // Fallback si la première ligne ne contient pas d'en-têtes classiques
-                const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false });
-                if (!matrix || matrix.length === 0) return [];
-
-                const headers = matrix[0];
-                return matrix.slice(1).map((row) => {
-                    const entry = {};
-                    headers.forEach((header, idx) => {
-                        const key = header || `col_${idx + 1}`;
-                        entry[key] = row[idx] ?? '';
-                    });
-                    return entry;
-                });
-            } catch (error) {
-                console.error('Erreur pendant le décodage Excel', error);
-                throw new Error('Impossible de lire ce fichier Excel. Vérifiez son contenu.');
             }
+            step();
+        });
+    }
+
+    function finalizeImport() {
+        setStatus(`Import terminé : ${state.features.length} bâtiments placés, ${state.ignored} ligne(s) ignorée(s).`, state.features.length ? 'good' : 'error');
+        hideProgress();
+        updateStats();
+        persist();
+        fitToData();
+    }
+
+    function fitToData() {
+        if (!state.features.length) return;
+        const bounds = L.latLngBounds(state.features.map(f => [f.lat, f.lon]));
+        map.fitBounds(bounds.pad(0.1));
+    }
+
+    function persist() {
+        try {
+            const payload = { features: state.features, ignored: state.ignored, coordHint: state.coordHint, source: state.source };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        } catch (e) {
+            console.warn('Autosave impossible', e);
         }
+    }
 
-        // Données d'exemple
-        const exempleData = [
-            {
-                nom: "Mairie de Lille",
-                proprietaire: "Ville de Lille",
-                adresse: "Place Augustin Laurent, Lille",
-                lat: 50.6292,
-                lng: 3.0573,
-                type: "Bâtiment public"
-            },
-            {
-                nom: "Cathédrale de Rouen",
-                proprietaire: "État français",
-                adresse: "Place de la Cathédrale, Rouen",
-                lat: 49.4404,
-                lng: 1.0940,
-                type: "Monument historique"
-            }
-        ].map((building) => ({
-            ...building,
-            id: buildingIdCounter++,
-            details: {
-                ...building,
-                latitude: building.lat,
-                longitude: building.lng
-            }
-        }));
-
-        resetProgressWithMessage();
-        const restored = loadPersistedBuildings();
-        if (!restored) {
-            buildingsData = exempleData;
-            resetMarkersLayer();
-            placeMarkersInChunks(buildingsData, () => {
-                setStatus('Prêt à importer vos données.');
-                setProgress(0, false);
-            });
+    function restore() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return false;
+            const payload = JSON.parse(raw);
+            if (!payload || !payload.features) return false;
+            state.features = payload.features;
+            state.ignored = payload.ignored || 0;
+            state.coordHint = payload.coordHint || '–';
+            state.source = payload.source || 'autosauvegarde';
+            updateStats();
+            placeMarkers(state.features).then(finalizeImport);
+            return true;
+        } catch (e) {
+            console.warn('Impossible de restaurer', e);
+            return false;
         }
-    </script>
+    }
+
+    function loadSample() {
+        handleRecords(SAMPLE.records, SAMPLE.source);
+    }
+
+    function resetAll() {
+        clearMap();
+        state.source = 'aucune';
+        updateStats();
+        localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function search(term) {
+        const value = term.trim().toLowerCase();
+        if (!value) { renderDetails(null); return; }
+        const found = state.features.find(f => Object.values(f.meta || {}).some(v => String(v).toLowerCase().includes(value)) || f.title.toLowerCase().includes(value));
+        if (found) {
+            renderDetails(found);
+            map.flyTo([found.lat, found.lon], 14);
+        }
+    }
+
+    /** ÉVÈNEMENTS **/
+    els.importBtn.addEventListener('click', () => els.fileInput.click());
+    els.fileInput.addEventListener('change', e => importFile(e.target.files[0]));
+    els.sampleBtn.addEventListener('click', loadSample);
+    els.resetBtn.addEventListener('click', resetAll);
+    els.search.addEventListener('input', e => search(e.target.value));
+
+    window.showDetails = (id) => {
+        const feature = state.indexedById.get(id);
+        if (feature) renderDetails(feature);
+    };
+
+    // Restaurer si possible sinon charger un échantillon minimal
+    if (!restore()) {
+        setStatus('Aucune autosauvegarde trouvée. Exemple chargé pour tester.');
+        loadSample();
+    } else {
+        setStatus('Données restaurées depuis l\'autosauvegarde.', 'good');
+    }
+})();
+</script>
 </body>
 </html>
