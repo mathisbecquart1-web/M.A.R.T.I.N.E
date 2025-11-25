@@ -118,30 +118,105 @@
 
         // Traitement des données importées
         function processImportedData(data) {
-            buildingsData = data.filter(item => item.lat && item.lng);
+            buildingsData = data
+                .map(normalizeBuilding)
+                .filter(item => Number.isFinite(item.lat) && Number.isFinite(item.lng));
+
             markersLayer.clearLayers();
-            
+
             buildingsData.forEach(building => addMarker(building));
             alert(`${buildingsData.length} bâtiments importés avec succès!`);
         }
 
         // Parser CSV simple
         function parseCSV(csv) {
-            const lines = csv.split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
+            const lines = csv.split(/\r?\n/).filter(line => line.trim());
+            if (lines.length === 0) return [];
+
+            const delimiter = detectDelimiter(lines[0]);
+            const headers = lines[0].split(delimiter).map(h => h.trim());
             const data = [];
-            
+
             for (let i = 1; i < lines.length; i++) {
-                if (lines[i].trim()) {
-                    const values = lines[i].split(',').map(v => v.trim());
-                    const item = {};
-                    headers.forEach((header, index) => {
-                        item[header] = values[index] || '';
-                    });
-                    data.push(item);
-                }
+                if (!lines[i].trim()) continue;
+
+                const rawValues = lines[i].split(delimiter).map(v => v.trim());
+                const item = {};
+
+                headers.forEach((header, index) => {
+                    item[header] = convertDecimalComma(rawValues[index] || '');
+                });
+
+                data.push(item);
             }
             return data;
+        }
+
+        function detectDelimiter(line) {
+            const candidates = [';', '\t', ','];
+            let bestDelimiter = ',';
+            let bestCount = 0;
+
+            candidates.forEach(delimiter => {
+                const count = line.split(delimiter).length;
+                if (count > bestCount) {
+                    bestCount = count;
+                    bestDelimiter = delimiter;
+                }
+            });
+
+            return bestDelimiter;
+        }
+
+        function convertDecimalComma(value) {
+            if (typeof value === 'number') return value;
+            if (typeof value !== 'string') return value;
+
+            const normalized = value.replace(',', '.');
+            const num = parseFloat(normalized);
+            return Number.isFinite(num) && normalized.match(/^-?\d+(\.\d+)?$/) ? num : value;
+        }
+
+        function normalizeBuilding(raw) {
+            const lat = extractCoordinate(raw, ['lat', 'latitude', 'y'], true);
+            const lng = extractCoordinate(raw, ['lng', 'lon', 'longitude', 'x'], false);
+
+            const fallbackCoords = findFallbackCoords(raw, lat, lng);
+
+            return {
+                nom: raw.nom || raw.name || 'Bâtiment sans nom',
+                proprietaire: raw.proprietaire || raw.owner || 'Propriétaire inconnu',
+                adresse: raw.adresse || raw.address || 'Adresse inconnue',
+                type: raw.type || raw.categorie || '',
+                lat: lat ?? fallbackCoords.lat,
+                lng: lng ?? fallbackCoords.lng
+            };
+        }
+
+        function extractCoordinate(item, keys, isLat) {
+            for (const key of keys) {
+                if (key in item) {
+                    const value = convertDecimalComma(item[key]);
+                    if (Number.isFinite(value)) return value;
+                }
+            }
+            return null;
+        }
+
+        function findFallbackCoords(item, lat, lng) {
+            const numericValues = Object.values(item)
+                .map(convertDecimalComma)
+                .filter(value => Number.isFinite(value));
+
+            if (numericValues.length >= 2) {
+                const [potentialLng, potentialLat] = numericValues.slice(-2);
+                return {
+                    lat: lat ?? potentialLat,
+                    lng: lng ?? potentialLng
+                };
+            }
+
+            return { lat: lat ?? null, lng: lng ?? null };
         }
 
         // Données d'exemple
