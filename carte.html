@@ -1,1023 +1,841 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atlas Bâtiments - Import & Carte</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        :root {
-            --bg: #0b1224;
-            --panel: #0f172a;
-            --card: #111b32;
-            --muted: #cbd5e1;
-            --accent: #60a5fa;
-            --accent-strong: #3b82f6;
-            --border: #1f2a44;
-            --good: #10b981;
-            --warn: #f59e0b;
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: radial-gradient(circle at 10% 20%, rgba(96, 165, 250, 0.14), transparent 35%),
-                        radial-gradient(circle at 85% 10%, rgba(59, 130, 246, 0.2), transparent 30%),
-                        linear-gradient(180deg, #0b1224 0%, #0b1224 32%, #0f172a 100%);
-            color: #e2e8f0;
-        }
-        header {
-            background: rgba(10, 18, 36, 0.8);
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(8px);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            padding: 16px 22px;
-            align-items: center;
-        }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .logo {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            background: linear-gradient(145deg, #2563eb 0%, #0ea5e9 100%);
-            display: grid;
-            place-items: center;
-            color: white;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.35);
-        }
-        h1 { margin: 0; font-size: 1.25rem; }
-        .pill {
-            background: rgba(59, 130, 246, 0.14);
-            color: #cde4ff;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            border: 1px solid rgba(96, 165, 250, 0.35);
-        }
-        .actions { display: flex; gap: 8px; flex: 1; align-items: center; min-width: 320px; flex-wrap: wrap; }
-        .field {
-            display: flex;
-            align-items: center;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px 12px;
-            gap: 10px;
-            flex: 1;
-            min-width: 240px;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
-        }
-        .field input { width: 100%; background: transparent; border: none; color: #e2e8f0; font-size: 0.98rem; outline: none; }
-        .btn {
-            border: none;
-            border-radius: 12px;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            color: white;
-            font-weight: 700;
-            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
-            cursor: pointer;
-            display: inline-flex;
-            gap: 8px;
-            align-items: center;
-            transition: transform 0.1s ease, box-shadow 0.2s ease;
-        }
-        .btn.secondary { background: #1f2937; box-shadow: none; border: 1px solid var(--border); }
-        .btn:hover { transform: translateY(-1px); }
-        .btn:active { transform: translateY(0); }
-        .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
-        .btn-ghost { background: transparent; border: 1px dashed var(--border); color: var(--muted); box-shadow: none; }
-        #file-input, #json-input { display: none; }
-        main { display: grid; grid-template-columns: 2.2fr 1.1fr; gap: 12px; padding: 16px 16px 18px; }
-        #map { height: 76vh; width: 100%; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 32px rgba(0,0,0,0.28); }
-        .side-panel { background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 32px rgba(0,0,0,0.32); }
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 12px 14px;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
-        }
-        .card h3 { margin: 0 0 8px; display: flex; align-items: center; gap: 8px; font-size: 1rem; color: #e2e8f0; }
-        .muted { color: var(--muted); font-size: 0.95rem; }
-        #status { display: flex; align-items: center; gap: 10px; }
-        #progress-outer { width: 100%; height: 10px; border-radius: 999px; background: #0b1326; border: 1px solid var(--border); overflow: hidden; display: none; }
-        #progress-inner { height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #22d3ee); transition: width 0.15s ease; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
-        .stat { padding: 10px 12px; border-radius: 12px; background: rgba(96, 165, 250, 0.06); border: 1px solid var(--border); }
-        .stat strong { display: block; color: #e2e8f0; font-size: 1.05rem; }
-        .stat span { color: var(--muted); font-size: 0.9rem; }
-        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
-        .detail { padding: 10px 12px; border-radius: 12px; background: #0c162d; border: 1px solid var(--border); word-break: break-word; }
-        .detail label { display: block; color: var(--muted); font-size: 0.82rem; margin-bottom: 4px; }
-        .detail .value { color: #e2e8f0; font-weight: 700; font-size: 0.98rem; }
-        .empty { text-align: center; padding: 20px; color: var(--muted); }
-        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-        .chip { background: #0c162d; border: 1px solid var(--border); padding: 8px 10px; border-radius: 999px; color: #cbd5e1; font-weight: 700; font-size: 0.9rem; }
-        .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #a7f3d0; padding: 6px 10px; border-radius: 999px; font-weight: 700; }
-        .errors { color: #fecdd3; font-weight: 700; }
-        .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin: 8px 0; }
-        .filters label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 4px; }
-        .filters input, .filters select, textarea {
-            width: 100%;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: #0c162d;
-            color: #e2e8f0;
-            padding: 8px 10px;
-            font-size: 0.95rem;
-        }
-        textarea { resize: vertical; min-height: 60px; }
-        .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-        .save-state { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--muted); }
-        .legend { display: flex; flex-wrap: wrap; gap: 6px; }
-        .legend span { background: rgba(255,255,255,0.04); border: 1px solid var(--border); padding: 6px 8px; border-radius: 10px; font-size: 0.85rem; }
-        .notice { border-left: 3px solid var(--accent); padding-left: 10px; color: var(--muted); }
-        @media (max-width: 1100px) { main { grid-template-columns: 1fr; } #map { height: 64vh; } }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestion des bâtiments géolocalisés</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+rqkG4S5moxCuxqdi8gkGZMWZ8Z6pQ7uFW3BqnquA=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --accent: #3b82f6;
+      --accent-2: #22d3ee;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f87171;
+      --success: #34d399;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 10% 20%, rgba(59,130,246,0.2), transparent 25%),
+                  radial-gradient(circle at 90% 10%, rgba(34,211,238,0.12), transparent 25%),
+                  radial-gradient(circle at 30% 80%, rgba(52,211,153,0.18), transparent 20%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+    header {
+      padding: 16px 20px;
+      background: rgba(17,24,39,0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .brand span {
+      display: inline-flex;
+      width: 38px;
+      height: 38px;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: 12px;
+      color: #0b1224;
+      font-weight: 800;
+      box-shadow: 0 10px 35px rgba(59,130,246,0.35);
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    button, label.button-like {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(135deg, rgba(59,130,246,0.9), rgba(34,211,238,0.9));
+      color: #0b1224;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(59,130,246,0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button.secondary, label.secondary {
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      box-shadow: none;
+    }
+    button:disabled, label.button-like.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    button:hover:not(:disabled), label.button-like:hover:not(.disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 38px rgba(59,130,246,0.42);
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 12px;
+      padding: 12px;
+      min-height: calc(100vh - 76px);
+    }
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .panel { order: 2; }
+    }
+    .panel {
+      background: rgba(17,24,39,0.9);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+      max-height: calc(100vh - 120px);
+      overflow: auto;
+    }
+    .panel h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .status {
+      display: grid;
+      gap: 6px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59,130,246,0.18);
+      color: #dbeafe;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid rgba(59,130,246,0.25);
+    }
+    progress {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.05);
+    }
+    progress::-webkit-progress-bar { background: rgba(255,255,255,0.05); }
+    progress::-webkit-progress-value {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+    progress::-moz-progress-bar {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+    }
+    .stat {
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .stat h3 { margin: 0 0 4px 0; font-size: 13px; color: var(--muted); }
+    .stat strong { font-size: 20px; }
+    .filters {
+      display: grid;
+      gap: 8px;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    label { font-size: 14px; color: var(--muted); }
+    input, select, textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px;
+      color: var(--text);
+      font: inherit;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid var(--accent-2);
+      border-color: var(--accent);
+    }
+    .map { border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 50px rgba(0,0,0,0.35); }
+    #map { width: 100%; height: calc(100vh - 120px); min-height: 480px; }
+    .list {
+      max-height: 240px;
+      overflow: auto;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      padding: 8px;
+    }
+    .item {
+      padding: 8px;
+      border-radius: 10px;
+      display: grid;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .item:hover { background: rgba(59,130,246,0.12); }
+    .divider { height: 1px; background: rgba(255,255,255,0.05); margin: 4px 0; }
+    .danger { color: var(--danger); }
+    .success { color: var(--success); }
+    .muted { color: var(--muted); }
+  </style>
 </head>
 <body>
-<header>
-    <div class="bar">
-        <div class="brand">
-            <div class="logo">BF</div>
-            <div>
-                <h1>Atlas Bâtiments</h1>
-                <div class="pill">Import Excel / CSV / JSON + Autosauvegarde</div>
-            </div>
-        </div>
-        <div class="actions" aria-label="Actions principales">
-            <div class="field">
-                <svg width="18" height="18" fill="none" stroke="#9fb3ce" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><line x1="12" y1="12" x2="17" y2="17"/></svg>
-                <input id="search-input" placeholder="Rechercher un bâtiment (nom, propriétaire, ville...)" aria-label="Recherche" />
-            </div>
-            <label class="btn" id="import-btn" for="file-input" aria-label="Importer un fichier Excel ou CSV">Importer Excel / CSV</label>
-            <label class="btn secondary" id="import-json-btn" for="json-input" aria-label="Importer un JSON">Importer JSON</label>
-            <input type="file" id="file-input" accept=".xlsx,.xls,.csv" aria-label="Importer un fichier" />
-            <input type="file" id="json-input" accept=".json" aria-label="Importer un JSON sauvegardé" />
-            <button class="btn secondary" id="export-btn">Exporter JSON</button>
-            <button class="btn secondary" id="sample-btn">Charger un exemple</button>
-            <button class="btn secondary" id="reset-btn">Réinitialiser</button>
-        </div>
+  <header>
+    <div class="brand" aria-label="Gestion des bâtiments">
+      <span aria-hidden="true">G</span>
+      <div>
+        <div>Carte bâtiments</div>
+        <small class="muted">Imports Excel / JSON, filtres, édition, sauvegarde</small>
+      </div>
     </div>
-</header>
-<main>
-    <div id="map" role="region" aria-label="Carte des bâtiments"></div>
-    <div class="side-panel" aria-label="Panneau d'information">
-        <div class="card" id="status-card">
-            <h3>État et sauvegarde</h3>
-            <div id="status" class="muted">Prêt pour un nouveau chargement.</div>
-            <div id="progress-outer"><div id="progress-inner"></div></div>
-            <div class="save-state" aria-live="polite">
-                <span id="save-indicator" class="badge">Enregistré</span>
-                <span id="save-time">–</span>
-            </div>
-        </div>
-        <div class="card">
-            <h3>Statistiques</h3>
-            <div class="stats">
-                <div class="stat"><strong id="stat-count">0</strong><span>Bâtiments affichés</span></div>
-                <div class="stat"><strong id="stat-total">0</strong><span>Total importé</span></div>
-                <div class="stat"><strong id="stat-ignored">0</strong><span>Lignes ignorées</span></div>
-                <div class="stat"><strong id="stat-coords">–</strong><span>Colonnes coordonnées détectées</span></div>
-                <div class="stat"><strong id="stat-source">–</strong><span>Source chargée</span></div>
-            </div>
-            <div class="legend" id="legend"></div>
-        </div>
-        <div class="card">
-            <h3>Filtres & outils</h3>
-            <div class="filters">
-                <div>
-                    <label for="filter-text">Filtre texte (multi-champs)</label>
-                    <input id="filter-text" placeholder="Mot-clé" />
-                </div>
-                <div>
-                    <label for="filter-field">Champ ciblé</label>
-                    <select id="filter-field"><option value="">(Tous)</option></select>
-                </div>
-                <div>
-                    <label for="filter-value">Valeur attendue</label>
-                    <input id="filter-value" placeholder="Type, état, ville..." />
-                </div>
-                <div>
-                    <label for="date-from">Date min</label>
-                    <input id="date-from" type="date" />
-                </div>
-                <div>
-                    <label for="date-to">Date max</label>
-                    <input id="date-to" type="date" />
-                </div>
-            </div>
-            <div class="toolbar">
-                <button class="btn" id="apply-filters">Appliquer filtres</button>
-                <button class="btn secondary" id="clear-filters">Réinitialiser filtres</button>
-                <button class="btn secondary" id="fit-btn">Recentrer</button>
-                <button class="btn secondary" id="restore-btn">Restaurer dernière version</button>
-            </div>
-            <p class="notice">Les filtres s'appliquent aux données importées (Excel/CSV/JSON) et sont inclus dans l'export.</p>
-        </div>
-        <div class="card">
-            <h3>Détails & édition</h3>
-            <div id="details" class="muted empty">Cliquez sur un marqueur ou recherchez un bâtiment pour afficher et modifier sa fiche.</div>
-        </div>
+    <div class="actions" aria-label="Actions principales">
+      <label class="button-like" for="excel-input" id="excel-label">📑 Importer Excel</label>
+      <input id="excel-input" type="file" accept=".xlsx,.xls,.csv" style="display:none" />
+      <label class="button-like secondary" for="json-input" id="json-label">📂 Importer JSON</label>
+      <input id="json-input" type="file" accept="application/json" style="display:none" />
+      <button id="export-json" type="button">💾 Exporter JSON</button>
+      <button id="reset-app" class="secondary" type="button">🔄 Réinitialiser</button>
     </div>
-</main>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-<script>
-(() => {
-    const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([49.5, 2.5], 6);
+  </header>
+  <div class="layout">
+    <aside class="panel" aria-label="Panneau de contrôle">
+      <section class="status">
+        <div class="badge" id="status-text">Prêt à importer</div>
+        <progress id="progress" value="0" max="100" aria-label="Progression" hidden></progress>
+        <div class="muted" id="summary">Aucune donnée chargée</div>
+        <div class="muted" id="autosave">Sauvegarde auto inactive</div>
+      </section>
+      <section class="stats" aria-label="Statistiques">
+        <div class="stat"><h3>Total</h3><strong id="stat-total">0</strong></div>
+        <div class="stat"><h3>Filtrés</h3><strong id="stat-filtered">0</strong></div>
+        <div class="stat"><h3>Ignorés</h3><strong id="stat-ignored">0</strong></div>
+        <div class="stat"><h3>Dernière sauvegarde</h3><strong id="stat-save">-</strong></div>
+      </section>
+      <section class="filters" aria-label="Filtres et recherche">
+        <div class="field">
+          <label for="search">Recherche texte</label>
+          <input id="search" type="search" placeholder="Nom, adresse, type..." />
+        </div>
+        <div class="field">
+          <label for="column-filter">Filtrer par colonne</label>
+          <select id="column-filter"></select>
+        </div>
+        <div class="field">
+          <label for="value-filter">Valeur attendue (contient)</label>
+          <input id="value-filter" type="text" placeholder="Type=Ecole, Etat=Actif..." />
+        </div>
+        <div class="actions">
+          <button id="apply-filters" type="button" class="secondary">Appliquer filtres</button>
+          <button id="clear-filters" type="button" class="secondary">Réinitialiser filtres</button>
+          <button id="fit-map" type="button" class="secondary">🗺️ Recentrer</button>
+        </div>
+      </section>
+      <section aria-label="Détails et édition">
+        <h2>Détails du bâtiment</h2>
+        <div id="details">Sélectionnez un point ou un élément.</div>
+      </section>
+      <section aria-label="Historique et liste">
+        <h2>Historique</h2>
+        <div id="history">Aucune sauvegarde précédente.</div>
+        <h2>Enregistrements</h2>
+        <div class="list" id="list"></div>
+      </section>
+    </aside>
+    <main class="map">
+      <div id="map" role="region" aria-label="Carte des bâtiments"></div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-VuZ9wZ0kJ7g3G3tHlrE8wG1rx65T1l26wO5GQ6Xuvlw=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script>
+    const map = L.map('map', { zoomControl: true }).setView([46.6, 2.4], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap'
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
     }).addTo(map);
-
-    const cluster = L.markerClusterGroup({
-        chunkedLoading: true,
-        chunkProgress: updateChunkProgress,
-        maxClusterRadius: 60,
-        disableClusteringAtZoom: 16
-    });
+    const cluster = L.markerClusterGroup({ chunkedLoading: true, chunkProgress: updateProgressChunk });
     map.addLayer(cluster);
 
-    window.addEventListener('error', (evt) => setStatus(`Erreur inattendue : ${evt.message}`, 'error'));
-    window.addEventListener('unhandledrejection', (evt) => setStatus(`Erreur asynchrone : ${evt.reason}`, 'error'));
-
-    const STORAGE_KEY = 'atlas-batiments-v3';
-    const STORAGE_PREV = 'atlas-batiments-v3-prev';
+    const els = {
+      status: document.getElementById('status-text'),
+      progress: document.getElementById('progress'),
+      summary: document.getElementById('summary'),
+      autosave: document.getElementById('autosave'),
+      statTotal: document.getElementById('stat-total'),
+      statFiltered: document.getElementById('stat-filtered'),
+      statIgnored: document.getElementById('stat-ignored'),
+      statSave: document.getElementById('stat-save'),
+      search: document.getElementById('search'),
+      columnFilter: document.getElementById('column-filter'),
+      valueFilter: document.getElementById('value-filter'),
+      details: document.getElementById('details'),
+      history: document.getElementById('history'),
+      list: document.getElementById('list'),
+      progressBar: document.getElementById('progress'),
+    };
 
     const state = {
-        features: [],
-        displayed: [],
-        indexedById: new Map(),
-        markerById: new Map(),
-        ignored: 0,
-        coordHint: '–',
-        source: 'aucune',
-        lastError: null,
-        filters: { text: '', field: '', value: '', from: '', to: '' },
-        detectedFields: [],
-        lastSave: null,
-        savePending: false,
-        selectedId: null,
+      records: [],
+      filtered: [],
+      ignored: 0,
+      lastSave: null,
+      filters: { text: '', column: '', value: '' },
+      view: { center: [46.6, 2.4], zoom: 6 },
+      busy: false,
     };
 
-    const els = {
-        fileInput: document.getElementById('file-input'),
-        jsonInput: document.getElementById('json-input'),
-        importBtn: document.getElementById('import-btn'),
-        importJsonBtn: document.getElementById('import-json-btn'),
-        exportBtn: document.getElementById('export-btn'),
-        sampleBtn: document.getElementById('sample-btn'),
-        resetBtn: document.getElementById('reset-btn'),
-        search: document.getElementById('search-input'),
-        status: document.getElementById('status'),
-        progressOuter: document.getElementById('progress-outer'),
-        progressInner: document.getElementById('progress-inner'),
-        statCount: document.getElementById('stat-count'),
-        statTotal: document.getElementById('stat-total'),
-        statIgnored: document.getElementById('stat-ignored'),
-        statCoords: document.getElementById('stat-coords'),
-        statSource: document.getElementById('stat-source'),
-        details: document.getElementById('details'),
-        filterText: document.getElementById('filter-text'),
-        filterField: document.getElementById('filter-field'),
-        filterValue: document.getElementById('filter-value'),
-        dateFrom: document.getElementById('date-from'),
-        dateTo: document.getElementById('date-to'),
-        applyFilters: document.getElementById('apply-filters'),
-        clearFilters: document.getElementById('clear-filters'),
-        fitBtn: document.getElementById('fit-btn'),
-        restoreBtn: document.getElementById('restore-btn'),
-        saveIndicator: document.getElementById('save-indicator'),
-        saveTime: document.getElementById('save-time'),
-        legend: document.getElementById('legend'),
-    };
-
-    const SAMPLE = {
-        source: 'Échantillon (JSON)',
-        records: [
-            { Nom: "Mairie d'Amiens", Ville: 'Amiens', Proprietaire: 'Ville', Type: 'Public', Etat: 'Ouvert', Latitude: 49.8941, Longitude: 2.2958 },
-            { Nom: 'Collège Pierre et Marie Curie', Ville: 'Abbeville', Proprietaire: 'Département', Type: 'Éducation', Etat: 'Rénovation', Latitude: 50.1052, Longitude: 1.8369 },
-            { Nom: 'Lycée Jean Rostand', Ville: 'Rouen', Proprietaire: 'Région', Type: 'Éducation', Etat: 'Ouvert', Latitude: 49.4447, Longitude: 1.0989 },
-            { Nom: 'Centre administratif', Ville: 'Calais', Proprietaire: 'État', Type: 'Administratif', Etat: 'Ouvert', Latitude: 50.9481, Longitude: 1.8564 },
-            { Nom: 'Maison des Services', Ville: 'Cherbourg', Proprietaire: 'Communauté Urbaine', Type: 'Service', Etat: 'Projet', Latitude: 49.6361, Longitude: -1.6244 },
-        ]
-    };
-
-    let saveTimer;
-
-    /** UTILITAIRES **/
-    function setStatus(text, tone = 'muted') {
-        state.lastError = tone === 'error' ? text : null;
-        els.status.className = tone === 'error' ? 'errors' : (tone === 'good' ? 'badge' : 'muted');
-        els.status.innerHTML = text;
+    let idCounter = 0;
+    function uuid() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      idCounter += 1;
+      return `loc-${Date.now()}-${idCounter}`;
     }
 
-    function setBusy(isBusy) {
-        const targets = [els.importBtn, els.importJsonBtn, els.exportBtn, els.sampleBtn, els.resetBtn, els.applyFilters];
-        targets.forEach(btn => btn && (btn.disabled = isBusy));
-        els.fileInput.disabled = isBusy;
-        els.jsonInput.disabled = isBusy;
-    }
-
-    function showProgress(percent) {
-        els.progressOuter.style.display = 'block';
-        els.progressInner.style.width = `${Math.min(100, Math.max(0, percent))}%`;
-    }
-
-    function hideProgress() {
-        els.progressOuter.style.display = 'none';
-        els.progressInner.style.width = '0%';
-    }
-
-    function updateChunkProgress(processed, total, elapsed) {
-        const speed = processed / (elapsed || 1);
-        const remaining = total - processed;
-        const eta = remaining / (speed || 1);
-        const percent = Math.min(100, (processed / total) * 100);
-        showProgress(percent);
-        setStatus(`Placement des marqueurs : ${processed}/${total} (~${eta.toFixed(0)} ms restants)`, 'muted');
-    }
-
-    function parseNumber(val) {
-        if (val === null || val === undefined) return NaN;
-        if (typeof val === 'number') return val;
-        if (typeof val !== 'string') return NaN;
-        const cleaned = val.trim().replace(/\s+/g, ' ').replace(',', '.');
-        const parsed = Number(cleaned);
-        if (!Number.isNaN(parsed)) return parsed;
-        const match = cleaned.match(/-?\d+(?:[\.,]\d+)?/);
-        return match ? Number(match[0].replace(',', '.')) : NaN;
-    }
-
-    function extractNumbers(value) {
-        if (typeof value === 'number') return [value];
-        if (typeof value !== 'string') return [];
-        return value.replace(/[,;]/g, ' ')
-            .split(/\s+/)
-            .map(parseNumber)
-            .filter(v => !Number.isNaN(v));
-    }
-
-    function bestLatLon(numbers) {
-        let best = null;
-        const consider = (lat, lon, score) => {
-            if (isValidLatLon(lat, lon) && (!best || score > best.score)) {
-                best = { lat, lon, score };
-            }
-        };
-        for (let i = 0; i < numbers.length - 1; i++) {
-            const a = numbers[i];
-            const b = numbers[i + 1];
-            consider(a, b, 3);
-            consider(b, a, 2); // cas inversé
+    function setBusy(flag, message) {
+      state.busy = flag;
+      els.status.textContent = message || (flag ? 'Traitement en cours...' : 'Prêt');
+      document.querySelectorAll('button, label.button-like').forEach(btn => {
+        if (btn.id === 'excel-label' || btn.id === 'json-label' || btn.tagName === 'BUTTON') {
+          if (flag) {
+            btn.classList.add('disabled');
+            btn.setAttribute('aria-disabled', 'true');
+          } else {
+            btn.classList.remove('disabled');
+            btn.removeAttribute('aria-disabled');
+          }
         }
-        return best ? { lat: best.lat, lon: best.lon } : null;
-    }
-
-    function detectCoords(obj) {
-        const keys = Object.keys(obj || {});
-        const coordNames = [
-            ['lat','latitude','y','coordy','northing','nord','lat\u00E9tude','latitud'],
-            ['lon','lng','longitude','x','coordx','easting','est','long','long\u00E9tude','longitud']
-        ];
-        let latKey = null, lonKey = null;
-        for (const key of keys) {
-            const lower = key.toLowerCase().replace(/\s+/g, '');
-            if (coordNames[0].some(k => lower.includes(k))) latKey = key;
-            if (coordNames[1].some(k => lower.includes(k))) lonKey = key;
-        }
-        if (latKey && lonKey) {
-            const lat = parseNumber(obj[latKey]);
-            const lon = parseNumber(obj[lonKey]);
-            if (isValidLatLon(lat, lon)) return { lat, lon, hint: `${latKey} / ${lonKey}` };
-        }
-
-        for (const key of keys) {
-            const nums = extractNumbers(obj[key]);
-            const pair = bestLatLon(nums);
-            if (pair) return { ...pair, hint: key };
-        }
-
-        const values = keys.map(k => parseNumber(obj[k])).filter(v => !Number.isNaN(v));
-        const fallback = bestLatLon(values);
-        if (fallback) return { ...fallback, hint: 'pair auto' };
-        return null;
-    }
-
-    function isValidLatLon(lat, lon) {
-        return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
-    }
-
-    function makeId() {
-        try {
-            if (crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
-        } catch (_) {}
-        return 'bat-' + Date.now().toString(36) + '-' + Math.random().toString(16).slice(2);
-    }
-
-    function normalizeRecords(records) {
-        const normalized = [];
-        let ignored = 0;
-        let hint = 'aucune';
-        records.forEach((row) => {
-            const obj = Array.isArray(row) ? row.reduce((acc, val, i) => { acc[`col_${i+1}`] = val; return acc; }, {}) : row;
-            const coords = detectCoords(obj);
-            if (!coords) { ignored++; return; }
-            hint = coords.hint || hint;
-            const { lat, lon } = coords;
-            const meta = { ...obj };
-            const title = meta.Nom || meta.nom || meta.Name || meta.Titre || meta['Libellé'] || meta.Building || `Bâtiment #${normalized.length + 1}`;
-            normalized.push({ id: makeId(), lat, lon, title, meta });
-        });
-        return { normalized, ignored, hint };
-    }
-
-    function buildPopup(feature) {
-        const parts = [ `<strong>${feature.title}</strong>` ];
-        const keys = Object.keys(feature.meta || {});
-        if (keys.length) {
-            parts.push('<div style="margin-top:6px;font-size:12px;line-height:1.4">');
-            keys.forEach(k => {
-                const v = feature.meta[k];
-                if (v === undefined || v === null || v === '') return;
-                parts.push(`<div><span style=\"color:#9ca3af\">${k} :</span> ${v}</div>`);
-            });
-            parts.push('</div>');
-        }
-        parts.push('<button class="btn" style="margin-top:8px;width:100%" onclick="window.showDetails(\'' + feature.id + '\')">Fiche complète</button>');
-        return parts.join('');
-    }
-
-    function renderDetails(feature) {
-        if (!feature) {
-            els.details.className = 'muted empty';
-            els.details.innerHTML = 'Cliquez sur un marqueur ou recherchez un bâtiment pour afficher et modifier sa fiche.';
-            return;
-        }
-        state.selectedId = feature.id;
-        els.details.className = '';
-        const entries = Object.entries(feature.meta || {});
-        const grid = entries.map(([k,v]) => {
-            const safeVal = v === undefined || v === null ? '' : v;
-            return `<div class="detail"><label>${k}</label><input data-field="${k}" value="${safeVal}" aria-label="${k}" /></div>`;
-        }).join('');
-        els.details.innerHTML = `<div class="chips"><div class="chip">${feature.title}</div><div class="chip">${feature.lat.toFixed(5)}, ${feature.lon.toFixed(5)}</div></div>` +
-            (grid ? `<div class="detail-grid">${grid}</div>` : '<div class="muted empty">Aucune information supplémentaire.</div>') +
-            '<div class="toolbar" style="margin-top:10px"><button class="btn" id="save-now">Sauvegarder</button><button class="btn secondary" id="duplicate">Dupliquer</button></div>';
-        els.details.querySelectorAll('input[data-field]').forEach(input => {
-            input.addEventListener('input', () => updateFeatureField(feature.id, input.dataset.field, input.value));
-        });
-        const saveBtn = document.getElementById('save-now');
-        if (saveBtn) saveBtn.addEventListener('click', () => persist());
-        const duplicateBtn = document.getElementById('duplicate');
-        if (duplicateBtn) duplicateBtn.addEventListener('click', () => duplicateFeature(feature));
-    }
-
-    function duplicateFeature(feature) {
-        const copy = { ...feature, id: makeId(), title: feature.title + ' (copie)', meta: { ...feature.meta } };
-        state.features.push(copy);
-        applyFilters(false);
-        setStatus('Bâtiment dupliqué.', 'good');
-        schedulePersist();
-    }
-
-    function updateFeatureField(id, field, value) {
-        const feature = state.features.find(f => f.id === id);
-        if (!feature) return;
-        feature.meta[field] = value;
-        state.indexedById.set(id, feature);
-        const marker = state.markerById.get(id);
-        if (marker) marker.bindPopup(buildPopup(feature));
-        state.savePending = true;
-        updateSaveIndicator();
-        schedulePersist();
-    }
-
-    function clearMap() {
-        cluster.clearLayers();
-        state.markerById.clear();
-        state.features = [];
-        state.displayed = [];
-        state.indexedById.clear();
-        state.ignored = 0;
-        state.coordHint = '–';
-        state.source = 'aucune';
-        state.detectedFields = [];
-        updateStats();
-        renderDetails(null);
-        hideProgress();
-        setStatus('Prêt pour un nouveau chargement.');
-        updateFieldsOptions();
-    }
-
-    function beginImport(label = 'fichier') {
-        cluster.clearLayers();
-        state.indexedById.clear();
-        state.markerById.clear();
-        state.features = [];
-        state.displayed = [];
-        state.ignored = 0;
-        state.coordHint = '–';
-        state.source = 'aucune';
-        updateStats();
-        renderDetails(null);
-        showProgress(2);
-        setBusy(true);
-        setStatus(`Import de ${label} en cours...`);
-        state.savePending = true;
-        updateSaveIndicator();
+      });
     }
 
     function updateStats() {
-        els.statCount.textContent = state.displayed.length.toLocaleString('fr-FR');
-        els.statTotal.textContent = state.features.length.toLocaleString('fr-FR');
-        els.statIgnored.textContent = state.ignored.toLocaleString('fr-FR');
-        els.statCoords.textContent = state.coordHint;
-        els.statSource.textContent = state.source;
+      els.statTotal.textContent = state.records.length;
+      els.statFiltered.textContent = state.filtered.length;
+      els.statIgnored.textContent = state.ignored;
+      els.statSave.textContent = state.lastSave ? new Date(state.lastSave).toLocaleString() : '-';
     }
 
-    async function importFile(file) {
-        if (!file) return;
-        beginImport(file.name);
-        try {
-            const buffer = await readBuffer(file);
-            let records = [];
-            let sourceLabel = file.name;
-            const lower = file.name.toLowerCase();
-            if (lower.endsWith('.xlsx') || lower.endsWith('.xls')) {
-                if (typeof XLSX === 'undefined') throw new Error('Bibliothèque Excel absente ou bloquée. Vérifiez votre connexion.');
-                setStatus('Décodage Excel en cours...');
-                const { records: excelRows, sheetName } = decodeExcel(buffer);
-                records = excelRows;
-                sourceLabel = `${file.name} (${sheetName})`;
-            } else if (lower.endsWith('.csv')) {
-                const text = new TextDecoder('utf-8').decode(buffer);
-                records = parseCSV(text);
-                sourceLabel = `${file.name} (CSV)`;
-            } else {
-                throw new Error('Format non supporté. Utilisez .xlsx .xls ou .csv.');
-            }
-            if (!records || !records.length) throw new Error('Aucune donnée exploitable trouvée.');
-            await handleRecords(records, sourceLabel);
-        } catch (err) {
-            console.error(err);
-            setStatus(`Erreur d'import : ${err.message}`, 'error');
-            hideProgress();
-        } finally {
-            els.fileInput.value = '';
-            setBusy(false);
+    function updateSummary(text, success = true) {
+      els.summary.textContent = text;
+      els.summary.className = success ? 'success' : 'danger';
+    }
+
+    function updateHistoryPanel() {
+      if (state.lastSave) {
+        els.history.textContent = `Dernière sauvegarde automatique : ${new Date(state.lastSave).toLocaleString()}`;
+      } else {
+        els.history.textContent = 'Aucune sauvegarde précédente.';
+      }
+    }
+
+    function updateProgress(value, label) {
+      els.progress.hidden = false;
+      els.progress.value = Math.min(100, Math.max(0, value));
+      els.status.textContent = label;
+    }
+
+    function updateProgressChunk(processed, total) {
+      const percent = Math.round((processed / total) * 100);
+      updateProgress(percent, `Placement des points ${percent}%`);
+    }
+
+    function resetProgress() {
+      els.progress.value = 0;
+      els.progress.hidden = true;
+    }
+
+    function clearUI() {
+      els.details.textContent = 'Sélectionnez un point ou un élément.';
+      els.list.innerHTML = '';
+      cluster.clearLayers();
+    }
+
+    function normalizeHeaders(headers) {
+      return headers.map(h => String(h || '').trim().toLowerCase());
+    }
+
+    function detectCoordKeys(headers) {
+      const normalized = normalizeHeaders(headers);
+      const latKeys = ['lat', 'latitude', 'y', 'lat.', 'coord_y'];
+      const lonKeys = ['lon', 'lng', 'longitude', 'x', 'long', 'coord_x'];
+      let latKey = '', lonKey = '';
+      normalized.forEach((key, i) => {
+        if (!latKey && latKeys.some(k => key.includes(k))) latKey = headers[i];
+        if (!lonKey && lonKeys.some(k => key.includes(k))) lonKey = headers[i];
+      });
+      return { latKey, lonKey };
+    }
+
+    function extractCoordinates(row, latKey, lonKey) {
+      const values = [];
+      Object.entries(row).forEach(([k,v]) => {
+        if (k === latKey || k === lonKey) return;
+        if (typeof v === 'string') {
+          const matches = v.match(/[-+]?\d*[\.,]?\d+/g);
+          if (matches) matches.forEach(m => values.push(m));
+        } else if (typeof v === 'number') {
+          values.push(String(v));
         }
+      });
+      function toNumber(val) {
+        if (typeof val === 'number') return val;
+        const t = String(val).replace(/\s/g, '').replace(',', '.');
+        const n = parseFloat(t);
+        return Number.isFinite(n) ? n : null;
+      }
+      const latVal = toNumber(latKey ? row[latKey] : undefined);
+      const lonVal = toNumber(lonKey ? row[lonKey] : undefined);
+      const pairs = [];
+      if (latVal !== null && lonVal !== null) pairs.push([latVal, lonVal]);
+      for (let i = 0; i < values.length - 1; i++) {
+        const a = toNumber(values[i]);
+        const b = toNumber(values[i+1]);
+        if (a !== null && b !== null) pairs.push([a,b]);
+      }
+      for (const [a,b] of pairs) {
+        if (Math.abs(a) <= 90 && Math.abs(b) <= 180) return { lat: a, lon: b };
+        if (Math.abs(b) <= 90 && Math.abs(a) <= 180) return { lat: b, lon: a };
+      }
+      return null;
     }
 
-    async function importJson(file) {
-        if (!file) return;
-        beginImport(file.name);
-        try {
-            const buffer = await readBuffer(file);
-            const text = new TextDecoder('utf-8').decode(buffer);
-            const payload = JSON.parse(text);
-            loadStatePayload(payload, `${file.name} (JSON)`, false);
-        } catch (err) {
-            console.error(err);
-            setStatus(`Erreur d'import JSON : ${err.message}`, 'error');
-            hideProgress();
-        } finally {
-            els.jsonInput.value = '';
-            setBusy(false);
+    function normalizeRecords(rows) {
+      const headers = rows.length ? Object.keys(rows[0]) : [];
+      const { latKey, lonKey } = detectCoordKeys(headers);
+      let valid = 0; let ignored = 0;
+      const records = [];
+      rows.forEach((row, idx) => {
+        const coord = extractCoordinates(row, latKey, lonKey);
+        if (!coord) { ignored++; return; }
+        const { lat, lon } = coord;
+        if (!Number.isFinite(lat) || !Number.isFinite(lon)) { ignored++; return; }
+        const attrs = { ...row };
+        if (latKey) delete attrs[latKey];
+        if (lonKey) delete attrs[lonKey];
+        records.push({ id: uuid(), lat, lon, attrs });
+        valid++;
+      });
+      state.ignored = ignored;
+      updateSummary(`${valid} lignes valides, ${ignored} ignorées`);
+      return records;
+    }
+
+    function addMarkers(records) {
+      cluster.clearLayers();
+      const markers = records.map(rec => {
+        const marker = L.marker([rec.lat, rec.lon]);
+        marker.bindPopup(buildPopup(rec));
+        marker.on('click', () => selectRecord(rec.id));
+        return marker;
+      });
+      cluster.addLayers(markers);
+      if (markers.length) {
+        const group = L.featureGroup(markers);
+        map.fitBounds(group.getBounds(), { padding: [30,30] });
+      }
+      resetProgress();
+    }
+
+    function buildPopup(rec) {
+      const lines = Object.entries(rec.attrs).map(([k,v]) => `<div><strong>${escapeHtml(k)} :</strong> ${escapeHtml(String(v ?? ''))}</div>`).join('');
+      return `<div><strong>Bâtiment</strong><br/>Lat: ${rec.lat.toFixed(5)}<br/>Lon: ${rec.lon.toFixed(5)}${lines ? '<hr/>'+lines : ''}<br/><button type="button" data-id="${rec.id}" class="popup-edit">Éditer</button></div>`;
+    }
+
+    function renderList(records) {
+      els.list.innerHTML = '';
+      records.slice(0, 2000).forEach(rec => {
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.tabIndex = 0;
+        item.innerHTML = `<div><strong>${escapeHtml(rec.attrs.nom || rec.attrs.name || 'Sans nom')}</strong></div><div class="muted">${rec.lat.toFixed(5)}, ${rec.lon.toFixed(5)}</div>`;
+        item.addEventListener('click', () => selectRecord(rec.id, true));
+        item.addEventListener('keydown', e => { if (e.key === 'Enter') selectRecord(rec.id, true); });
+        els.list.appendChild(item);
+      });
+      if (!records.length) {
+        const empty = document.createElement('div');
+        empty.className = 'muted';
+        empty.textContent = 'Aucun enregistrement à afficher.';
+        els.list.appendChild(empty);
+      }
+    }
+
+    function renderDetails(rec) {
+      if (!rec) { els.details.textContent = 'Sélectionnez un point ou un élément.'; return; }
+      const form = document.createElement('form');
+      form.setAttribute('aria-label', 'Édition du bâtiment');
+      form.innerHTML = `
+        <div class="field"><label>Latitude</label><input name="lat" type="number" step="any" value="${rec.lat}" required /></div>
+        <div class="field"><label>Longitude</label><input name="lon" type="number" step="any" value="${rec.lon}" required /></div>
+      `;
+      Object.entries(rec.attrs).forEach(([k,v]) => {
+        const field = document.createElement('div');
+        field.className = 'field';
+        const label = document.createElement('label');
+        label.textContent = k;
+        const input = document.createElement('input');
+        input.name = `attr-${k}`;
+        input.value = v ?? '';
+        field.appendChild(label);
+        field.appendChild(input);
+        form.appendChild(field);
+      });
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const saveBtn = document.createElement('button');
+      saveBtn.type = 'submit';
+      saveBtn.textContent = 'Enregistrer';
+      const dupBtn = document.createElement('button');
+      dupBtn.type = 'button';
+      dupBtn.className = 'secondary';
+      dupBtn.textContent = 'Dupliquer';
+      actions.appendChild(saveBtn);
+      actions.appendChild(dupBtn);
+      form.appendChild(actions);
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const data = new FormData(form);
+        const lat = parseFloat(data.get('lat'));
+        const lon = parseFloat(data.get('lon'));
+        if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+          updateSummary('Coordonnées invalides', false);
+          return;
         }
-    }
-
-    function readBuffer(file) {
-        if (file.arrayBuffer) return file.arrayBuffer();
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onerror = () => reject(new Error('Lecture du fichier impossible.'));
-            reader.onabort = () => reject(new Error('Lecture annulée.'));
-            reader.onload = () => resolve(reader.result);
-            reader.readAsArrayBuffer(file);
+        const attrs = {};
+        data.forEach((value, key) => {
+          if (key.startsWith('attr-')) attrs[key.replace('attr-','')] = value;
         });
+        rec.lat = lat; rec.lon = lon; rec.attrs = attrs;
+        persistState();
+        applyFilters();
+        updateSummary('Bâtiment mis à jour');
+        setTimeout(() => selectRecord(rec.id, true), 50);
+      });
+      dupBtn.addEventListener('click', () => {
+        const copy = { id: uuid(), lat: rec.lat, lon: rec.lon, attrs: { ...rec.attrs, copie: 'oui' } };
+        state.records.push(copy);
+        persistState();
+        applyFilters();
+        updateSummary('Bâtiment dupliqué');
+      });
+      els.details.innerHTML = '';
+      els.details.appendChild(form);
     }
 
-    function decodeExcel(buffer) {
-        if (typeof XLSX === 'undefined') throw new Error('Bibliothèque Excel non chargée.');
-        let workbook;
-        try {
-            workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
-        } catch (err) {
-            try {
-                workbook = XLSX.read(buffer, { type: 'array' });
-            } catch (fallbackErr) {
-                try {
-                    workbook = XLSX.read(buffer, { type: 'binary' });
-                } catch (binaryErr) {
-                    throw new Error('Décodage Excel impossible : ' + binaryErr.message);
-                }
-            }
-        }
-        const sheetName = workbook.SheetNames[0];
-        if (!sheetName) throw new Error('Aucun onglet détecté.');
-        const sheet = workbook.Sheets[sheetName];
-        if (!sheet) throw new Error('Onglet illisible.');
+    function selectRecord(id, panToMarker = false) {
+      const rec = state.records.find(r => r.id === id);
+      renderDetails(rec);
+      if (panToMarker && rec) {
+        map.setView([rec.lat, rec.lon], Math.max(map.getZoom(), 14));
+      }
+    }
 
-        const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-        if (!matrix.length) return { records: [], sheetName };
-        const headers = (matrix.shift() || []).map((h, idx) => (h && String(h).trim()) || `col_${idx + 1}`);
-        const rows = matrix
-            .filter(row => row.some(cell => String(cell).trim().length))
-            .map(row => {
-                const obj = {};
-                headers.forEach((h, i) => { obj[h] = row[i] ?? ''; });
-                return obj;
-            });
-        return { records: rows, sheetName };
+    function applyFilters() {
+      const text = els.search.value.trim().toLowerCase();
+      const column = els.columnFilter.value;
+      const value = els.valueFilter.value.trim().toLowerCase();
+      state.filters = { text, column, value };
+      state.filtered = state.records.filter(rec => {
+        const haystack = Object.values(rec.attrs).concat([rec.lat, rec.lon]).join(' ').toLowerCase();
+        if (text && !haystack.includes(text)) return false;
+        if (column && value) {
+          const colVal = String(rec.attrs[column] ?? '').toLowerCase();
+          if (!colVal.includes(value)) return false;
+        }
+        return true;
+      });
+      renderList(state.filtered);
+      addMarkers(state.filtered);
+      updateStats();
+      persistState(false);
+    }
+
+    function populateFiltersOptions() {
+      const keys = new Set();
+      state.records.forEach(rec => Object.keys(rec.attrs).forEach(k => keys.add(k)));
+      els.columnFilter.innerHTML = '<option value="">(Toutes colonnes)</option>';
+      Array.from(keys).sort().forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k; opt.textContent = k;
+        els.columnFilter.appendChild(opt);
+      });
+    }
+
+    function handleSheet(rows) {
+      const records = normalizeRecords(rows);
+      if (!records.length) {
+        updateSummary('Aucune ligne valide trouvée.', false);
+        setBusy(false, 'Prêt');
+        resetProgress();
+        return;
+      }
+      state.records = records;
+      state.filtered = records;
+      populateFiltersOptions();
+      renderList(records);
+      addMarkers(records);
+      updateStats();
+      persistState();
+      setBusy(false, 'Import terminé');
+    }
+
+    function parseExcel(file) {
+      if (!window.XLSX) {
+        updateSummary('Bibliothèque Excel manquante', false);
+        setBusy(false, 'Erreur');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onerror = () => { updateSummary('Lecture fichier échouée', false); setBusy(false, 'Erreur'); };
+      reader.onprogress = e => {
+        if (e.lengthComputable) {
+          const pct = Math.round((e.loaded / e.total) * 40);
+          updateProgress(pct, 'Lecture du fichier...');
+        }
+      };
+      reader.onload = e => {
+        updateProgress(45, 'Décodage Excel');
+        try {
+          const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+          const sheetName = wb.SheetNames[0];
+          const sheet = wb.Sheets[sheetName];
+          if (!sheet) throw new Error('Onglet introuvable');
+          const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+          updateProgress(60, 'Normalisation des lignes');
+          handleSheet(rows);
+        } catch(err) {
+          console.error(err);
+          updateSummary('Erreur Excel: ' + err.message, false);
+          setBusy(false, 'Erreur');
+          resetProgress();
+        }
+      };
+      reader.readAsArrayBuffer(file);
     }
 
     function parseCSV(text) {
-        const rows = text.replace(/^\ufeff/, '').split(/\r?\n/).filter(r => r.trim().length);
-        if (!rows.length) return [];
-        const delimiter = detectDelimiter(rows[0]);
-        const headers = rows[0].split(delimiter).map(h => h.trim());
-        return rows.slice(1).map(line => {
-            const cols = line.split(delimiter).map(c => c.trim());
-            const obj = {};
-            headers.forEach((h, i) => obj[h || `col_${i+1}`] = cols[i] ?? '');
-            return obj;
-        });
+      const lines = text.split(/\r?\n/).filter(l => l.trim().length);
+      if (!lines.length) return [];
+      const separators = [';','\t',',','|'];
+      const headerLine = lines[0];
+      const sep = separators.reduce((best, cur) => headerLine.split(cur).length > (headerLine.split(best).length) ? cur : best, separators[0]);
+      const headers = headerLine.split(sep).map(h => h.trim());
+      return lines.slice(1).map(line => {
+        const cells = line.split(sep);
+        const row = {};
+        headers.forEach((h,i) => { row[h || `col${i}`] = cells[i] ?? ''; });
+        return row;
+      });
     }
 
-    function detectDelimiter(sample) {
-        const delimiters = [';','\t','|',','];
-        const scores = delimiters.map(d => ({ d, count: sample.split(d).length }));
-        scores.sort((a,b) => b.count - a.count);
-        return scores[0].d;
-    }
-
-    async function handleRecords(records, sourceLabel) {
-        setStatus('Normalisation des coordonnées...');
-        showProgress(12);
-        const { normalized, ignored, hint } = normalizeRecords(records);
-        if (!normalized.length) {
-            setStatus('Aucune coordonnée valide détectée dans le fichier.', 'error');
-            hideProgress();
-            cluster.clearLayers();
-            state.features = [];
-            state.displayed = [];
-            state.ignored = records.length;
-            state.coordHint = '–';
-            state.source = sourceLabel;
-            updateStats();
-            setBusy(false);
-            return;
-        }
-        state.features = normalized;
-        state.ignored = ignored;
-        state.coordHint = hint;
-        state.source = sourceLabel;
-        collectFields();
-        applyFilters(false);
-        await placeMarkers(state.displayed);
-        finalizeImport();
-    }
-
-    function collectFields() {
-        const keys = new Set();
-        state.features.forEach(f => Object.keys(f.meta || {}).forEach(k => keys.add(k)));
-        state.detectedFields = Array.from(keys).sort();
-        updateFieldsOptions();
-    }
-
-    function syncFiltersUI() {
-        els.filterText.value = state.filters.text || '';
-        els.filterField.value = state.filters.field || '';
-        els.filterValue.value = state.filters.value || '';
-        els.dateFrom.value = state.filters.from || '';
-        els.dateTo.value = state.filters.to || '';
-    }
-
-    function updateFieldsOptions() {
-        const select = els.filterField;
-        select.innerHTML = '<option value="">(Tous)</option>' + state.detectedFields.map(k => `<option value="${k}">${k}</option>`).join('');
-        renderLegend();
-    }
-
-    function renderLegend() {
-        els.legend.innerHTML = '';
-        if (!state.detectedFields.length) return;
-        const candidates = ['Type','type','Etat','État','etat','Ville','Commune'];
-        const toShow = candidates.filter(c => state.detectedFields.includes(c));
-        toShow.forEach(c => {
-            const span = document.createElement('span');
-            span.textContent = `Filtrable : ${c}`;
-            els.legend.appendChild(span);
-        });
-    }
-
-    async function placeMarkers(features) {
-        cluster.clearLayers();
-        state.markerById.clear();
-        state.indexedById.clear();
-        if (!features.length) {
-            setStatus('Aucun bâtiment placé (0 coordonnées valides).', 'error');
-            hideProgress();
-            updateStats();
-            return;
-        }
-        return new Promise(resolve => {
-            const chunkSize = 400;
-            let index = 0;
-            function step() {
-                const slice = features.slice(index, index + chunkSize);
-                slice.forEach(f => {
-                    const marker = L.marker([f.lat, f.lon]);
-                    marker.bindPopup(buildPopup(f));
-                    marker.on('click', () => renderDetails(f));
-                    cluster.addLayer(marker);
-                    state.indexedById.set(f.id, f);
-                    state.markerById.set(f.id, marker);
-                });
-                index += chunkSize;
-                showProgress(Math.min(100, (index / features.length) * 100));
-                if (index < features.length) {
-                    requestAnimationFrame(step);
-                } else {
-                    resolve();
-                }
-            }
-            step();
-        });
-    }
-
-    function finalizeImport(skipSave=false) {
-        setStatus(`Import terminé : ${state.features.length} bâtiments placés, ${state.ignored} ligne(s) ignorée(s).`, state.features.length ? 'good' : 'error');
-        hideProgress();
-        updateStats();
-        if (!skipSave) persist(); else updateSaveIndicator();
-        fitToData();
-        setBusy(false);
-    }
-
-    function fitToData() {
-        if (!state.displayed.length) return;
-        const bounds = L.latLngBounds(state.displayed.map(f => [f.lat, f.lon]));
-        map.fitBounds(bounds.pad(0.1));
-    }
-
-    function schedulePersist() {
-        clearTimeout(saveTimer);
-        saveTimer = setTimeout(() => persist(), 800);
-    }
-
-    function persist() {
+    function parseJSON(file) {
+      const reader = new FileReader();
+      reader.onerror = () => { updateSummary('Lecture JSON échouée', false); setBusy(false, 'Erreur'); };
+      reader.onload = e => {
         try {
-            const payload = {
-                features: state.features,
-                displayedIds: state.displayed.map(f => f.id),
-                ignored: state.ignored,
-                coordHint: state.coordHint,
-                source: state.source,
-                filters: state.filters,
-                map: { center: map.getCenter(), zoom: map.getZoom() },
-                detectedFields: state.detectedFields,
-                lastSave: Date.now(),
-            };
-            const previous = localStorage.getItem(STORAGE_KEY);
-            if (previous) localStorage.setItem(STORAGE_PREV, previous);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-            state.lastSave = payload.lastSave;
-            state.savePending = false;
-            updateSaveIndicator();
-        } catch (e) {
-            console.warn('Autosave impossible', e);
-            setStatus('Autosauvegarde impossible : ' + e.message, 'error');
+          const payload = JSON.parse(e.target.result);
+          if (!payload || !Array.isArray(payload.records)) throw new Error('Format JSON invalide');
+          state.records = payload.records;
+          state.filtered = payload.records;
+          state.filters = payload.filters || state.filters;
+          state.view = payload.view || state.view;
+          state.lastSave = payload.timestamp || Date.now();
+          populateFiltersOptions();
+          els.search.value = state.filters.text || '';
+          els.columnFilter.value = state.filters.column || '';
+          els.valueFilter.value = state.filters.value || '';
+          renderList(state.records);
+          addMarkers(state.records);
+          map.setView(state.view.center || [46.6,2.4], state.view.zoom || 6);
+          updateSummary('JSON importé');
+          persistState(false);
+          setBusy(false, 'Import terminé');
+          updateStats();
+        } catch(err) {
+          console.error(err);
+          updateSummary('Erreur JSON: ' + err.message, false);
+          setBusy(false, 'Erreur');
         }
+      };
+      reader.readAsText(file, 'utf-8');
     }
 
-    function updateSaveIndicator() {
-        if (state.savePending) {
-            els.saveIndicator.textContent = 'Modifications en attente';
-            els.saveIndicator.className = 'badge';
-            els.saveIndicator.style.background = 'rgba(245, 158, 11, 0.1)';
-            els.saveIndicator.style.color = '#fef08a';
-        } else {
-            els.saveIndicator.textContent = 'Enregistré';
-            els.saveIndicator.className = 'badge';
-            els.saveIndicator.style.background = 'rgba(16, 185, 129, 0.1)';
-            els.saveIndicator.style.color = '#a7f3d0';
-        }
-        els.saveTime.textContent = state.lastSave ? new Date(state.lastSave).toLocaleString('fr-FR') : '–';
+    function persistState(updateSave = true) {
+      const timestamp = updateSave ? Date.now() : (state.lastSave || Date.now());
+      const payload = {
+        records: state.records,
+        filters: state.filters,
+        view: { center: map.getCenter(), zoom: map.getZoom() },
+        timestamp,
+      };
+      localStorage.setItem('batimap-state', JSON.stringify(payload));
+      if (updateSave || !state.lastSave) state.lastSave = payload.timestamp;
+      els.autosave.textContent = `Sauvegarde auto : ${new Date(payload.timestamp).toLocaleString()}`;
+      els.statSave.textContent = new Date(payload.timestamp).toLocaleString();
+      updateHistoryPanel();
     }
 
-    function restore(latest = true) {
-        try {
-            const raw = localStorage.getItem(latest ? STORAGE_KEY : STORAGE_PREV);
-            if (!raw) return false;
-            const payload = JSON.parse(raw);
-            return loadStatePayload(payload, latest ? 'autosauvegarde' : 'version précédente', true);
-        } catch (e) {
-            console.warn('Impossible de restaurer', e);
-            return false;
-        }
-    }
-
-    function loadStatePayload(payload, label, fit) {
-        if (!payload || !payload.features) throw new Error('Sauvegarde invalide.');
-        state.features = payload.features;
-        state.ignored = payload.ignored || 0;
-        state.coordHint = payload.coordHint || '–';
-        state.source = payload.source || label;
-        state.detectedFields = payload.detectedFields || [];
-        state.filters = payload.filters || state.filters;
-        state.lastSave = payload.lastSave || null;
-        collectFields();
-        syncFiltersUI();
-        applyFilters(false, payload.displayedIds || null);
-        placeMarkers(state.displayed).then(() => {
-            if (fit) {
-                if (payload.map && payload.map.center) {
-                    map.setView([payload.map.center.lat, payload.map.center.lng], payload.map.zoom || 6);
-                } else {
-                    fitToData();
-                }
-            } else {
-                fitToData();
-            }
-            finalizeImport(true);
-        });
-        setStatus(`Données restaurées depuis ${label}.`, 'good');
-        return true;
-    }
-
-    function loadSample() {
-        handleRecords(SAMPLE.records, SAMPLE.source);
-    }
-
-    function resetAll() {
-        clearMap();
+    function restoreState() {
+      const raw = localStorage.getItem('batimap-state');
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        if (!data.records) return;
+        state.records = data.records;
+        state.filtered = data.records;
+        state.filters = data.filters || state.filters;
+        state.view = data.view || state.view;
+        state.lastSave = data.timestamp || null;
+        els.search.value = state.filters.text || '';
+        els.columnFilter.value = state.filters.column || '';
+        els.valueFilter.value = state.filters.value || '';
+        populateFiltersOptions();
+        renderList(state.records);
+        addMarkers(state.records);
+        map.setView(state.view.center || [46.6,2.4], state.view.zoom || 6);
+        updateSummary('Données restaurées');
+        els.autosave.textContent = state.lastSave ? `Sauvegarde auto : ${new Date(state.lastSave).toLocaleString()}` : 'Sauvegarde auto inactive';
+        updateHistoryPanel();
         updateStats();
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(STORAGE_PREV);
-        updateSaveIndicator();
+      } catch(err) {
+        console.error(err);
+      }
     }
 
-    function search(term) {
-        const value = term.trim().toLowerCase();
-        if (!value) { renderDetails(null); return; }
-        const found = state.displayed.find(f => Object.values(f.meta || {}).some(v => String(v).toLowerCase().includes(value)) || f.title.toLowerCase().includes(value));
-        if (found) {
-            renderDetails(found);
-            map.flyTo([found.lat, found.lon], 14);
-        }
+    function exportJSON() {
+      const payload = {
+        records: state.records,
+        filters: state.filters,
+        view: { center: map.getCenter(), zoom: map.getZoom() },
+        timestamp: Date.now(),
+        metadata: { source: 'batimap', version: 1 }
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'batiments.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      updateSummary('Export JSON créé');
     }
 
-    function applyFilters(triggerSave = true, presetIds = null) {
-        const filters = state.filters;
-        filters.text = els.filterText.value || filters.text;
-        filters.field = els.filterField.value || filters.field;
-        filters.value = els.filterValue.value || filters.value;
-        filters.from = els.dateFrom.value || filters.from;
-        filters.to = els.dateTo.value || filters.to;
-
-        const text = (filters.text || '').toLowerCase();
-        const field = filters.field;
-        const value = (filters.value || '').toLowerCase();
-        const from = filters.from ? new Date(filters.from) : null;
-        const to = filters.to ? new Date(filters.to) : null;
-
-        let filtered = state.features.slice();
-        if (presetIds) {
-            filtered = filtered.filter(f => presetIds.includes(f.id));
-        }
-
-        filtered = filtered.filter(f => {
-            const values = Object.values(f.meta || {}).map(v => String(v).toLowerCase());
-            const textMatch = text ? values.some(v => v.includes(text)) || f.title.toLowerCase().includes(text) : true;
-            let fieldMatch = true;
-            if (field && value) {
-                fieldMatch = String(f.meta[field] || '').toLowerCase().includes(value);
-            } else if (value && !field) {
-                fieldMatch = values.some(v => v.includes(value));
-            }
-            let dateMatch = true;
-            if (from || to) {
-                const dateVal = field ? new Date(f.meta[field]) : null;
-                if (field && dateVal.toString() !== 'Invalid Date') {
-                    if (from && dateVal < from) dateMatch = false;
-                    if (to && dateVal > to) dateMatch = false;
-                }
-            }
-            return textMatch && fieldMatch && dateMatch;
-        });
-
-        state.displayed = filtered;
-        updateStats();
-        placeMarkers(filtered).then(() => fitToData());
-        if (triggerSave) schedulePersist();
+    function escapeHtml(str) {
+      const mapChars = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+      return String(str).replace(/[&<>"']/g, c => mapChars[c] || c);
     }
 
-    function clearFiltersUI() {
-        els.filterText.value = '';
-        els.filterField.value = '';
-        els.filterValue.value = '';
-        els.dateFrom.value = '';
-        els.dateTo.value = '';
-        state.filters = { text: '', field: '', value: '', from: '', to: '' };
-    }
-
-    function exportJson() {
-        const payload = {
-            features: state.features,
-            ignored: state.ignored,
-            coordHint: state.coordHint,
-            source: state.source,
-            filters: state.filters,
-            map: { center: map.getCenter(), zoom: map.getZoom() },
-            detectedFields: state.detectedFields,
-            lastSave: state.lastSave || Date.now(),
-            displayedIds: state.displayed.map(f => f.id),
+    document.getElementById('excel-input').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file || state.busy) return;
+      setBusy(true, 'Import en cours...');
+      resetProgress();
+      updateProgress(5, 'Préparation');
+      const ext = file.name.toLowerCase();
+      if (ext.endsWith('.csv')) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          updateProgress(30, 'Parsing CSV');
+          const rows = parseCSV(ev.target.result);
+          handleSheet(rows);
         };
-        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'batiments_export.json';
-        a.click();
-        URL.revokeObjectURL(url);
-        setStatus('Export JSON prêt.', 'good');
-    }
+        reader.onerror = () => { updateSummary('Lecture CSV échouée', false); setBusy(false, 'Erreur'); };
+        reader.readAsText(file, 'utf-8');
+      } else if (ext.endsWith('.xlsx') || ext.endsWith('.xls')) {
+        parseExcel(file);
+      } else {
+        updateSummary('Format non supporté', false);
+        setBusy(false, 'Erreur');
+      }
+      e.target.value = '';
+    });
 
-    /** ÉVÈNEMENTS **/
-    els.importBtn.addEventListener('click', () => {
-        try { els.fileInput.click(); } catch (err) { setStatus('Sélection de fichier impossible : ' + err.message, 'error'); }
+    document.getElementById('json-input').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file || state.busy) return;
+      setBusy(true, 'Import JSON...');
+      parseJSON(file);
+      e.target.value = '';
     });
-    els.importJsonBtn.addEventListener('click', () => {
-        try { els.jsonInput.click(); } catch (err) { setStatus('Sélection de fichier impossible : ' + err.message, 'error'); }
-    });
-    els.fileInput.addEventListener('change', e => {
-        const file = e.target.files && e.target.files[0];
-        if (file) {
-            setStatus(`Fichier détecté : ${file.name}`);
-            importFile(file);
-        } else {
-            setStatus('Aucun fichier sélectionné.', 'error');
-        }
-    });
-    els.jsonInput.addEventListener('change', e => {
-        const file = e.target.files && e.target.files[0];
-        if (file) {
-            setStatus(`Fichier JSON détecté : ${file.name}`);
-            importJson(file);
-        } else { setStatus('Aucun fichier JSON sélectionné.', 'error'); }
-    });
-    els.sampleBtn.addEventListener('click', loadSample);
-    els.resetBtn.addEventListener('click', resetAll);
-    els.search.addEventListener('input', e => search(e.target.value));
-    els.applyFilters.addEventListener('click', () => applyFilters());
-    els.clearFilters.addEventListener('click', () => { clearFiltersUI(); applyFilters(); });
-    els.fitBtn.addEventListener('click', fitToData);
-    els.restoreBtn.addEventListener('click', () => {
-        if (!restore(false)) setStatus('Aucune version précédente à restaurer.', 'error');
-    });
-    els.exportBtn.addEventListener('click', exportJson);
 
-    window.showDetails = (id) => {
-        const feature = state.indexedById.get(id);
-        if (feature) renderDetails(feature);
-    };
+    document.getElementById('export-json').addEventListener('click', exportJSON);
+    document.getElementById('reset-app').addEventListener('click', () => {
+      state.records = [];
+      state.filtered = [];
+      state.ignored = 0;
+      clearUI();
+      cluster.clearLayers();
+      updateStats();
+      els.summary.textContent = 'Réinitialisé';
+      els.autosave.textContent = 'Sauvegarde auto inactive';
+      resetProgress();
+      localStorage.removeItem('batimap-state');
+      state.lastSave = null;
+      updateHistoryPanel();
+    });
 
-    // Restaurer si possible sinon charger un échantillon minimal
-    if (!restore()) {
-        try {
-            setStatus('Aucune autosauvegarde trouvée. Exemple chargé pour tester.');
-            loadSample();
-        } catch (err) {
-            console.error(err);
-            setStatus('Impossible de charger l\'exemple : ' + err.message, 'error');
-        }
-    } else {
-        setStatus('Données restaurées depuis l\'autosauvegarde.', 'good');
-    }
-    updateSaveIndicator();
-})();
-</script>
+    document.getElementById('apply-filters').addEventListener('click', applyFilters);
+    document.getElementById('clear-filters').addEventListener('click', () => {
+      els.search.value = '';
+      els.columnFilter.value = '';
+      els.valueFilter.value = '';
+      applyFilters();
+    });
+    document.getElementById('fit-map').addEventListener('click', () => {
+      if (!state.filtered.length) return;
+      const markers = state.filtered.map(r => L.marker([r.lat, r.lon]));
+      const group = L.featureGroup(markers);
+      map.fitBounds(group.getBounds(), { padding: [30,30] });
+    });
+
+    els.search.addEventListener('input', () => { applyFilters(); });
+    els.valueFilter.addEventListener('input', () => { applyFilters(); });
+    els.columnFilter.addEventListener('change', () => { applyFilters(); });
+
+    map.on('moveend', () => {
+      state.view = { center: [map.getCenter().lat, map.getCenter().lng], zoom: map.getZoom() };
+      persistState(false);
+    });
+
+    cluster.on('popupopen', e => {
+      const btn = e.popup._contentNode.querySelector('.popup-edit');
+      if (btn) btn.addEventListener('click', () => selectRecord(btn.dataset.id, true));
+    });
+
+    restoreState();
+    updateHistoryPanel();
+  </script>
 </body>
 </html>
