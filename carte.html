@@ -112,6 +112,27 @@
             gap: 8px;
         }
 
+        #progress-container {
+            position: relative;
+            margin-top: 10px;
+            height: 8px;
+            background: rgba(226, 232, 240, 0.8);
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+            display: none;
+        }
+
+        #progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+            transition: width 0.2s ease;
+        }
+
         #map { height: 72vh; width: 100%; border-top: 1px solid rgba(255, 255, 255, 0.4); }
 
         #details-panel {
@@ -183,6 +204,7 @@
             </div>
         </div>
         <div id="status-message"><span class="status-dot"></span><span id="status-text"></span></div>
+        <div id="progress-container"><div id="progress-bar"></div></div>
     </div>
     <div id="map"></div>
     <div id="details-panel">
@@ -220,6 +242,9 @@
         let markersLayer = L.markerClusterGroup(clusterOptions).addTo(map);
         const markerIndex = new Map();
         const statusTextEl = document.getElementById('status-text');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const STORAGE_KEY = 'carte-batiments-v1';
 
         function resetMarkersLayer() {
             map.removeLayer(markersLayer);
@@ -229,6 +254,17 @@
 
         function setStatus(message) {
             statusTextEl.textContent = message || 'Prêt à importer vos données.';
+        }
+
+        function setProgress(percent, active = true) {
+            const clamped = Math.max(0, Math.min(100, Math.round(percent)));
+            if (!active) {
+                progressContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+                return;
+            }
+            progressContainer.style.display = 'block';
+            progressBar.style.width = `${clamped}%`;
         }
 
         // Fonction pour ajouter un marqueur
@@ -244,6 +280,42 @@
             markersLayer.addLayer(marker);
             markerIndex.set(building.id, marker);
             return marker;
+        }
+
+        function persistBuildings() {
+            try {
+                const payload = {
+                    buildings: buildingsData,
+                    nextId: buildingIdCounter
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+            } catch (e) {
+                console.warn('Impossible de sauvegarder localement', e);
+            }
+        }
+
+        function loadPersistedBuildings() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return false;
+                const saved = JSON.parse(raw);
+                if (!saved || !Array.isArray(saved.buildings) || saved.buildings.length === 0) return false;
+
+                buildingIdCounter = saved.nextId || (Math.max(...saved.buildings.map(b => b.id || 0)) + 1);
+                buildingsData = saved.buildings;
+                resetMarkersLayer();
+                setStatus(`Restauration de ${buildingsData.length} bâtiments sauvegardés...`);
+                setProgress(10, true);
+                placeMarkersInChunks(buildingsData, () => {
+                    setStatus('Bâtiments restaurés depuis l\'autosauvegarde.');
+                    setProgress(100);
+                    setTimeout(() => setProgress(0, false), 600);
+                });
+                return true;
+            } catch (e) {
+                console.warn('Aucune autosauvegarde valide détectée', e);
+                return false;
+            }
         }
 
         // Fonction de recherche
@@ -290,6 +362,7 @@
             const reader = new FileReader();
 
             setStatus('Lecture du fichier en cours...');
+            setProgress(5, true);
 
             reader.onload = function(e) {
                 try {
@@ -305,9 +378,11 @@
                         processImportedData(data);
                     } else {
                         alert('Format non supporté. Veuillez importer un CSV, JSON ou Excel.');
+                        setProgress(0, false);
                     }
                 } catch (error) {
                     setStatus('Erreur lors de l\'import.');
+                    setProgress(0, false);
                     alert('Erreur lors de l\'import: ' + error.message);
                 }
             };
@@ -317,6 +392,8 @@
             } else {
                 reader.readAsText(file);
             }
+
+            event.target.value = '';
         }
 
         // Normalisation d'un bâtiment : repère les coordonnées même si les champs sont nommés différemment
@@ -395,37 +472,46 @@
 
         // Traitement des données importées (asynchrone pour éviter les blocages)
         function processImportedData(data) {
-            if (!Array.isArray(data) || data.length === 0) {
+            const rows = Array.isArray(data) ? data : Object.values(data || {});
+            if (!rows || rows.length === 0) {
                 setStatus('Aucune donnée détectée.');
+                setProgress(0, false);
                 return;
             }
 
             setStatus('Normalisation des lignes en cours...');
+            setProgress(12, true);
             buildingIdCounter = 1;
             resetMarkersLayer();
             buildingsData = [];
 
-            const chunkSize = 400;
+            const chunkSize = 350;
             let index = 0;
 
             function normalizeChunk() {
-                const end = Math.min(index + chunkSize, data.length);
+                const end = Math.min(index + chunkSize, rows.length);
                 for (let i = index; i < end; i++) {
-                    const normalized = normalizeBuilding(data[i]);
+                    const normalized = normalizeBuilding(rows[i]);
                     if (normalized) {
                         buildingsData.push(normalized);
                     }
                 }
                 index = end;
 
-                if (index < data.length) {
-                    setStatus(`Normalisation... ${index}/${data.length}`);
+                if (index < rows.length) {
+                    const percent = 12 + Math.round((index / rows.length) * 40);
+                    setStatus(`Normalisation... ${index}/${rows.length}`);
+                    setProgress(percent, true);
                     setTimeout(normalizeChunk, 0);
                 } else {
                     setStatus(`Placement des marqueurs (${buildingsData.length} bâtiments)...`);
+                    setProgress(55, true);
                     placeMarkersInChunks(buildingsData, () => {
+                        persistBuildings();
                         alert(`${buildingsData.length} bâtiments importés avec succès!`);
                         setStatus('Import terminé.');
+                        setProgress(100, true);
+                        setTimeout(() => setProgress(0, false), 800);
                     });
                 }
             }
@@ -447,6 +533,8 @@
 
                 if (index < items.length) {
                     setStatus(`Préparation des marqueurs... ${index}/${items.length}`);
+                    const percent = 55 + Math.round((index / items.length) * 40);
+                    setProgress(percent, true);
                     (window.requestIdleCallback || window.setTimeout)(addChunk, 0);
                 } else {
                     const layers = markersLayer.getLayers();
@@ -454,6 +542,7 @@
                         const group = new L.featureGroup(layers);
                         map.fitBounds(group.getBounds());
                     }
+                    setProgress(95, true);
                     if (onDone) onDone();
                 }
             }
@@ -501,7 +590,9 @@
             if (lines.length === 0) return [];
 
             const delimiter = detectDelimiter(lines[0]);
-            const headers = lines[0].split(delimiter).map(h => h.trim());
+            const headers = lines[0]
+                .split(delimiter)
+                .map(h => h.replace(/\uFEFF/g, '').trim());
             const data = [];
 
             for (let i = 1; i < lines.length; i++) {
@@ -543,7 +634,7 @@
                 lng: 1.0940,
                 type: "Monument historique"
             }
-        ].map((building, index) => ({
+        ].map((building) => ({
             ...building,
             id: buildingIdCounter++,
             details: {
@@ -553,10 +644,15 @@
             }
         }));
 
-        // Chargement des données d'exemple
-        buildingsData = exempleData;
-        exempleData.forEach(building => addMarker(building));
-        setStatus('Prêt à importer vos données.');
+        const restored = loadPersistedBuildings();
+        if (!restored) {
+            buildingsData = exempleData;
+            resetMarkersLayer();
+            placeMarkersInChunks(buildingsData, () => {
+                setStatus('Prêt à importer vos données.');
+                setProgress(0, false);
+            });
+        }
     </script>
 </body>
 </html>
