@@ -1288,7 +1288,7 @@
 
         .missions-layout {
             display: grid;
-            grid-template-columns: 360px 1fr;
+            grid-template-columns: minmax(330px, 380px) 1fr;
             gap: 16px;
         }
 
@@ -1416,6 +1416,63 @@
             justify-content: space-between;
             align-items: center;
             gap: 10px;
+        }
+
+        .mission-notebook-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .mission-notebook-item {
+            padding: 10px 12px;
+            border: 1px dashed #d7ddf7;
+            border-radius: 10px;
+            background: #fafbff;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .mission-notebook-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mission-notebook-title {
+            font-weight: 700;
+            color: #2c3e50;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .mission-notebook-notes {
+            font-size: 12px;
+            color: #4b5563;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .mission-notebook-actions {
+            display: inline-flex;
+            gap: 6px;
+        }
+
+        .mission-note-snippet {
+            font-size: 12px;
+            color: #4b5563;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .mission-actions {
@@ -1719,14 +1776,22 @@
         }
 
         .task-summary-cell {
-            font-size: 13px;
-            line-height: 1.4;
+            font-size: 12px;
+            line-height: 1.25;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 1;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
-            word-break: break-word;
+            white-space: nowrap;
+            max-width: 180px;
+        }
+
+        .task-table td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 220px;
         }
 
         .task-table tbody tr.clickable-row {
@@ -3119,6 +3184,22 @@
 
                     <div id="missionCalendar" class="mission-calendar month-view"></div>
                 </div>
+
+                <div class="mission-card" style="grid-column: 1 / -1;">
+                    <h3>📒 Cahier des missions (sans date)</h3>
+                    <form class="mission-form" onsubmit="addNotebookMission(event)">
+                        <input type="text" id="notebookTitle" placeholder="Intitulé de la mission" required>
+                        <textarea id="notebookNotes" rows="3" placeholder="Notes libres ou éléments à suivre"></textarea>
+                        <select id="notebookStatus">
+                            <option value="planned">🕒 À faire</option>
+                            <option value="in_progress">🚧 En cours</option>
+                            <option value="done">✅ Terminé</option>
+                        </select>
+                        <button type="submit" class="btn btn-secondary">➕ Ajouter au cahier</button>
+                    </form>
+
+                    <div class="mission-notebook-list" id="missionNotebookList"></div>
+                </div>
             </div>
         </div>
 
@@ -3902,6 +3983,7 @@
         let suppressRowClickSelection = false;
         let bulkEditTab = null;
         let missions = [];
+        let missionNotebook = [];
         let missionView = 'month';
         let missionFocusDate = new Date();
 
@@ -8281,6 +8363,55 @@ return;
             showNotification('🗑️ Mission supprimée');
         }
 
+        function addNotebookMission(event) {
+            try {
+                event.preventDefault();
+                const titleInput = document.getElementById('notebookTitle');
+                const notesInput = document.getElementById('notebookNotes');
+                const statusInput = document.getElementById('notebookStatus');
+
+                if (!titleInput || !titleInput.value.trim()) {
+                    showNotification('❌ Le cahier nécessite un titre', 'error');
+                    return;
+                }
+
+                missionNotebook.unshift({
+                    id: generateUniqueId(),
+                    title: titleInput.value.trim(),
+                    notes: notesInput?.value || '',
+                    status: statusInput?.value || 'planned',
+                    createdAt: new Date(),
+                    source: 'notebook'
+                });
+
+                titleInput.value = '';
+                if (notesInput) notesInput.value = '';
+                if (statusInput) statusInput.value = 'planned';
+
+                renderMissionNotebook();
+                saveAllData();
+                showNotification('✅ Mission ajoutée au cahier');
+            } catch (error) {
+                console.error('Erreur ajout cahier missions:', error);
+                showNotification('❌ Impossible d\'ajouter au cahier', 'error');
+            }
+        }
+
+        function toggleNotebookStatus(id) {
+            missionNotebook = missionNotebook.map(note => note.id === id
+                ? { ...note, status: note.status === 'done' ? 'planned' : 'done' }
+                : note);
+            renderMissionNotebook();
+            saveAllData();
+        }
+
+        function deleteNotebookMission(id) {
+            missionNotebook = missionNotebook.filter(note => note.id !== id);
+            renderMissionNotebook();
+            saveAllData();
+            showNotification('🗑️ Mission retirée du cahier');
+        }
+
         function getMissionsByDate(date) {
             const key = formatDateKey(date);
             return missions.filter(mission => formatDateKey(mission.dueAt) === key);
@@ -8305,10 +8436,10 @@ return;
                 item.className = 'mission-list-item';
 
                 item.innerHTML = `
-                    <div>
+                    <div style="min-width:0;">
                         <div style="font-weight:700; color:#2c3e50;">${mission.title}</div>
                         <div style="font-size:12px; color:#666;">${mission.dueAt.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'short' })} ${mission.dueAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
-                        ${mission.notes ? `<div style="font-size:13px; color:#555;">${escapeHtml(mission.notes)}</div>` : ''}
+                        ${mission.notes ? `<div class="mission-note-snippet" title="${escapeHtml(mission.notes)}">${escapeHtml(mission.notes)}</div>` : ''}
                     </div>
                     <div class="mission-actions">
                         <button class="btn btn-secondary btn-compact" onclick="toggleMissionStatus('${mission.id}')">${mission.status === 'done' ? '↩️ Replanifier' : '✅ Terminer'}</button>
@@ -8317,6 +8448,36 @@ return;
                 `;
 
                 container.appendChild(item);
+            });
+        }
+
+        function renderMissionNotebook() {
+            const container = document.getElementById('missionNotebookList');
+            if (!container) return;
+
+            if (missionNotebook.length === 0) {
+                container.innerHTML = '<div style="color:#666;">Aucune mission dans le cahier.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            missionNotebook.forEach(note => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'mission-notebook-item';
+
+                wrapper.innerHTML = `
+                    <div class="mission-notebook-meta">
+                        <div class="mission-notebook-title" title="${escapeHtml(note.title)}">${escapeHtml(note.title)}</div>
+                        ${note.notes ? `<div class="mission-notebook-notes" title="${escapeHtml(note.notes)}">${escapeHtml(note.notes)}</div>` : '<div class="mission-notebook-notes" style="color:#9ca3af;">Pas de note</div>'}
+                        <div style="font-size:11px; color:#6b7280;">${note.status === 'done' ? '✅ Terminé' : note.status === 'in_progress' ? '🚧 En cours' : '🕒 À faire'} · ajouté le ${new Date(note.createdAt).toLocaleDateString('fr-FR')}</div>
+                    </div>
+                    <div class="mission-notebook-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="toggleNotebookStatus('${note.id}')">${note.status === 'done' ? '↩️ Reprendre' : '✅ Terminer'}</button>
+                        <button class="btn btn-danger btn-compact" onclick="deleteNotebookMission('${note.id}')">🗑️</button>
+                    </div>
+                `;
+
+                container.appendChild(wrapper);
             });
         }
 
@@ -11526,6 +11687,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
                     missions: missions,
+                    missionNotebook: missionNotebook,
                     activityLog: activityLog,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
@@ -11605,6 +11767,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     completedTasks: completedTasks,
                     savedSearches: savedSearches,
                     missions: missions,
+                    missionNotebook: missionNotebook,
                     activityLog: activityLog,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
@@ -11790,6 +11953,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 status: mission.status || 'planned'
             }));
 
+            missionNotebook = (data.missionNotebook || []).map(note => ({
+                ...note,
+                createdAt: reviveDate(note.createdAt) || new Date(),
+                status: note.status || 'planned'
+            }));
+
             activityLog = (data.activityLog || []).map(entry => ({
                 ...entry,
                 timestamp: reviveDate(entry.timestamp) || new Date()
@@ -11830,6 +11999,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateSavedSearchesDisplay();
             updateRecentActivity();
             renderMissionList();
+            renderMissionNotebook();
             renderMissionCalendar();
             rebuildColumnSuggestions();
             saveAllData();
