@@ -10617,12 +10617,11 @@ return;
         function parseBulkPaste() {
             try {
                 const paste = document.getElementById('bulkEditPaste');
-                const raw = (paste?.value || '').trim();
+                const raw = paste?.value ?? '';
                 if (!raw) return [];
 
                 return raw.split(/\r?\n/)
-                    .map(line => line.split('\t'))
-                    .filter(row => row.some(cell => (cell || '').trim() !== ''));
+                    .map(line => line.split('\t').map(cell => (cell ?? '').trim()));
             } catch (error) {
                 console.error('Erreur analyse collage en masse:', error);
                 return [];
