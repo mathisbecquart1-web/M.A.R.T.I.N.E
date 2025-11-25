@@ -4283,9 +4283,8 @@
 
             if (text && progressText) {
                 const hasEta = typeof etaMs === 'number' && isFinite(etaMs) && etaMs >= 0;
-                const clampedEta = hasEta ? Math.min(20000, etaMs) : null;
                 const etaLabel = hasEta
-                    ? `${progressText} • Temps restant estimé : ${formatDuration(clampedEta)}`
+                    ? `${progressText} • Temps restant estimé : ${formatDuration(etaMs)}`
                     : progressText;
 
                 text.textContent = etaLabel;
@@ -5509,10 +5508,9 @@ return;
                 const seen = new Set();
                 const pushAreas = (areas = []) => {
                     areas.forEach(area => {
-                        if (!seen.has(area)) {
-                            seen.add(area);
-                            orderedTextAreas.push(area);
-                        }
+                        if (!area || seen.has(area)) return;
+                        seen.add(area);
+                        orderedTextAreas.push(area);
                     });
                 };
 
@@ -5531,54 +5529,68 @@ return;
                 pushAreas(allTextAreas);
 
                 const total = orderedTextAreas.length;
-                let processed = 0;
-                let lastUpdate = performance.now();
-                const startTime = performance.now();
-                let lastThroughputMark = startTime;
-                let lastThroughputProcessed = 0;
-                let smoothedThroughput = 0;
-
                 adjustInProgress = true;
                 showProcessingOverlay('Ajustement des zones de texte...', `Ajustement des champs 0/${total}`);
 
-                const schedule = window.requestIdleCallback
-                    ? (cb) => requestIdleCallback(cb, { timeout: 50 })
+                let processed = 0;
+                let resized = 0;
+                const startTime = performance.now();
+                let lastUpdate = startTime;
+
+                const schedule = window.requestAnimationFrame
+                    ? (cb) => window.requestAnimationFrame(cb)
                     : (cb) => setTimeout(cb, 0);
+
+                const resizeSingle = (field) => {
+                    if (!field) return;
+                    const signature = useCache
+                        ? `${field.value || ''}::${field.clientWidth || field.offsetWidth || 0}`
+                        : null;
+
+                    if (useCache && signature) {
+                        const cached = textAreaExpansionCache.get(field);
+                        if (cached && cached.signature === signature) {
+                            return;
+                        }
+                    }
+
+                    field.style.height = 'auto';
+                    const desiredHeight = Math.max(field.scrollHeight, 38) + 'px';
+                    if (field.style.height !== desiredHeight) {
+                        field.style.height = desiredHeight;
+                    }
+
+                    if (useCache && signature) {
+                        textAreaExpansionCache.set(field, {
+                            signature,
+                            height: field.style.height
+                        });
+                    }
+                    resized++;
+                };
 
                 const processChunk = () => {
                     try {
                         const remaining = total - processed;
                         const chunkSize = Math.min(
-                            Math.max(200, Math.ceil(total / 40)),
-                            Math.max(50, remaining)
+                            Math.max(250, Math.ceil(total / 30)),
+                            Math.max(120, remaining)
                         );
+                        const end = Math.min(processed + chunkSize, total);
 
-                        for (let i = 0; i < chunkSize && processed < total; i++) {
-                            autoResizeField(orderedTextAreas[processed], { useCache });
-                            processed++;
+                        for (let i = processed; i < end; i++) {
+                            resizeSingle(orderedTextAreas[i]);
                         }
+                        processed = end;
 
                         const now = performance.now();
-                        const timeSinceLast = now - lastUpdate;
-                        const throughputWindow = now - lastThroughputMark;
-                        const processedWindow = processed - lastThroughputProcessed;
-                        const shouldUpdate = (timeSinceLast > 120) || processed === total;
+                        const elapsed = now - startTime || 1;
+                        const throughput = processed / elapsed; // fields per ms
+                        const remainingItems = total - processed;
+                        const etaMs = throughput > 0 ? (remainingItems / throughput) : null;
 
-                        if (throughputWindow >= 80 && processedWindow > 0) {
-                            const instantThroughput = processedWindow / throughputWindow; // fields per ms
-                            smoothedThroughput = smoothedThroughput
-                                ? (smoothedThroughput * 0.65 + instantThroughput * 0.35)
-                                : instantThroughput;
-                            lastThroughputMark = now;
-                            lastThroughputProcessed = processed;
-                        }
-
-                        if (shouldUpdate) {
+                        if ((now - lastUpdate) >= 100 || processed === total) {
                             const progress = Math.round((processed / total) * 100);
-                            const remainingItems = total - processed;
-                            const etaMs = smoothedThroughput > 0
-                                ? (remainingItems / smoothedThroughput)
-                                : null;
                             updateProcessingProgress(
                                 `Ajustement des champs ${processed}/${total}`,
                                 progress,
@@ -5590,8 +5602,8 @@ return;
                         if (processed < total) {
                             schedule(processChunk);
                         } else {
-                            updateProcessingProgress(`Ajustement des champs ${total}/${total}` , 100, 0);
-                            finalize({ success: true, message: `✅ Zones de texte ajustées (${total})` });
+                            updateProcessingProgress(`Ajustement des champs ${total}/${total}`, 100, 0);
+                            finalize({ success: true, message: `✅ Zones de texte ajustées (${resized}/${total})` });
                         }
                     } catch (chunkError) {
                         console.error('Erreur lors de l\'ajustement des textes:', chunkError);
@@ -5599,7 +5611,7 @@ return;
                     }
                 };
 
-                requestAnimationFrame(processChunk);
+                schedule(processChunk);
             } catch (error) {
                 console.error('Erreur ajustement champs texte:', error);
                 finalize({ success: false, message: '❌ Impossible d\'ajuster les zones de texte' });
