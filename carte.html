@@ -389,28 +389,29 @@
         setStatus(`Lecture de "${file.name}" ...`);
         showProgress(4);
         try {
-            const buffer = await file.arrayBuffer();
+            const buffer = await readBuffer(file);
             let records = [];
+            let sourceLabel = file.name;
             const lower = file.name.toLowerCase();
             if (lower.endsWith('.xlsx') || lower.endsWith('.xls')) {
                 setStatus('Décodage Excel en cours...');
-                const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
-                const sheetName = workbook.SheetNames[0];
-                if (!sheetName) throw new Error('Aucun onglet détecté.');
-                const sheet = workbook.Sheets[sheetName];
-                records = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+                const { records: excelRows, sheetName } = decodeExcel(buffer);
+                records = excelRows;
+                sourceLabel = `${file.name} (${sheetName})`;
             } else if (lower.endsWith('.csv')) {
                 const text = new TextDecoder('utf-8').decode(buffer);
                 records = parseCSV(text);
+                sourceLabel = `${file.name} (CSV)`;
             } else if (lower.endsWith('.json')) {
                 const text = new TextDecoder('utf-8').decode(buffer);
                 const parsed = JSON.parse(text);
                 records = Array.isArray(parsed) ? parsed : (parsed.data || parsed.records || []);
+                sourceLabel = `${file.name} (JSON)`;
             } else {
                 throw new Error('Format non supporté. Utilisez .xlsx .xls .csv ou .json');
             }
             if (!records || !records.length) throw new Error('Aucune donnée exploitable trouvée.');
-            await handleRecords(records, file.name);
+            await handleRecords(records, sourceLabel);
         } catch (err) {
             console.error(err);
             setStatus(`Erreur d'import : ${err.message}`, 'error');
@@ -418,6 +419,39 @@
         } finally {
             els.fileInput.value = '';
         }
+    }
+
+    function readBuffer(file) {
+        if (file.arrayBuffer) return file.arrayBuffer();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error('Lecture du fichier impossible.'));
+            reader.onabort = () => reject(new Error('Lecture annulée.'));
+            reader.onload = () => resolve(reader.result);
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    function decodeExcel(buffer) {
+        if (typeof XLSX === 'undefined') throw new Error('Bibliothèque Excel non chargée.');
+        const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        if (!sheetName) throw new Error('Aucun onglet détecté.');
+        const sheet = workbook.Sheets[sheetName];
+        if (!sheet) throw new Error('Onglet illisible.');
+
+        // Lecture robuste : on récupère les valeurs brutes même sans en-têtes explicites
+        const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+        if (!matrix.length) return { records: [], sheetName };
+        const headers = (matrix.shift() || []).map((h, idx) => (h && String(h).trim()) || `col_${idx + 1}`);
+        const rows = matrix
+            .filter(row => row.some(cell => String(cell).trim().length))
+            .map(row => {
+                const obj = {};
+                headers.forEach((h, i) => { obj[h] = row[i] ?? ''; });
+                return obj;
+            });
+        return { records: rows, sheetName };
     }
 
     function parseCSV(text) {
