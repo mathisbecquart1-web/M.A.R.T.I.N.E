@@ -5537,7 +5537,19 @@ return;
         }
 
         function normalizeTextValue(value = '') {
-            const lines = value.split(/\r?\n/).map(line => line.replace(/[ \t]+/g, ' ').trim());
+            if (value === null || value === undefined) return '';
+
+            const unified = value
+                .toString()
+                .replace(/\u00A0/g, ' ')
+                .replace(/[“”«»]/g, '"')
+                .replace(/[‘’]/g, "'")
+                .replace(/\s*([:;,!?])\s*/g, '$1 ');
+
+            const lines = unified
+                .split(/\r?\n/)
+                .map(line => line.replace(/\s{2,}/g, ' ').trim());
+
             return lines.join('\n').trim();
         }
 
@@ -5549,36 +5561,58 @@ return;
             const button = document.getElementById('normalizeTextButton');
             button?.setAttribute('disabled', 'disabled');
 
+            const finalize = ({ success, message }) => {
+                hideProcessingOverlay();
+                normalizeInProgress = false;
+                button?.removeAttribute('disabled');
+
+                if (success) {
+                    showNotification(message || '✅ Texte régulé');
+                } else {
+                    showNotification(message || '❌ Impossible de réguler les textes', 'error');
+                }
+            };
+
             try {
-                const fields = Array.from(document.querySelectorAll('textarea.editable-textarea, input.editable'))
-                    .filter(field => !field.disabled);
+                const fields = Array.from(document.querySelectorAll('textarea.editable-textarea, input.editable'));
 
                 if (!fields.length) {
-                    showNotification('ℹ️ Aucun champ texte à réguler');
-                    normalizeInProgress = false;
-                    button?.removeAttribute('disabled');
+                    finalize({ success: false, message: 'ℹ️ Aucun champ texte à réguler' });
                     return;
                 }
 
                 normalizeInProgress = true;
+
                 const total = fields.length;
                 let processed = 0;
                 let modified = 0;
                 const startTime = performance.now();
-                const turboMode = total > 2000;
-                const chunkSize = turboMode ? 6000 : 1200;
-                const resizeStride = turboMode ? 18 : 4;
+                const turboMode = total > 5000;
+                const chunkSize = turboMode ? 8000 : 2000;
+                const resizeStride = turboMode ? 24 : 6;
                 let lastUpdate = startTime;
                 const etaSamples = [];
+                const changedFieldsLog = [];
 
                 showProcessingOverlay(
-                    turboMode ? 'Turbo régulation des textes...' : 'Optimisation des textes...',
+                    'Régulation globale des textes...',
                     `Régulation des champs 0/${total}`
                 );
 
                 const schedule = window.requestIdleCallback
-                    ? (cb) => requestIdleCallback(cb, { timeout: turboMode ? 30 : 100 })
+                    ? (cb) => requestIdleCallback(cb, { timeout: turboMode ? 30 : 80 })
                     : (cb) => setTimeout(cb, 0);
+
+                const identifyField = (field) => {
+                    const tab = field.closest('.tab-content');
+                    const row = field.closest('tr');
+                    const column = field.closest('td');
+                    return {
+                        tab: tab?.id || 'global',
+                        rowId: row?.getAttribute('data-row-id') || row?.getAttribute('data-row') || '',
+                        column: column?.getAttribute('data-column') || field.name || field.placeholder || 'champ'
+                    };
+                };
 
                 const processChunk = () => {
                     try {
@@ -5586,20 +5620,17 @@ return;
 
                         while (processed < total && count < chunkSize) {
                             const field = fields[processed];
+                            const currentValue = (field?.value || '').toString();
+                            const normalized = normalizeTextValue(currentValue);
 
-                            try {
-                                const currentValue = field?.value || '';
-                                const normalized = normalizeTextValue(currentValue);
-                                if (normalized !== currentValue) {
-                                    field.value = normalized;
-                                    modified++;
-                                }
+                            if (normalized !== currentValue) {
+                                field.value = normalized;
+                                modified++;
+                                changedFieldsLog.push(identifyField(field));
+                            }
 
-                                if (field?.tagName === 'TEXTAREA' && (processed % resizeStride === 0)) {
-                                    autoResizeField(field, { useCache: true });
-                                }
-                            } catch (fieldError) {
-                                console.error('Erreur sur un champ lors de la régulation:', fieldError);
+                            if (field?.tagName === 'TEXTAREA' && (processed % resizeStride === 0)) {
+                                autoResizeField(field, { useCache: true });
                             }
 
                             processed++;
@@ -5607,7 +5638,7 @@ return;
                         }
 
                         const now = performance.now();
-                        const shouldUpdate = (now - lastUpdate > 60) || processed === total;
+                        const shouldUpdate = (now - lastUpdate > 80) || processed === total;
                         if (shouldUpdate) {
                             const elapsed = now - startTime;
                             const remaining = total - processed;
@@ -5615,7 +5646,7 @@ return;
                             const eta = throughput > 0 ? (remaining / throughput) : null;
                             if (isFinite(eta)) {
                                 etaSamples.push(eta);
-                                if (etaSamples.length > 6) etaSamples.shift();
+                                if (etaSamples.length > 8) etaSamples.shift();
                             }
                             const smoothEta = etaSamples.length
                                 ? etaSamples.reduce((a, b) => a + b, 0) / etaSamples.length
@@ -5634,29 +5665,28 @@ return;
                             schedule(processChunk);
                         } else {
                             updateProcessingProgress(`Régulation des champs ${total}/${total}`, 100, 0);
-                            hideProcessingOverlay();
-                            showNotification(`✅ Texte régulé sur ${modified}/${total} champ(s)`);
-                            queueSaveAllData();
-                            normalizeInProgress = false;
-                            button?.removeAttribute('disabled');
                             expandAllTextFields({ prioritizeTab: 'verifbaux', silent: true, useCache: true });
+                            flushQueuedSaveAllData();
+
+                            if (changedFieldsLog.length) {
+                                console.table?.(changedFieldsLog.slice(0, 100));
+                            }
+
+                            finalize({
+                                success: true,
+                                message: `✅ Texte régulé sur ${modified}/${total} champ(s)`
+                            });
                         }
                     } catch (chunkError) {
                         console.error('Erreur lors de la régulation des textes:', chunkError);
-                        hideProcessingOverlay();
-                        normalizeInProgress = false;
-                        button?.removeAttribute('disabled');
-                        showNotification('❌ Impossible de réguler les textes', 'error');
+                        finalize({ success: false, message: '❌ Impossible de réguler les textes' });
                     }
                 };
 
                 requestAnimationFrame(processChunk);
             } catch (error) {
                 console.error('Erreur lors de la régulation des textes:', error);
-                hideProcessingOverlay();
-                normalizeInProgress = false;
-                button?.removeAttribute('disabled');
-                showNotification('❌ Impossible de réguler les textes', 'error');
+                finalize({ success: false, message: '❌ Impossible de réguler les textes' });
             }
         }
 
