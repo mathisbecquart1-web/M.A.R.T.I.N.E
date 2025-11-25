@@ -379,6 +379,7 @@
                         const data = parseCSV(csv);
                         processImportedData(data);
                     } else if (extension === 'xlsx' || extension === 'xls') {
+                        setStatus('Décodage Excel...');
                         const data = parseExcel(e.target.result);
                         processImportedData(data);
                     } else {
@@ -386,7 +387,7 @@
                         resetProgressWithMessage();
                     }
                 } catch (error) {
-                    console.error(error);
+                    console.error('Erreur d\'import', error);
                     setStatus('Erreur lors de l\'import.');
                     setProgress(0, false);
                     alert('Erreur lors de l\'import: ' + error.message);
@@ -632,10 +633,32 @@
 
         // Lecture de la première feuille Excel et conversion en objets
         function parseExcel(arrayBuffer) {
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-            const firstSheetName = workbook.SheetNames[0];
+            const data = arrayBuffer instanceof Uint8Array ? arrayBuffer : new Uint8Array(arrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames && workbook.SheetNames[0];
+            if (!firstSheetName) {
+                throw new Error('Le fichier Excel ne contient aucune feuille lisible.');
+            }
+
             const sheet = workbook.Sheets[firstSheetName];
-            return XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
+            const rows = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
+            if (rows && rows.length > 0) {
+                return rows;
+            }
+
+            // Fallback si la première ligne ne contient pas d'en-têtes classiques
+            const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false });
+            if (!matrix || matrix.length === 0) return [];
+
+            const headers = matrix[0];
+            return matrix.slice(1).map((row) => {
+                const entry = {};
+                headers.forEach((header, idx) => {
+                    const key = header || `col_${idx + 1}`;
+                    entry[key] = row[idx] ?? '';
+                });
+                return entry;
+            });
         }
 
         // Données d'exemple
