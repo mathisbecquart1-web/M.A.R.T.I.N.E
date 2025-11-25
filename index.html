@@ -4297,11 +4297,11 @@
             const bar = document.getElementById('processingProgressBar');
 
             if (text && progressText) {
-                let label = progressText;
-                if (typeof etaMs === 'number' && isFinite(etaMs) && etaMs >= 0) {
-                    label += ` • Temps restant estimé : ${formatDuration(etaMs)}`;
-                }
-                text.textContent = label;
+                const hasEta = typeof etaMs === 'number' && isFinite(etaMs) && etaMs >= 0;
+                const clampedEta = hasEta ? Math.min(60000, etaMs) : null;
+                text.textContent = hasEta
+                    ? `${progressText} • Temps restant estimé : ${formatDuration(clampedEta)}`
+                    : progressText;
             }
             if (bar && typeof percentage === 'number') {
                 bar.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
@@ -5583,18 +5583,25 @@ return;
                 let processed = 0;
                 let modified = 0;
                 const startTime = performance.now();
+                const turboMode = total > 2000;
+                const chunkSize = turboMode ? 4000 : 800;
+                const resizeStride = turboMode ? 8 : 2;
+                let lastUpdate = startTime;
+                const etaSamples = [];
 
-                showProcessingOverlay('Optimisation des textes...', 'Préparation des champs...');
+                showProcessingOverlay(
+                    turboMode ? 'Turbo régulation des textes...' : 'Optimisation des textes...',
+                    'Préparation des champs...'
+                );
 
                 const schedule = window.requestIdleCallback
-                    ? (cb) => requestIdleCallback(cb, { timeout: 80 })
+                    ? (cb) => requestIdleCallback(cb, { timeout: turboMode ? 40 : 120 })
                     : (cb) => setTimeout(cb, 0);
 
                 const processChunk = () => {
-                    const budgetStart = performance.now();
-                    const budget = 14;
+                    let count = 0;
 
-                    while (processed < total && performance.now() - budgetStart < budget) {
+                    while (processed < total && count < chunkSize) {
                         const field = fields[processed];
                         const normalized = normalizeTextValue(field.value || '');
                         if (normalized !== (field.value || '')) {
@@ -5602,17 +5609,36 @@ return;
                             modified++;
                         }
 
-                        if (field.tagName === 'TEXTAREA') {
+                        if (field.tagName === 'TEXTAREA' && (processed % resizeStride === 0)) {
                             autoResizeField(field, { useCache: true });
                         }
 
                         processed++;
+                        count++;
                     }
 
-                    const progress = Math.round((processed / total) * 100);
-                    const elapsed = performance.now() - startTime;
-                    const eta = processed > 0 ? ((elapsed / processed) * (total - processed)) : null;
-                    updateProcessingProgress(`Régulation des champs ${processed}/${total}`, progress, eta);
+                    const now = performance.now();
+                    if (now - lastUpdate > 80 || processed === total) {
+                        const elapsed = now - startTime;
+                        const remaining = total - processed;
+                        const throughput = processed > 0 ? processed / elapsed : 0;
+                        const eta = throughput > 0 ? (remaining / throughput) : null;
+                        if (isFinite(eta)) {
+                            etaSamples.push(eta);
+                            if (etaSamples.length > 5) etaSamples.shift();
+                        }
+                        const smoothEta = etaSamples.length
+                            ? etaSamples.reduce((a, b) => a + b, 0) / etaSamples.length
+                            : null;
+
+                        const progress = Math.round((processed / total) * 100);
+                        updateProcessingProgress(
+                            `Régulation des champs ${processed}/${total}`,
+                            progress,
+                            smoothEta ? smoothEta * 1000 : null
+                        );
+                        lastUpdate = now;
+                    }
 
                     if (processed < total) {
                         schedule(processChunk);
