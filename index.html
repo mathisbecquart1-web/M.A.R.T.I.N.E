@@ -5480,14 +5480,18 @@ return;
         function adjustAllTextAreas(options = {}) {
             if (adjustInProgress) return;
 
-                const { prioritizeTab = 'verifbaux', useCache = true } = options;
-                const button = document.getElementById('adjustTextAreasButton');
-                button?.setAttribute('disabled', 'disabled');
+            const { prioritizeTab = 'verifbaux', useCache = true } = options;
+            const button = document.getElementById('adjustTextAreasButton');
+            if (button) {
+                button.setAttribute('disabled', 'disabled');
+            }
 
             const finalize = ({ success, message }) => {
                 hideProcessingOverlay();
                 adjustInProgress = false;
-                button?.removeAttribute('disabled');
+                if (button) {
+                    button.removeAttribute('disabled');
+                }
 
                 if (message) {
                     showNotification(message, success ? 'success' : 'error');
