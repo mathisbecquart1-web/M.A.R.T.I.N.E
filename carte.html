@@ -369,6 +369,12 @@
             setStatus(`Lecture du fichier « ${file.name} »...`);
             setProgress(5, true);
 
+            reader.onerror = () => {
+                setStatus('Lecture du fichier impossible.');
+                setProgress(0, false);
+                alert('Impossible de lire le fichier. Veuillez réessayer.');
+            };
+
             reader.onload = function(e) {
                 try {
                     if (extension === 'json') {
@@ -460,13 +466,19 @@
 
         // Récupère une coordonnée à partir d'une liste de clés potentielles
         function findCoordinate(item, possibleKeys) {
-            for (const key of possibleKeys) {
-                const matchingKey = Object.keys(item).find(
-                    k => k.toLowerCase() === key.toLowerCase()
-                );
+            const normalizeKey = (k) => k
+                .toString()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[\s_\-\.]+/g, '')
+                .toLowerCase();
 
-                if (matchingKey) {
-                    const value = parseNumericValue(item[matchingKey]);
+            const normalizedCandidates = possibleKeys.map(normalizeKey);
+
+            for (const rawKey of Object.keys(item)) {
+                const key = normalizeKey(rawKey);
+                if (normalizedCandidates.some(candidate => key === candidate || key.includes(candidate))) {
+                    const value = parseNumericValue(item[rawKey]);
                     if (value !== null) return value;
                 }
             }
@@ -633,32 +645,41 @@
 
         // Lecture de la première feuille Excel et conversion en objets
         function parseExcel(arrayBuffer) {
-            const data = arrayBuffer instanceof Uint8Array ? arrayBuffer : new Uint8Array(arrayBuffer);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const firstSheetName = workbook.SheetNames && workbook.SheetNames[0];
-            if (!firstSheetName) {
-                throw new Error('Le fichier Excel ne contient aucune feuille lisible.');
-            }
+            try {
+                if (!arrayBuffer) {
+                    throw new Error('Données Excel introuvables.');
+                }
 
-            const sheet = workbook.Sheets[firstSheetName];
-            const rows = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
-            if (rows && rows.length > 0) {
-                return rows;
-            }
+                const data = arrayBuffer instanceof Uint8Array ? arrayBuffer : new Uint8Array(arrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames && workbook.SheetNames[0];
+                if (!firstSheetName) {
+                    throw new Error('Le fichier Excel ne contient aucune feuille lisible.');
+                }
 
-            // Fallback si la première ligne ne contient pas d'en-têtes classiques
-            const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false });
-            if (!matrix || matrix.length === 0) return [];
+                const sheet = workbook.Sheets[firstSheetName];
+                const rows = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
+                if (rows && rows.length > 0) {
+                    return rows;
+                }
 
-            const headers = matrix[0];
-            return matrix.slice(1).map((row) => {
-                const entry = {};
-                headers.forEach((header, idx) => {
-                    const key = header || `col_${idx + 1}`;
-                    entry[key] = row[idx] ?? '';
+                // Fallback si la première ligne ne contient pas d'en-têtes classiques
+                const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false });
+                if (!matrix || matrix.length === 0) return [];
+
+                const headers = matrix[0];
+                return matrix.slice(1).map((row) => {
+                    const entry = {};
+                    headers.forEach((header, idx) => {
+                        const key = header || `col_${idx + 1}`;
+                        entry[key] = row[idx] ?? '';
+                    });
+                    return entry;
                 });
-                return entry;
-            });
+            } catch (error) {
+                console.error('Erreur pendant le décodage Excel', error);
+                throw new Error('Impossible de lire ce fichier Excel. Vérifiez son contenu.');
+            }
         }
 
         // Données d'exemple
