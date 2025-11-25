@@ -3995,6 +3995,7 @@
         let missionView = 'month';
         let missionFocusDate = new Date();
         let autoExpandTextEnabled = false;
+        const textAreaExpansionCache = new WeakMap();
 
         // Initialisation des compteurs
         Object.keys(tabConfigs).forEach(tabName => {
@@ -4261,6 +4262,14 @@
                 scheduleTabStatsUpdate(tabName);
                 refreshRowSelections(tabName);
                 updateBulkSelectionInfo(tabName);
+
+                if (autoExpandTextEnabled) {
+                    scheduleIdleTask(() => expandAllTextFields({
+                        prioritizeTab: tabName,
+                        silent: true,
+                        useCache: true
+                    }));
+                }
 
                 logActivity(`Navigation vers ${getTabDisplayName(tabName)}`, 'info');
 
@@ -5427,23 +5436,40 @@ return;
         }
 
         // 📊 GESTION DES TABLEAUX
-        function autoResizeField(field) {
+        function autoResizeField(field, { useCache = false } = {}) {
             if (field.tagName === 'TEXTAREA') {
+                const signature = useCache
+                    ? `${field.value || ''}::${field.clientWidth || field.offsetWidth || 0}`
+                    : null;
+
+                if (useCache && signature) {
+                    const cached = textAreaExpansionCache.get(field);
+                    if (cached && cached.signature === signature) {
+                        return;
+                    }
+                }
+
                 const previousHeight = field.style.height;
                 field.style.height = 'auto';
                 const desiredHeight = Math.max(field.scrollHeight, 38) + 'px';
 
                 if (previousHeight === desiredHeight) {
                     field.style.height = previousHeight;
-                    return;
+                } else {
+                    field.style.height = desiredHeight;
                 }
 
-                field.style.height = desiredHeight;
+                if (useCache && signature) {
+                    textAreaExpansionCache.set(field, {
+                        signature,
+                        height: field.style.height
+                    });
+                }
             }
         }
 
         function expandAllTextFields(options = {}) {
-            const { silent = false, prioritizeTab = 'verifbaux' } = options;
+            const { silent = false, prioritizeTab = 'verifbaux', useCache = false } = options;
             try {
                 const allTextAreas = Array.from(document.querySelectorAll('textarea.editable-textarea'));
                 if (!allTextAreas.length) return;
@@ -5490,7 +5516,7 @@ return;
                     const budget = showLoader ? 12 : 7;
 
                     while (processed < total && performance.now() - start < budget) {
-                        autoResizeField(orderedTextAreas[processed]);
+                        autoResizeField(orderedTextAreas[processed], { useCache });
                         processed++;
                     }
 
@@ -5531,7 +5557,7 @@ return;
         function toggleExpandAllText() {
             autoExpandTextEnabled = !autoExpandTextEnabled;
             updateExpandTextButton();
-            expandAllTextFields({ prioritizeTab: 'verifbaux', silent: autoExpandTextEnabled });
+            expandAllTextFields({ prioritizeTab: 'verifbaux', silent: autoExpandTextEnabled, useCache: true });
             queueSaveAllData();
 
             showNotification(autoExpandTextEnabled
@@ -12121,7 +12147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMissionCalendar();
             rebuildColumnSuggestions();
             if (autoExpandTextEnabled) {
-                scheduleIdleTask(() => expandAllTextFields({ prioritizeTab: 'verifbaux', silent: true }));
+                scheduleIdleTask(() => expandAllTextFields({ prioritizeTab: 'verifbaux', silent: true, useCache: true }));
             }
             queueSaveAllData();
         }
