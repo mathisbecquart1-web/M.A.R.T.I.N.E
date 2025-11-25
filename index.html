@@ -2744,7 +2744,7 @@
             </div>
         </div>
 
-        <!-- ONGLET VÉRIFICATION BAUX -->
+            <!-- ONGLET VÉRIFICATION BAUX -->
         <div id="verifbaux" class="tab-content">
             <!-- FILTRES -->
             <div class="filters-section">
@@ -2757,15 +2757,6 @@
                     <div class="filter-group">
                         <label>RG</label>
                         <input type="text" id="filterVerifbauxRG" placeholder="Filtrer par RG..." oninput="filterTable('verifbaux')">
-                    </div>
-                    <div class="filter-group">
-                        <label>État</label>
-                        <select id="filterVerifbauxEtat" onchange="filterTable('verifbaux')">
-                            <option value="">Tous</option>
-                            <option value="OK">OK</option>
-                            <option value="NOK">NOK</option>
-                            <option value="EN COURS">EN COURS</option>
-                        </select>
                     </div>
                     <div class="filter-group">
                         <label>Région</label>
@@ -2786,15 +2777,14 @@
             <div class="import-export-section">
                 <h4>🚀 Import/Export Excel avec Validation</h4>
                 <div class="import-methods">
-                    <div class="import-method">
-                        <h5>📁 Import fichier Excel</h5>
-                        <p>Import avec validation stricte des états (OK/NOK/EN COURS) et vérification des codes RG contre la base.</p>
-                        <div class="file-drop-zone">
-                            <input type="file" class="file-input-hidden" id="fileInputVerifbaux" accept=".xlsx,.xls,.csv" onchange="handleFileImport('verifbaux', this)">
-                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
-                            <div style="color: #666; font-size: 14px;">Validation des états OK/NOK/EN COURS</div>
-                        </div>
+                <div class="import-method">
+                    <h5>📁 Import fichier Excel</h5>
+                    <p>Import avec vérification des codes RG contre la base.</p>
+                    <div class="file-drop-zone">
+                        <input type="file" class="file-input-hidden" id="fileInputVerifbaux" accept=".xlsx,.xls,.csv" onchange="handleFileImport('verifbaux', this)">
+                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
                     </div>
+                </div>
 
                     <div class="import-method">
                         <h5>📋 Copier-Coller Excel</h5>
@@ -2819,8 +2809,6 @@
                 <button class="btn btn-primary" onclick="addRow('verifbaux')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('verifbaux')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('verifbaux')">📊 Exporter Excel</button>
-                <button class="btn btn-warning" onclick="validateAllBauxStates()">🔍 Valider tous les états</button>
-                <button class="btn btn-success" onclick="markAllAsOK()">✅ Marquer sélection OK</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('verifbaux')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('verifbaux')">🗑️ Effacer tout</button>
             </div>
@@ -2835,7 +2823,6 @@
                             <th style="width: 100px;">UT-BAT</th>
                             <th style="width: 80px;">RG</th>
                             <th style="width: 120px;">Numéro Bail</th>
-                            <th style="width: 100px;">État</th>
                             <th style="width: 150px;">Lieu</th>
                             <th style="width: 150px;">Nom du Bâtiment</th>
                             <th style="width: 100px;">Région</th>
@@ -2853,24 +2840,20 @@
             <!-- STATISTIQUES SPÉCIALISÉES -->
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="verifbauxTotalRows">0</span></div>
-                <div class="stats-item" style="color: #28a745;">✅ OK: <span id="verifbauxOKRows">0</span></div>
-                <div class="stats-item" style="color: #dc3545;">❌ NOK: <span id="verifbauxNOKRows">0</span></div>
-                <div class="stats-item" style="color: #ffc107;">⏳ En cours: <span id="verifbauxEnCoursRows">0</span></div>
-                    <div class="stats-item">✅ Traités: <span id="verifbauxProcessedRows">0</span></div>
-                    <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'verifbaux')">
-                        <div class="stat-header">
-                            <span class="stat-toggle" aria-hidden="true">▸</span>
-                            <div class="stat-main">⏳ En attente: <span id="verifbauxPendingRows">0</span></div>
-                        </div>
-                        <span class="stat-hint">Déplier pour retrouver la prochaine vérification à traiter</span>
-                        <div class="stat-actions">
-                            <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('verifbaux');">📍 Aller aux en attente</button>
-                        </div>
-                        <div class="pending-list" id="verifbauxPendingList"></div>
+                <div class="stats-item">✅ Traités: <span id="verifbauxProcessedRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'verifbaux')">
+                    <div class="stat-header">
+                        <span class="stat-toggle" aria-hidden="true">▸</span>
+                        <div class="stat-main">⏳ En attente: <span id="verifbauxPendingRows">0</span></div>
                     </div>
-                    <div class="stats-item">📈 Taux de validation: <span id="verifbauxValidationRate">0%</span></div>
-                    <div class="stats-item">📈 Taux de traitement: <span id="verifbauxCompletionRate">0%</span></div>
+                    <span class="stat-hint">Déplier pour retrouver la prochaine vérification à traiter</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('verifbaux');">📍 Aller aux en attente</button>
+                    </div>
+                    <div class="pending-list" id="verifbauxPendingList"></div>
                 </div>
+                <div class="stats-item">📈 Taux de traitement: <span id="verifbauxCompletionRate">0%</span></div>
+            </div>
             </div>
 
         <!-- ONGLET PNI -->
@@ -3606,7 +3589,7 @@
                 </div>
 
                 <div class="stats-card">
-                    <h3>🎯 États de vérification</h3>
+                    <h3>🎯 Suivi des vérifications</h3>
                     <div style="height: 300px; position: relative;">
                         <canvas id="verificationChart"></canvas>
                     </div>
@@ -3859,7 +3842,7 @@
                 icon: '📐'
             },
             verifbaux: {
-                columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'État', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Date Vérification', 'Traité'],
+                columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Date Vérification', 'Traité'],
                 displayName: 'Vérification baux',
                 icon: '✅'
             },
@@ -6220,7 +6203,29 @@ return;
                 let processed = 0;
                 let pending = 0;
                 
-                if (['verifbaux', 'pni'].includes(tabName)) {
+                if (tabName === 'verifbaux') {
+                    let treated = 0;
+
+                    rows.forEach(row => {
+                        const inputs = row.querySelectorAll('input, textarea, select');
+                        const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
+                        const traiteInput = inputs[traiteIndex];
+                        const traite = traiteInput ? traiteInput.value.toLowerCase() : '';
+
+                        if (traite === 'oui') {
+                            treated++;
+                        }
+                    });
+
+                    const pendingRows = Math.max(total - treated, 0);
+
+                    document.getElementById(`${tabName}TotalRows`).textContent = total;
+                    document.getElementById(`${tabName}ProcessedRows`).textContent = treated;
+                    document.getElementById(`${tabName}PendingRows`).textContent = pendingRows;
+                    const completionRate = total > 0 ? Math.round((treated / total) * 100) : 0;
+                    document.getElementById(`${tabName}CompletionRate`).textContent = completionRate + '%';
+
+                } else if (tabName === 'pni') {
                     let ok = 0, nok = 0, enCours = 0;
                     let treated = 0;
 
@@ -8960,36 +8965,39 @@ return;
             try {
                 const ctx = document.getElementById('verificationChart');
                 if (!ctx || !window.Chart) return;
-                
+
                 const tbody = document.getElementById('verifbauxTableBody');
                 if (!tbody) return;
-                
-                let ok = 0, nok = 0, enCours = 0;
-                
+
+                let traites = 0;
+                let attente = 0;
+
                 const rows = tbody.querySelectorAll('tr');
                 rows.forEach(row => {
                     const inputs = row.querySelectorAll('input, textarea, select');
-                    const etatIndex = tabConfigs['verifbaux'].columns.indexOf('État');
-                    const etatInput = inputs[etatIndex];
-                    const etat = etatInput ? etatInput.value.toUpperCase() : '';
-                    
-                    if (etat === 'OK') ok++;
-                    else if (etat === 'NOK') nok++;
-                    else if (etat === 'EN COURS') enCours++;
+                    const traiteIndex = tabConfigs['verifbaux'].columns.indexOf('Traité');
+                    const traiteInput = inputs[traiteIndex];
+                    const traite = traiteInput ? traiteInput.value.toLowerCase() : '';
+
+                    if (traite === 'oui') {
+                        traites++;
+                    } else {
+                        attente++;
+                    }
                 });
-                
+
                 if (chartInstances.verificationChart) {
                     chartInstances.verificationChart.destroy();
                 }
-                
-                if (ok + nok + enCours > 0) {
+
+                if (traites + attente > 0) {
                     chartInstances.verificationChart = new Chart(ctx, {
                         type: 'pie',
                         data: {
-                            labels: ['OK', 'NOK', 'En cours'],
+                            labels: ['Traité', 'En attente'],
                             datasets: [{
-                                data: [ok, nok, enCours],
-                                backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
+                                data: [traites, attente],
+                                backgroundColor: ['#28a745', '#ffc107'],
                                 borderWidth: 2,
                                 borderColor: '#fff'
                             }]
@@ -9005,7 +9013,7 @@ return;
                         }
                     });
                 }
-                
+
             } catch (error) {
                 console.error('Erreur graphique vérification:', error);
             }
@@ -11394,81 +11402,6 @@ return;
             }
         }
 
-        function validateAllBauxStates() {
-            try {
-                const tbody = document.getElementById('verifbauxTableBody');
-                if (!tbody) return;
-                
-                const rows = tbody.querySelectorAll('tr');
-                let validated = 0;
-                let errors = 0;
-                
-                rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea, select');
-                    const etatIndex = tabConfigs['verifbaux'].columns.indexOf('État');
-                    const etatInput = inputs[etatIndex];
-                    
-                    if (etatInput) {
-                        const etat = etatInput.value.toUpperCase();
-                        if (['OK', 'NOK', 'EN COURS'].includes(etat)) {
-                            etatInput.classList.remove('has-error');
-                            etatInput.classList.add('has-success');
-                            validated++;
-                        } else if (etat) {
-                            etatInput.classList.add('has-error');
-                            errors++;
-                        }
-                    }
-                });
-                
-                updateStats('verifbaux');
-                
-                if (errors > 0) {
-                    showNotification(`⚠️ ${validated} état(s) validé(s), ${errors} erreur(s) détectée(s)`, 'warning');
-                } else {
-                    showNotification(`✅ ${validated} état(s) validé(s) avec succès`);
-                }
-                
-            } catch (error) {
-                console.error('Erreur validation états baux:', error);
-                showNotification('❌ Erreur lors de la validation', 'error');
-            }
-        }
-
-        function markAllAsOK() {
-            try {
-                const tbody = document.getElementById('verifbauxTableBody');
-                if (!tbody) return;
-                
-                const rows = tbody.querySelectorAll('tr');
-                let marked = 0;
-                
-                rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea, select');
-                    const etatIndex = tabConfigs['verifbaux'].columns.indexOf('État');
-                    const etatInput = inputs[etatIndex];
-                    
-                    if (etatInput && !etatInput.value) {
-                        etatInput.value = 'OK';
-                        etatInput.classList.remove('has-error', 'has-warning');
-                        marked++;
-                    }
-                });
-
-                if (marked > 0) {
-                    updateStats('verifbaux');
-                    queueSaveAllData();
-                    showNotification(`✅ ${marked} ligne(s) marquée(s) comme OK`);
-                } else {
-                    showNotification('ℹ️ Aucune ligne vide à marquer', 'info');
-                }
-                
-            } catch (error) {
-                console.error('Erreur marquage OK:', error);
-                showNotification('❌ Erreur lors du marquage', 'error');
-            }
-        }
-
         function validateAllRGCodes() {
             try {
                 if (Object.keys(rgDatabase).length === 0) {
@@ -11669,9 +11602,9 @@ return;
             if (verificationChart && verificationChart.data?.datasets?.[0]) {
                 const data = verificationChart.data.datasets[0].data || [];
                 snapshots.push({
-                    title: 'État Vérification Baux',
-                    headers: ['État', 'Entrées'],
-                    rows: ['OK', 'NOK', 'En cours'].map((label, idx) => [label, data[idx] || 0])
+                    title: 'Suivi Vérification Baux',
+                    headers: ['Statut', 'Entrées'],
+                    rows: ['Traité', 'En attente'].map((label, idx) => [label, data[idx] || 0])
                 });
             }
 
@@ -12387,8 +12320,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.clearAllPendingTasks = clearAllPendingTasks;
         window.exportTasksToExcel = exportTasksToExcel;
         window.exportActiveBatch = exportActiveBatch;
-        window.validateAllBauxStates = validateAllBauxStates;
-        window.markAllAsOK = markAllAsOK;
         window.validateAllRGCodes = validateAllRGCodes;
         window.buildRGDatabase = buildRGDatabase;
         window.buildUTDatabase = buildUTDatabase;
