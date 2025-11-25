@@ -63,6 +63,11 @@
             padding: 6px 10px;
             font-size: 0.9em;
         }
+        #status-message {
+            margin-top: 10px;
+            color: #555;
+            font-size: 0.95em;
+        }
     </style>
 </head>
 <body>
@@ -73,6 +78,7 @@
             <input type="file" id="file-input" accept=".csv,.json,.xlsx,.xls" onchange="importData(event)">
             <button class="btn" onclick="document.getElementById('file-input').click()">Importer données</button>
         </div>
+        <div id="status-message"></div>
     </div>
     <div id="map"></div>
     <div id="details-panel">
@@ -94,14 +100,19 @@
         let buildingsData = [];
         let buildingIdCounter = 1;
         let markersLayer = L.layerGroup().addTo(map);
+        const statusEl = document.getElementById('status-message');
+
+        function setStatus(message) {
+            statusEl.textContent = message || '';
+        }
 
         // Fonction pour ajouter un marqueur
         function addMarker(building) {
             const marker = L.marker([building.lat, building.lng])
                 .bindPopup(`
                     <strong>${building.nom}</strong><br>
-                    Propriétaire: ${building.proprietaire}<br>
-                    Adresse: ${building.adresse}<br>
+                    Propriétaire: ${building.proprietaire || '—'}<br>
+                    Adresse: ${building.adresse || '—'}<br>
                     Type: ${building.type || 'Non spécifié'}<br>
                     <button class="btn btn-small" onclick="showBuildingDetails(${building.id})">Fiche du bâtiment</button>
                 `);
@@ -136,6 +147,8 @@
             const extension = file.name.split('.').pop().toLowerCase();
             const reader = new FileReader();
 
+            setStatus('Lecture du fichier en cours...');
+
             reader.onload = function(e) {
                 try {
                     if (extension === 'json') {
@@ -152,6 +165,7 @@
                         alert('Format non supporté. Veuillez importer un CSV, JSON ou Excel.');
                     }
                 } catch (error) {
+                    setStatus('Erreur lors de l\'import.');
                     alert('Erreur lors de l\'import: ' + error.message);
                 }
             };
@@ -187,19 +201,25 @@
                 return null;
             }
 
+            const baseName = item.nom || item.name || item.Nom || item.libelle || item.label;
+            const baseOwner = item.proprietaire || item.owner || item.Proprietaire || item.gestionnaire;
+            const baseAddress = item.adresse || item.address || item.Adresse || item.localisation;
+            const baseType = item.type || item.categorie || item.Type || item.catégorie;
+
             const building = {
                 id: buildingIdCounter++,
-                nom: item.nom || item.name || 'Bâtiment',
-                proprietaire: item.proprietaire || item.owner || '',
-                adresse: item.adresse || item.address || '',
-                type: item.type || item.categorie || '',
+                nom: (baseName && String(baseName).trim()) || `Bâtiment ${buildingIdCounter - 1}`,
+                proprietaire: baseOwner ? String(baseOwner).trim() : '',
+                adresse: baseAddress ? String(baseAddress).trim() : '',
+                type: baseType ? String(baseType).trim() : '',
                 lat: normalizedLat,
                 lng: normalizedLng,
                 details: {}
             };
 
             Object.keys(item).forEach(key => {
-                building.details[key] = item[key];
+                const value = item[key];
+                building.details[key] = value === undefined || value === null ? '' : value;
             });
 
             building.details.latitude = normalizedLat;
@@ -231,16 +251,70 @@
             return Number.isNaN(number) ? null : number;
         }
 
-        // Traitement des données importées
+        // Traitement des données importées (asynchrone pour éviter les blocages)
         function processImportedData(data) {
-            buildingsData = data
-                .map(normalizeBuilding)
-                .filter(item => item && item.lat !== null && item.lng !== null);
+            if (!Array.isArray(data) || data.length === 0) {
+                setStatus('Aucune donnée détectée.');
+                return;
+            }
 
+            setStatus('Normalisation des lignes en cours...');
+            buildingIdCounter = 1;
             markersLayer.clearLayers();
+            buildingsData = [];
 
-            buildingsData.forEach(building => addMarker(building));
-            alert(`${buildingsData.length} bâtiments importés avec succès!`);
+            const chunkSize = 400;
+            let index = 0;
+
+            function normalizeChunk() {
+                const end = Math.min(index + chunkSize, data.length);
+                for (let i = index; i < end; i++) {
+                    const normalized = normalizeBuilding(data[i]);
+                    if (normalized) {
+                        buildingsData.push(normalized);
+                    }
+                }
+                index = end;
+
+                if (index < data.length) {
+                    setStatus(`Normalisation... ${index}/${data.length}`);
+                    setTimeout(normalizeChunk, 0);
+                } else {
+                    setStatus(`Placement des marqueurs (${buildingsData.length} bâtiments)...`);
+                    placeMarkersInChunks(buildingsData, () => {
+                        alert(`${buildingsData.length} bâtiments importés avec succès!`);
+                        setStatus('Import terminé.');
+                    });
+                }
+            }
+
+            normalizeChunk();
+        }
+
+        function placeMarkersInChunks(items, onDone) {
+            const chunkSize = 400;
+            let index = 0;
+
+            function addChunk() {
+                const end = Math.min(index + chunkSize, items.length);
+                for (let i = index; i < end; i++) {
+                    addMarker(items[i]);
+                }
+                index = end;
+
+                if (index < items.length) {
+                    setStatus(`Placement des marqueurs... ${index}/${items.length}`);
+                    setTimeout(addChunk, 0);
+                } else {
+                    if (items.length > 0) {
+                        const group = new L.featureGroup(markersLayer.getLayers());
+                        map.fitBounds(group.getBounds());
+                    }
+                    if (onDone) onDone();
+                }
+            }
+
+            addChunk();
         }
 
         function showBuildingDetails(buildingId) {
@@ -253,6 +327,11 @@
 
             const entries = Object.entries(building.details)
                 .map(([key, value]) => ({ key, value }));
+
+            if (entries.length === 0) {
+                content.textContent = 'Aucune information disponible pour ce bâtiment.';
+                return;
+            }
 
             content.innerHTML = entries
                 .map(entry => `
@@ -299,7 +378,7 @@
             const workbook = XLSX.read(arrayBuffer, { type: 'array' });
             const firstSheetName = workbook.SheetNames[0];
             const sheet = workbook.Sheets[firstSheetName];
-            return XLSX.utils.sheet_to_json(sheet, { defval: '' });
+            return XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
         }
 
         // Données d'exemple
