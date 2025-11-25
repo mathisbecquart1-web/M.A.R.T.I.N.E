@@ -4283,10 +4283,12 @@
 
             if (text && progressText) {
                 const hasEta = typeof etaMs === 'number' && isFinite(etaMs) && etaMs >= 0;
-                const clampedEta = hasEta ? Math.min(60000, etaMs) : null;
-                text.textContent = hasEta
+                const clampedEta = hasEta ? Math.min(20000, etaMs) : null;
+                const etaLabel = hasEta
                     ? `${progressText} • Temps restant estimé : ${formatDuration(clampedEta)}`
                     : progressText;
+
+                text.textContent = etaLabel;
             }
             if (bar && typeof percentage === 'number') {
                 bar.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
@@ -4295,6 +4297,7 @@
 
         function formatDuration(ms) {
             if (!isFinite(ms) || ms < 0) return '';
+            if (ms < 900) return '<1s';
             const totalSeconds = Math.max(0, Math.round(ms / 1000));
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
@@ -5477,9 +5480,9 @@ return;
         function adjustAllTextAreas(options = {}) {
             if (adjustInProgress) return;
 
-            const { prioritizeTab = 'verifbaux', useCache = true } = options;
-            const button = document.getElementById('adjustTextAreasButton');
-            button?.setAttribute('disabled', 'disabled');
+                const { prioritizeTab = 'verifbaux', useCache = true } = options;
+                const button = document.getElementById('adjustTextAreasButton');
+                button?.setAttribute('disabled', 'disabled');
 
             const finalize = ({ success, message }) => {
                 hideProcessingOverlay();
@@ -5527,32 +5530,51 @@ return;
                 let processed = 0;
                 let lastUpdate = performance.now();
                 const startTime = performance.now();
+                let lastThroughputMark = startTime;
+                let lastThroughputProcessed = 0;
+                let smoothedThroughput = 0;
 
                 adjustInProgress = true;
                 showProcessingOverlay('Ajustement des zones de texte...', `Ajustement des champs 0/${total}`);
 
                 const schedule = window.requestIdleCallback
-                    ? (cb) => requestIdleCallback(cb, { timeout: 80 })
+                    ? (cb) => requestIdleCallback(cb, { timeout: 50 })
                     : (cb) => setTimeout(cb, 0);
 
                 const processChunk = () => {
                     try {
-                        const chunkBudget = 12;
-                        const chunkStart = performance.now();
+                        const remaining = total - processed;
+                        const chunkSize = Math.min(
+                            Math.max(200, Math.ceil(total / 40)),
+                            Math.max(50, remaining)
+                        );
 
-                        while (processed < total && performance.now() - chunkStart < chunkBudget) {
+                        for (let i = 0; i < chunkSize && processed < total; i++) {
                             autoResizeField(orderedTextAreas[processed], { useCache });
                             processed++;
                         }
 
                         const now = performance.now();
-                        const shouldUpdate = (now - lastUpdate > 80) || processed === total;
+                        const timeSinceLast = now - lastUpdate;
+                        const throughputWindow = now - lastThroughputMark;
+                        const processedWindow = processed - lastThroughputProcessed;
+                        const shouldUpdate = (timeSinceLast > 120) || processed === total;
+
+                        if (throughputWindow >= 80 && processedWindow > 0) {
+                            const instantThroughput = processedWindow / throughputWindow; // fields per ms
+                            smoothedThroughput = smoothedThroughput
+                                ? (smoothedThroughput * 0.65 + instantThroughput * 0.35)
+                                : instantThroughput;
+                            lastThroughputMark = now;
+                            lastThroughputProcessed = processed;
+                        }
+
                         if (shouldUpdate) {
                             const progress = Math.round((processed / total) * 100);
-                            const elapsed = now - startTime;
-                            const remaining = total - processed;
-                            const throughput = processed > 0 ? processed / elapsed : 0;
-                            const etaMs = throughput > 0 ? (remaining / throughput) : null;
+                            const remainingItems = total - processed;
+                            const etaMs = smoothedThroughput > 0
+                                ? (remainingItems / smoothedThroughput)
+                                : null;
                             updateProcessingProgress(
                                 `Ajustement des champs ${processed}/${total}`,
                                 progress,
