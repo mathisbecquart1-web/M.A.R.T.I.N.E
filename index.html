@@ -193,6 +193,51 @@
             transition: width 0.2s ease;
         }
 
+        .chart-legend-list {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 13px;
+            color: #334;
+        }
+
+        .chart-legend-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 6px 10px;
+            border: 1px solid #eef2ff;
+            border-radius: 8px;
+            background: #f7f8ff;
+        }
+
+        .chart-legend-item.empty {
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legend-label {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .legend-value {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
         .tabs-container {
             display: flex;
             background: rgba(255,255,255,0.9);
@@ -813,11 +858,6 @@
         .btn-primary {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-        }
-
-        .btn-primary.toggle-active {
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.35), 0 6px 18px rgba(0,0,0,0.15);
-            filter: saturate(1.05);
         }
 
         .btn-success {
@@ -2132,7 +2172,7 @@
             <button class="btn btn-primary" onclick="exportCompleteBackup()">📤 Télécharger Sauvegarde</button>
             <button class="btn btn-primary" onclick="importCompleteBackup()">📥 Importer Sauvegarde</button>
             <input type="file" id="backupFileInput" accept="application/json" style="display: none;" onchange="handleBackupImport()">
-            <button class="btn btn-primary" id="expandTextButton" aria-pressed="false" onclick="toggleExpandAllText()">🪄 Afficher tout le texte</button>
+            <button class="btn btn-success" id="adjustTextAreasButton" onclick="adjustAllTextAreas()">↕️ Ajuster toutes les zones de texte</button>
         </div>
     </div>
 
@@ -2749,7 +2789,7 @@
             </div>
         </div>
 
-        <!-- ONGLET VÉRIFICATION BAUX -->
+            <!-- ONGLET VÉRIFICATION BAUX -->
         <div id="verifbaux" class="tab-content">
             <!-- FILTRES -->
             <div class="filters-section">
@@ -2762,15 +2802,6 @@
                     <div class="filter-group">
                         <label>RG</label>
                         <input type="text" id="filterVerifbauxRG" placeholder="Filtrer par RG..." oninput="filterTable('verifbaux')">
-                    </div>
-                    <div class="filter-group">
-                        <label>État</label>
-                        <select id="filterVerifbauxEtat" onchange="filterTable('verifbaux')">
-                            <option value="">Tous</option>
-                            <option value="OK">OK</option>
-                            <option value="NOK">NOK</option>
-                            <option value="EN COURS">EN COURS</option>
-                        </select>
                     </div>
                     <div class="filter-group">
                         <label>Région</label>
@@ -2791,15 +2822,14 @@
             <div class="import-export-section">
                 <h4>🚀 Import/Export Excel avec Validation</h4>
                 <div class="import-methods">
-                    <div class="import-method">
-                        <h5>📁 Import fichier Excel</h5>
-                        <p>Import avec validation stricte des états (OK/NOK/EN COURS) et vérification des codes RG contre la base.</p>
-                        <div class="file-drop-zone">
-                            <input type="file" class="file-input-hidden" id="fileInputVerifbaux" accept=".xlsx,.xls,.csv" onchange="handleFileImport('verifbaux', this)">
-                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
-                            <div style="color: #666; font-size: 14px;">Validation des états OK/NOK/EN COURS</div>
-                        </div>
+                <div class="import-method">
+                    <h5>📁 Import fichier Excel</h5>
+                    <p>Import avec vérification des codes RG contre la base.</p>
+                    <div class="file-drop-zone">
+                        <input type="file" class="file-input-hidden" id="fileInputVerifbaux" accept=".xlsx,.xls,.csv" onchange="handleFileImport('verifbaux', this)">
+                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
                     </div>
+                </div>
 
                     <div class="import-method">
                         <h5>📋 Copier-Coller Excel</h5>
@@ -2824,8 +2854,6 @@
                 <button class="btn btn-primary" onclick="addRow('verifbaux')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('verifbaux')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('verifbaux')">📊 Exporter Excel</button>
-                <button class="btn btn-warning" onclick="validateAllBauxStates()">🔍 Valider tous les états</button>
-                <button class="btn btn-success" onclick="markAllAsOK()">✅ Marquer sélection OK</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('verifbaux')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('verifbaux')">🗑️ Effacer tout</button>
             </div>
@@ -2840,7 +2868,6 @@
                             <th style="width: 100px;">UT-BAT</th>
                             <th style="width: 80px;">RG</th>
                             <th style="width: 120px;">Numéro Bail</th>
-                            <th style="width: 100px;">État</th>
                             <th style="width: 150px;">Lieu</th>
                             <th style="width: 150px;">Nom du Bâtiment</th>
                             <th style="width: 100px;">Région</th>
@@ -2858,24 +2885,20 @@
             <!-- STATISTIQUES SPÉCIALISÉES -->
             <div class="stats">
                 <div class="stats-item">📊 Total: <span id="verifbauxTotalRows">0</span></div>
-                <div class="stats-item" style="color: #28a745;">✅ OK: <span id="verifbauxOKRows">0</span></div>
-                <div class="stats-item" style="color: #dc3545;">❌ NOK: <span id="verifbauxNOKRows">0</span></div>
-                <div class="stats-item" style="color: #ffc107;">⏳ En cours: <span id="verifbauxEnCoursRows">0</span></div>
-                    <div class="stats-item">✅ Traités: <span id="verifbauxProcessedRows">0</span></div>
-                    <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'verifbaux')">
-                        <div class="stat-header">
-                            <span class="stat-toggle" aria-hidden="true">▸</span>
-                            <div class="stat-main">⏳ En attente: <span id="verifbauxPendingRows">0</span></div>
-                        </div>
-                        <span class="stat-hint">Déplier pour retrouver la prochaine vérification à traiter</span>
-                        <div class="stat-actions">
-                            <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('verifbaux');">📍 Aller aux en attente</button>
-                        </div>
-                        <div class="pending-list" id="verifbauxPendingList"></div>
+                <div class="stats-item">✅ Traités: <span id="verifbauxProcessedRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'verifbaux')">
+                    <div class="stat-header">
+                        <span class="stat-toggle" aria-hidden="true">▸</span>
+                        <div class="stat-main">⏳ En attente: <span id="verifbauxPendingRows">0</span></div>
                     </div>
-                    <div class="stats-item">📈 Taux de validation: <span id="verifbauxValidationRate">0%</span></div>
-                    <div class="stats-item">📈 Taux de traitement: <span id="verifbauxCompletionRate">0%</span></div>
+                    <span class="stat-hint">Déplier pour retrouver la prochaine vérification à traiter</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('verifbaux');">📍 Aller aux en attente</button>
+                    </div>
+                    <div class="pending-list" id="verifbauxPendingList"></div>
                 </div>
+                <div class="stats-item">📈 Taux de traitement: <span id="verifbauxCompletionRate">0%</span></div>
+            </div>
             </div>
 
         <!-- ONGLET PNI -->
@@ -3391,7 +3414,6 @@
         <!-- ONGLET STATS MENSUELLES -->
         <div id="statsmensuelles" class="tab-content">
             <div class="stats-actions">
-                <div class="fun-badge">Camemberts mensuels prêts à partager</div>
                 <div class="monthly-controls">
                     <label for="monthlyMonthPicker">Mois analysé</label>
                     <input type="month" id="monthlyMonthPicker" onchange="refreshMonthlyStats()">
@@ -3429,19 +3451,29 @@
                 </div>
 
                 <div class="stats-card">
-                    <h3>🥧 Camembert par statut</h3>
+                    <h3>Répartition par statut</h3>
                     <div style="height: 260px; position: relative;">
                         <canvas id="monthlyStatusChart"></canvas>
                     </div>
+                    <div class="chart-legend-list" id="monthlyStatusLegend"></div>
                     <div class="stats-empty-search" id="monthlyStatusEmpty" style="display: none;">Aucune donnée pour ce mois.</div>
                 </div>
 
                 <div class="stats-card">
-                    <h3>🥧 Camembert par onglet traité</h3>
+                    <h3>Répartition par onglet</h3>
                     <div style="height: 260px; position: relative;">
                         <canvas id="monthlyTabsChart"></canvas>
                     </div>
+                    <div class="chart-legend-list" id="monthlyTabsLegend"></div>
                     <div class="stats-empty-search" id="monthlyTabsEmpty" style="display: none;">Aucun traitement enregistré sur le mois.</div>
+                </div>
+
+                <div class="stats-card">
+                    <h3>Histogramme mensuel global</h3>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="monthlyOverviewBar"></canvas>
+                    </div>
+                    <div class="stats-empty-search" id="monthlyOverviewEmpty" style="display: none;">Aucune activité traitée ce mois.</div>
                 </div>
 
                 <div class="stats-card">
@@ -3601,6 +3633,7 @@
                     <div style="height: 300px; position: relative;">
                         <canvas id="tabsChart"></canvas>
                     </div>
+                    <div class="chart-legend-list" id="tabsChartLegend"></div>
                 </div>
 
                 <div class="stats-card">
@@ -3611,10 +3644,11 @@
                 </div>
 
                 <div class="stats-card">
-                    <h3>🎯 États de vérification</h3>
+                    <h3>🎯 Suivi des vérifications</h3>
                     <div style="height: 300px; position: relative;">
                         <canvas id="verificationChart"></canvas>
                     </div>
+                    <div class="chart-legend-list" id="verificationChartLegend"></div>
                 </div>
 
                 <div class="stats-card">
@@ -3864,7 +3898,7 @@
                 icon: '📐'
             },
             verifbaux: {
-                columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'État', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Date Vérification', 'Traité'],
+                columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Date Vérification', 'Traité'],
                 displayName: 'Vérification baux',
                 icon: '✅'
             },
@@ -3994,7 +4028,6 @@
         let missionNotebook = [];
         let missionView = 'month';
         let missionFocusDate = new Date();
-        let autoExpandTextEnabled = false;
         const textAreaExpansionCache = new WeakMap();
 
         // Initialisation des compteurs
@@ -4259,17 +4292,10 @@
                 });
 
                 activeTabName = tabName;
+                queueSaveAllData();
                 scheduleTabStatsUpdate(tabName);
                 refreshRowSelections(tabName);
                 updateBulkSelectionInfo(tabName);
-
-                if (autoExpandTextEnabled) {
-                    scheduleIdleTask(() => expandAllTextFields({
-                        prioritizeTab: tabName,
-                        silent: true,
-                        useCache: true
-                    }));
-                }
 
                 logActivity(`Navigation vers ${getTabDisplayName(tabName)}`, 'info');
 
@@ -4290,14 +4316,33 @@
             updateProcessingProgress(progressText, 0);
         }
 
-        function updateProcessingProgress(progressText, percentage) {
+        function updateProcessingProgress(progressText, percentage, etaMs) {
             const text = document.getElementById('processingText');
             const bar = document.getElementById('processingProgressBar');
 
-            if (text && progressText) text.textContent = progressText;
+            if (text && progressText) {
+                const hasEta = typeof etaMs === 'number' && isFinite(etaMs) && etaMs >= 0;
+                const etaLabel = hasEta
+                    ? `${progressText} • Temps restant estimé : ${formatDuration(etaMs)}`
+                    : progressText;
+
+                text.textContent = etaLabel;
+            }
             if (bar && typeof percentage === 'number') {
                 bar.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
             }
+        }
+
+        function formatDuration(ms) {
+            if (!isFinite(ms) || ms < 0) return '';
+            if (ms < 900) return '<1s';
+            const totalSeconds = Math.max(0, Math.round(ms / 1000));
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            if (minutes > 0) {
+                return `${minutes}m${seconds.toString().padStart(2, '0')}s`;
+            }
+            return `${seconds}s`;
         }
 
         function hideProcessingOverlay() {
@@ -5468,20 +5513,43 @@ return;
             }
         }
 
-        function expandAllTextFields(options = {}) {
-            const { silent = false, prioritizeTab = 'verifbaux', useCache = false } = options;
+        let adjustInProgress = false;
+
+        function adjustAllTextAreas(options = {}) {
+            if (adjustInProgress) return;
+
+            const { prioritizeTab = 'verifbaux', useCache = true } = options;
+            const button = document.getElementById('adjustTextAreasButton');
+            if (button) {
+                button.setAttribute('disabled', 'disabled');
+            }
+
+            const finalize = ({ success, message }) => {
+                hideProcessingOverlay();
+                adjustInProgress = false;
+                if (button) {
+                    button.removeAttribute('disabled');
+                }
+
+                if (message) {
+                    showNotification(message, success ? 'success' : 'error');
+                }
+            };
+
             try {
                 const allTextAreas = Array.from(document.querySelectorAll('textarea.editable-textarea'));
-                if (!allTextAreas.length) return;
+                if (!allTextAreas.length) {
+                    finalize({ success: false, message: 'ℹ️ Aucun champ texte à ajuster' });
+                    return;
+                }
 
                 const orderedTextAreas = [];
                 const seen = new Set();
                 const pushAreas = (areas = []) => {
                     areas.forEach(area => {
-                        if (!seen.has(area)) {
-                            seen.add(area);
-                            orderedTextAreas.push(area);
-                        }
+                        if (!area || seen.has(area)) return;
+                        seen.add(area);
+                        orderedTextAreas.push(area);
                     });
                 };
 
@@ -5500,69 +5568,93 @@ return;
                 pushAreas(allTextAreas);
 
                 const total = orderedTextAreas.length;
-                const showLoader = total > 120 && !silent;
+                adjustInProgress = true;
+                showProcessingOverlay('Ajustement des zones de texte...', `Ajustement des champs 0/${total}`);
+
                 let processed = 0;
+                let resized = 0;
+                const startTime = performance.now();
+                let lastUpdate = startTime;
 
-                if (showLoader) {
-                    showProcessingOverlay('Ajustement des champs texte...', 'Préparation des champs...');
-                }
-
-                const schedule = window.requestIdleCallback
-                    ? (cb) => requestIdleCallback(cb, { timeout: 120 })
+                const schedule = window.requestAnimationFrame
+                    ? (cb) => window.requestAnimationFrame(cb)
                     : (cb) => setTimeout(cb, 0);
 
+                const resizeSingle = (field) => {
+                    if (!field) return;
+                    const signature = useCache
+                        ? `${field.value || ''}::${field.clientWidth || field.offsetWidth || 0}`
+                        : null;
+
+                    if (useCache && signature) {
+                        const cached = textAreaExpansionCache.get(field);
+                        if (cached && cached.signature === signature) {
+                            return;
+                        }
+                    }
+
+                    field.style.height = 'auto';
+                    const desiredHeight = Math.max(field.scrollHeight, 38) + 'px';
+                    if (field.style.height !== desiredHeight) {
+                        field.style.height = desiredHeight;
+                    }
+
+                    if (useCache && signature) {
+                        textAreaExpansionCache.set(field, {
+                            signature,
+                            height: field.style.height
+                        });
+                    }
+                    resized++;
+                };
+
                 const processChunk = () => {
-                    const start = performance.now();
-                    const budget = showLoader ? 12 : 7;
+                    try {
+                        const remaining = total - processed;
+                        const chunkSize = Math.min(
+                            Math.max(250, Math.ceil(total / 30)),
+                            Math.max(120, remaining)
+                        );
+                        const end = Math.min(processed + chunkSize, total);
 
-                    while (processed < total && performance.now() - start < budget) {
-                        autoResizeField(orderedTextAreas[processed], { useCache });
-                        processed++;
-                    }
-
-                    if (showLoader) {
-                        const percent = Math.round((processed / total) * 100);
-                        updateProcessingProgress(`Ajustement des champs ${processed}/${total}`, percent);
-                    }
-
-                    if (processed < total) {
-                        schedule(processChunk);
-                    } else {
-                        if (showLoader) {
-                            hideProcessingOverlay();
+                        for (let i = processed; i < end; i++) {
+                            resizeSingle(orderedTextAreas[i]);
                         }
-                        if (!silent) {
-                            showNotification(`🪄 ${total} champ(s) texte ajusté(s)`);
+                        processed = end;
+
+                        const now = performance.now();
+                        const elapsed = now - startTime || 1;
+                        const throughput = processed / elapsed; // fields per ms
+                        const remainingItems = total - processed;
+                        const etaMs = throughput > 0 ? (remainingItems / throughput) : null;
+
+                        if ((now - lastUpdate) >= 100 || processed === total) {
+                            const progress = Math.round((processed / total) * 100);
+                            updateProcessingProgress(
+                                `Ajustement des champs ${processed}/${total}`,
+                                progress,
+                                etaMs
+                            );
+                            lastUpdate = now;
                         }
+
+                        if (processed < total) {
+                            schedule(processChunk);
+                        } else {
+                            updateProcessingProgress(`Ajustement des champs ${total}/${total}`, 100, 0);
+                            finalize({ success: true, message: `✅ Zones de texte ajustées (${resized}/${total})` });
+                        }
+                    } catch (chunkError) {
+                        console.error('Erreur lors de l\'ajustement des textes:', chunkError);
+                        finalize({ success: false, message: '❌ Impossible d\'ajuster les zones de texte' });
                     }
                 };
 
-                requestAnimationFrame(processChunk);
+                schedule(processChunk);
             } catch (error) {
                 console.error('Erreur ajustement champs texte:', error);
+                finalize({ success: false, message: '❌ Impossible d\'ajuster les zones de texte' });
             }
-        }
-
-        function updateExpandTextButton() {
-            const btn = document.getElementById('expandTextButton');
-            if (!btn) return;
-
-            btn.textContent = autoExpandTextEnabled
-                ? '🪄 Affichage texte auto (activé)'
-                : '🪄 Afficher tout le texte';
-            btn.setAttribute('aria-pressed', autoExpandTextEnabled ? 'true' : 'false');
-            btn.classList.toggle('toggle-active', autoExpandTextEnabled);
-        }
-
-        function toggleExpandAllText() {
-            autoExpandTextEnabled = !autoExpandTextEnabled;
-            updateExpandTextButton();
-            expandAllTextFields({ prioritizeTab: 'verifbaux', silent: autoExpandTextEnabled, useCache: true });
-            queueSaveAllData();
-
-            showNotification(autoExpandTextEnabled
-                ? '🪄 Affichage complet mémorisé pour les prochaines sessions'
-                : '📏 Affichage compact mémorisé pour les prochaines sessions');
         }
 
         function createEditableField(column, tabName, value = '') {
@@ -6167,7 +6259,29 @@ return;
                 let processed = 0;
                 let pending = 0;
                 
-                if (['verifbaux', 'pni'].includes(tabName)) {
+                if (tabName === 'verifbaux') {
+                    let treated = 0;
+
+                    rows.forEach(row => {
+                        const inputs = row.querySelectorAll('input, textarea, select');
+                        const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
+                        const traiteInput = inputs[traiteIndex];
+                        const traite = traiteInput ? traiteInput.value.toLowerCase() : '';
+
+                        if (traite === 'oui') {
+                            treated++;
+                        }
+                    });
+
+                    const pendingRows = Math.max(total - treated, 0);
+
+                    document.getElementById(`${tabName}TotalRows`).textContent = total;
+                    document.getElementById(`${tabName}ProcessedRows`).textContent = treated;
+                    document.getElementById(`${tabName}PendingRows`).textContent = pendingRows;
+                    const completionRate = total > 0 ? Math.round((treated / total) * 100) : 0;
+                    document.getElementById(`${tabName}CompletionRate`).textContent = completionRate + '%';
+
+                } else if (tabName === 'pni') {
                     let ok = 0, nok = 0, enCours = 0;
                     let treated = 0;
 
@@ -8245,10 +8359,14 @@ return;
 
         function renderMonthlyCharts(stats) {
             try {
+                ensureCenterTextPlugin();
+
                 const statusCtx = document.getElementById('monthlyStatusChart');
                 const tabsCtx = document.getElementById('monthlyTabsChart');
+                const overviewCtx = document.getElementById('monthlyOverviewBar');
                 const statusEmpty = document.getElementById('monthlyStatusEmpty');
                 const tabsEmpty = document.getElementById('monthlyTabsEmpty');
+                const overviewEmpty = document.getElementById('monthlyOverviewEmpty');
 
                 const hasStatusData = (stats.processed + stats.pending) > 0;
                 if (chartInstances.monthlyStatusChart) {
@@ -8258,14 +8376,16 @@ return;
 
                 if (statusEmpty) statusEmpty.style.display = hasStatusData ? 'none' : 'block';
 
+                const statusColors = ['#28a745', '#ffc107'];
                 if (hasStatusData && statusCtx && window.Chart) {
+                    const statusData = [stats.processed, stats.pending];
                     chartInstances.monthlyStatusChart = new Chart(statusCtx, {
-                        type: 'pie',
+                        type: 'doughnut',
                         data: {
                             labels: ['Traitées', 'En attente'],
                             datasets: [{
-                                data: [stats.processed, stats.pending],
-                                backgroundColor: ['#28a745', '#ffc107'],
+                                data: statusData,
+                                backgroundColor: statusColors,
                                 borderWidth: 2,
                                 borderColor: '#fff'
                             }]
@@ -8273,9 +8393,19 @@ return;
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom' } }
+                            cutout: '65%',
+                            plugins: {
+                                legend: { display: false },
+                                martineCenterText: {
+                                    text: `${stats.total}`,
+                                    subtext: 'total'
+                                }
+                            }
                         }
                     });
+                    renderLegendList('monthlyStatusLegend', ['Traitées', 'En attente'], statusData, statusColors);
+                } else {
+                    renderLegendList('monthlyStatusLegend', [], [], statusColors);
                 }
 
                 const processedPerTab = (stats.perTab || []).filter(stat => stat.processed > 0);
@@ -8286,14 +8416,18 @@ return;
 
                 if (tabsEmpty) tabsEmpty.style.display = processedPerTab.length ? 'none' : 'block';
 
+                const tabColors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b'];
                 if (tabsCtx && processedPerTab.length && window.Chart) {
+                    const tabLabels = processedPerTab.map(stat => getTabDisplayName(stat.tabName));
+                    const tabData = processedPerTab.map(stat => stat.processed);
+
                     chartInstances.monthlyTabsChart = new Chart(tabsCtx, {
                         type: 'doughnut',
                         data: {
-                            labels: processedPerTab.map(stat => getTabDisplayName(stat.tabName)),
+                            labels: tabLabels,
                             datasets: [{
-                                data: processedPerTab.map(stat => stat.processed),
-                                backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b'],
+                                data: tabData,
+                                backgroundColor: tabColors,
                                 borderWidth: 2,
                                 borderColor: '#fff'
                             }]
@@ -8301,7 +8435,57 @@ return;
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { position: 'right' } }
+                            cutout: '65%',
+                            plugins: {
+                                legend: { display: false },
+                                martineCenterText: {
+                                    text: `${tabData.reduce((a, b) => a + (Number(b) || 0), 0)}`,
+                                    subtext: 'traités'
+                                }
+                            }
+                        }
+                    });
+                    renderLegendList('monthlyTabsLegend', tabLabels, tabData, tabColors);
+                } else {
+                    renderLegendList('monthlyTabsLegend', [], [], tabColors);
+                }
+
+                if (chartInstances.monthlyOverviewChart) {
+                    chartInstances.monthlyOverviewChart.destroy();
+                    chartInstances.monthlyOverviewChart = null;
+                }
+
+                const sortedOverview = (stats.perTab || []).slice().sort((a, b) => b.total - a.total);
+                if (overviewEmpty) overviewEmpty.style.display = sortedOverview.length ? 'none' : 'block';
+
+                if (overviewCtx && sortedOverview.length && window.Chart) {
+                    chartInstances.monthlyOverviewChart = new Chart(overviewCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedOverview.map(stat => getTabDisplayName(stat.tabName)),
+                            datasets: [
+                                {
+                                    label: 'Traités',
+                                    data: sortedOverview.map(stat => stat.processed),
+                                    backgroundColor: '#28a745'
+                                },
+                                {
+                                    label: 'En attente',
+                                    data: sortedOverview.map(stat => stat.pending),
+                                    backgroundColor: '#ffc107'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { stacked: true },
+                                y: { stacked: true, beginAtZero: true }
+                            },
+                            plugins: {
+                                legend: { position: 'top' }
+                            }
                         }
                     });
                 }
@@ -8335,7 +8519,7 @@ return;
                 .slice(0, 3)
                 .map(stat => `${getTabDisplayName(stat.tabName)} : ${stat.processed} traité(s)`);
 
-            preview.innerHTML = `
+                preview.innerHTML = `
                 <strong>Rapport mensuel ${monthLabel}</strong>
                 <ul>
                     <li>${stats.processed} traité(s) / ${stats.total} entrée(s) (${rate}% de complétion)</li>
@@ -8344,6 +8528,67 @@ return;
                 </ul>
                 <div style="font-size: 12px; color: #555;">Ce bloc est prêt à être collé dans un e-mail ou un chat.</div>
             `;
+        }
+
+        function ensureCenterTextPlugin() {
+            if (!window.Chart || Chart._martineCenterRegistered) return;
+
+            const centerTextPlugin = {
+                id: 'martineCenterText',
+                afterDraw(chart, args, pluginOptions) {
+                    if (!pluginOptions || !pluginOptions.text || !chart.chartArea) return;
+
+                    const { ctx, chartArea } = chart;
+                    const centerX = (chartArea.left + chartArea.right) / 2;
+                    const centerY = (chartArea.top + chartArea.bottom) / 2;
+
+                    ctx.save();
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = pluginOptions.color || '#2c3e50';
+                    ctx.font = pluginOptions.font || '600 16px "Segoe UI", sans-serif';
+                    ctx.fillText(pluginOptions.text, centerX, centerY);
+
+                    if (pluginOptions.subtext) {
+                        ctx.font = pluginOptions.subFont || '12px "Segoe UI", sans-serif';
+                        ctx.fillStyle = pluginOptions.subColor || '#556';
+                        ctx.fillText(pluginOptions.subtext, centerX, centerY + 16);
+                    }
+
+                    ctx.restore();
+                }
+            };
+
+            Chart.register(centerTextPlugin);
+            Chart._martineCenterRegistered = true;
+        }
+
+        function renderLegendList(containerId, labels = [], data = [], colors = []) {
+            const container = document.getElementById(containerId);
+            if (!container) return 0;
+
+            const total = data.reduce((sum, value) => sum + (Number(value) || 0), 0);
+
+            if (!labels.length || !data.length || total === 0) {
+                container.innerHTML = '<div class="chart-legend-item empty">Aucune donnée à afficher</div>';
+                return 0;
+            }
+
+            container.innerHTML = labels.map((label, idx) => {
+                const value = Number(data[idx]) || 0;
+                const percent = total ? Math.round((value / total) * 100) : 0;
+                const color = colors[idx % colors.length] || '#667eea';
+
+                return `
+                    <div class="chart-legend-item">
+                        <span class="legend-color" style="background:${color}"></span>
+                        <span class="legend-label">${label}</span>
+                        <span class="legend-value">${value}${total ? ` (${percent}%)` : ''}</span>
+                    </div>
+                `;
+            }).join('');
+
+            return total;
         }
 
         function refreshMonthlyStats(forceReset = false) {
@@ -8743,6 +8988,7 @@ return;
 
         function updateTabsChart() {
             try {
+                ensureCenterTextPlugin();
                 const ctx = document.getElementById('tabsChart');
                 if (!ctx) return;
                 
@@ -8769,7 +9015,9 @@ return;
                 if (chartInstances.tabsChart) {
                     chartInstances.tabsChart.destroy();
                 }
-                
+
+                const total = renderLegendList('tabsChartLegend', labels, data, backgroundColors);
+
                 if (data.length > 0 && window.Chart) {
                     chartInstances.tabsChart = new Chart(ctx, {
                         type: 'doughnut',
@@ -8785,21 +9033,18 @@ return;
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            cutout: '65%',
                             plugins: {
-                                legend: {
-                                    position: 'right',
-                                    labels: {
-                                        boxWidth: 12,
-                                        font: {
-                                            size: 12
-                                        }
-                                    }
+                                legend: { display: false },
+                                martineCenterText: {
+                                    text: `${total}`,
+                                    subtext: 'total'
                                 }
                             }
                         }
                     });
                 }
-                
+
             } catch (error) {
                 console.error('Erreur graphique répartition:', error);
             }
@@ -8905,38 +9150,47 @@ return;
 
         function updateVerificationChart() {
             try {
+                ensureCenterTextPlugin();
                 const ctx = document.getElementById('verificationChart');
                 if (!ctx || !window.Chart) return;
-                
+
                 const tbody = document.getElementById('verifbauxTableBody');
                 if (!tbody) return;
-                
-                let ok = 0, nok = 0, enCours = 0;
-                
+
+                let traites = 0;
+                let attente = 0;
+
                 const rows = tbody.querySelectorAll('tr');
                 rows.forEach(row => {
                     const inputs = row.querySelectorAll('input, textarea, select');
-                    const etatIndex = tabConfigs['verifbaux'].columns.indexOf('État');
-                    const etatInput = inputs[etatIndex];
-                    const etat = etatInput ? etatInput.value.toUpperCase() : '';
-                    
-                    if (etat === 'OK') ok++;
-                    else if (etat === 'NOK') nok++;
-                    else if (etat === 'EN COURS') enCours++;
+                    const traiteIndex = tabConfigs['verifbaux'].columns.indexOf('Traité');
+                    const traiteInput = inputs[traiteIndex];
+                    const traite = traiteInput ? traiteInput.value.toLowerCase() : '';
+
+                    if (traite === 'oui') {
+                        traites++;
+                    } else {
+                        attente++;
+                    }
                 });
-                
+
                 if (chartInstances.verificationChart) {
                     chartInstances.verificationChart.destroy();
                 }
-                
-                if (ok + nok + enCours > 0) {
+
+                const labels = ['Traité', 'En attente'];
+                const data = [traites, attente];
+                const colors = ['#28a745', '#ffc107'];
+                const total = renderLegendList('verificationChartLegend', labels, data, colors);
+
+                if (traites + attente > 0) {
                     chartInstances.verificationChart = new Chart(ctx, {
-                        type: 'pie',
+                        type: 'doughnut',
                         data: {
-                            labels: ['OK', 'NOK', 'En cours'],
+                            labels,
                             datasets: [{
-                                data: [ok, nok, enCours],
-                                backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
+                                data,
+                                backgroundColor: colors,
                                 borderWidth: 2,
                                 borderColor: '#fff'
                             }]
@@ -8944,15 +9198,18 @@ return;
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            cutout: '65%',
                             plugins: {
-                                legend: {
-                                    position: 'bottom'
+                                legend: { display: false },
+                                martineCenterText: {
+                                    text: `${total}`,
+                                    subtext: 'total'
                                 }
                             }
                         }
                     });
                 }
-                
+
             } catch (error) {
                 console.error('Erreur graphique vérification:', error);
             }
@@ -10564,12 +10821,11 @@ return;
         function parseBulkPaste() {
             try {
                 const paste = document.getElementById('bulkEditPaste');
-                const raw = (paste?.value || '').trim();
+                const raw = paste?.value ?? '';
                 if (!raw) return [];
 
                 return raw.split(/\r?\n/)
-                    .map(line => line.split('\t'))
-                    .filter(row => row.some(cell => (cell || '').trim() !== ''));
+                    .map(line => line.split('\t').map(cell => (cell ?? '').trim()));
             } catch (error) {
                 console.error('Erreur analyse collage en masse:', error);
                 return [];
@@ -10638,9 +10894,27 @@ return;
                         if (colIndex < 0) return;
                         const input = inputs[colIndex];
                         if (!input) return;
-                        const newValue = rowsData[rowIdx]?.[idx] ?? '';
-                        input.value = newValue;
+
+                        const columnName = tabConfigs[tabName]?.columns?.[colIndex] || '';
+                        const pastedRaw = rowsData[rowIdx]?.[idx] ?? '';
+                        const normalized = pastedRaw.toString().trim().toLowerCase();
+
+                        let valueToApply = pastedRaw;
+                        if (columnName === 'Traité') {
+                            if (['oui', 'o', 'traite', 'traité', 'x'].includes(normalized)) {
+                                valueToApply = 'Oui';
+                            } else if (['non', 'n'].includes(normalized)) {
+                                valueToApply = 'Non';
+                            } else {
+                                valueToApply = '';
+                            }
+                        }
+
+                        input.value = valueToApply;
                         input.dispatchEvent(new Event('input', { bubbles: true }));
+                        if (input.tagName === 'SELECT') {
+                            input.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
                     });
                 });
 
@@ -11324,81 +11598,6 @@ return;
             }
         }
 
-        function validateAllBauxStates() {
-            try {
-                const tbody = document.getElementById('verifbauxTableBody');
-                if (!tbody) return;
-                
-                const rows = tbody.querySelectorAll('tr');
-                let validated = 0;
-                let errors = 0;
-                
-                rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea, select');
-                    const etatIndex = tabConfigs['verifbaux'].columns.indexOf('État');
-                    const etatInput = inputs[etatIndex];
-                    
-                    if (etatInput) {
-                        const etat = etatInput.value.toUpperCase();
-                        if (['OK', 'NOK', 'EN COURS'].includes(etat)) {
-                            etatInput.classList.remove('has-error');
-                            etatInput.classList.add('has-success');
-                            validated++;
-                        } else if (etat) {
-                            etatInput.classList.add('has-error');
-                            errors++;
-                        }
-                    }
-                });
-                
-                updateStats('verifbaux');
-                
-                if (errors > 0) {
-                    showNotification(`⚠️ ${validated} état(s) validé(s), ${errors} erreur(s) détectée(s)`, 'warning');
-                } else {
-                    showNotification(`✅ ${validated} état(s) validé(s) avec succès`);
-                }
-                
-            } catch (error) {
-                console.error('Erreur validation états baux:', error);
-                showNotification('❌ Erreur lors de la validation', 'error');
-            }
-        }
-
-        function markAllAsOK() {
-            try {
-                const tbody = document.getElementById('verifbauxTableBody');
-                if (!tbody) return;
-                
-                const rows = tbody.querySelectorAll('tr');
-                let marked = 0;
-                
-                rows.forEach(row => {
-                    const inputs = row.querySelectorAll('input, textarea, select');
-                    const etatIndex = tabConfigs['verifbaux'].columns.indexOf('État');
-                    const etatInput = inputs[etatIndex];
-                    
-                    if (etatInput && !etatInput.value) {
-                        etatInput.value = 'OK';
-                        etatInput.classList.remove('has-error', 'has-warning');
-                        marked++;
-                    }
-                });
-
-                if (marked > 0) {
-                    updateStats('verifbaux');
-                    queueSaveAllData();
-                    showNotification(`✅ ${marked} ligne(s) marquée(s) comme OK`);
-                } else {
-                    showNotification('ℹ️ Aucune ligne vide à marquer', 'info');
-                }
-                
-            } catch (error) {
-                console.error('Erreur marquage OK:', error);
-                showNotification('❌ Erreur lors du marquage', 'error');
-            }
-        }
-
         function validateAllRGCodes() {
             try {
                 if (Object.keys(rgDatabase).length === 0) {
@@ -11599,9 +11798,9 @@ return;
             if (verificationChart && verificationChart.data?.datasets?.[0]) {
                 const data = verificationChart.data.datasets[0].data || [];
                 snapshots.push({
-                    title: 'État Vérification Baux',
-                    headers: ['État', 'Entrées'],
-                    rows: ['OK', 'NOK', 'En cours'].map((label, idx) => [label, data[idx] || 0])
+                    title: 'Suivi Vérification Baux',
+                    headers: ['Statut', 'Entrées'],
+                    rows: ['Traité', 'En attente'].map((label, idx) => [label, data[idx] || 0])
                 });
             }
 
@@ -11829,7 +12028,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     missions: missions,
                     missionNotebook: missionNotebook,
                     activityLog: activityLog,
-                    autoExpandTextEnabled: autoExpandTextEnabled,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -11910,7 +12108,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     missions: missions,
                     missionNotebook: missionNotebook,
                     activityLog: activityLog,
-                    autoExpandTextEnabled: autoExpandTextEnabled,
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -12040,8 +12237,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             rgDatabase = data.rgDatabase || {};
             dismissedRGChanges = new Set(data.dismissedRGChanges || []);
-            autoExpandTextEnabled = Boolean(data.autoExpandTextEnabled);
-            updateExpandTextButton();
             refreshRGSuggestions();
 
             pendingTasks = (data.pendingTasks || []).map(task => ({
@@ -12146,9 +12341,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMissionNotebook();
             renderMissionCalendar();
             rebuildColumnSuggestions();
-            if (autoExpandTextEnabled) {
-                scheduleIdleTask(() => expandAllTextFields({ prioritizeTab: 'verifbaux', silent: true, useCache: true }));
-            }
             queueSaveAllData();
         }
 
@@ -12187,7 +12379,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // 🔧 INITIALISATION COMPLÈTE
         function initializeApp() {
             try {
-                updateExpandTextButton();
                 loadAllData();
                 refreshRGSuggestions();
                 renderTaskExcelCells();
@@ -12281,7 +12472,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.exportAllToExcel = exportAllToExcel;
         window.exportStatsReport = exportStatsReport;
         window.exportMonthlyReport = exportMonthlyReport;
-        window.toggleExpandAllText = toggleExpandAllText;
+        window.adjustAllTextAreas = adjustAllTextAreas;
         window.clearAll = clearAll;
         window.triggerFileInput = triggerFileInput;
         window.handleFileImport = handleFileImport;
@@ -12325,8 +12516,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.clearAllPendingTasks = clearAllPendingTasks;
         window.exportTasksToExcel = exportTasksToExcel;
         window.exportActiveBatch = exportActiveBatch;
-        window.validateAllBauxStates = validateAllBauxStates;
-        window.markAllAsOK = markAllAsOK;
         window.validateAllRGCodes = validateAllRGCodes;
         window.buildRGDatabase = buildRGDatabase;
         window.buildUTDatabase = buildUTDatabase;
