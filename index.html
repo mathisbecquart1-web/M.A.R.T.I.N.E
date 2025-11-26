@@ -193,6 +193,51 @@
             transition: width 0.2s ease;
         }
 
+        .chart-legend-list {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 13px;
+            color: #334;
+        }
+
+        .chart-legend-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 6px 10px;
+            border: 1px solid #eef2ff;
+            border-radius: 8px;
+            background: #f7f8ff;
+        }
+
+        .chart-legend-item.empty {
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legend-label {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .legend-value {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
         .tabs-container {
             display: flex;
             background: rgba(255,255,255,0.9);
@@ -3369,7 +3414,6 @@
         <!-- ONGLET STATS MENSUELLES -->
         <div id="statsmensuelles" class="tab-content">
             <div class="stats-actions">
-                <div class="fun-badge">Camemberts mensuels prêts à partager</div>
                 <div class="monthly-controls">
                     <label for="monthlyMonthPicker">Mois analysé</label>
                     <input type="month" id="monthlyMonthPicker" onchange="refreshMonthlyStats()">
@@ -3407,19 +3451,29 @@
                 </div>
 
                 <div class="stats-card">
-                    <h3>🥧 Camembert par statut</h3>
+                    <h3>Répartition par statut</h3>
                     <div style="height: 260px; position: relative;">
                         <canvas id="monthlyStatusChart"></canvas>
                     </div>
+                    <div class="chart-legend-list" id="monthlyStatusLegend"></div>
                     <div class="stats-empty-search" id="monthlyStatusEmpty" style="display: none;">Aucune donnée pour ce mois.</div>
                 </div>
 
                 <div class="stats-card">
-                    <h3>🥧 Camembert par onglet traité</h3>
+                    <h3>Répartition par onglet</h3>
                     <div style="height: 260px; position: relative;">
                         <canvas id="monthlyTabsChart"></canvas>
                     </div>
+                    <div class="chart-legend-list" id="monthlyTabsLegend"></div>
                     <div class="stats-empty-search" id="monthlyTabsEmpty" style="display: none;">Aucun traitement enregistré sur le mois.</div>
+                </div>
+
+                <div class="stats-card">
+                    <h3>Histogramme mensuel global</h3>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="monthlyOverviewBar"></canvas>
+                    </div>
+                    <div class="stats-empty-search" id="monthlyOverviewEmpty" style="display: none;">Aucune activité traitée ce mois.</div>
                 </div>
 
                 <div class="stats-card">
@@ -3579,6 +3633,7 @@
                     <div style="height: 300px; position: relative;">
                         <canvas id="tabsChart"></canvas>
                     </div>
+                    <div class="chart-legend-list" id="tabsChartLegend"></div>
                 </div>
 
                 <div class="stats-card">
@@ -3593,6 +3648,7 @@
                     <div style="height: 300px; position: relative;">
                         <canvas id="verificationChart"></canvas>
                     </div>
+                    <div class="chart-legend-list" id="verificationChartLegend"></div>
                 </div>
 
                 <div class="stats-card">
@@ -8303,10 +8359,14 @@ return;
 
         function renderMonthlyCharts(stats) {
             try {
+                ensureCenterTextPlugin();
+
                 const statusCtx = document.getElementById('monthlyStatusChart');
                 const tabsCtx = document.getElementById('monthlyTabsChart');
+                const overviewCtx = document.getElementById('monthlyOverviewBar');
                 const statusEmpty = document.getElementById('monthlyStatusEmpty');
                 const tabsEmpty = document.getElementById('monthlyTabsEmpty');
+                const overviewEmpty = document.getElementById('monthlyOverviewEmpty');
 
                 const hasStatusData = (stats.processed + stats.pending) > 0;
                 if (chartInstances.monthlyStatusChart) {
@@ -8316,14 +8376,16 @@ return;
 
                 if (statusEmpty) statusEmpty.style.display = hasStatusData ? 'none' : 'block';
 
+                const statusColors = ['#28a745', '#ffc107'];
                 if (hasStatusData && statusCtx && window.Chart) {
+                    const statusData = [stats.processed, stats.pending];
                     chartInstances.monthlyStatusChart = new Chart(statusCtx, {
-                        type: 'pie',
+                        type: 'doughnut',
                         data: {
                             labels: ['Traitées', 'En attente'],
                             datasets: [{
-                                data: [stats.processed, stats.pending],
-                                backgroundColor: ['#28a745', '#ffc107'],
+                                data: statusData,
+                                backgroundColor: statusColors,
                                 borderWidth: 2,
                                 borderColor: '#fff'
                             }]
@@ -8331,9 +8393,19 @@ return;
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom' } }
+                            cutout: '65%',
+                            plugins: {
+                                legend: { display: false },
+                                martineCenterText: {
+                                    text: `${stats.total}`,
+                                    subtext: 'total'
+                                }
+                            }
                         }
                     });
+                    renderLegendList('monthlyStatusLegend', ['Traitées', 'En attente'], statusData, statusColors);
+                } else {
+                    renderLegendList('monthlyStatusLegend', [], [], statusColors);
                 }
 
                 const processedPerTab = (stats.perTab || []).filter(stat => stat.processed > 0);
@@ -8344,14 +8416,18 @@ return;
 
                 if (tabsEmpty) tabsEmpty.style.display = processedPerTab.length ? 'none' : 'block';
 
+                const tabColors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b'];
                 if (tabsCtx && processedPerTab.length && window.Chart) {
+                    const tabLabels = processedPerTab.map(stat => getTabDisplayName(stat.tabName));
+                    const tabData = processedPerTab.map(stat => stat.processed);
+
                     chartInstances.monthlyTabsChart = new Chart(tabsCtx, {
                         type: 'doughnut',
                         data: {
-                            labels: processedPerTab.map(stat => getTabDisplayName(stat.tabName)),
+                            labels: tabLabels,
                             datasets: [{
-                                data: processedPerTab.map(stat => stat.processed),
-                                backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b'],
+                                data: tabData,
+                                backgroundColor: tabColors,
                                 borderWidth: 2,
                                 borderColor: '#fff'
                             }]
@@ -8359,7 +8435,57 @@ return;
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { position: 'right' } }
+                            cutout: '65%',
+                            plugins: {
+                                legend: { display: false },
+                                martineCenterText: {
+                                    text: `${tabData.reduce((a, b) => a + (Number(b) || 0), 0)}`,
+                                    subtext: 'traités'
+                                }
+                            }
+                        }
+                    });
+                    renderLegendList('monthlyTabsLegend', tabLabels, tabData, tabColors);
+                } else {
+                    renderLegendList('monthlyTabsLegend', [], [], tabColors);
+                }
+
+                if (chartInstances.monthlyOverviewChart) {
+                    chartInstances.monthlyOverviewChart.destroy();
+                    chartInstances.monthlyOverviewChart = null;
+                }
+
+                const sortedOverview = (stats.perTab || []).slice().sort((a, b) => b.total - a.total);
+                if (overviewEmpty) overviewEmpty.style.display = sortedOverview.length ? 'none' : 'block';
+
+                if (overviewCtx && sortedOverview.length && window.Chart) {
+                    chartInstances.monthlyOverviewChart = new Chart(overviewCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedOverview.map(stat => getTabDisplayName(stat.tabName)),
+                            datasets: [
+                                {
+                                    label: 'Traités',
+                                    data: sortedOverview.map(stat => stat.processed),
+                                    backgroundColor: '#28a745'
+                                },
+                                {
+                                    label: 'En attente',
+                                    data: sortedOverview.map(stat => stat.pending),
+                                    backgroundColor: '#ffc107'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { stacked: true },
+                                y: { stacked: true, beginAtZero: true }
+                            },
+                            plugins: {
+                                legend: { position: 'top' }
+                            }
                         }
                     });
                 }
@@ -8393,7 +8519,7 @@ return;
                 .slice(0, 3)
                 .map(stat => `${getTabDisplayName(stat.tabName)} : ${stat.processed} traité(s)`);
 
-            preview.innerHTML = `
+                preview.innerHTML = `
                 <strong>Rapport mensuel ${monthLabel}</strong>
                 <ul>
                     <li>${stats.processed} traité(s) / ${stats.total} entrée(s) (${rate}% de complétion)</li>
@@ -8402,6 +8528,67 @@ return;
                 </ul>
                 <div style="font-size: 12px; color: #555;">Ce bloc est prêt à être collé dans un e-mail ou un chat.</div>
             `;
+        }
+
+        function ensureCenterTextPlugin() {
+            if (!window.Chart || Chart._martineCenterRegistered) return;
+
+            const centerTextPlugin = {
+                id: 'martineCenterText',
+                afterDraw(chart, args, pluginOptions) {
+                    if (!pluginOptions || !pluginOptions.text || !chart.chartArea) return;
+
+                    const { ctx, chartArea } = chart;
+                    const centerX = (chartArea.left + chartArea.right) / 2;
+                    const centerY = (chartArea.top + chartArea.bottom) / 2;
+
+                    ctx.save();
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = pluginOptions.color || '#2c3e50';
+                    ctx.font = pluginOptions.font || '600 16px "Segoe UI", sans-serif';
+                    ctx.fillText(pluginOptions.text, centerX, centerY);
+
+                    if (pluginOptions.subtext) {
+                        ctx.font = pluginOptions.subFont || '12px "Segoe UI", sans-serif';
+                        ctx.fillStyle = pluginOptions.subColor || '#556';
+                        ctx.fillText(pluginOptions.subtext, centerX, centerY + 16);
+                    }
+
+                    ctx.restore();
+                }
+            };
+
+            Chart.register(centerTextPlugin);
+            Chart._martineCenterRegistered = true;
+        }
+
+        function renderLegendList(containerId, labels = [], data = [], colors = []) {
+            const container = document.getElementById(containerId);
+            if (!container) return 0;
+
+            const total = data.reduce((sum, value) => sum + (Number(value) || 0), 0);
+
+            if (!labels.length || !data.length || total === 0) {
+                container.innerHTML = '<div class="chart-legend-item empty">Aucune donnée à afficher</div>';
+                return 0;
+            }
+
+            container.innerHTML = labels.map((label, idx) => {
+                const value = Number(data[idx]) || 0;
+                const percent = total ? Math.round((value / total) * 100) : 0;
+                const color = colors[idx % colors.length] || '#667eea';
+
+                return `
+                    <div class="chart-legend-item">
+                        <span class="legend-color" style="background:${color}"></span>
+                        <span class="legend-label">${label}</span>
+                        <span class="legend-value">${value}${total ? ` (${percent}%)` : ''}</span>
+                    </div>
+                `;
+            }).join('');
+
+            return total;
         }
 
         function refreshMonthlyStats(forceReset = false) {
@@ -8801,6 +8988,7 @@ return;
 
         function updateTabsChart() {
             try {
+                ensureCenterTextPlugin();
                 const ctx = document.getElementById('tabsChart');
                 if (!ctx) return;
                 
@@ -8827,7 +9015,9 @@ return;
                 if (chartInstances.tabsChart) {
                     chartInstances.tabsChart.destroy();
                 }
-                
+
+                const total = renderLegendList('tabsChartLegend', labels, data, backgroundColors);
+
                 if (data.length > 0 && window.Chart) {
                     chartInstances.tabsChart = new Chart(ctx, {
                         type: 'doughnut',
@@ -8843,21 +9033,18 @@ return;
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            cutout: '65%',
                             plugins: {
-                                legend: {
-                                    position: 'right',
-                                    labels: {
-                                        boxWidth: 12,
-                                        font: {
-                                            size: 12
-                                        }
-                                    }
+                                legend: { display: false },
+                                martineCenterText: {
+                                    text: `${total}`,
+                                    subtext: 'total'
                                 }
                             }
                         }
                     });
                 }
-                
+
             } catch (error) {
                 console.error('Erreur graphique répartition:', error);
             }
@@ -8963,6 +9150,7 @@ return;
 
         function updateVerificationChart() {
             try {
+                ensureCenterTextPlugin();
                 const ctx = document.getElementById('verificationChart');
                 if (!ctx || !window.Chart) return;
 
@@ -8990,14 +9178,19 @@ return;
                     chartInstances.verificationChart.destroy();
                 }
 
+                const labels = ['Traité', 'En attente'];
+                const data = [traites, attente];
+                const colors = ['#28a745', '#ffc107'];
+                const total = renderLegendList('verificationChartLegend', labels, data, colors);
+
                 if (traites + attente > 0) {
                     chartInstances.verificationChart = new Chart(ctx, {
-                        type: 'pie',
+                        type: 'doughnut',
                         data: {
-                            labels: ['Traité', 'En attente'],
+                            labels,
                             datasets: [{
-                                data: [traites, attente],
-                                backgroundColor: ['#28a745', '#ffc107'],
+                                data,
+                                backgroundColor: colors,
                                 borderWidth: 2,
                                 borderColor: '#fff'
                             }]
@@ -9005,9 +9198,12 @@ return;
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            cutout: '65%',
                             plugins: {
-                                legend: {
-                                    position: 'bottom'
+                                legend: { display: false },
+                                martineCenterText: {
+                                    text: `${total}`,
+                                    subtext: 'total'
                                 }
                             }
                         }
