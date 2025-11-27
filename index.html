@@ -488,28 +488,36 @@
         savedImages = {};
       }
 
+      const applyImage = (key, directSrc) => {
+        const current = directSrc || savedImages[key]?.src || imageDefaults[key];
+        document.querySelectorAll(`[data-image-key="${key}"], [data-image-preview="${key}"]`).forEach(img => {
+          if (current) img.src = current;
+        });
+      };
+
       const saveAndApply = (key, src) => {
         if (src) {
           savedImages[key] = { src };
         } else {
           delete savedImages[key];
         }
-        localStorage.setItem(imageStorageKey, JSON.stringify(savedImages));
+        try {
+          localStorage.setItem(imageStorageKey, JSON.stringify(savedImages));
+        } catch (e) {
+          // ignore quota errors silently
+        }
         applyImage(key);
       };
 
-      const applyImage = (key) => {
-        const current = savedImages[key]?.src || imageDefaults[key];
-        document.querySelectorAll(`[data-image-key="${key}"], [data-image-preview="${key}"]`).forEach(img => {
-          img.src = current;
-        });
-      };
-
-      const handleFile = (key, file, urlInput, fileInput) => {
+      const fileToDataUrl = (key, file, urlInput, fileInput) => {
         if (!file) return;
+        const tempUrl = URL.createObjectURL(file);
+        applyImage(key, tempUrl);
+
         const reader = new FileReader();
         reader.onload = () => {
           saveAndApply(key, reader.result);
+          URL.revokeObjectURL(tempUrl);
           if (urlInput) urlInput.value = '';
           if (fileInput) fileInput.value = '';
         };
@@ -535,7 +543,7 @@
           zone.classList.remove('dragging');
           const [file] = e.dataTransfer?.files || [];
           if (file) {
-            handleFile(key, file, urlInput, fileInput);
+            fileToDataUrl(key, file, urlInput, fileInput);
             return;
           }
           const droppedUrl = (e.dataTransfer?.getData('text/uri-list') || e.dataTransfer?.getData('text/plain') || '').trim();
@@ -561,7 +569,7 @@
 
         zone.addEventListener('click', () => fileInput?.click());
 
-        fileInput?.addEventListener('change', () => handleFile(key, fileInput.files?.[0], urlInput, fileInput));
+        fileInput?.addEventListener('change', () => fileToDataUrl(key, fileInput.files?.[0], urlInput, fileInput));
 
         urlInput?.addEventListener('change', () => {
           const value = urlInput.value.trim();
