@@ -84,6 +84,10 @@
     .small { font-size: 14px; }
     .footer-note { text-align: center; color: var(--muted); font-size: 13px; margin-top: 22px; }
 
+    .image-control { display: grid; gap: 8px; }
+    .image-control img { border-radius: 12px; width: 100%; max-height: 160px; object-fit: cover; border: 1px solid rgba(0,0,0,0.08); }
+    .image-control small { color: var(--muted); }
+
     .view { display: none; gap: 18px; }
     .view.active { display: grid; }
 
@@ -129,7 +133,7 @@
             <h3>Où ?</h3>
             <p class="muted small">Au cœur des Bahamas, la Résidence THALASSA s’ouvre sur l’océan et sur des jardins luxuriants.</p>
             <div class="card" style="padding: 0; overflow: hidden;">
-              <img src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80" alt="Illustration des Bahamas sur une carte du monde" style="width: 100%; display: block; object-fit: cover; max-height: 320px;">
+              <img data-image-key="accueil-map" src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80" alt="Illustration des Bahamas sur une carte du monde" style="width: 100%; display: block; object-fit: cover; max-height: 320px;">
             </div>
           </div>
           <div class="card">
@@ -143,6 +147,11 @@
             <p class="muted small">✨ En clair, c’est le luxe à l’état pur... Un lieu si rare que l’on ne l’oublie jamais.</p>
           </div>
         </section>
+        <div class="card">
+          <h3>Personnaliser les visuels</h3>
+          <p class="muted small">Ajoutez vos propres photos (URL ou fichier). Elles restent sauvegardées dans ce navigateur et se rechargent automatiquement.</p>
+          <div id="image-controls" class="grid two"></div>
+        </div>
         <div class="card">
           <h3>Sur ce site pour les copropriétaires il y a :</h3>
           <ul class="list">
@@ -359,6 +368,10 @@
     const links = Array.from(document.querySelectorAll('[data-section]'));
     const triggers = Array.from(document.querySelectorAll('[data-section-trigger]'));
 
+    const imageDefaults = {
+      'accueil-map': 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80'
+    };
+
     function showSection(id) {
       const target = document.getElementById(id) || sections[0];
       const link = links.find(l => l.dataset.section === target.id);
@@ -440,9 +453,96 @@
       });
     }
 
+    function initImages() {
+      const imageStorageKey = 'thalassa-images';
+      let savedImages = {};
+      try {
+        savedImages = JSON.parse(localStorage.getItem(imageStorageKey) || '{}') || {};
+      } catch (e) {
+        savedImages = {};
+      }
+
+      const saveAndApply = (key, src) => {
+        if (src) {
+          savedImages[key] = { src };
+        } else {
+          delete savedImages[key];
+        }
+        localStorage.setItem(imageStorageKey, JSON.stringify(savedImages));
+        applyImage(key);
+      };
+
+      const applyImage = (key) => {
+        const current = savedImages[key]?.src || imageDefaults[key];
+        document.querySelectorAll(`[data-image-key="${key}"], [data-image-preview="${key}"]`).forEach(img => {
+          img.src = current;
+        });
+      };
+
+      const controls = document.querySelector('#image-controls');
+      if (controls) {
+        const config = [
+          { key: 'accueil-map', label: 'Visuel "Où ?"', hint: 'Image affichée à côté de la question "Où ?".' }
+        ];
+
+        controls.innerHTML = '';
+        config.forEach(item => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'image-control';
+          wrapper.innerHTML = `
+            <strong>${item.label}</strong>
+            <small>${item.hint}</small>
+            <img data-image-preview="${item.key}" alt="Prévisualisation ${item.label}">
+            <label class="small">URL personnalisée</label>
+            <input type="url" placeholder="https://..." aria-label="URL pour ${item.label}">
+            <label class="small">Ou importer un fichier</label>
+            <input type="file" accept="image/*" aria-label="Importer un fichier pour ${item.label}">
+            <button class="button secondary" type="button">Réinitialiser</button>
+          `;
+          controls.appendChild(wrapper);
+
+          const urlInput = wrapper.querySelector('input[type="url"]');
+          const fileInput = wrapper.querySelector('input[type="file"]');
+          const resetBtn = wrapper.querySelector('button');
+
+          const storedSrc = savedImages[item.key]?.src || '';
+          urlInput.value = storedSrc && storedSrc.startsWith('http') ? storedSrc : '';
+
+          urlInput.addEventListener('change', () => {
+            const value = urlInput.value.trim();
+            if (!value) {
+              saveAndApply(item.key, null);
+              return;
+            }
+            saveAndApply(item.key, value);
+          });
+
+          fileInput.addEventListener('change', () => {
+            const file = fileInput.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+              saveAndApply(item.key, reader.result);
+              urlInput.value = '';
+            };
+            reader.readAsDataURL(file);
+          });
+
+          resetBtn.addEventListener('click', () => {
+            urlInput.value = '';
+            fileInput.value = '';
+            saveAndApply(item.key, null);
+          });
+        });
+      }
+
+      Object.keys(imageDefaults).forEach(applyImage);
+    }
+
     function init() {
       initFaq();
       initDemandes();
+      initImages();
       const hash = location.hash.replace('#','');
       showSection(hash || links[0].dataset.section);
       window.addEventListener('hashchange', () => showSection(location.hash.replace('#','') || links[0].dataset.section));
