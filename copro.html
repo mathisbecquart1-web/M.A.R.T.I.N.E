@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résidence Thalassa · Vie de copro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-copro" data-page="copro">
+  <div class="page">
+    <header>
+      <div class="nav">
+        <div class="brand">
+          <div class="pill">Île aux Bahamas</div>
+          <div>Résidence Thalassa</div>
+        </div>
+        <div class="nav-links">
+          <a href="thalassav4.html" data-page="accueil">Accueil</a>
+          <a href="charte.html" data-page="charte">Charte</a>
+          <a href="onglets.html" data-page="onglets">Onglets</a>
+          <a href="services.html" data-page="services">Services</a>
+          <a href="formations.html" data-page="formations">Formations</a>
+          <a href="ag2025.html" data-page="ag2025">Dernière AG</a>
+          <a href="copro.html" data-page="copro">Vie de copro</a>
+          <a href="owners.html" data-page="owners">Copropriétaires</a>
+          <a href="demandes.html" data-page="demandes">Demandes</a>
+          <a href="faq.html" data-page="faq">FAQ</a>
+        </div>
+        <div class="nav-actions">
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Règlement</button>
+          <button type="button" class="btn-primary" onclick="openAdmin()">🔐 Admin TALASSA</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="section" id="copro">
+      <h2>Options & services pour copropriétaires</h2>
+      <p class="subtitle">Des outils concrets pour la vie sur l’île, l’entretien des cabanons et la coordination entre copropriétaires.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🛠️ Maintenance express</div>
+          <div class="meta">Déclarez incidents techniques, déclenchez une intervention, suivez le statut en temps réel.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🧺 Conciergerie ménage</div>
+          <div class="meta">Planning partagé de ménage des cabanons, rotation hebdomadaire et kit de nettoyage fourni.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🗂️ Documents copro</div>
+          <div class="meta">Règlement, EDD, composition du bureau, comptes rendus et PV d’AG accessibles hors connexion.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🛟 Port & sécurité</div>
+          <div class="meta">Badges numériques, suivi des autorisations, rappel des consignes et de l’utilisation du port privatif.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🏐 Sports & loisirs</div>
+          <div class="meta">Tableau de créneaux partagé pour le beach-volley et le golf, sans réservation obligatoire.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🤝 Vie communautaire</div>
+          <div class="meta">Forum d’annonces, échanges de matériel, entraide pour arrivées/départs et événements sur place.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

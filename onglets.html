@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résidence Thalassa · Onglets interactifs</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-onglets" data-page="onglets">
+  <div class="page">
+    <header>
+      <div class="nav">
+        <div class="brand">
+          <div class="pill">Île aux Bahamas</div>
+          <div>Résidence Thalassa</div>
+        </div>
+        <div class="nav-links">
+          <a href="thalassav4.html" data-page="accueil">Accueil</a>
+          <a href="charte.html" data-page="charte">Charte</a>
+          <a href="onglets.html" data-page="onglets">Onglets</a>
+          <a href="services.html" data-page="services">Services</a>
+          <a href="formations.html" data-page="formations">Formations</a>
+          <a href="ag2025.html" data-page="ag2025">Dernière AG</a>
+          <a href="copro.html" data-page="copro">Vie de copro</a>
+          <a href="owners.html" data-page="owners">Copropriétaires</a>
+          <a href="demandes.html" data-page="demandes">Demandes</a>
+          <a href="faq.html" data-page="faq">FAQ</a>
+        </div>
+        <div class="nav-actions">
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Règlement</button>
+          <button type="button" class="btn-primary" onclick="openAdmin()">🔐 Admin TALASSA</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2>Onglets interactifs</h2>
+      <p class="subtitle">Navigation rapide : accès, services copro, vie de l’île, documents officiels, formations et règles communes.</p>
+      <div class="tab-wrapper">
+        <div class="tabs" id="tabsNav"></div>
+        <div class="tab-panels" id="tabsPanels"></div>
+      </div>
+    </section>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

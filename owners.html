@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résidence Thalassa · Copropriétaires</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-owners" data-page="owners">
+  <div class="page">
+    <header>
+      <div class="nav">
+        <div class="brand">
+          <div class="pill">Île aux Bahamas</div>
+          <div>Résidence Thalassa</div>
+        </div>
+        <div class="nav-links">
+          <a href="thalassav4.html" data-page="accueil">Accueil</a>
+          <a href="charte.html" data-page="charte">Charte</a>
+          <a href="onglets.html" data-page="onglets">Onglets</a>
+          <a href="services.html" data-page="services">Services</a>
+          <a href="formations.html" data-page="formations">Formations</a>
+          <a href="ag2025.html" data-page="ag2025">Dernière AG</a>
+          <a href="copro.html" data-page="copro">Vie de copro</a>
+          <a href="owners.html" data-page="owners">Copropriétaires</a>
+          <a href="demandes.html" data-page="demandes">Demandes</a>
+          <a href="faq.html" data-page="faq">FAQ</a>
+        </div>
+        <div class="nav-actions">
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Règlement</button>
+          <button type="button" class="btn-primary" onclick="openAdmin()">🔐 Admin TALASSA</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="section" id="owners">
+      <h2>Tableau des copropriétaires</h2>
+      <p class="subtitle">Sections, tantièmes généraux et tantièmes place pour le port.</p>
+      <div class="two-col">
+        <label>Filtrer par section
+          <select id="sectionFilter"></select>
+        </label>
+        <button type="button" class="btn-ghost" onclick="downloadCoproCsv()">📊 Exporter la liste</button>
+      </div>
+      <table class="table" id="ownersTable"></table>
+    </section>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
