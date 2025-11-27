@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résidence Thalassa · Portail unique</title>
+  <style>
+    :root {
+      --blue: #0f7bff;
+      --purple: #8245ff;
+      --green: #12b886;
+      --amber: #f59f00;
+      --red: #f03e3e;
+      --bg: #eef4ff;
+      --text: #0f172a;
+      --muted: #4b5563;
+      --card: rgba(255, 255, 255, 0.95);
+      --shadow: 0 18px 40px rgba(15, 27, 45, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background: var(--bg);
+      transition: background 0.4s ease;
+    }
+
+    body.theme-accueil { background: radial-gradient(circle at 18% 20%, #d7e8ff 0, #b2d4ff 25%, #7fb3ff 55%, #3a6cf6 100%); }
+    body.theme-charte { background: radial-gradient(circle at 20% 16%, #f2e7ff 0, #d8c4ff 30%, #b39bff 60%, #5e3dbf 100%); }
+    body.theme-onglets { background: radial-gradient(circle at 12% 28%, #e5f8ff 0, #c3ecff 30%, #8fd5ff 60%, #3b9dd9 100%); }
+    body.theme-services { background: radial-gradient(circle at 16% 18%, #e7fff6 0, #c0f5df 32%, #91e6c8 60%, #3abf8d 100%); }
+    body.theme-formations { background: radial-gradient(circle at 18% 24%, #fff5e0 0, #ffdba0 30%, #ffb347 60%, #f59f00 100%); }
+    body.theme-ag { background: radial-gradient(circle at 20% 18%, #ffe9e9 0, #ffc9c9 30%, #ff9b9b 60%, #f03e3e 100%); }
+    body.theme-copro { background: radial-gradient(circle at 16% 18%, #f5f7ff 0, #d7defc 32%, #acbdf7 62%, #5a7fe4 100%); }
+    body.theme-owners { background: radial-gradient(circle at 18% 22%, #f2fbff 0, #d7f1ff 30%, #9fd8f5 60%, #498ec7 100%); }
+    body.theme-demandes { background: radial-gradient(circle at 18% 24%, #fff3e8 0, #ffd9b8 32%, #ffb47a 60%, #f59f00 100%); }
+    body.theme-faq { background: radial-gradient(circle at 18% 18%, #f0f5ff 0, #d7e1ff 32%, #b3c8ff 60%, #7188e0 100%); }
+
+    .page { max-width: 1100px; margin: 0 auto; padding: 26px 16px 64px; display: grid; gap: 18px; }
+
+    header { position: sticky; top: 0; z-index: 20; padding-bottom: 10px; backdrop-filter: blur(14px); }
+
+    .nav { background: rgba(255, 255, 255, 0.96); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 18px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: var(--shadow); flex-wrap: wrap; }
+
+    .brand { font-weight: 800; letter-spacing: -0.5px; color: var(--text); display: flex; gap: 10px; align-items: center; }
+
+    .brand .pill { font-size: 11px; padding: 6px 8px; border-radius: 10px; background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; font-weight: 700; }
+
+    .nav-links { display: flex; flex-wrap: wrap; gap: 8px; color: var(--muted); font-weight: 600; }
+
+    .nav-links a { text-decoration: none; color: inherit; padding: 8px 10px; border-radius: 10px; transition: background 0.2s ease, color 0.2s ease; }
+    .nav-links a:hover { background: rgba(15, 27, 45, 0.08); }
+    .nav-links a.active { background: var(--text); color: white; box-shadow: 0 8px 20px rgba(0,0,0,0.18); }
+
+    .card { background: var(--card); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.5); }
+    .hero { display: grid; gap: 12px; }
+    h1, h2, h3 { margin: 0; }
+    h1 { font-size: clamp(26px, 4vw, 34px); display: flex; align-items: center; gap: 10px; }
+    .badge { background: rgba(255, 255, 255, 0.8); border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: var(--muted); display: inline-flex; gap: 8px; align-items: center; }
+
+    .grid { display: grid; gap: 14px; }
+    .grid.two { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .grid.three { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+    a.button, button.button { display: inline-flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; text-decoration: none; border: none; font-weight: 700; cursor: pointer; box-shadow: var(--shadow); }
+    a.button.secondary, button.button.secondary { background: white; color: var(--text); border: 1px solid rgba(0,0,0,0.06); }
+
+    .tag { display: inline-flex; padding: 6px 10px; background: rgba(0,0,0,0.06); border-radius: 10px; font-size: 12px; font-weight: 700; color: var(--muted); }
+    .list { display: grid; gap: 10px; margin: 0; padding-left: 18px; color: var(--muted); }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.06); text-align: left; }
+
+    .faq-item { border: 1px solid rgba(0,0,0,0.06); border-radius: 12px; padding: 12px; background: rgba(255,255,255,0.9); }
+    .faq-item summary { cursor: pointer; font-weight: 700; color: var(--text); }
+
+    form { display: grid; gap: 10px; }
+    input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.12); font-size: 14px; }
+    textarea { min-height: 120px; resize: vertical; }
+
+    .muted { color: var(--muted); }
+    .small { font-size: 14px; }
+    .footer-note { text-align: center; color: var(--muted); font-size: 13px; margin-top: 22px; }
+
+    .view { display: none; gap: 18px; }
+    .view.active { display: grid; }
+
+    @media (max-width: 720px) {
+      .nav { justify-content: center; }
+      .nav-links { justify-content: center; }
+      h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body class="theme-accueil">
+  <div class="page">
+    <header>
+      <nav class="nav">
+        <div class="brand">Résidence Thalassa <span class="pill">Portail</span></div>
+        <div class="nav-links">
+          <a href="#accueil" data-section="accueil" data-theme="accueil">Accueil</a>
+          <a href="#charte" data-section="charte" data-theme="charte">Charte</a>
+          <a href="#onglets" data-section="onglets" data-theme="onglets">Onglets</a>
+          <a href="#services" data-section="services" data-theme="services">Services</a>
+          <a href="#formations" data-section="formations" data-theme="formations">Formations</a>
+          <a href="#ag2025" data-section="ag2025" data-theme="ag">AG 2025</a>
+          <a href="#vie-copro" data-section="vie-copro" data-theme="copro">Vie de copro</a>
+          <a href="#coproprietaires" data-section="coproprietaires" data-theme="owners">Copropriétaires</a>
+          <a href="#demandes" data-section="demandes" data-theme="demandes">Demandes</a>
+          <a href="#faq" data-section="faq" data-theme="faq">FAQ</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section id="accueil" class="view active">
+        <div class="card hero">
+          <span class="badge">Bienvenue</span>
+          <h1>Portail tout-en-un dans un seul HTML</h1>
+          <p class="muted">Cliquez sur un onglet pour afficher uniquement la page voulue : chaque vue remplace la précédente tout en conservant le même bandeau.</p>
+          <div class="grid two">
+            <a class="button" data-section-trigger="services" href="#services">Découvrir les services</a>
+            <a class="button secondary" data-section-trigger="demandes" href="#demandes">Suivre mes demandes</a>
+          </div>
+        </div>
+        <section class="grid two">
+          <div class="card">
+            <h3>Navigation instantanée</h3>
+            <p class="muted small">Chaque lien charge sa section dédiée sans changer de fichier. Le thème de couleur s'adapte automatiquement.</p>
+          </div>
+          <div class="card">
+            <h3>Expérience fluide</h3>
+            <p class="muted small">Tout est embarqué ici : textes, formulaires, FAQ et suivi des demandes. Aucun autre fichier nécessaire.</p>
+          </div>
+        </section>
+        <div class="footer-note">Portail Thalassa — tout-en-un</div>
+      </section>
+
+      <section id="charte" class="view">
+        <div class="card hero">
+          <span class="badge">Charte</span>
+          <h1>Charte de bon voisinage</h1>
+          <p class="muted">Respect, convivialité et entretien collectif : trois axes pour vivre ensemble sereinement.</p>
+        </div>
+        <section class="grid two">
+          <div class="card">
+            <h3>Respect des espaces communs</h3>
+            <ul class="list">
+              <li>Silence après 22h et information préalable pour tout chantier.</li>
+              <li>Propreté des halls, ascenseurs et locaux vélo.</li>
+              <li>Tri sélectif et évacuation des encombrants programmée.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Communication</h3>
+            <ul class="list">
+              <li>Utiliser le panneau d'affichage numérique pour prévenir des travaux.</li>
+              <li>Remonter les incidents via l'onglet Demandes.</li>
+              <li>Participer aux réunions trimestrielles pour les décisions clés.</li>
+            </ul>
+          </div>
+        </section>
+      </section>
+
+      <section id="onglets" class="view">
+        <div class="card hero">
+          <span class="badge">Onglets</span>
+          <h1>Vue d'ensemble des rubriques</h1>
+          <p class="muted">Chaque rubrique a son ambiance et ses cartes dédiées. Cliquez dans le bandeau pour y accéder instantanément.</p>
+        </div>
+        <section class="grid three">
+          <div class="card"><h3>Services</h3><p class="muted small">Prestataires, maintenance et réservations.</p></div>
+          <div class="card"><h3>Formations</h3><p class="muted small">Parcours pour le conseil syndical et les résidents.</p></div>
+          <div class="card"><h3>AG 2025</h3><p class="muted small">Ordre du jour, votes et documents clés.</p></div>
+          <div class="card"><h3>Vie de copro</h3><p class="muted small">Événements, convivialité et espaces partagés.</p></div>
+          <div class="card"><h3>Copropriétaires</h3><p class="muted small">Contacts, lots et répartition des charges.</p></div>
+          <div class="card"><h3>Demandes</h3><p class="muted small">Incidents, suivi et clôture des tickets.</p></div>
+        </section>
+      </section>
+
+      <section id="services" class="view">
+        <div class="card hero">
+          <span class="badge">Services</span>
+          <h1>Prestataires, équipements et maintenance</h1>
+          <p class="muted">Ascenseurs, chauffage, nettoyage, espaces verts et sécurité technique rassemblés ici.</p>
+        </div>
+        <section class="grid two">
+          <div class="card">
+            <h3>Prestations suivies</h3>
+            <ul class="list">
+              <li>Ascenseurs · Société Lifty — tél. 01 23 45 67 89</li>
+              <li>Chauffage · Calorim — tél. 01 44 55 66 77</li>
+              <li>Nettoyage · Clean&Co — tél. 01 77 88 99 00</li>
+              <li>Espaces verts · VertAzur — tél. 01 11 22 33 44</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Points de vigilance</h3>
+            <ul class="list">
+              <li>Test mensuel des alarmes incendie et mises à jour des plans d'évacuation.</li>
+              <li>Contrat d'entretien chaudière revu au 1er juin, gain énergétique estimé à 8%.</li>
+              <li>Réserves de produits ménagers écologiques pour les parties communes.</li>
+            </ul>
+          </div>
+        </section>
+        <div class="card">
+          <h3>Réservations et accès</h3>
+          <p class="muted small">Salle commune et local vélo accessibles via QR code temporaire. Planifiez vos passages pour limiter les conflits d'usage.</p>
+        </div>
+      </section>
+
+      <section id="formations" class="view">
+        <div class="card hero">
+          <span class="badge">Formations</span>
+          <h1>Se former à la gestion de copropriété</h1>
+          <p class="muted">Modules courts pour comprendre les charges, la sécurité et l'animation de la résidence.</p>
+        </div>
+        <section class="grid two">
+          <div class="card">
+            <h3>Programme</h3>
+            <ul class="list">
+              <li>Budget & charges : lire un relevé, anticiper les travaux.</li>
+              <li>Sécurité : plans d'évacuation, défibrillateur, alarmes.</li>
+              <li>Communication : compte-rendus, affichage, e-mailings.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Modalités</h3>
+            <p class="muted small">Sessions mensuelles (1h) animées par le conseil syndical. Inscription via l'onglet Demandes.</p>
+          </div>
+        </section>
+      </section>
+
+      <section id="ag2025" class="view">
+        <div class="card hero">
+          <span class="badge">Assemblée Générale</span>
+          <h1>AG 2025 · préparation</h1>
+          <p class="muted">Ordre du jour prévisionnel, budgets, devis et travaux prioritaires.</p>
+        </div>
+        <section class="grid two">
+          <div class="card">
+            <h3>Points clés</h3>
+            <ul class="list">
+              <li>Vote rénovation cage d'escalier (devis en cours).</li>
+              <li>Renouvellement contrat d'entretien ascenseurs.</li>
+              <li>Budget prévisionnel 2025 avec baisse ciblée de 5%.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Documents</h3>
+            <p class="muted small">Procurations, rapports et devis seront ajoutés ici dès validation.</p>
+          </div>
+        </section>
+      </section>
+
+      <section id="vie-copro" class="view">
+        <div class="card hero">
+          <span class="badge">Vie de copro</span>
+          <h1>Moments conviviaux</h1>
+          <p class="muted">Pot d'accueil trimestriel, troc de plantes et ateliers bricolage pour mieux se connaître.</p>
+        </div>
+        <section class="grid two">
+          <div class="card">
+            <h3>Événements à venir</h3>
+            <ul class="list">
+              <li>Atelier compostage — samedi 15 juin.</li>
+              <li>Nettoyage participatif de la cour — dimanche 7 juillet.</li>
+              <li>Troc livres & jeux — samedi 21 septembre.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Espaces partagés</h3>
+            <p class="muted small">Salle commune sur réservation, local vélo sécurisé, coins verts pour jardinières collaboratives.</p>
+          </div>
+        </section>
+      </section>
+
+      <section id="coproprietaires" class="view">
+        <div class="card hero">
+          <span class="badge">Copropriétaires</span>
+          <h1>Contacts et répartition</h1>
+          <p class="muted">Référents par bâtiment et répartition indicative des charges.</p>
+        </div>
+        <section class="grid two">
+          <div class="card">
+            <h3>Référents</h3>
+            <ul class="list">
+              <li>Bâtiment A — Julie Martin</li>
+              <li>Bâtiment B — Karim Haddad</li>
+              <li>Bâtiment C — Anaïs Leroy</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Charges (aperçu)</h3>
+            <table class="table">
+              <thead><tr><th>Poste</th><th>%</th></tr></thead>
+              <tbody>
+                <tr><td>Ascenseurs</td><td>22%</td></tr>
+                <tr><td>Chauffage</td><td>28%</td></tr>
+                <tr><td>Espaces verts</td><td>12%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="demandes" class="view">
+        <div class="card hero">
+          <span class="badge">Demandes</span>
+          <h1>Incidents & questions</h1>
+          <p class="muted">Soumettez vos demandes, suivez-les et marquez-les comme traitées : tout reste stocké localement sur votre navigateur.</p>
+        </div>
+        <section class="grid two">
+          <div class="card">
+            <h3>Nouvelle demande</h3>
+            <form id="demande-form">
+              <input name="nom" type="text" placeholder="Nom" required />
+              <select name="type">
+                <option value="Incident">Incident</option>
+                <option value="Question">Question</option>
+                <option value="Suggestion">Suggestion</option>
+              </select>
+              <textarea name="message" placeholder="Décrivez votre demande" required></textarea>
+              <button class="button" type="submit">Enregistrer</button>
+            </form>
+          </div>
+          <div class="card">
+            <h3>Suivi</h3>
+            <div id="demande-list" class="grid"></div>
+          </div>
+        </section>
+      </section>
+
+      <section id="faq" class="view">
+        <div class="card hero">
+          <span class="badge">FAQ</span>
+          <h1>Questions fréquentes</h1>
+          <p class="muted">Consultez les réponses clés ou ouvrez une demande si besoin.</p>
+        </div>
+        <section class="grid">
+          <details class="faq-item" open>
+            <summary>Comment accéder au local vélo ?</summary>
+            <p class="muted small">Demandez un QR code temporaire via l'onglet Demandes.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Qui prévenir en cas de fuite ?</summary>
+            <p class="muted small">Signalez-le immédiatement dans Demandes et appelez le référent du bâtiment.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Où trouver les comptes-rendus ?</summary>
+            <p class="muted small">Ils seront publiés dans la section AG 2025 après validation.</p>
+          </details>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const sections = Array.from(document.querySelectorAll('.view'));
+    const links = Array.from(document.querySelectorAll('[data-section]'));
+    const triggers = Array.from(document.querySelectorAll('[data-section-trigger]'));
+
+    function showSection(id) {
+      const target = document.getElementById(id) || sections[0];
+      const link = links.find(l => l.dataset.section === target.id);
+      sections.forEach(section => section.classList.toggle('active', section === target));
+      links.forEach(l => l.classList.toggle('active', l === link));
+      document.body.className = `theme-${link?.dataset.theme || 'accueil'}`;
+      history.replaceState({}, '', `#${target.id}`);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        showSection(link.dataset.section);
+      });
+    });
+
+    triggers.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showSection(btn.dataset.sectionTrigger);
+      });
+    });
+
+    function initFaq() {
+      document.querySelectorAll('.faq-item').forEach(item => {
+        const summary = item.querySelector('summary');
+        summary?.addEventListener('click', () => {
+          document.querySelectorAll('.faq-item').forEach(other => {
+            if (other !== item) other.removeAttribute('open');
+          });
+        });
+      });
+    }
+
+    function initDemandes() {
+      const form = document.querySelector('#demande-form');
+      const list = document.querySelector('#demande-list');
+      if (!form || !list) return;
+
+      const storageKey = 'thalassa-demandes';
+      const rows = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
+      const render = () => {
+        list.innerHTML = '';
+        if (!rows.length) {
+          list.innerHTML = '<p class="muted small">Aucune demande pour le moment.</p>';
+          return;
+        }
+        rows.forEach((row, index) => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.innerHTML = `<strong>${row.nom}</strong> — ${row.type}<br><span class="muted small">${row.message}</span>`;
+          const btn = document.createElement('button');
+          btn.className = 'button secondary';
+          btn.textContent = 'Marquer comme traité';
+          btn.addEventListener('click', () => {
+            rows.splice(index, 1);
+            localStorage.setItem(storageKey, JSON.stringify(rows));
+            render();
+          });
+          div.appendChild(btn);
+          list.appendChild(div);
+        });
+      };
+
+      render();
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const nom = form.nom.value.trim();
+        const type = form.type.value;
+        const message = form.message.value.trim();
+        if (!nom || !message) return;
+        rows.push({ nom, type, message });
+        localStorage.setItem(storageKey, JSON.stringify(rows));
+        form.reset();
+        render();
+      });
+    }
+
+    function init() {
+      initFaq();
+      initDemandes();
+      const hash = location.hash.replace('#','');
+      showSection(hash || links[0].dataset.section);
+      window.addEventListener('hashchange', () => showSection(location.hash.replace('#','') || links[0].dataset.section));
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
