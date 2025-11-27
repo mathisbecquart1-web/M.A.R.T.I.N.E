@@ -55,6 +55,8 @@
     .nav-links a:hover { background: rgba(15, 27, 45, 0.08); }
     .nav-links a.active { background: var(--text); color: white; box-shadow: 0 8px 20px rgba(0,0,0,0.18); }
 
+    .save-indicator { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 12px; background: rgba(15, 27, 45, 0.06); color: var(--muted); font-weight: 700; font-size: 12px; }
+
     .card { background: var(--card); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.5); }
     .hero { display: grid; gap: 12px; }
     h1, h2, h3 { margin: 0; }
@@ -170,6 +172,7 @@
           <a href="#demandes" data-section="demandes" data-theme="demandes">Demandes</a>
           <a href="#faq" data-section="faq" data-theme="faq">FAQ</a>
         </div>
+        <div class="save-indicator">Sauvegarde auto · <span data-last-saved>En cours…</span></div>
       </nav>
     </header>
 
@@ -427,10 +430,12 @@
     const links = Array.from(document.querySelectorAll('[data-section]'));
     const triggers = Array.from(document.querySelectorAll('[data-section-trigger]'));
 
+    const snapshotStorageKey = 'thalassa-snapshot';
     const editableStorageKey = 'thalassa-editable';
     const draftStorageKey = 'thalassa-drafts';
     const sectionStorageKey = 'thalassa-last-section';
     const imageStorageKey = 'thalassa-images';
+    const demandeStorageKey = 'thalassa-demandes';
 
     const loadJSON = (key, fallback) => {
       try { return JSON.parse(localStorage.getItem(key)) || JSON.parse(sessionStorage.getItem(key)) || fallback; }
@@ -447,8 +452,49 @@
       }
     };
 
-    let editableStore = loadJSON(editableStorageKey, {});
-    let draftStore = loadJSON(draftStorageKey, {});
+    const snapshot = loadJSON(snapshotStorageKey, null);
+    const pickStore = (snapKey, legacyKey, fallback) => {
+      if (snapshot && snapshot[snapKey] !== undefined) return snapshot[snapKey];
+      const legacy = loadJSON(legacyKey, undefined);
+      return legacy !== undefined ? legacy : fallback;
+    };
+
+    let editableStore = pickStore('editable', editableStorageKey, {});
+    let draftStore = pickStore('drafts', draftStorageKey, {});
+    let savedImages = pickStore('images', imageStorageKey, {});
+    let demandeRows = pickStore('demandes', demandeStorageKey, []);
+    let lastSection = snapshot?.lastSection || null;
+    let lastSavedAt = snapshot?.savedAt || null;
+    let lastSavedDisplay = null;
+
+    const updateSaveBadge = () => {
+      if (!lastSavedDisplay) return;
+      if (!lastSavedAt) {
+        lastSavedDisplay.textContent = 'Jamais';
+        return;
+      }
+      try {
+        const date = new Date(lastSavedAt);
+        lastSavedDisplay.textContent = date.toLocaleString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
+      } catch (e) {
+        lastSavedDisplay.textContent = lastSavedAt;
+      }
+    };
+
+    const commitSnapshot = (reason = 'auto') => {
+      const payload = {
+        editable: editableStore,
+        drafts: draftStore,
+        images: savedImages,
+        demandes: demandeRows,
+        lastSection,
+        savedAt: new Date().toISOString(),
+        reason
+      };
+      lastSavedAt = payload.savedAt;
+      saveJSON(snapshotStorageKey, payload);
+      updateSaveBadge();
+    };
 
     const imageDefaults = {
       'accueil-map': {
@@ -465,7 +511,9 @@
       document.body.className = `theme-${link?.dataset.theme || 'accueil'}`;
       history.replaceState({}, '', `#${target.id}`);
       window.scrollTo({ top: 0, behavior: 'instant' });
+      lastSection = target.id;
       try { localStorage.setItem(sectionStorageKey, target.id); } catch (e) {}
+      commitSnapshot('section-change');
     }
 
     links.forEach(link => {
@@ -493,6 +541,7 @@
         el.addEventListener('input', () => {
           editableStore[key] = el.innerHTML;
           saveJSON(editableStorageKey, editableStore);
+          commitSnapshot('content-edit');
         });
       });
     }
@@ -502,6 +551,7 @@
         if (value === '' || value === null || value === undefined) delete draftStore[key];
         else draftStore[key] = value;
         saveJSON(draftStorageKey, draftStore);
+        commitSnapshot('draft-update');
       };
 
       document.querySelectorAll('[data-persist]').forEach(input => {
@@ -527,6 +577,7 @@
         clear: (keys = []) => {
           keys.forEach(k => delete draftStore[k]);
           saveJSON(draftStorageKey, draftStore);
+          commitSnapshot('draft-clear');
         }
       };
     }
@@ -547,16 +598,15 @@
       const list = document.querySelector('#demande-list');
       if (!form || !list) return;
 
-      const storageKey = 'thalassa-demandes';
-      const rows = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      if (!Array.isArray(demandeRows)) demandeRows = [];
 
       const render = () => {
         list.innerHTML = '';
-        if (!rows.length) {
+        if (!demandeRows.length) {
           list.innerHTML = '<p class="muted small">Aucune demande pour le moment.</p>';
           return;
         }
-        rows.forEach((row, index) => {
+        demandeRows.forEach((row, index) => {
           const div = document.createElement('div');
           div.className = 'card';
           div.innerHTML = `<strong>${row.nom}</strong> — ${row.type}<br><span class="muted small">${row.message}</span>`;
@@ -564,8 +614,9 @@
           btn.className = 'button secondary';
           btn.textContent = 'Marquer comme traité';
           btn.addEventListener('click', () => {
-            rows.splice(index, 1);
-            localStorage.setItem(storageKey, JSON.stringify(rows));
+            demandeRows.splice(index, 1);
+            saveJSON(demandeStorageKey, demandeRows);
+            commitSnapshot('demande-close');
             render();
           });
           div.appendChild(btn);
@@ -581,8 +632,9 @@
         const type = form.type.value;
         const message = form.message.value.trim();
         if (!nom || !message) return;
-        rows.push({ nom, type, message });
-        localStorage.setItem(storageKey, JSON.stringify(rows));
+        demandeRows.push({ nom, type, message });
+        saveJSON(demandeStorageKey, demandeRows);
+        commitSnapshot('demande-add');
         form.reset();
         draftManager?.clear(['demande-nom', 'demande-type', 'demande-message']);
         render();
@@ -616,7 +668,6 @@
         reader.readAsDataURL(file);
       });
       const clamp = (v, min = 0, max = 100) => Math.min(Math.max(Number(v) || 0, min), max);
-      let savedImages = loadJSON(imageStorageKey, {});
 
       const persist = (key, updates) => {
         const next = { ...(savedImages[key] || {}) };
@@ -632,6 +683,7 @@
           savedImages[key] = next;
         }
         saveJSON(imageStorageKey, savedImages);
+        commitSnapshot('image-update');
       };
 
       document.querySelectorAll('[data-drop-target]').forEach(zone => {
@@ -862,15 +914,23 @@
     }
 
     function init() {
+      lastSavedDisplay = document.querySelector('[data-last-saved]');
+      updateSaveBadge();
+      saveJSON(editableStorageKey, editableStore);
+      saveJSON(draftStorageKey, draftStore);
+      saveJSON(imageStorageKey, savedImages);
+      saveJSON(demandeStorageKey, demandeRows);
+
       initEditableContent();
       const draftManager = initFormDrafts();
       initFaq();
       initDemandes(draftManager);
       initImages();
       const hash = location.hash.replace('#','');
-      const storedSection = localStorage.getItem(sectionStorageKey);
+      const storedSection = localStorage.getItem(sectionStorageKey) || lastSection;
       showSection(hash || storedSection || links[0].dataset.section);
       window.addEventListener('hashchange', () => showSection(location.hash.replace('#','') || links[0].dataset.section));
+      commitSnapshot('init-sync');
     }
 
     document.addEventListener('DOMContentLoaded', init);
