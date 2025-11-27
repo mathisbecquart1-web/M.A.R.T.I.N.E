@@ -87,7 +87,6 @@
     .drop-zone {
       border: 1px dashed rgba(0,0,0,0.2);
       border-radius: 12px;
-      overflow: hidden;
       position: relative;
       cursor: pointer;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -95,7 +94,36 @@
     }
     .drop-zone:hover { border-color: var(--purple); }
     .drop-zone.dragging { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(15, 123, 255, 0.2); }
-    .drop-zone img { width: 100%; display: block; object-fit: cover; max-height: 320px; }
+    .drop-zone .image-viewport {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      height: 320px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(240,245,255,0.9));
+    }
+    .drop-zone img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 50%;
+      cursor: grab;
+      user-select: none;
+    }
+    .drop-zone.panning img { cursor: grabbing; }
+    .drop-zone .hint,
+    .drop-zone .inline-controls {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+    .drop-zone:hover .hint,
+    .drop-zone:focus-within .hint,
+    .drop-zone.dragging .hint,
+    .drop-zone:hover .inline-controls,
+    .drop-zone:focus-within .inline-controls,
+    .drop-zone.dragging .inline-controls { opacity: 1; pointer-events: auto; }
     .drop-zone .hint {
       position: absolute;
       bottom: 10px;
@@ -158,7 +186,9 @@
             <h3>Où ?</h3>
             <p class="muted small">Au cœur des Bahamas, la Résidence THALASSA s’ouvre sur l’océan et sur des jardins luxuriants.</p>
             <div class="drop-zone" data-drop-target data-image-key="accueil-map">
-              <img data-image-key="accueil-map" data-image-preview="accueil-map" src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80" alt="Illustration des Bahamas sur une carte du monde">
+              <div class="image-viewport" data-image-viewport>
+                <img data-image-key="accueil-map" data-image-preview="accueil-map" src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80" alt="Illustration des Bahamas sur une carte du monde">
+              </div>
               <div class="hint">Glissez votre photo ici ou cliquez pour importer</div>
               <input type="file" accept="image/*" aria-label="Importer un visuel" style="display:none;">
               <div class="inline-controls">
@@ -395,7 +425,10 @@
     const triggers = Array.from(document.querySelectorAll('[data-section-trigger]'));
 
     const imageDefaults = {
-      'accueil-map': 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80'
+      'accueil-map': {
+        src: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80',
+        pos: { x: 50, y: 50 }
+      }
     };
 
     function showSection(id) {
@@ -480,6 +513,7 @@
     }
 
     function initImages() {
+      const clamp = (v, min = 0, max = 100) => Math.min(Math.max(Number(v) || 0, min), max);
       const imageStorageKey = 'thalassa-images';
       let savedImages = {};
       try {
@@ -488,11 +522,18 @@
         savedImages = {};
       }
 
-      const persist = (key, src) => {
-        if (src) {
-          savedImages[key] = { src };
-        } else {
+      const persist = (key, updates) => {
+        const next = { ...(savedImages[key] || {}) };
+        if (Object.prototype.hasOwnProperty.call(updates, 'src')) {
+          if (updates.src) next.src = updates.src; else delete next.src;
+        }
+        if (updates.pos) {
+          next.pos = { x: clamp(updates.pos.x, 0, 100), y: clamp(updates.pos.y, 0, 100) };
+        }
+        if (!next.src && !next.pos) {
           delete savedImages[key];
+        } else {
+          savedImages[key] = next;
         }
         try { localStorage.setItem(imageStorageKey, JSON.stringify(savedImages)); } catch (e) {}
       };
@@ -500,18 +541,42 @@
       document.querySelectorAll('[data-drop-target]').forEach(zone => {
         const key = zone.dataset.imageKey;
         const preview = zone.querySelector(`[data-image-preview="${key}"]`);
+        const viewport = zone.querySelector('[data-image-viewport]');
         const urlInput = zone.querySelector('input[type="url"]');
         const fileInput = zone.querySelector('input[type="file"]');
         const resetBtn = zone.querySelector('[data-reset-image]');
+
+        const applyPosition = (pos) => {
+          const safe = { x: clamp(pos?.x ?? 50), y: clamp(pos?.y ?? 50) };
+          if (preview) {
+            preview.style.objectPosition = `${safe.x}% ${safe.y}%`;
+            preview.dataset.x = safe.x;
+            preview.dataset.y = safe.y;
+          }
+          return safe;
+        };
+
+        const state = () => {
+          const defaults = imageDefaults[key] || {};
+          const saved = savedImages[key] || {};
+          return {
+            src: saved.src || defaults.src,
+            pos: {
+              x: saved.pos?.x ?? defaults.pos?.x ?? 50,
+              y: saved.pos?.y ?? defaults.pos?.y ?? 50
+            }
+          };
+        };
 
         const setPreview = (src) => {
           if (preview && src) preview.src = src;
         };
 
         const applyFromStore = () => {
-          const current = savedImages[key]?.src || imageDefaults[key];
-          setPreview(current);
-          if (urlInput) urlInput.value = current?.startsWith('http') ? current : '';
+          const current = state();
+          setPreview(current.src);
+          applyPosition(current.pos);
+          if (urlInput) urlInput.value = current.src?.startsWith('http') ? current.src : '';
         };
 
         applyFromStore();
@@ -520,9 +585,10 @@
           if (!file) return;
           const tempUrl = URL.createObjectURL(file);
           setPreview(tempUrl);
+          applyPosition({ x: 50, y: 50 });
           const reader = new FileReader();
           reader.onload = () => {
-            persist(key, reader.result);
+            persist(key, { src: reader.result, pos: { x: 50, y: 50 } });
             applyFromStore();
             URL.revokeObjectURL(tempUrl);
             if (urlInput) urlInput.value = '';
@@ -546,7 +612,7 @@
           }
           const droppedUrl = (e.dataTransfer?.getData('text/uri-list') || e.dataTransfer?.getData('text/plain') || '').trim();
           if (droppedUrl) {
-            persist(key, droppedUrl);
+            persist(key, { src: droppedUrl, pos: { x: 50, y: 50 } });
             applyFromStore();
           }
         };
@@ -565,25 +631,131 @@
         });
         zone.addEventListener('drop', handleDrop);
 
-        zone.addEventListener('click', () => fileInput?.click());
+        let panCandidate = null;
+        let isPanning = false;
+        let suppressClick = false;
+
+        const updatePan = (clientX, clientY) => {
+          if (!panCandidate || !isPanning) return;
+          const nextPos = {
+            x: clamp(panCandidate.x + ((clientX - panCandidate.startX) / panCandidate.width) * 100),
+            y: clamp(panCandidate.y + ((clientY - panCandidate.startY) / panCandidate.height) * 100)
+          };
+          applyPosition(nextPos);
+        };
+
+        const finishPan = () => {
+          if (isPanning && preview) {
+            persist(key, { pos: { x: Number(preview.dataset.x) || 50, y: Number(preview.dataset.y) || 50 } });
+          }
+          isPanning = false;
+          panCandidate = null;
+          zone.classList.remove('panning');
+          setTimeout(() => { suppressClick = false; }, 0);
+        };
+
+        const handleMouseMove = (e) => {
+          if (!panCandidate) return;
+          const distance = Math.hypot(e.clientX - panCandidate.startX, e.clientY - panCandidate.startY);
+          if (!isPanning && distance > 4) {
+            isPanning = true;
+            suppressClick = true;
+            zone.classList.add('panning');
+          }
+          if (isPanning) {
+            e.preventDefault();
+            updatePan(e.clientX, e.clientY);
+          }
+        };
+
+        const handleMouseUp = () => {
+          window.removeEventListener('mousemove', handleMouseMove);
+          window.removeEventListener('mouseup', handleMouseUp);
+          finishPan();
+        };
+
+        const handleMouseDown = (e) => {
+          if (e.button !== 0 || !viewport) return;
+          const rect = viewport.getBoundingClientRect();
+          panCandidate = {
+            startX: e.clientX,
+            startY: e.clientY,
+            x: Number(preview?.dataset.x) || 50,
+            y: Number(preview?.dataset.y) || 50,
+            width: rect.width || 1,
+            height: rect.height || 1
+          };
+          window.addEventListener('mousemove', handleMouseMove);
+          window.addEventListener('mouseup', handleMouseUp);
+        };
+
+        const handleTouchMove = (e) => {
+          const touch = e.touches?.[0];
+          if (!touch) return;
+          if (panCandidate && !isPanning) {
+            const distance = Math.hypot(touch.clientX - panCandidate.startX, touch.clientY - panCandidate.startY);
+            if (distance > 4) {
+              isPanning = true;
+              suppressClick = true;
+              zone.classList.add('panning');
+            }
+          }
+          if (isPanning) {
+            e.preventDefault();
+            updatePan(touch.clientX, touch.clientY);
+          }
+        };
+
+        const handleTouchEnd = () => {
+          window.removeEventListener('touchmove', handleTouchMove);
+          window.removeEventListener('touchend', handleTouchEnd);
+          finishPan();
+        };
+
+        const handleTouchStart = (e) => {
+          const touch = e.touches?.[0];
+          if (!touch || !viewport) return;
+          const rect = viewport.getBoundingClientRect();
+          panCandidate = {
+            startX: touch.clientX,
+            startY: touch.clientY,
+            x: Number(preview?.dataset.x) || 50,
+            y: Number(preview?.dataset.y) || 50,
+            width: rect.width || 1,
+            height: rect.height || 1
+          };
+          window.addEventListener('touchmove', handleTouchMove, { passive: false });
+          window.addEventListener('touchend', handleTouchEnd);
+        };
+
+        preview?.addEventListener('mousedown', handleMouseDown);
+        preview?.addEventListener('touchstart', handleTouchStart, { passive: false });
+
+        zone.addEventListener('click', (e) => {
+          if (suppressClick || isPanning) {
+            e.preventDefault();
+            return;
+          }
+          fileInput?.click();
+        });
 
         fileInput?.addEventListener('change', () => handleFile(fileInput.files?.[0]));
 
         urlInput?.addEventListener('change', () => {
           const value = urlInput.value.trim();
           if (!value) {
-            persist(key, null);
+            persist(key, { src: null, pos: { x: 50, y: 50 } });
             applyFromStore();
             return;
           }
-          persist(key, value);
+          persist(key, { src: value, pos: { x: 50, y: 50 } });
           applyFromStore();
         });
 
         resetBtn?.addEventListener('click', () => {
           if (urlInput) urlInput.value = '';
           if (fileInput) fileInput.value = '';
-          persist(key, null);
+          persist(key, { src: null, pos: { x: 50, y: 50 } });
           applyFromStore();
         });
       });
