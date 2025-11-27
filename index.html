@@ -185,6 +185,46 @@
             gap: 14px;
         }
 
+        /* Bandeau de page pour donner l'impression d'une vraie navigation avec fond visuel par section */
+        .page-banner {
+            position: relative;
+            margin: 0 0 24px;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-banner__bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, rgba(0, 103, 117, 0.88), rgba(0, 140, 156, 0.45)),
+                        url('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1600&q=80') center/cover;
+            filter: saturate(1.05);
+            transform: scale(1.02);
+        }
+
+        .page-banner__content {
+            position: relative;
+            padding: 48px 0;
+            color: #fff;
+        }
+
+        .crumb {
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 12px;
+            opacity: 0.86;
+            margin: 0 0 8px;
+        }
+
+        .page-banner h1 {
+            margin: 6px 0 6px;
+            color: #fff;
+        }
+
+        .page-banner p { margin: 0 0 14px; color: rgba(255,255,255,0.9); }
+
+        .banner-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
         .hero-image {
             position: relative;
             border-radius: 14px;
@@ -372,6 +412,8 @@
             min-width: 120px;
         }
 
+        .hidden { display: none !important; }
+
         .small-text {
             color: var(--muted);
             font-size: 13px;
@@ -479,8 +521,22 @@
             </div>
         </div>
 
+        <!-- Bandeau dynamique qui change d'image et de titre selon l'onglet choisi -->
+        <div id="pageBanner" class="page-banner hidden" aria-hidden="true">
+            <div class="page-banner__bg" id="bannerBg"></div>
+            <div class="page-banner__content container">
+                <p class="crumb" id="bannerCrumb">Thalassa · Présentation</p>
+                <h1 id="bannerTitle">Parcourir la Résidence Thalassa</h1>
+                <p id="bannerSub">Chaque section s'ouvre comme une page dédiée pour une expérience plus immersive.</p>
+                <div class="banner-actions">
+                    <button class="btn-primary nav-btn" data-target="demandes">Déposer une demande</button>
+                    <button class="btn-outline nav-btn" data-target="presentation">Revenir à l'accueil</button>
+                </div>
+            </div>
+        </div>
+
         <!-- En-tête héro remis en page façon Bahamas.com -->
-        <header class="listing-hero">
+        <header class="listing-hero" id="landingHero">
             <div class="container hero-grid">
                 <div>
                     <div class="eyebrow">Bahamas · Résidence Thalassa</div>
@@ -1147,12 +1203,100 @@ Les occupants devront veiller à ce que la tranquillité de l’île ne soit en 
         const navButtons = document.querySelectorAll('.nav-btn');
         const sections = document.querySelectorAll('.section');
         const navSelect = document.querySelector('.nav-select');
+        const landingHero = document.getElementById('landingHero');
+        const pageBanner = document.getElementById('pageBanner');
+        const bannerBg = document.getElementById('bannerBg');
+        const bannerCrumb = document.getElementById('bannerCrumb');
+        const bannerTitle = document.getElementById('bannerTitle');
+        const bannerSub = document.getElementById('bannerSub');
 
-        function showSection(target) {
+        // Cartouche par section pour mettre à jour le bandeau (titre + image) et renforcer l'effet de page dédiée
+        const sectionMeta = {
+            presentation: {
+                crumb: 'Thalassa · Accueil',
+                title: 'Résidence Thalassa, le rêve sur pilotis',
+                sub: 'Replongez dans le panorama, le storytelling et les chiffres clés de la copropriété.',
+                image: 'https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1600&q=80'
+            },
+            reglement: {
+                crumb: 'Thalassa · Règlement',
+                title: 'Règlement de copropriété',
+                sub: 'Destination des parties, conditions de jouissance et règles d’administration des espaces.',
+                image: 'https://images.unsplash.com/photo-1526481280695-3c469c2f88b8?auto=format&fit=crop&w=1600&q=80'
+            },
+            ag: {
+                crumb: 'Thalassa · Assemblées générales',
+                title: 'Historique des AG',
+                sub: 'Décisions votées, PV et résolutions clés présentés comme une page d’archives.',
+                image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80'
+            },
+            edd: {
+                crumb: 'Thalassa · État descriptif',
+                title: 'État descriptif de division (EDD)',
+                sub: 'Lots, tantièmes et informations techniques réunies dans une page claire.',
+                image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80'
+            },
+            lots: {
+                crumb: 'Thalassa · Lots détaillés',
+                title: 'Présentation détaillée des lots',
+                sub: 'Chaque lot présenté comme une fiche, avec recherches, images et usages.',
+                image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80'
+            },
+            communs: {
+                crumb: 'Thalassa · Parties communes',
+                title: 'Parties communes & usages privatifs',
+                sub: 'Ponton, plage, golf, port privatif : l’espace partagé traité comme une page magazine.',
+                image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80'
+            },
+            syndic: {
+                crumb: 'Thalassa · Syndic & agenda',
+                title: 'Coordonnées du syndic et calendrier',
+                sub: 'Contact, horaires et événements à venir dans une page d’organisation.',
+                image: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=1600&q=80'
+            },
+            demandes: {
+                crumb: 'Thalassa · Demandes',
+                title: 'Suivi des demandes des copropriétaires',
+                sub: 'Création, priorisation et statut des demandes dans une page dédiée.',
+                image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80'
+            }
+        };
+
+        function updateBanner(target) {
+            const meta = sectionMeta[target];
+            if (!meta) return;
+            bannerCrumb.textContent = meta.crumb;
+            bannerTitle.textContent = meta.title;
+            bannerSub.textContent = meta.sub;
+            bannerBg.style.backgroundImage = `linear-gradient(120deg, rgba(0, 103, 117, 0.88), rgba(0, 140, 156, 0.45)), url('${meta.image}')`;
+        }
+
+        function showSection(target, skipScroll = false) {
             navButtons.forEach(b => b.classList.toggle('active', b.dataset.target === target));
             sections.forEach(sec => sec.classList.toggle('active', sec.id === target));
             if (navSelect) navSelect.value = target;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Simule une navigation réelle : mise à jour de l'URL hash + alternance héro / bandeau
+            if (history.replaceState) {
+                history.replaceState(null, '', `#${target}`);
+            } else {
+                location.hash = `#${target}`;
+            }
+
+            if (target === 'presentation') {
+                landingHero?.classList.remove('hidden');
+                pageBanner?.classList.add('hidden');
+                pageBanner?.setAttribute('aria-hidden', 'true');
+            } else {
+                landingHero?.classList.add('hidden');
+                pageBanner?.classList.remove('hidden');
+                pageBanner?.setAttribute('aria-hidden', 'false');
+                updateBanner(target);
+            }
+
+            if (!skipScroll) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
         navButtons.forEach(btn => {
@@ -1164,6 +1308,11 @@ Les occupants devront veiller à ce que la tranquillité de l’île ne soit en 
                 showSection(e.target.value);
             });
         }
+
+        // Activer la section correspondant au hash pour permettre un atterrissage direct façon page distincte
+        const initialSection = location.hash ? location.hash.replace('#', '') : 'presentation';
+        const validSection = sectionMeta[initialSection] ? initialSection : 'presentation';
+        showSection(validSection, true);
 
         // ---------------------------
         // 1) Présentation de la copropriété
