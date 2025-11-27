@@ -433,12 +433,18 @@
     const imageStorageKey = 'thalassa-images';
 
     const loadJSON = (key, fallback) => {
-      try { return JSON.parse(localStorage.getItem(key)) || fallback; }
-      catch (e) { return fallback; }
+      try { return JSON.parse(localStorage.getItem(key)) || JSON.parse(sessionStorage.getItem(key)) || fallback; }
+      catch (e) {
+        try { return JSON.parse(sessionStorage.getItem(key)) || fallback; }
+        catch (err) { return fallback; }
+      }
     };
 
     const saveJSON = (key, value) => {
-      try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+      const payload = JSON.stringify(value);
+      try { localStorage.setItem(key, payload); } catch (e) {
+        try { sessionStorage.setItem(key, payload); } catch (_) {}
+      }
     };
 
     let editableStore = loadJSON(editableStorageKey, {});
@@ -584,6 +590,31 @@
     }
 
     function initImages() {
+      const MAX_SIZE = 1400;
+      const compressImage = (file) => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result;
+          const img = new Image();
+          img.onload = () => {
+            try {
+              const canvas = document.createElement('canvas');
+              const ratio = Math.min(1, MAX_SIZE / Math.max(img.width, img.height));
+              canvas.width = Math.max(1, Math.round(img.width * ratio));
+              canvas.height = Math.max(1, Math.round(img.height * ratio));
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              resolve(canvas.toDataURL('image/jpeg', 0.9));
+            } catch (err) {
+              resolve(base64);
+            }
+          };
+          img.onerror = () => resolve(base64);
+          img.src = base64;
+        };
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+      });
       const clamp = (v, min = 0, max = 100) => Math.min(Math.max(Number(v) || 0, min), max);
       let savedImages = loadJSON(imageStorageKey, {});
 
@@ -600,7 +631,7 @@
         } else {
           savedImages[key] = next;
         }
-        try { localStorage.setItem(imageStorageKey, JSON.stringify(savedImages)); } catch (e) {}
+        saveJSON(imageStorageKey, savedImages);
       };
 
       document.querySelectorAll('[data-drop-target]').forEach(zone => {
@@ -646,20 +677,24 @@
 
         applyFromStore();
 
-        const handleFile = (file) => {
+        const handleFile = async (file) => {
           if (!file) return;
           const tempUrl = URL.createObjectURL(file);
           setPreview(tempUrl);
           applyPosition({ x: 50, y: 50 });
-          const reader = new FileReader();
-          reader.onload = () => {
-            persist(key, { src: reader.result, pos: { x: 50, y: 50 } });
+          const compressed = await compressImage(file);
+          if (!compressed) {
             applyFromStore();
             URL.revokeObjectURL(tempUrl);
-            if (urlInput) urlInput.value = '';
             if (fileInput) fileInput.value = '';
-          };
-          reader.readAsDataURL(file);
+            return;
+          }
+          const src = compressed;
+          persist(key, { src, pos: { x: 50, y: 50 } });
+          applyFromStore();
+          URL.revokeObjectURL(tempUrl);
+          if (urlInput) urlInput.value = '';
+          if (fileInput) fileInput.value = '';
         };
 
         const stop = (e) => e.stopPropagation();
