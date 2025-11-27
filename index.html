@@ -4,29 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini site de copropriété</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        /* Style global : typographie simple et mise en page responsive */
+        /* Style global : typographie, palette et ambiance "site de rêve" */
         :root {
-            --primary: #2b6cb0;
-            --primary-light: #e6f0ff;
-            --background: #f7f8fb;
+            --primary: #0ea5e9;
+            --primary-deep: #0c4a6e;
+            --primary-light: #e0f7ff;
+            --accent: #f97316;
+            --background: #f6fbff;
             --card: #ffffff;
-            --text: #1f2933;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --shadow: 0 10px 30px rgba(43, 108, 176, 0.08);
+            --text: #0b172a;
+            --muted: #5b6472;
+            --border: #e5eef6;
+            --shadow: 0 18px 50px rgba(12, 74, 110, 0.14);
+            --glass: rgba(255, 255, 255, 0.7);
         }
 
         * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at 20% 20%, #f0f6ff, #f7f8fb 30%),
-                        radial-gradient(circle at 80% 0%, #f5f7ff, #f7f8fb 30%),
-                        var(--background);
+            font-family: "Manrope", "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at 15% 20%, rgba(14,165,233,0.22), transparent 28%),
+                        radial-gradient(circle at 85% 15%, rgba(249,115,22,0.14), transparent 25%),
+                        linear-gradient(180deg, #f8fbff 0%, #eef6ff 60%, #f8fbff 100%);
             color: var(--text);
-            line-height: 1.5;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            /* halo doux pour rappeler une île au soleil */
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.9), transparent 32%),
+                        radial-gradient(circle at 90% 0%, rgba(14,165,233,0.12), transparent 30%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .container {
@@ -35,61 +54,84 @@
         }
 
         header.hero {
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            background: linear-gradient(120deg, #0b1224 0%, #0f4c75 40%, #0ea5e9 100%);
             color: #fff;
-            padding: 40px 0 28px;
+            padding: 54px 0 36px;
             position: relative;
             overflow: hidden;
+            isolation: isolate;
         }
 
-        header.hero::after {
+        header.hero::after,
+        header.hero::before {
             content: "";
             position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15), transparent 40%);
-            pointer-events: none;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            filter: blur(110px);
+            opacity: 0.55;
+            z-index: 0;
         }
+
+        header.hero::before { background: #22d3ee; inset: -60px auto auto -120px; }
+        header.hero::after { background: #f97316; inset: auto -120px -120px auto; }
 
         .hero-grid {
             position: relative;
+            z-index: 1;
             display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            gap: 26px;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 30px;
             align-items: center;
         }
 
         .eyebrow {
             text-transform: uppercase;
-            letter-spacing: 0.12em;
-            font-size: 13px;
-            opacity: 0.8;
+            letter-spacing: 0.14em;
+            font-size: 12px;
+            opacity: 0.78;
             margin-bottom: 10px;
         }
 
+        h1 { font-family: "Playfair Display", "Times New Roman", serif; }
+
         header h1 {
-            margin: 0 0 12px;
-            font-size: clamp(26px, 4vw, 34px);
+            margin: 0 0 10px;
+            font-size: clamp(28px, 4.4vw, 40px);
+            letter-spacing: 0.01em;
         }
 
         header p {
-            margin: 0 0 16px;
+            margin: 0 0 18px;
             color: rgba(255, 255, 255, 0.9);
+            max-width: 620px;
         }
 
         .hero-actions {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 12px;
+            margin-top: 12px;
         }
 
         .hero-card {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 14px;
-            padding: 18px;
-            backdrop-filter: blur(6px);
+            background: linear-gradient(145deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 18px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
             box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::after {
+            content: "Lagons & Sérénité";
+            position: absolute;
+            inset: auto 12px 12px auto;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
         }
 
         .hero-card h3 { margin: 0 0 6px; color: #fff; }
@@ -97,29 +139,30 @@
 
         .stat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 12px;
             margin-top: 12px;
         }
 
         .stat {
             background: #fff;
-            border-radius: 12px;
-            padding: 12px 14px;
+            border-radius: 14px;
+            padding: 14px 16px;
             color: var(--text);
             box-shadow: var(--shadow);
         }
 
         .stat .label { color: var(--muted); font-size: 13px; }
-        .stat .value { font-weight: 700; font-size: 18px; margin-top: 4px; }
+        .stat .value { font-weight: 800; font-size: 18px; margin-top: 4px; }
 
         .top-nav {
             position: sticky;
             top: 0;
             z-index: 20;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid rgba(14, 165, 233, 0.15);
         }
 
         .nav-inner {
@@ -130,38 +173,46 @@
             padding: 14px 0;
         }
 
-        .brand { font-weight: 700; color: var(--primary); letter-spacing: 0.02em; }
+        .brand {
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
 
         .nav-links {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
             justify-content: flex-start;
         }
 
         .nav-links button {
-            border: 1px solid var(--border);
-            background: #fff;
-            color: var(--text);
-            padding: 10px 12px;
-            border-radius: 10px;
+            border: 1px solid rgba(14,165,233,0.35);
+            background: linear-gradient(120deg, rgba(255,255,255,0.9), rgba(224,247,255,0.8));
+            color: var(--primary-deep);
+            padding: 10px 14px;
+            border-radius: 999px;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 6px 16px rgba(12, 74, 110, 0.08);
         }
 
         .nav-links button.active {
-            background: var(--primary);
+            background: linear-gradient(120deg, #0ea5e9, #22d3ee);
             color: #fff;
-            border-color: var(--primary);
+            border-color: transparent;
+            box-shadow: 0 12px 28px rgba(14, 165, 233, 0.35);
         }
+
+        .nav-links button:hover { transform: translateY(-1px); }
 
         .nav-actions { display: flex; gap: 8px; align-items: center; }
 
-        main { padding: 28px 0 40px; }
+        main { padding: 28px 0 40px; position: relative; z-index: 1; }
 
         .section { display: none; }
         .section.active { display: block; }
@@ -174,16 +225,17 @@
             margin: 10px 0 18px;
         }
 
-        h2 { margin: 0; color: var(--primary); }
+        h2 { margin: 0; color: var(--primary); letter-spacing: 0.01em; }
         h3 { margin-top: 0; }
 
         .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 20px;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 22px;
             box-shadow: var(--shadow);
+            backdrop-filter: blur(6px);
         }
 
         label {
@@ -207,17 +259,17 @@
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(120deg, #0ea5e9, #22d3ee);
             color: #fff;
             border: 1px solid var(--primary);
             padding: 10px 16px;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 10px 24px rgba(43, 108, 176, 0.18);
+            box-shadow: 0 12px 28px rgba(14, 165, 233, 0.3);
             transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(43,108,176,0.22); }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgba(14,165,233,0.35); }
 
         .btn-primary:active { transform: translateY(0); }
 
@@ -226,17 +278,18 @@
             color: var(--primary);
             border: 1px solid var(--primary);
             padding: 10px 16px;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
         }
 
         .btn-danger {
-            background: #dc2626;
+            background: linear-gradient(120deg, #ef4444, #dc2626);
             color: #fff;
             border: none;
             padding: 10px 16px;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
+            box-shadow: 0 12px 24px rgba(220, 38, 38, 0.3);
         }
 
         table {
@@ -333,11 +386,55 @@
             color: #4338ca;
         }
 
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(14, 165, 233, 0.12);
+            color: var(--primary-deep);
+            border-radius: 999px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .dream-panels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin: -32px auto 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dream-card {
+            padding: 18px;
+            border-radius: 18px;
+            background: linear-gradient(160deg, #ffffff, #ecfeff);
+            border: 1px solid rgba(14, 165, 233, 0.25);
+            box-shadow: 0 14px 32px rgba(12, 74, 110, 0.12);
+        }
+
+        .dream-card h4 { margin: 8px 0 6px; }
+        .dream-card p { margin: 0 0 10px; color: var(--muted); }
+
+        .section-lede {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin: 10px 0 14px;
+            border-left: 4px solid var(--primary);
+            padding-left: 12px;
+        }
+
+        .section-lede p { margin: 0; color: var(--muted); }
+
         .footer {
-            background: #0b1224;
+            background: linear-gradient(120deg, #0b1224, #0f2844);
             color: #e5e7eb;
-            padding: 18px 0;
-            margin-top: 24px;
+            padding: 20px 0;
+            margin-top: 32px;
         }
 
         .footer .small-text { color: #cbd5e1; }
@@ -355,8 +452,14 @@
             <div class="container hero-grid">
                 <div>
                     <div class="eyebrow">Espace résidents</div>
-                    <h1>Résidence Thalassa — île aux Bahamas</h1>
-                    <p>Un portail clair pour raconter la vie sur les cabanons sur pilotis, suivre les AG, partager le règlement insulaire et préparer les demandes au syndic.</p>
+                    <div class="chip">Site de rêve · Île aux Bahamas</div>
+                    <h1>Résidence Thalassa — cabanons sur pilotis</h1>
+                    <p>Un mini-site élégant pour vivre la vie insulaire : raconter la copropriété, feuilleter le règlement, suivre les assemblées, rêver des lots et déposer les demandes au syndic en toute sérénité.</p>
+                    <ul style="margin: 0 0 10px 18px; color: rgba(255,255,255,0.86);">
+                        <li>Navigation fluide façon SPA, sans rechargement</li>
+                        <li>Vos données et photos sont gardées au chaud dans le navigateur</li>
+                        <li>Boutons d'accès rapide vers présentation et demandes</li>
+                    </ul>
                     <div class="hero-actions">
                         <button class="btn-primary nav-btn" data-target="presentation">Accéder à la présentation</button>
                         <button class="btn-primary nav-btn" data-target="demandes">Déposer une demande</button>
@@ -387,10 +490,32 @@
             </div>
         </header>
 
+        <!-- Cartes d'ambiance pour renforcer l'effet "site internet" -->
+        <section class="container dream-panels">
+            <div class="dream-card">
+                <div class="chip">Vivre sur l'eau</div>
+                <h4>Lagons turquoise & cabanons</h4>
+                <p>Présentez la Résidence Thalassa comme une destination : nom, adresse, description idyllique.</p>
+                <button class="btn-outline nav-btn" data-target="presentation">Rédiger la présentation</button>
+            </div>
+            <div class="dream-card">
+                <div class="chip">Organisation</div>
+                <h4>Règlement & AG stylés</h4>
+                <p>Ajoutez vos articles, vos PV et vos décisions pour garder le suivi des assemblées.</p>
+                <button class="btn-outline nav-btn" data-target="ag">Accéder aux AG</button>
+            </div>
+            <div class="dream-card">
+                <div class="chip">Conciergerie</div>
+                <h4>Demandes au syndic</h4>
+                <p>Un tableau net pour suivre les demandes et préparer la prochaine AG sans stress.</p>
+                <button class="btn-outline nav-btn" data-target="demandes">Voir le suivi</button>
+            </div>
+        </section>
+
         <!-- Barre de navigation sticky pour piloter les sections SPA -->
         <div class="top-nav">
             <div class="container nav-inner">
-                <div class="brand">CoproPanel</div>
+                <div class="brand">Thalassa Dream</div>
                 <div class="nav-links">
                     <button class="nav-btn active" data-target="presentation">Présentation</button>
                     <button class="nav-btn" data-target="reglement">Règlement</button>
@@ -410,6 +535,13 @@
         <main class="container">
             <!-- SECTION 1 : Présentation -->
             <section id="presentation" class="section active">
+                <div class="section-lede">
+                    <div>
+                        <strong>Présentation immersive</strong>
+                        <p>Décrivez la résidence, ajoutez vos photos et affichez un résumé instantané.</p>
+                    </div>
+                    <div class="chip">Données locales</div>
+                </div>
                 <div class="card">
                     <h2>Présentation de la copropriété</h2>
                     <p class="small-text">Renseignez ici le descriptif général de la résidence. Les champs ci-dessous sont enregistrés en localStorage.</p>
@@ -452,6 +584,13 @@
 
             <!-- SECTION 2 : Règlement -->
             <section id="reglement" class="section">
+                <div class="section-lede">
+                    <div>
+                        <strong>Cadre de vie</strong>
+                        <p>Capturez vos articles, consignes et accords dans un accordéon clair.</p>
+                    </div>
+                    <div class="chip">Règlement</div>
+                </div>
                 <div class="card">
                     <h2>Règlement de copropriété</h2>
                     <form id="reglementForm">
@@ -480,6 +619,13 @@
 
             <!-- SECTION 3 : Historique AG -->
             <section id="ag" class="section">
+                <div class="section-lede">
+                    <div>
+                        <strong>Mémoires des AG</strong>
+                        <p>Gardez trace des décisions, PV et résolutions pour chaque assemblée.</p>
+                    </div>
+                    <div class="chip">Suivi</div>
+                </div>
                 <div class="card">
                     <h2>Historique des assemblées générales</h2>
                     <form id="agForm">
@@ -519,6 +665,13 @@
 
             <!-- SECTION 4 : EDD -->
             <section id="edd" class="section">
+                <div class="section-lede">
+                    <div>
+                        <strong>État descriptif</strong>
+                        <p>Cartographiez les lots, escalier, tantièmes : tout est sauvegardé localement.</p>
+                    </div>
+                    <div class="chip">EDD</div>
+                </div>
                 <div class="card">
                     <h2>État descriptif de division (EDD)</h2>
                     <form id="eddForm">
@@ -559,6 +712,13 @@
 
             <!-- SECTION 5 : Présentation détaillée des lots -->
             <section id="lots" class="section">
+                <div class="section-lede">
+                    <div>
+                        <strong>Fiches rêve</strong>
+                        <p>Cartes détaillées, filtres, images par lot : personnalisez chaque cabanon.</p>
+                    </div>
+                    <div class="chip">Lots détaillés</div>
+                </div>
                 <div class="card">
                     <h2>Présentation détaillée des lots</h2>
                     <div class="search-row">
@@ -596,6 +756,13 @@
 
             <!-- SECTION 6 : Parties communes -->
             <section id="communs" class="section">
+                <div class="section-lede">
+                    <div>
+                        <strong>Espaces partagés</strong>
+                        <p>Listez pontons, plages, usages privatifs et ajoutez des visuels illustratifs.</p>
+                    </div>
+                    <div class="chip">Commun & privatif</div>
+                </div>
                 <div class="card">
                     <h2>Parties communes et parties à usage privatif</h2>
                     <div class="grid">
@@ -641,6 +808,13 @@
 
             <!-- SECTION 7 : Syndic & Agenda -->
             <section id="syndic" class="section">
+                <div class="section-lede">
+                    <div>
+                        <strong>Conciergerie insulaire</strong>
+                        <p>Coordonnées du syndic, agenda des événements et interventions à venir.</p>
+                    </div>
+                    <div class="chip">Syndic & agenda</div>
+                </div>
                 <div class="card">
                     <h2>Coordonnées du syndic</h2>
                     <form id="syndicForm">
@@ -682,6 +856,13 @@
 
             <!-- SECTION 8 : Demandes copropriétaires -->
             <section id="demandes" class="section">
+                <div class="section-lede">
+                    <div>
+                        <strong>Support des résidents</strong>
+                        <p>Collectez les demandes, priorisez-les et suivez le statut jusqu'au traitement.</p>
+                    </div>
+                    <div class="chip">Demandes</div>
+                </div>
                 <div class="card">
                     <h2>Demandes des copropriétaires</h2>
                     <form id="demandeForm">
@@ -735,8 +916,8 @@
         <footer class="footer">
             <div class="container flex-between">
                 <div>
-                    <strong>CoproPanel</strong>
-                    <p class="small-text">Maquette front-end : remplissez vos données, remplacez les textes d'exemple et ajoutez vos photos.</p>
+                    <strong>Résidence Thalassa</strong>
+                    <p class="small-text">Un mini-site full front pour une copropriété de rêve : remplacez les textes d'exemple, ajoutez vos photos, tout reste dans votre navigateur.</p>
                 </div>
                 <div class="small-text">Données conservées localement (navigateur).</div>
             </div>
