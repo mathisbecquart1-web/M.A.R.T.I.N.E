@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résidence Thalassa · Demandes</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-demandes" data-page="demandes">
+  <div class="page">
+    <header>
+      <div class="nav">
+        <div class="brand">
+          <div class="pill">Île aux Bahamas</div>
+          <div>Résidence Thalassa</div>
+        </div>
+        <div class="nav-links">
+          <a href="thalassav4.html" data-page="accueil">Accueil</a>
+          <a href="charte.html" data-page="charte">Charte</a>
+          <a href="onglets.html" data-page="onglets">Onglets</a>
+          <a href="services.html" data-page="services">Services</a>
+          <a href="formations.html" data-page="formations">Formations</a>
+          <a href="ag2025.html" data-page="ag2025">Dernière AG</a>
+          <a href="copro.html" data-page="copro">Vie de copro</a>
+          <a href="owners.html" data-page="owners">Copropriétaires</a>
+          <a href="demandes.html" data-page="demandes">Demandes</a>
+          <a href="faq.html" data-page="faq">FAQ</a>
+        </div>
+        <div class="nav-actions">
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Règlement</button>
+          <button type="button" class="btn-primary" onclick="openAdmin()">🔐 Admin TALASSA</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="section" id="demandes">
+      <div class="admin-bar">
+        <div>
+          <h2>Demande d'information</h2>
+          <p class="subtitle">Questions copropriétaires, signalements ou besoins logistiques. Sauvegarde automatique toutes les 30 secondes et à chaque modification.</p>
+        </div>
+        <button type="button" class="btn-ghost" onclick="resetDraft()">Réinitialiser le brouillon</button>
+      </div>
+      <form id="requestForm">
+        <div class="two-col">
+          <label>Nom et prénom
+            <input name="name" required placeholder="Votre nom" />
+          </label>
+          <label>Email
+            <input name="email" type="email" required placeholder="vous@example.com" />
+          </label>
+        </div>
+        <div class="two-col">
+          <label>Téléphone
+            <input name="phone" required placeholder="+33..." />
+          </label>
+          <label>Lot concerné
+            <select name="lot" id="lotSelect" required></select>
+          </label>
+        </div>
+        <label>Message
+          <textarea name="message" placeholder="Précisez vos besoins, incidents, questions sur l’île." required></textarea>
+        </label>
+        <button class="btn-primary" type="submit">Envoyer la demande</button>
+        <div id="draftStatus" class="meta"></div>
+      </form>
+    </section>
+
+    <section id="adminPanel" class="section hidden">
+      <div class="admin-bar">
+        <h2>Administration TALASSA</h2>
+        <button type="button" class="btn-ghost" onclick="logout()">Se déconnecter</button>
+      </div>
+      <div class="subtitle">Consulter et éditer toutes les demandes envoyées par les copropriétaires. Tout est sauvegardé localement et reste accessible hors connexion après authentification.</div>
+
+      <h3>Demandes reçues</h3>
+      <div class="section" style="padding:12px; background: rgba(255,255,255,0.8);">
+        <table class="table" id="requestsTable"></table>
+      </div>
+    </section>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

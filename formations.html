@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résidence Thalassa · Formations</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-formations" data-page="formations">
+  <div class="page">
+    <header>
+      <div class="nav">
+        <div class="brand">
+          <div class="pill">Île aux Bahamas</div>
+          <div>Résidence Thalassa</div>
+        </div>
+        <div class="nav-links">
+          <a href="thalassav4.html" data-page="accueil">Accueil</a>
+          <a href="charte.html" data-page="charte">Charte</a>
+          <a href="onglets.html" data-page="onglets">Onglets</a>
+          <a href="services.html" data-page="services">Services</a>
+          <a href="formations.html" data-page="formations">Formations</a>
+          <a href="ag2025.html" data-page="ag2025">Dernière AG</a>
+          <a href="copro.html" data-page="copro">Vie de copro</a>
+          <a href="owners.html" data-page="owners">Copropriétaires</a>
+          <a href="demandes.html" data-page="demandes">Demandes</a>
+          <a href="faq.html" data-page="faq">FAQ</a>
+        </div>
+        <div class="nav-actions">
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Règlement</button>
+          <button type="button" class="btn-primary" onclick="openAdmin()">🔐 Admin TALASSA</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="section" id="formations">
+      <h2>Formations & prévention</h2>
+      <p class="subtitle">Programmes dédiés aux copropriétaires, accessibles hors connexion.</p>
+      <div class="grid-cards">
+        <div class="card-sm"><div class="flag">🦜 Sensibilisation faune</div><div class="meta">Ateliers mensuels sur la protection de la faune locale et le respect des zones calmes.</div></div>
+        <div class="card-sm"><div class="flag">⛑️ Premiers secours</div><div class="meta">Sessions de premiers secours et utilisation du défibrillateur de l’île.</div></div>
+        <div class="card-sm"><div class="flag">🌊 Parcelles d’eau</div><div class="meta">Briefs dédiés aux lots disposant d’un espace privatif d’eau (partie commune).</div></div>
+        <div class="card-sm"><div class="flag">🧾 Règlement animé</div><div class="meta">Lecture guidée des règles clés : bruit, animaux, port, propreté, incendie.</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="agenda">
+      <h2>Agenda & jalons</h2>
+      <p class="subtitle">Toutes les étapes pour la présentation orale du 28 novembre et le suivi de la copropriété.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🎤 Présentation orale</div>
+          <div class="meta">28 novembre · Copro physiquement</div>
+          <div class="badge-soft">Salle & lieu confirmés une semaine avant</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📑 Règlement</div>
+          <div class="meta">Niveau 5/6 · EDD et composition inclus</div>
+          <div class="badge-soft">Téléchargeable, mis à jour à chaque révision</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🛥️ Parties communes</div>
+          <div class="meta">Ponton, plage, port privatif, terrains sportifs</div>
+          <div class="badge-soft">Définition & conditions de jouissance</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📌 Lieu</div>
+          <div class="meta">Île aux Bahamas · Résidence Thalassa</div>
+          <div class="badge-soft">Accès bateau + aérien détaillé dans les onglets</div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
