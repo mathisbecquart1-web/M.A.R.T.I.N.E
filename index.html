@@ -73,6 +73,9 @@
     .table { width: 100%; border-collapse: collapse; }
     .table th, .table td { padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.06); text-align: left; }
 
+    [contenteditable="true"] { cursor: text; }
+    [contenteditable="true"]:focus { outline: 2px solid rgba(15,123,255,0.18); border-radius: 6px; }
+
     .faq-item { border: 1px solid rgba(0,0,0,0.06); border-radius: 12px; padding: 12px; background: rgba(255,255,255,0.9); }
     .faq-item summary { cursor: pointer; font-weight: 700; color: var(--text); }
 
@@ -173,9 +176,9 @@
     <main>
       <section id="accueil" class="view active">
         <div class="card hero">
-          <span class="badge">Bienvenue</span>
-          <h1>La Résidence THALASSA ️ c’est quoi ?</h1>
-          <p class="muted">C’est bien plus qu’une simple copropriété : c’est un style de vie, une invitation permanente au calme, au soleil et au luxe 💸.</p>
+          <span class="badge" data-editable="badge-bienvenue">Bienvenue</span>
+          <h1 data-editable="h1-accueil">La Résidence THALASSA ️ c’est quoi ?</h1>
+          <p class="muted" data-editable="intro-accueil">C’est bien plus qu’une simple copropriété : c’est un style de vie, une invitation permanente au calme, au soleil et au luxe 💸.</p>
           <div class="grid two">
             <a class="button" data-section-trigger="services" href="#services">Voir l’historique AG</a>
             <a class="button secondary" data-section-trigger="demandes" href="#demandes">Suivre mes demandes</a>
@@ -183,8 +186,8 @@
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Où ?</h3>
-            <p class="muted small">Au cœur des Bahamas, la Résidence THALASSA s’ouvre sur l’océan et sur des jardins luxuriants.</p>
+            <h3 data-editable="ou-titre">Où ?</h3>
+            <p class="muted small" data-editable="ou-texte">Au cœur des Bahamas, la Résidence THALASSA s’ouvre sur l’océan et sur des jardins luxuriants.</p>
             <div class="drop-zone" data-drop-target data-image-key="accueil-map">
               <div class="image-viewport" data-image-viewport>
                 <img data-image-key="accueil-map" data-image-preview="accueil-map" src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80" alt="Illustration des Bahamas sur une carte du monde">
@@ -198,19 +201,19 @@
             </div>
           </div>
           <div class="card">
-            <h3>Un cadre unique</h3>
-            <ul class="list">
+            <h3 data-editable="cadre-titre">Un cadre unique</h3>
+            <ul class="list" data-editable="cadre-list">
               <li>🌊 Un environnement juste unique.</li>
               <li>🏡 Des logements d’exception.</li>
               <li>⛳️ Avec des parties communes à couper le souffle.</li>
               <li>‍♀️ Un lieu pour se ressourcer.</li>
             </ul>
-            <p class="muted small">✨ En clair, c’est le luxe à l’état pur... Un lieu si rare que l’on ne l’oublie jamais.</p>
+            <p class="muted small" data-editable="cadre-note">✨ En clair, c’est le luxe à l’état pur... Un lieu si rare que l’on ne l’oublie jamais.</p>
           </div>
         </section>
         <div class="card">
-          <h3>Sur ce site pour les copropriétaires il y a :</h3>
-          <ul class="list">
+          <h3 data-editable="contenus-titre">Sur ce site pour les copropriétaires il y a :</h3>
+          <ul class="list" data-editable="contenus-list">
             <li>Le règlementaire de copropriété</li>
             <li>L’Assemblée générale</li>
             <li>L’EDD</li>
@@ -220,27 +223,27 @@
             <li>Des demandes de copropriété</li>
           </ul>
         </div>
-        <div class="footer-note">Portail Thalassa — le luxe à l’état pur</div>
+        <div class="footer-note" data-editable="footer">Portail Thalassa — le luxe à l’état pur</div>
       </section>
 
       <section id="charte" class="view">
         <div class="card hero">
-          <span class="badge">Règlement</span>
-          <h1>Règlement de copropriété</h1>
-          <p class="muted">Principes communs pour préserver le cadre de vie, la tranquillité et le bon usage des parties communes.</p>
+          <span class="badge" data-editable="badge-reglement">Règlement</span>
+          <h1 data-editable="titre-reglement">Règlement de copropriété</h1>
+          <p class="muted" data-editable="intro-reglement">Principes communs pour préserver le cadre de vie, la tranquillité et le bon usage des parties communes.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Respect des espaces communs</h3>
-            <ul class="list">
+            <h3 data-editable="reglement-respect-titre">Respect des espaces communs</h3>
+            <ul class="list" data-editable="reglement-respect-list">
               <li>Silence après 22h et information préalable pour tout chantier.</li>
               <li>Propreté des halls, ascenseurs et locaux vélo.</li>
               <li>Tri sélectif et évacuation des encombrants programmée.</li>
             </ul>
           </div>
           <div class="card">
-            <h3>Communication</h3>
-            <ul class="list">
+            <h3 data-editable="reglement-com-titre">Communication</h3>
+            <ul class="list" data-editable="reglement-com-list">
               <li>Utiliser le panneau d'affichage numérique pour prévenir des travaux.</li>
               <li>Remonter les incidents via l'onglet Demandes.</li>
               <li>Participer aux réunions trimestrielles pour les décisions clés.</li>
@@ -251,14 +254,14 @@
 
       <section id="services" class="view">
         <div class="card hero">
-          <span class="badge">Historique AG</span>
-          <h1>Décisions et comptes-rendus</h1>
-          <p class="muted">Synthèses des assemblées passées, prestataires retenus et suivi des contrats votés.</p>
+          <span class="badge" data-editable="badge-ag">Historique AG</span>
+          <h1 data-editable="titre-ag">Décisions et comptes-rendus</h1>
+          <p class="muted" data-editable="intro-ag">Synthèses des assemblées passées, prestataires retenus et suivi des contrats votés.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Prestations suivies</h3>
-            <ul class="list">
+            <h3 data-editable="ag-prestations-titre">Prestations suivies</h3>
+            <ul class="list" data-editable="ag-prestations-list">
               <li>Ascenseurs · Société Lifty — tél. 01 23 45 67 89</li>
               <li>Chauffage · Calorim — tél. 01 44 55 66 77</li>
               <li>Nettoyage · Clean&Co — tél. 01 77 88 99 00</li>
@@ -266,8 +269,8 @@
             </ul>
           </div>
           <div class="card">
-            <h3>Décisions marquantes</h3>
-            <ul class="list">
+            <h3 data-editable="ag-decisions-titre">Décisions marquantes</h3>
+            <ul class="list" data-editable="ag-decisions-list">
               <li>Validation du plan de rénovation cage d'escalier (vote 2024).</li>
               <li>Renouvellement du contrat ascenseurs avec clause d'amélioration.</li>
               <li>Budget chauffage 2025 adopté avec objectif de -5% de consommation.</li>
@@ -275,121 +278,121 @@
           </div>
         </section>
         <div class="card">
-          <h3>Documents archivés</h3>
-          <p class="muted small">Procès-verbaux, devis votés et avenants sont listés ici pour consultation rapide.</p>
+          <h3 data-editable="ag-docs-titre">Documents archivés</h3>
+          <p class="muted small" data-editable="ag-docs-texte">Procès-verbaux, devis votés et avenants sont listés ici pour consultation rapide.</p>
         </div>
       </section>
 
       <section id="formations" class="view">
         <div class="card hero">
-          <span class="badge">EDD</span>
-          <h1>État Descriptif de Division</h1>
-          <p class="muted">Références utiles sur la composition des lots, les tantièmes et les règles d'usage associées.</p>
+          <span class="badge" data-editable="badge-edd">EDD</span>
+          <h1 data-editable="titre-edd">État Descriptif de Division</h1>
+          <p class="muted" data-editable="intro-edd">Références utiles sur la composition des lots, les tantièmes et les règles d'usage associées.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Répartition</h3>
-            <ul class="list">
+            <h3 data-editable="edd-repartition-titre">Répartition</h3>
+            <ul class="list" data-editable="edd-repartition-list">
               <li>Tantièmes généraux par lot et bâtiment.</li>
               <li>Quotes-parts liées aux ascenseurs et équipements spécifiques.</li>
               <li>Réserves techniques indiquées dans l'état descriptif.</li>
             </ul>
           </div>
           <div class="card">
-            <h3>Consultation</h3>
-            <p class="muted small">Accès aux plans, descriptions de lots et mises à jour validées en AG.</p>
+            <h3 data-editable="edd-consultation-titre">Consultation</h3>
+            <p class="muted small" data-editable="edd-consultation-texte">Accès aux plans, descriptions de lots et mises à jour validées en AG.</p>
           </div>
         </section>
       </section>
 
       <section id="ag2025" class="view">
         <div class="card hero">
-          <span class="badge">Lots</span>
-          <h1>Détails des lots</h1>
-          <p class="muted">Informations clés sur chaque lot, charges associées et contacts dédiés.</p>
+          <span class="badge" data-editable="badge-lots">Lots</span>
+          <h1 data-editable="titre-lots">Détails des lots</h1>
+          <p class="muted" data-editable="intro-lots">Informations clés sur chaque lot, charges associées et contacts dédiés.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Points clés</h3>
-            <ul class="list">
+            <h3 data-editable="lots-points-titre">Points clés</h3>
+            <ul class="list" data-editable="lots-points-list">
               <li>Surface, tantièmes et affectations pour chaque lot.</li>
               <li>Récapitulatif des travaux réalisés ou votés par lot.</li>
               <li>Contacts privilégiés pour les questions relatives au lot.</li>
             </ul>
           </div>
           <div class="card">
-            <h3>Documents</h3>
-            <p class="muted small">Plans, attestations et relevés seront déposés ici au fur et à mesure.</p>
+            <h3 data-editable="lots-docs-titre">Documents</h3>
+            <p class="muted small" data-editable="lots-docs-texte">Plans, attestations et relevés seront déposés ici au fur et à mesure.</p>
           </div>
         </section>
       </section>
 
       <section id="vie-copro" class="view">
         <div class="card hero">
-          <span class="badge">Parties communes</span>
-          <h1>Gestion des espaces partagés</h1>
-          <p class="muted">Équipements collectifs, règles d'usage et créneaux de maintenance des zones communes.</p>
+          <span class="badge" data-editable="badge-communs">Parties communes</span>
+          <h1 data-editable="titre-communs">Gestion des espaces partagés</h1>
+          <p class="muted" data-editable="intro-communs">Équipements collectifs, règles d'usage et créneaux de maintenance des zones communes.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Équipements suivis</h3>
-            <ul class="list">
+            <h3 data-editable="communs-equip-titre">Équipements suivis</h3>
+            <ul class="list" data-editable="communs-equip-list">
               <li>Ascenseurs : contrôle mensuel et rapports disponibles.</li>
               <li>Local vélo : nettoyage trimestriel et gestion des badges.</li>
               <li>Salle commune : calendrier de réservation partagé.</li>
             </ul>
           </div>
           <div class="card">
-            <h3>Règles d'usage</h3>
-            <p class="muted small">Consultez les horaires de tranquillité, les consignes de propreté et les procédures de réservation.</p>
+            <h3 data-editable="communs-regles-titre">Règles d'usage</h3>
+            <p class="muted small" data-editable="communs-regles-texte">Consultez les horaires de tranquillité, les consignes de propreté et les procédures de réservation.</p>
           </div>
         </section>
       </section>
 
       <section id="coproprietaires" class="view">
         <div class="card hero">
-          <span class="badge">Syndic</span>
-          <h1>Coordonnées du syndic</h1>
-          <p class="muted">Contacts directs, horaires et canaux pour joindre le syndic ou déposer un document.</p>
+          <span class="badge" data-editable="badge-syndic">Syndic</span>
+          <h1 data-editable="titre-syndic">Coordonnées du syndic</h1>
+          <p class="muted" data-editable="intro-syndic">Contacts directs, horaires et canaux pour joindre le syndic ou déposer un document.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Contact principal</h3>
-            <ul class="list">
+            <h3 data-editable="syndic-contact-titre">Contact principal</h3>
+            <ul class="list" data-editable="syndic-contact-list">
               <li>Syndic : Cabinet Océane Gestion</li>
               <li>Téléphone : 01 55 66 77 88</li>
               <li>Email : contact@oceane-gestion.fr</li>
             </ul>
           </div>
           <div class="card">
-            <h3>Permanences</h3>
-            <p class="muted small">Accueil téléphonique du lundi au vendredi, 9h-12h30 / 14h-17h. Dépôt de documents sur rendez-vous ou via l'onglet Demandes.</p>
+            <h3 data-editable="syndic-permanences-titre">Permanences</h3>
+            <p class="muted small" data-editable="syndic-permanences-texte">Accueil téléphonique du lundi au vendredi, 9h-12h30 / 14h-17h. Dépôt de documents sur rendez-vous ou via l'onglet Demandes.</p>
           </div>
         </section>
       </section>
 
       <section id="demandes" class="view">
         <div class="card hero">
-          <span class="badge">Demandes</span>
-          <h1>Incidents & questions</h1>
-          <p class="muted">Soumettez vos demandes, suivez-les et marquez-les comme traitées : tout reste stocké localement sur votre navigateur.</p>
+          <span class="badge" data-editable="badge-demandes">Demandes</span>
+          <h1 data-editable="titre-demandes">Incidents & questions</h1>
+          <p class="muted" data-editable="intro-demandes">Soumettez vos demandes, suivez-les et marquez-les comme traitées : tout reste stocké localement sur votre navigateur.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Nouvelle demande</h3>
+            <h3 data-editable="demandes-form-titre">Nouvelle demande</h3>
             <form id="demande-form">
-              <input name="nom" type="text" placeholder="Nom" required />
-              <select name="type">
+              <input name="nom" type="text" placeholder="Nom" required data-persist="demande-nom" />
+              <select name="type" data-persist="demande-type">
                 <option value="Incident">Incident</option>
                 <option value="Question">Question</option>
                 <option value="Suggestion">Suggestion</option>
               </select>
-              <textarea name="message" placeholder="Décrivez votre demande" required></textarea>
+              <textarea name="message" placeholder="Décrivez votre demande" required data-persist="demande-message"></textarea>
               <button class="button" type="submit">Enregistrer</button>
             </form>
           </div>
           <div class="card">
-            <h3>Suivi</h3>
+            <h3 data-editable="demandes-suivi-titre">Suivi</h3>
             <div id="demande-list" class="grid"></div>
           </div>
         </section>
@@ -397,22 +400,22 @@
 
       <section id="faq" class="view">
         <div class="card hero">
-          <span class="badge">FAQ</span>
-          <h1>Questions fréquentes</h1>
-          <p class="muted">Consultez les réponses clés ou ouvrez une demande si besoin.</p>
+          <span class="badge" data-editable="badge-faq">FAQ</span>
+          <h1 data-editable="titre-faq">Questions fréquentes</h1>
+          <p class="muted" data-editable="intro-faq">Consultez les réponses clés ou ouvrez une demande si besoin.</p>
         </div>
         <section class="grid">
           <details class="faq-item" open>
-            <summary>Comment accéder au local vélo ?</summary>
-            <p class="muted small">Demandez un QR code temporaire via l'onglet Demandes.</p>
+            <summary data-editable="faq1-question">Comment accéder au local vélo ?</summary>
+            <p class="muted small" data-editable="faq1-reponse">Demandez un QR code temporaire via l'onglet Demandes.</p>
           </details>
           <details class="faq-item">
-            <summary>Qui prévenir en cas de fuite ?</summary>
-            <p class="muted small">Signalez-le immédiatement dans Demandes et appelez le référent du bâtiment.</p>
+            <summary data-editable="faq2-question">Qui prévenir en cas de fuite ?</summary>
+            <p class="muted small" data-editable="faq2-reponse">Signalez-le immédiatement dans Demandes et appelez le référent du bâtiment.</p>
           </details>
           <details class="faq-item">
-            <summary>Où trouver les comptes-rendus ?</summary>
-            <p class="muted small">Ils seront publiés dans la section Historique AG après validation.</p>
+            <summary data-editable="faq3-question">Où trouver les comptes-rendus ?</summary>
+            <p class="muted small" data-editable="faq3-reponse">Ils seront publiés dans la section Historique AG après validation.</p>
           </details>
         </section>
       </section>
@@ -423,6 +426,23 @@
     const sections = Array.from(document.querySelectorAll('.view'));
     const links = Array.from(document.querySelectorAll('[data-section]'));
     const triggers = Array.from(document.querySelectorAll('[data-section-trigger]'));
+
+    const editableStorageKey = 'thalassa-editable';
+    const draftStorageKey = 'thalassa-drafts';
+    const sectionStorageKey = 'thalassa-last-section';
+    const imageStorageKey = 'thalassa-images';
+
+    const loadJSON = (key, fallback) => {
+      try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+      catch (e) { return fallback; }
+    };
+
+    const saveJSON = (key, value) => {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+    };
+
+    let editableStore = loadJSON(editableStorageKey, {});
+    let draftStore = loadJSON(draftStorageKey, {});
 
     const imageDefaults = {
       'accueil-map': {
@@ -439,6 +459,7 @@
       document.body.className = `theme-${link?.dataset.theme || 'accueil'}`;
       history.replaceState({}, '', `#${target.id}`);
       window.scrollTo({ top: 0, behavior: 'instant' });
+      try { localStorage.setItem(sectionStorageKey, target.id); } catch (e) {}
     }
 
     links.forEach(link => {
@@ -455,6 +476,55 @@
       });
     });
 
+    function initEditableContent() {
+      document.querySelectorAll('[data-editable]').forEach(el => {
+        const key = el.dataset.editable;
+        if (!key) return;
+        if (editableStore[key] !== undefined) {
+          el.innerHTML = editableStore[key];
+        }
+        el.setAttribute('contenteditable', 'true');
+        el.addEventListener('input', () => {
+          editableStore[key] = el.innerHTML;
+          saveJSON(editableStorageKey, editableStore);
+        });
+      });
+    }
+
+    function initFormDrafts() {
+      const persist = (key, value) => {
+        if (value === '' || value === null || value === undefined) delete draftStore[key];
+        else draftStore[key] = value;
+        saveJSON(draftStorageKey, draftStore);
+      };
+
+      document.querySelectorAll('[data-persist]').forEach(input => {
+        const key = input.dataset.persist;
+        if (!key) return;
+        const saved = draftStore[key];
+        if (saved !== undefined) {
+          if (input.type === 'checkbox' || input.type === 'radio') {
+            input.checked = !!saved;
+          } else {
+            input.value = saved;
+          }
+        }
+        const update = () => {
+          const value = (input.type === 'checkbox' || input.type === 'radio') ? input.checked : input.value;
+          persist(key, value);
+        };
+        input.addEventListener('input', update);
+        input.addEventListener('change', update);
+      });
+
+      return {
+        clear: (keys = []) => {
+          keys.forEach(k => delete draftStore[k]);
+          saveJSON(draftStorageKey, draftStore);
+        }
+      };
+    }
+
     function initFaq() {
       document.querySelectorAll('.faq-item').forEach(item => {
         const summary = item.querySelector('summary');
@@ -466,7 +536,7 @@
       });
     }
 
-    function initDemandes() {
+    function initDemandes(draftManager) {
       const form = document.querySelector('#demande-form');
       const list = document.querySelector('#demande-list');
       if (!form || !list) return;
@@ -508,19 +578,14 @@
         rows.push({ nom, type, message });
         localStorage.setItem(storageKey, JSON.stringify(rows));
         form.reset();
+        draftManager?.clear(['demande-nom', 'demande-type', 'demande-message']);
         render();
       });
     }
 
     function initImages() {
       const clamp = (v, min = 0, max = 100) => Math.min(Math.max(Number(v) || 0, min), max);
-      const imageStorageKey = 'thalassa-images';
-      let savedImages = {};
-      try {
-        savedImages = JSON.parse(localStorage.getItem(imageStorageKey) || '{}') || {};
-      } catch (e) {
-        savedImages = {};
-      }
+      let savedImages = loadJSON(imageStorageKey, {});
 
       const persist = (key, updates) => {
         const next = { ...(savedImages[key] || {}) };
@@ -762,11 +827,14 @@
     }
 
     function init() {
+      initEditableContent();
+      const draftManager = initFormDrafts();
       initFaq();
-      initDemandes();
+      initDemandes(draftManager);
       initImages();
       const hash = location.hash.replace('#','');
-      showSection(hash || links[0].dataset.section);
+      const storedSection = localStorage.getItem(sectionStorageKey);
+      showSection(hash || storedSection || links[0].dataset.section);
       window.addEventListener('hashchange', () => showSection(location.hash.replace('#','') || links[0].dataset.section));
     }
 
