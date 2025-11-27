@@ -424,6 +424,54 @@
             <p class="muted small" data-editable="lots-docs-texte">Plans, attestations et relevés seront déposés ici au fur et à mesure.</p>
           </div>
         </section>
+        <section class="card">
+          <h3 data-editable="lots-galerie-titre">Galerie des lots</h3>
+          <p class="muted small" data-editable="lots-galerie-texte">Ajoutez jusqu’à trois visuels représentatifs des lots et décrivez-les.</p>
+          <div class="grid three">
+            <div class="card">
+              <div class="drop-zone" data-drop-target data-image-key="lots-visuel-1">
+                <div class="image-viewport" data-image-viewport>
+                  <img data-image-key="lots-visuel-1" data-image-preview="lots-visuel-1" src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80" alt="Visuel du lot 1">
+                </div>
+                <div class="hint">Glissez votre photo ici ou cliquez pour importer</div>
+                <input type="file" accept="image/*" aria-label="Importer un visuel" style="display:none;">
+                <div class="inline-controls">
+                  <input type="url" placeholder="Coller une URL (optionnel)" aria-label="URL de l’image">
+                  <button class="button secondary" type="button" data-reset-image="lots-visuel-1">Réinitialiser</button>
+                </div>
+              </div>
+              <p class="muted small" data-editable="lots-visuel-1-desc">Description du visuel 1.</p>
+            </div>
+            <div class="card">
+              <div class="drop-zone" data-drop-target data-image-key="lots-visuel-2">
+                <div class="image-viewport" data-image-viewport>
+                  <img data-image-key="lots-visuel-2" data-image-preview="lots-visuel-2" src="https://images.unsplash.com/photo-1495433324511-bf8e92934d90?auto=format&fit=crop&w=900&q=80" alt="Visuel du lot 2">
+                </div>
+                <div class="hint">Glissez votre photo ici ou cliquez pour importer</div>
+                <input type="file" accept="image/*" aria-label="Importer un visuel" style="display:none;">
+                <div class="inline-controls">
+                  <input type="url" placeholder="Coller une URL (optionnel)" aria-label="URL de l’image">
+                  <button class="button secondary" type="button" data-reset-image="lots-visuel-2">Réinitialiser</button>
+                </div>
+              </div>
+              <p class="muted small" data-editable="lots-visuel-2-desc">Description du visuel 2.</p>
+            </div>
+            <div class="card">
+              <div class="drop-zone" data-drop-target data-image-key="lots-visuel-3">
+                <div class="image-viewport" data-image-viewport>
+                  <img data-image-key="lots-visuel-3" data-image-preview="lots-visuel-3" src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80" alt="Visuel du lot 3">
+                </div>
+                <div class="hint">Glissez votre photo ici ou cliquez pour importer</div>
+                <input type="file" accept="image/*" aria-label="Importer un visuel" style="display:none;">
+                <div class="inline-controls">
+                  <input type="url" placeholder="Coller une URL (optionnel)" aria-label="URL de l’image">
+                  <button class="button secondary" type="button" data-reset-image="lots-visuel-3">Réinitialiser</button>
+                </div>
+              </div>
+              <p class="muted small" data-editable="lots-visuel-3-desc">Description du visuel 3.</p>
+            </div>
+          </div>
+        </section>
       </section>
 
       <section id="vie-copro" class="view">
