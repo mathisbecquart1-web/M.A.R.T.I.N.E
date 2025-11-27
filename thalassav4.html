@@ -71,6 +71,7 @@
       transition: background 0.2s ease, color 0.2s ease;
     }
     .nav-links a:hover { background: rgba(15, 123, 255, 0.08); color: var(--text); }
+    .nav-links a.active { background: rgba(15, 123, 255, 0.12); color: var(--text); box-shadow: 0 6px 16px rgba(15, 123, 255, 0.12); }
 
     .brand {
       display: flex;
@@ -265,16 +266,16 @@
           <div>Résidence Thalassa</div>
         </div>
         <div class="nav-links">
-          <a href="#hero">Accueil</a>
-          <a href="#charte">Charte</a>
-          <a href="#tabs">Onglets</a>
-          <a href="#services">Services</a>
-          <a href="#formations">Formations</a>
-          <a href="#ag2025">Dernière AG</a>
-          <a href="#copro">Vie de copro</a>
-          <a href="#owners">Copropriétaires</a>
-          <a href="#demandes">Demandes</a>
-          <a href="#faq">FAQ</a>
+          <a href="#hero" data-page="hero">Accueil</a>
+          <a href="#charte" data-page="charte">Charte</a>
+          <a href="#tabs" data-page="tabs">Onglets</a>
+          <a href="#services" data-page="services">Services</a>
+          <a href="#formations" data-page="formations">Formations</a>
+          <a href="#ag2025" data-page="ag2025">Dernière AG</a>
+          <a href="#copro" data-page="copro">Vie de copro</a>
+          <a href="#owners" data-page="owners">Copropriétaires</a>
+          <a href="#demandes" data-page="demandes">Demandes</a>
+          <a href="#faq" data-page="faq">FAQ</a>
         </div>
         <div class="nav-actions">
           <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Règlement</button>
@@ -298,8 +299,8 @@
           <span class="pill-box">Accès admin sécurisé (TALASSA / TALASSAVIVEZLEREVE)</span>
         </div>
         <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
-          <button type="button" class="btn-primary" onclick="document.getElementById('demandes').scrollIntoView({behavior:'smooth'})">📨 Envoyer une demande</button>
-          <button type="button" class="btn-ghost" onclick="document.getElementById('ag2025').scrollIntoView({behavior:'smooth'})">🧾 Voir le PV 2025</button>
+          <button type="button" class="btn-primary" onclick="navigateTo('demandes')">📨 Envoyer une demande</button>
+          <button type="button" class="btn-ghost" onclick="navigateTo('ag2025')">🧾 Voir le PV 2025</button>
         </div>
       </div>
       <div class="panel">
@@ -967,10 +968,44 @@ Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
       toast('Vous êtes déconnecté.');
     }
 
+    const sections = Array.from(document.querySelectorAll('section[id]'));
+
+    function setActiveNav(targetId) {
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.classList.toggle('active', link.dataset.page === targetId);
+      });
+    }
+
+    function navigateTo(targetId, updateHash = true) {
+      const target = document.getElementById(targetId) || document.getElementById('hero');
+      sections.forEach(sec => sec.classList.toggle('hidden', sec.id !== target.id));
+      setActiveNav(target.id);
+      if (updateHash) {
+        history.replaceState(null, '', '#' + target.id);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setupNavigation() {
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          navigateTo(link.dataset.page);
+        });
+      });
+      const initial = window.location.hash.replace('#', '') || 'hero';
+      navigateTo(initial, false);
+      window.addEventListener('hashchange', () => {
+        const target = window.location.hash.replace('#', '') || 'hero';
+        navigateTo(target, false);
+      });
+    }
+
     document.getElementById('requestForm').addEventListener('submit', submitRequest);
     document.getElementById('requestForm').addEventListener('input', () => { saveDraft(); });
     setInterval(saveDraft, 30000);
 
+    setupNavigation();
     populateLotOptions();
     populateSectionFilter();
     renderOwners();
