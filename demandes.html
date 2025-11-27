@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demandes & Incidents</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-demandes">
+  <div class="page">
+    <header>
+      <nav class="nav">
+        <div class="brand">Résidence Thalassa <span class="pill">Portail</span></div>
+        <div class="nav-links">
+          <a href="index.html">Accueil</a>
+          <a href="charte.html">Charte</a>
+          <a href="onglets.html">Onglets</a>
+          <a href="services.html">Services</a>
+          <a href="formations.html">Formations</a>
+          <a href="ag2025.html">AG 2025</a>
+          <a href="vie-copro.html">Vie de copro</a>
+          <a href="coproprietaires.html">Copropriétaires</a>
+          <a href="demandes.html">Demandes</a>
+          <a href="faq.html">FAQ</a>
+        </div>
+      </nav>
+    </header>
+
+    <section class="card hero">
+      <span class="badge">Suivi des demandes</span>
+      <h1>Déclarer un incident et suivre son traitement</h1>
+      <p class="muted">Remplissez le formulaire, vos demandes s'enregistrent dans votre navigateur et restent visibles sur cette page. Vous pouvez les marquer comme traitées.</p>
+    </section>
+
+    <section class="grid two">
+      <div class="card">
+        <h3>Déclarer</h3>
+        <form id="demande-form" class="grid">
+          <input name="nom" placeholder="Nom complet" required />
+          <select name="type">
+            <option value="Incident">Incident</option>
+            <option value="Demande de travaux">Demande de travaux</option>
+            <option value="Question">Question</option>
+          </select>
+          <textarea name="message" rows="4" placeholder="Détaillez votre demande" required></textarea>
+          <button class="button" type="submit">Soumettre</button>
+        </form>
+      </div>
+      <div class="card">
+        <h3>Mes demandes</h3>
+        <div id="demande-list" class="grid"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Delais et suivi</h3>
+      <p class="muted small">Objectif de prise en charge : 24h ouvrées. Les demandes marquées comme traitées sont retirées de la liste locale.</p>
+    </section>
+
+    <div class="footer-note">Demandes Thalassa — simplicité et traçabilité</div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
