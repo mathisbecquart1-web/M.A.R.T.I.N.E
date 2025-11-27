@@ -89,7 +89,7 @@
     .small { font-size: 14px; }
     .footer-note { text-align: center; color: var(--muted); font-size: 13px; margin-top: 22px; }
 
-    .drop-zone {
+    .drop-zone { 
       border: 1px dashed rgba(0,0,0,0.2);
       border-radius: 12px;
       position: relative;
@@ -129,7 +129,7 @@
     .drop-zone:hover .inline-controls,
     .drop-zone:focus-within .inline-controls,
     .drop-zone.dragging .inline-controls { opacity: 1; pointer-events: auto; }
-    .drop-zone .hint {
+    .drop-zone .hint { 
       position: absolute;
       bottom: 10px;
       left: 10px;
@@ -145,6 +145,8 @@
     }
     .inline-controls { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-top: 10px; }
     .inline-controls input[type="url"] { margin: 0; }
+
+    .drop-zone.map-drop .image-viewport { height: 440px; }
 
     .pv-card { display: grid; gap: 16px; }
     .pv-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
@@ -478,20 +480,32 @@
         <div class="card hero">
           <span class="badge" data-editable="badge-communs">Parties communes</span>
           <h1 data-editable="titre-communs">Gestion des espaces partagés</h1>
-          <p class="muted" data-editable="intro-communs">Équipements collectifs, règles d'usage et créneaux de maintenance des zones communes.</p>
+          <p class="muted" data-editable="intro-communs">Les parties communes rassemblent la vie insulaire : ponton, plage, terrains de beach-volley et de golf, et le port avec les places de bateau privatives.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3 data-editable="communs-equip-titre">Équipements suivis</h3>
-            <ul class="list" data-editable="communs-equip-list">
-              <li>Ascenseurs : contrôle mensuel et rapports disponibles.</li>
-              <li>Local vélo : nettoyage trimestriel et gestion des badges.</li>
-              <li>Salle commune : calendrier de réservation partagé.</li>
-            </ul>
+            <h3 data-editable="communs-carte-titre">Carte des parties communes</h3>
+            <div class="drop-zone map-drop" data-drop-target data-image-key="communs-map">
+              <div class="image-viewport" data-image-viewport>
+                <img data-image-key="communs-map" data-image-preview="communs-map" src="https://images.unsplash.com/photo-1505764706515-aa95265c5abc?auto=format&fit=crop&w=1400&q=80" alt="Carte des parties communes">
+              </div>
+              <div class="hint">Glissez la carte de l’île ou cliquez pour importer</div>
+              <input type="file" accept="image/*" aria-label="Importer la carte" style="display:none;">
+              <div class="inline-controls">
+                <input type="url" placeholder="Coller une URL (optionnel)" aria-label="URL de la carte">
+                <button class="button secondary" type="button" data-reset-image="communs-map">Réinitialiser</button>
+              </div>
+            </div>
+            <p class="muted small" data-editable="communs-carte-legende">Importez une grande image de l’île : le recadrage est libre pour centrer le port, le ponton ou les plages.</p>
           </div>
           <div class="card">
-            <h3 data-editable="communs-regles-titre">Règles d'usage</h3>
-            <p class="muted small" data-editable="communs-regles-texte">Consultez les horaires de tranquillité, les consignes de propreté et les procédures de réservation.</p>
+            <h3 data-editable="communs-equip-titre">Équipements et usages</h3>
+            <p class="muted" data-editable="communs-equip-texte">Les parties communes regroupent le ponton principal, la plage, les terrains de beach-volley et de golf, ainsi que le port où chaque place de bateau privative est identifiée. Elles sont accessibles à tous dans le respect du règlement et des créneaux de maintenance.</p>
+            <ul class="list" data-editable="communs-equip-list">
+              <li>Ponton & plage : accès libre, propreté et calme attendus.</li>
+              <li>Beach-volley & golf : pensez à réserver vos créneaux.</li>
+              <li>Port : stationnement sur la place attribuée à votre lot.</li>
+            </ul>
           </div>
         </section>
       </section>
@@ -643,6 +657,10 @@
     const imageDefaults = {
       'accueil-map': {
         src: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80',
+        pos: { x: 50, y: 50 }
+      },
+      'communs-map': {
+        src: 'https://images.unsplash.com/photo-1505764706515-aa95265c5abc?auto=format&fit=crop&w=1400&q=80',
         pos: { x: 50, y: 50 }
       }
     };
