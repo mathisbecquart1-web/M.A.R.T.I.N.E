@@ -355,8 +355,8 @@
             <div class="container hero-grid">
                 <div>
                     <div class="eyebrow">Espace résidents</div>
-                    <h1>Mini site de la copropriété</h1>
-                    <p>Un portail clair pour présenter la résidence, suivre les AG, le règlement et préparer les demandes au syndic.</p>
+                    <h1>Résidence Thalassa — île aux Bahamas</h1>
+                    <p>Un portail clair pour raconter la vie sur les cabanons sur pilotis, suivre les AG, partager le règlement insulaire et préparer les demandes au syndic.</p>
                     <div class="hero-actions">
                         <button class="btn-primary nav-btn" data-target="presentation">Accéder à la présentation</button>
                         <button class="btn-primary nav-btn" data-target="demandes">Déposer une demande</button>
@@ -764,6 +764,137 @@
             },
             clearAll: () => localStorage.clear()
         };
+
+        // Jeu de données par défaut inspiré du brief "Résidence Thalassa"
+        const seedKey = 'thalassaSeedV1';
+        if (!storage.get(seedKey, false)) {
+            storage.set('presentationData', {
+                nom: 'Résidence Thalassa',
+                adresse: 'Île aux Bahamas — cabanons sur pilotis',
+                lots: '25 lots',
+                annee: '2025',
+                description: 'Une île privée où chaque cabanon sur pilotis profite d\'une parcelle d\'eau, d\'un ponton commun et d\'équipements sportifs (beach-volley, golf, port).'
+            });
+            storage.set('presentationImages', []);
+
+            storage.set('reglementContent', `Détermine la destination des parties tant privatives que communes.
+Fixe les conditions de leur jouissance.
+Fixe les règles relatives à l'administration des parties communes.
+
+Règlement de la copropriété Thalassa
+Les occupants devront veiller à ce que la tranquillité de l’île ne soit en aucun cas troublée par leur fait, celui des personnes de leur famille, de leurs invités ou des gens à leur service. Chaque occupant devra se conformer à ces règles établies pour maintenir l'ordre et les bons rapports entre voisins.`);
+            storage.set('reglementArticles', [
+                {
+                    numero: 'Article 1',
+                    titre: 'Destination des parties',
+                    texte: 'La Résidence Thalassa détermine la destination des parties tant privatives que communes et rappelle que chaque parcelle d\'eau attachée à un lot reste à usage maritime individuel.'
+                },
+                {
+                    numero: 'Article 2',
+                    titre: 'Jouissance et tranquillité',
+                    texte: 'Pas de bruit après 00h pour respecter le voisinage et la faune locale. Les animaux sont autorisés s’ils ne troublent pas la tranquillité.'
+                },
+                {
+                    numero: 'Article 3',
+                    titre: 'Locaux communs et port',
+                    texte: 'Utilisation du port réservée aux résidents (1 place par cabanon). Plage et ponton : usage collectif, interdiction de privatiser. Terrain de beach-volley et golf : réservation par créneau.'
+                },
+                {
+                    numero: 'Article 4',
+                    titre: 'Sécurité et respect de l\'environnement',
+                    texte: 'Propreté des lieux communs, interdiction de feu de camp ou barbecue hors zones prévues. Formations de sensibilisation à la préservation de la faune et premiers secours recommandées.'
+                }
+            ]);
+
+            storage.set('agList', [
+                {
+                    date: '2025-03-12',
+                    type: 'Ordinaire',
+                    decisions: 'AG tenue sur l\'Île du Levant : examen des résolutions liées au naturisme et rappel des tantièmes (10 000 / 10 000 présents).',
+                    pv: 'Procès-verbal du 12 mars 2025 — salle polyvalente'
+                }
+            ]);
+
+            storage.set('eddLots', [
+                { numero: '1', batiment: 'A', etage: '', description: 'Mr DUPOND — T4', tantiemes: '400 (place 0)' },
+                { numero: '2', batiment: 'A', etage: '', description: 'Mr DUPIRE — T4', tantiemes: '400 (place 422)' },
+                { numero: '3', batiment: 'A', etage: '', description: 'Mme LEGRAND — T4', tantiemes: '400 (place 30)' },
+                { numero: '4', batiment: 'A', etage: '', description: 'Mme FLAMENT — T4', tantiemes: '400 (place 456)' },
+                { numero: '5', batiment: 'A', etage: '', description: 'Mr ROY — T4', tantiemes: '400 (place 0)' },
+                { numero: '6', batiment: 'B', etage: '', description: 'Mr DUBON — T4', tantiemes: '400 (place 0)' },
+                { numero: '7', batiment: 'B', etage: '', description: 'Mme PETIT — T4', tantiemes: '400 (place 590)' },
+                { numero: '8', batiment: 'B', etage: '', description: 'Mr BOUCHER — T4', tantiemes: '400 (place 430)' },
+                { numero: '9', batiment: 'B', etage: '', description: 'Mr MARCHAND — T4', tantiemes: '400 (place 0)' },
+                { numero: '10', batiment: 'B', etage: '', description: 'Mme LEGRAND — T4', tantiemes: '400 (place 444)' },
+                { numero: '11', batiment: 'C', etage: '', description: 'Mme VALET — T4', tantiemes: '400 (place 0)' },
+                { numero: '12', batiment: 'C', etage: '', description: 'Mme PASZKIEWICZ — T4', tantiemes: '400 (place 999)' },
+                { numero: '13', batiment: 'C', etage: '', description: 'Mr LAMBLIN — T4', tantiemes: '400 (place 444)' },
+                { numero: '14', batiment: 'C', etage: '', description: 'Mme BOURNISIEN — T4', tantiemes: '400 (place 444)' },
+                { numero: '15', batiment: 'C', etage: '', description: 'Mr DRANCOURT HENOCH — T4', tantiemes: '400 (place 444)' },
+                { numero: '16', batiment: 'D', etage: '', description: 'Mme CAPIAUX — T4', tantiemes: '400 (place 0)' },
+                { numero: '17', batiment: 'D', etage: '', description: 'Mr BECQUART — T4', tantiemes: '400 (place 555)' },
+                { numero: '18', batiment: 'D', etage: '', description: 'Mme DEHAENE — T4', tantiemes: '400 (place 600)' },
+                { numero: '19', batiment: 'D', etage: '', description: 'Mr VIVIER — T4', tantiemes: '400 (place 677)' },
+                { numero: '20', batiment: 'D', etage: '', description: 'Mme SPINA — T4', tantiemes: '400 (place 999)' },
+                { numero: '21', batiment: 'E', etage: '', description: 'Mme SOLOU — T4', tantiemes: '400 (place 444)' },
+                { numero: '22', batiment: 'E', etage: '', description: 'Mme MAILLART — T4', tantiemes: '400 (place 888)' },
+                { numero: '23', batiment: 'E', etage: '', description: 'Mr GRABAR — T4', tantiemes: '400 (place 888)' },
+                { numero: '24', batiment: 'E', etage: '', description: 'Mr BERNARD — T4', tantiemes: '400 (place 0)' },
+                { numero: '25', batiment: 'E', etage: '', description: 'Mme RICCHAUD — T4', tantiemes: '400 (place 246)' }
+            ]);
+
+            storage.set('lotsDetails', [
+                {
+                    numero: '1',
+                    type: 'Cabanon T4 sur pilotis',
+                    surface: '120 m² + terrasse lagon',
+                    usage: 'Habitation',
+                    infos: 'Vue lagon, accès direct au ponton et à la parcelle d\'eau privative.',
+                    images: []
+                },
+                {
+                    numero: '7',
+                    type: 'Cabanon T4 vue océan',
+                    surface: '115 m²',
+                    usage: 'Habitation',
+                    infos: 'Proximité du terrain de beach-volley et golf, place de bateau incluse.',
+                    images: []
+                },
+                {
+                    numero: '12',
+                    type: 'Cabanon T4 premium',
+                    surface: '130 m²',
+                    usage: 'Habitation',
+                    infos: 'Grande terrasse panoramique, lot rattaché à une partie d\'eau privative.',
+                    images: []
+                }
+            ]);
+
+            storage.set('communes', [
+                { nom: 'Ponton & plage', desc: 'Espaces collectifs pour les baignades et départs en mer (usage non privatisable).' },
+                { nom: 'Terrain de beach-volley & golf', desc: 'Réservation par créneau pour éviter les conflits.' },
+                { nom: 'Port résident', desc: '1 place de bateau privative par cabanon, circulation sécurisée.' }
+            ]);
+
+            storage.set('privatives', [
+                { nom: 'Parcelle d\'eau attenante', desc: 'Usage exclusif lié à certains lots pour activités nautiques individuelles.', lot: 'Lots 1,7,12' },
+                { nom: 'Place de bateau dédiée', desc: 'Emplacement réservé dans le port pour chaque cabanon.', lot: 'Tous les lots' }
+            ]);
+
+            storage.set('events', [
+                { date: '2024-11-28', titre: 'Présentation orale de la Résidence Thalassa', desc: 'Présentation physique de la copropriété, règlement, EDD et composition des lots.' }
+            ]);
+
+            storage.set('syndicData', {
+                nom: 'Syndic Résidence Thalassa',
+                adresse: 'Île aux Bahamas — bureau du port',
+                tel: '',
+                email: '',
+                horaires: 'Permanence sur place lors des présentations et créneaux annoncés.'
+            });
+
+            storage.set(seedKey, true);
+        }
 
         // Navigation SPA : afficher / masquer les sections
         const navButtons = document.querySelectorAll('.nav-btn');
