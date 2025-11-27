@@ -146,6 +146,19 @@
     .inline-controls { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-top: 10px; }
     .inline-controls input[type="url"] { margin: 0; }
 
+    .pv-card { display: grid; gap: 16px; }
+    .pv-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .pv-meta .meta { background: rgba(0,0,0,0.04); border-radius: 12px; padding: 10px 12px; display: grid; gap: 4px; }
+    .pv-meta .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 800; }
+    .pv-meta .value { font-weight: 700; color: var(--text); }
+    .pv-block { background: rgba(255,255,255,0.75); border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.4); }
+    .pv-block h4 { margin-bottom: 8px; font-size: 16px; }
+    .pv-block p { margin: 0; }
+    .pv-resolutions { display: grid; gap: 12px; }
+    .pv-resolution { border: 1px solid rgba(240, 62, 62, 0.2); background: linear-gradient(135deg, rgba(255, 233, 233, 0.6), rgba(255, 255, 255, 0.9)); border-radius: 12px; padding: 12px 14px; }
+    .pv-resolution strong { color: var(--text); }
+    .pv-resolution em { color: var(--red); font-style: normal; font-weight: 700; }
+
     .view { display: none; gap: 18px; }
     .view.active { display: grid; }
 
@@ -259,34 +272,69 @@
           <h1 data-editable="titre-ag">Assemblée Générale du 12 mars 2025</h1>
           <p class="muted" data-editable="intro-ag">Procès-verbal complet de la dernière assemblée générale de la Résidence TALASSA.</p>
         </div>
-        <div class="card">
-          <h3 data-editable="ag-pv-titre">PROCÈS-VERBAL DE L’ASSEMBLÉE GÉNÉRALE DES COPROPRIÉTAIRES</h3>
-          <p class="muted small" data-editable="ag-pv-synthese">Résidence TALASSA · Île du Levant — 12 mars 2025, 17h00. Les copropriétaires, régulièrement convoqués par le syndic, se sont réunis en Assemblée Générale dans la salle polyvalente. La feuille de présence atteste de 10 000 / 10 000 tantièmes représentés.</p>
-          <section class="grid two">
-            <div class="card">
-              <h4 data-editable="ag-bureau-titre">COMPOSITION DU BUREAU</h4>
-              <ul class="list" data-editable="ag-bureau-liste">
-                <li>Président de séance : M. DUPOND</li>
-                <li>Scrutateur : Mme FLAMENT</li>
-                <li>Secrétaire : Mme PETIT</li>
-                <li>Ouverture de séance : 17h15</li>
-              </ul>
-            </div>
-            <div class="card">
-              <h4 data-editable="ag-listes-titre">LISTE DES COPROPRIÉTAIRES ET TANTIÈMES</h4>
-              <p class="muted small" data-editable="ag-listes-texte">Tableau fourni par le syndicat — voir document annexe.</p>
-            </div>
-          </section>
-          <div class="card">
-            <h4 data-editable="ag-resolutions-titre">RÉSOLUTIONS</h4>
-            <ol class="list" data-editable="ag-resolutions-liste">
-              <li><strong>RÉSOLUTION 1 — Autorisation du naturisme dans les parties communes</strong><br>Majorité requise : Article 25 (tantièmes généraux). Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. <em>Résultat : La résolution est rejetée.</em></li>
-              <li><strong>RÉSOLUTION 2 — Autorisation du naturisme dans les parties communes entre 00h00 et 06h00</strong><br>Majorité requise : Article 25 (tantièmes généraux). Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. <em>Résultat : La résolution est rejetée.</em></li>
-              <li><strong>RÉSOLUTION 3 — Autorisation du naturisme sur une zone dédiée des parties communes</strong><br>Majorité requise : Article 25 (tantièmes généraux). Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. <em>Résultat : La résolution est rejetée.</em></li>
-              <li><strong>RÉSOLUTION 4 — Autorisation de pratiquer le naturisme sur la parcelle d’eau privative de chaque copropriétaire</strong><br>Majorité requise : Article 24 (tantièmes généraux). Ont voté contre : Mme SOLOU uniquement. Ont voté pour : tous les autres copropriétaires. <em>Résultat : La résolution est adoptée à la majorité.</em></li>
-            </ol>
+        <div class="card pv-card">
+          <div class="pv-block">
+            <h3 data-editable="ag-pv-titre">PROCÈS-VERBAL DE L’ASSEMBLÉE GÉNÉRALE DES COPROPRIÉTAIRES</h3>
+            <p class="muted small" data-editable="ag-pv-synthese">Résidence TALASSA — Île du Levant — 12 mars 2025, 17h00. Les copropriétaires de la résidence, régulièrement convoqués par le syndic, se sont réunis en Assemblée Générale dans la salle polyvalente de l’île. La feuille de présence, émargée par les copropriétaires présents et les mandataires, a permis de constater que les copropriétaires présents, représentés ou votants par correspondance totalisent 10 000 / 10 000 tantièmes.</p>
           </div>
-          <div class="card">
+
+          <div class="pv-meta">
+            <div class="meta">
+              <div class="label">Résidence</div>
+              <div class="value" data-editable="ag-meta-residence">TALASSA — Île du Levant</div>
+            </div>
+            <div class="meta">
+              <div class="label">Date & heure</div>
+              <div class="value" data-editable="ag-meta-date">12 mars 2025 — 17h00 (ouverture de séance à 17h15)</div>
+            </div>
+            <div class="meta">
+              <div class="label">Lieu</div>
+              <div class="value" data-editable="ag-meta-lieu">Salle polyvalente de l’île</div>
+            </div>
+            <div class="meta">
+              <div class="label">Quorum constaté</div>
+              <div class="value" data-editable="ag-meta-quorum">10 000 / 10 000 tantièmes (présents, représentés ou par correspondance)</div>
+            </div>
+          </div>
+
+          <div class="pv-block">
+            <h4 data-editable="ag-bureau-titre">COMPOSITION DU BUREAU</h4>
+            <ul class="list" data-editable="ag-bureau-liste">
+              <li>Président de séance : M. DUPOND</li>
+              <li>Scrutateur : Mme FLAMENT</li>
+              <li>Secrétaire : Mme PETIT</li>
+              <li>La séance est ouverte à 17h15.</li>
+            </ul>
+          </div>
+
+          <div class="pv-block">
+            <h4 data-editable="ag-listes-titre">LISTE DES COPROPRIÉTAIRES ET TANTIÈMES</h4>
+            <p class="muted small" data-editable="ag-listes-texte">Tableau fourni par le syndicat — voir document annexe.</p>
+          </div>
+
+          <div class="pv-block">
+            <h4 data-editable="ag-resolutions-titre">RÉSOLUTIONS</h4>
+            <div class="pv-resolutions">
+              <div class="pv-resolution" data-editable="ag-resolution-1">
+                <strong>RÉSOLUTION 1 — Autorisation du naturisme dans les parties communes</strong><br>
+                Majorité requise : Article 25 (tantièmes généraux). Après présentation de la demande visant à autoriser la pratique du naturisme dans l’ensemble des parties communes de la résidence, l’Assemblée procède au vote. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. <em>Résultat : La résolution est rejetée.</em>
+              </div>
+              <div class="pv-resolution" data-editable="ag-resolution-2">
+                <strong>RÉSOLUTION 2 — Autorisation du naturisme dans les parties communes entre 00h00 et 06h00</strong><br>
+                Majorité requise : Article 25 (tantièmes généraux). Il est proposé d’autoriser le naturisme dans les parties communes durant une plage restreinte : de minuit à 6 heures. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. <em>Résultat : La résolution est rejetée.</em>
+              </div>
+              <div class="pv-resolution" data-editable="ag-resolution-3">
+                <strong>RÉSOLUTION 3 — Autorisation du naturisme sur une zone dédiée des parties communes</strong><br>
+                Majorité requise : Article 25 (tantièmes généraux). L’Assemblée examine la possibilité d’aménager une zone réservée au naturisme, située en bord de mer et identifiée sur le plan de la copropriété. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. <em>Résultat : La résolution est rejetée.</em>
+              </div>
+              <div class="pv-resolution" data-editable="ag-resolution-4">
+                <strong>RÉSOLUTION 4 — Autorisation de pratiquer le naturisme sur la parcelle d’eau privative de chaque copropriétaire</strong><br>
+                Majorité requise : Article 24 (tantièmes généraux). Chaque lot dispose, selon le règlement de copropriété, d’une parcelle d’eau privative permettant des usages maritimes individuels. Il est proposé d’autoriser explicitement la pratique du naturisme dans ces espaces. Ont voté contre : Mme SOLOU uniquement. Ont voté pour : tous les autres copropriétaires. <em>Résultat : La résolution est adoptée à la majorité.</em>
+              </div>
+            </div>
+          </div>
+
+          <div class="pv-block">
             <h4 data-editable="ag-cloture-titre">CLÔTURE DE SÉANCE</h4>
             <p class="muted small" data-editable="ag-cloture-texte">Plus aucune question n’étant posée, la séance est levée à 19h05.</p>
             <p class="muted small" data-editable="ag-signataires-texte">Président de séance : M. DUPOND · Secrétaire : Mme PETIT · Scrutateur : Mme FLAMENT. Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.</p>
