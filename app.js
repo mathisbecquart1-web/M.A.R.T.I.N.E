@@ -90,10 +90,50 @@ const lotNames = coproprietaires.map(c => `Lot ${c.lot} — ${c.nom} (Section ${
 let isAdmin = false;
 
 function highlightNav() {
-  const current = document.body.dataset.page;
+  const current = document.body.dataset.page || 'accueil';
   document.querySelectorAll('.nav-links a').forEach(link => {
-    link.classList.toggle('active', link.dataset.page === current);
+    const target = link.getAttribute('href') || '';
+    const anchor = target.startsWith('#') ? target.slice(1) : link.dataset.page;
+    link.classList.toggle('active', anchor === current);
   });
+}
+
+function setActiveSection(id) {
+  if (!id) return;
+  if (document.body.dataset.page !== id) {
+    document.body.dataset.page = id;
+  }
+  highlightNav();
+}
+
+function setupSinglePageNav() {
+  const sections = Array.from(document.querySelectorAll('section[data-section]'));
+  if (!sections.length) return;
+
+  const currentHash = location.hash.replace('#', '') || 'accueil';
+  setActiveSection(currentHash);
+
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', e => {
+      const href = link.getAttribute('href') || '';
+      if (!href.startsWith('#')) return;
+      const target = document.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.replaceState(null, '', href);
+      setActiveSection(target.id);
+    });
+  });
+
+  window.addEventListener('scroll', () => {
+    const offset = window.scrollY + 140;
+    let current = sections[0].id;
+    for (const section of sections) {
+      if (offset >= section.offsetTop) current = section.id;
+    }
+    setActiveSection(current);
+  }, { passive: true });
 }
 
 function populateLotOptions() {
@@ -381,6 +421,7 @@ function initRequests() {
 }
 
 function init() {
+  setupSinglePageNav();
   highlightNav();
   populateSectionFilter();
   renderOwners();

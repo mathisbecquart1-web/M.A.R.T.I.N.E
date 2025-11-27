@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Résidence Thalassa · Accueil</title>
+  <title>Résidence Thalassa · Portail complet</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="theme-accueil" data-page="accueil">
@@ -15,16 +15,16 @@
           <div>Résidence Thalassa</div>
         </div>
         <div class="nav-links">
-          <a href="thalassav4.html" data-page="accueil">Accueil</a>
-          <a href="charte.html" data-page="charte">Charte</a>
-          <a href="onglets.html" data-page="onglets">Onglets</a>
-          <a href="services.html" data-page="services">Services</a>
-          <a href="formations.html" data-page="formations">Formations</a>
-          <a href="ag2025.html" data-page="ag2025">Dernière AG</a>
-          <a href="copro.html" data-page="copro">Vie de copro</a>
-          <a href="owners.html" data-page="owners">Copropriétaires</a>
-          <a href="demandes.html" data-page="demandes">Demandes</a>
-          <a href="faq.html" data-page="faq">FAQ</a>
+          <a href="#accueil" data-page="accueil">Accueil</a>
+          <a href="#charte" data-page="charte">Charte</a>
+          <a href="#onglets" data-page="onglets">Onglets</a>
+          <a href="#services" data-page="services">Services</a>
+          <a href="#formations" data-page="formations">Formations</a>
+          <a href="#ag2025" data-page="ag2025">Dernière AG</a>
+          <a href="#copro" data-page="copro">Vie de copro</a>
+          <a href="#owners" data-page="owners">Copropriétaires</a>
+          <a href="#demandes" data-page="demandes">Demandes</a>
+          <a href="#faq" data-page="faq">FAQ</a>
         </div>
         <div class="nav-actions">
           <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Règlement</button>
@@ -33,10 +33,10 @@
       </div>
     </header>
 
-    <section class="hero split">
+    <section class="hero split" id="accueil" data-section>
       <div>
         <h1>Cabanons sur pilotis · copropriété privée</h1>
-        <p>Plage, ponton, terrains de beach-volley et golf, port privatif : la résidence Thalassa est pensée pour les copropriétaires uniquement. Toutes les actions sont réparties sur des pages dédiées pour une navigation claire.</p>
+        <p>Plage, ponton, terrains de beach-volley et golf, port privatif : la résidence Thalassa est pensée pour les copropriétaires uniquement. Ce portail regroupe tout en un seul fichier pour naviguer sans changer de page.</p>
         <div class="chips">
           <div class="chip">Ponton / plage / port privatif</div>
           <div class="chip">Terrain de beach-volley & golf</div>
@@ -48,8 +48,8 @@
           <span class="pill-box">Accès admin sécurisé (TALASSA / TALASSAVIVEZLEREVE)</span>
         </div>
         <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
-          <a class="btn-primary btn-link" href="demandes.html">📨 Envoyer une demande</a>
-          <a class="btn-ghost btn-link" href="ag2025.html">🧾 Voir le PV 2025</a>
+          <a class="btn-primary btn-link" href="#demandes">📨 Envoyer une demande</a>
+          <a class="btn-ghost btn-link" href="#ag2025">🧾 Voir le PV 2025</a>
         </div>
       </div>
       <div class="panel">
@@ -61,6 +61,296 @@
           <div class="chip">PV & règlement téléchargeables</div>
         </div>
       </div>
+    </section>
+
+    <section class="section split" id="charte" data-section>
+      <div>
+        <h2>Charte des parties communes</h2>
+        <p class="subtitle">Fixe les règles relatives à l’administration et la jouissance des espaces : ponton, plage, terrains de beach-volley/golf, port privatif (1 place par cabanon).</p>
+        <div class="grid">
+          <div class="card-sm">
+            <div class="flag">🌊 Espaces partagés</div>
+            <div class="meta">Plage & ponton en usage collectif, aucune privatisation. Port réservé aux résidents, badge sécurisé.</div>
+          </div>
+          <div class="card-sm">
+            <div class="flag">🌿 Respect & quiétude</div>
+            <div class="meta">Pas de bruit après 00h, éclairage doux, animaux autorisés s’ils ne troublent pas la tranquillité.</div>
+          </div>
+          <div class="card-sm">
+            <div class="flag">🏐 Sports</div>
+            <div class="meta">Terrains de beach-volley & golf : créneaux partagés affichés, sans réservation ni statut de lot.</div>
+          </div>
+          <div class="card-sm">
+            <div class="flag">🔥 Sécurité & propreté</div>
+            <div class="meta">Propreté collective, interdiction de feu de camp/barbecue hors zones prévues.</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="flag">🆕 Nouvelles options copro</div>
+        <div class="meta">• Formation sensibilisation préservation de la faune.
+• Formation premiers secours sur site.
+• Espace privatif d’une partie d’eau (partie commune) pour certains lots.
+• Affichage des tantièmes généraux et des tantièmes place pour le port.</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📥 Exporter règlement</button>
+          <button type="button" class="btn-primary" onclick="downloadCoproCsv()">📊 Exporter tableau copro</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="onglets" data-section>
+      <h2>Onglets interactifs</h2>
+      <p class="subtitle">Navigation rapide : accès, services copro, vie de l’île, documents officiels, formations et règles communes.</p>
+      <div class="tab-wrapper">
+        <div class="tabs" id="tabsNav"></div>
+        <div class="tab-panels" id="tabsPanels"></div>
+      </div>
+    </section>
+
+    <section class="section" id="services" data-section>
+      <h2>Services sur site et confort quotidien</h2>
+      <p class="subtitle">Grille complète pour un site digne d’un vrai resort copropriétaire.</p>
+      <div class="grid-cards" id="servicesGrid"></div>
+    </section>
+
+    <section class="section" id="formations" data-section>
+      <h2>Formations & prévention</h2>
+      <p class="subtitle">Programmes dédiés aux copropriétaires, accessibles hors connexion.</p>
+      <div class="grid-cards">
+        <div class="card-sm"><div class="flag">🦜 Sensibilisation faune</div><div class="meta">Ateliers mensuels sur la protection de la faune locale et le respect des zones calmes.</div></div>
+        <div class="card-sm"><div class="flag">⛑️ Premiers secours</div><div class="meta">Sessions de premiers secours et utilisation du défibrillateur de l’île.</div></div>
+        <div class="card-sm"><div class="flag">🌊 Parcelles d’eau</div><div class="meta">Briefs dédiés aux lots disposant d’un espace privatif d’eau (partie commune).</div></div>
+        <div class="card-sm"><div class="flag">🧾 Règlement animé</div><div class="meta">Lecture guidée des règles clés : bruit, animaux, port, propreté, incendie.</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="agenda">
+      <h2>Agenda & jalons</h2>
+      <p class="subtitle">Toutes les étapes pour la présentation orale du 28 novembre et le suivi de la copropriété.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🎤 Présentation orale</div>
+          <div class="meta">28 novembre · Copro physiquement</div>
+          <div class="badge-soft">Salle & lieu confirmés une semaine avant</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📑 Règlement</div>
+          <div class="meta">Niveau 5/6 · EDD et composition inclus</div>
+          <div class="badge-soft">Téléchargeable, mis à jour à chaque révision</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🛥️ Parties communes</div>
+          <div class="meta">Ponton, plage, port privatif, terrains sportifs</div>
+          <div class="badge-soft">Définition & conditions de jouissance</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📌 Lieu</div>
+          <div class="meta">Île aux Bahamas · Résidence Thalassa</div>
+          <div class="badge-soft">Accès bateau + aérien détaillé dans les onglets</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ag2025" data-section>
+      <h2>Dernière Assemblée Générale · 12 mars 2025</h2>
+      <p class="subtitle">Procès-verbal complet de l’AG des copropriétaires — Île du Levant, salle polyvalente.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🧾 Composition du bureau</div>
+          <div class="meta">Président : M. DUPOND · Scrutateur : Mme FLAMENT · Secrétaire : Mme PETIT</div>
+          <div class="badge-soft">Ouverture : 17h15 · 10 000 / 10 000 tantièmes</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📋 Ordre du jour</div>
+          <div class="meta">Détermination des destinations privatives et communes, conditions de jouissance, règles d’administration.</div>
+          <div class="meta">Lieu : Île du Levant · Port privatif et salle polyvalente.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">✅ Résolution adoptée</div>
+          <div class="meta">Autorisation de pratiquer le naturisme sur la parcelle d’eau privative de chaque copropriétaire (Article 24).</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">❌ Résolutions rejetées</div>
+          <div class="meta">1) Naturisme dans toutes les parties communes.</div>
+          <div class="meta">2) Naturisme entre 00h00 et 06h00 dans les parties communes.</div>
+          <div class="meta">3) Naturisme sur une zone commune dédiée en bord de mer.</div>
+        </div>
+      </div>
+      <div class="section" style="margin-top:14px; background: rgba(255,255,255,0.85);">
+        <div class="admin-bar">
+          <div>
+            <div class="flag">📝 Procès-verbal détaillé</div>
+            <div class="meta">Texte intégral pour archivage et consultation hors connexion.</div>
+          </div>
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Télécharger règlement & PV</button>
+        </div>
+        <div class="meta" style="white-space: pre-line; line-height: 1.6; margin-top: 10px;">
+PROCÈS-VERBAL DE L’ASSEMBLÉE GÉNÉRALE DES COPROPRIÉTAIRES
+Résidence TALASSA · Île du Levant — 12 mars 2025, 17h00
+Les copropriétaires de la Résidence TALASSA, régulièrement convoqués par le syndic, se sont réunis en Assemblée Générale dans la salle polyvalente de l’île. La feuille de présence, émargée par les copropriétaires présents et les mandataires, a permis de constater que les copropriétaires présents, représentés ou votants par correspondance totalisent 10 000 / 10 000 tantièmes.
+
+COMPOSITION DU BUREAU
+Président de séance : M. DUPOND
+Scrutateur : Mme FLAMENT
+Secrétaire : Mme PETIT
+La séance est ouverte à 17h15.
+
+LISTE DES COPROPRIÉTAIRES ET TANTIÈMES
+(Tableau fourni par le syndicat — voir section Copropriétaires.)
+
+RÉSOLUTIONS
+RÉSOLUTION 1 — Autorisation du naturisme dans les parties communes
+Majorité requise : Article 25 (tantièmes généraux)
+Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU.
+Résultat : La résolution est rejetée.
+
+RÉSOLUTION 2 — Autorisation du naturisme dans les parties communes entre 00h00 et 06h00
+Majorité requise : Article 25 (tantièmes généraux)
+Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU.
+Résultat : La résolution est rejetée.
+
+RÉSOLUTION 3 — Autorisation du naturisme sur une zone dédiée des parties communes
+Majorité requise : Article 25 (tantièmes généraux)
+Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU.
+Résultat : La résolution est rejetée.
+
+RÉSOLUTION 4 — Autorisation de pratiquer le naturisme sur la parcelle d’eau privative de chaque copropriétaire
+Majorit requise : Article 24 (tantièmes généraux)
+Chaque lot dispose, selon le règlement de copropriété, d’une parcelle d’eau privative permettant des usages maritimes individuels. Il est proposé d’autoriser explicitement la pratique du naturisme dans ces espaces.
+Ont voté contre : Mme SOLOU uniquement.
+Ont voté pour : Tous les autres copropriétaires.
+Résultat : La résolution est adoptée à la majorité.
+
+CLÔTURE DE SÉANCE
+Plus aucune question n’étant posée, la séance est levée à 19h05.
+Président de séance : M. DUPOND
+Secrétaire : Mme PETIT
+Scrutateur : Mme FLAMENT
+Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="copro" data-section>
+      <h2>Options & services pour copropriétaires</h2>
+      <p class="subtitle">Des outils concrets pour la vie sur l’île, l’entretien des cabanons et la coordination entre copropriétaires.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🛠️ Maintenance express</div>
+          <div class="meta">Déclarez incidents techniques, déclenchez une intervention, suivez le statut en temps réel.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🧺 Conciergerie ménage</div>
+          <div class="meta">Planning partagé de ménage des cabanons, rotation hebdomadaire et kit de nettoyage fourni.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🗂️ Documents copro</div>
+          <div class="meta">Règlement, EDD, composition du bureau, comptes rendus et PV d’AG accessibles hors connexion.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🛟 Port & sécurité</div>
+          <div class="meta">Badges numériques, suivi des autorisations, rappel des consignes et de l’utilisation du port privatif.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🏐 Sports & loisirs</div>
+          <div class="meta">Tableau de créneaux partagé pour le beach-volley et le golf, sans réservation obligatoire.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🤝 Vie communautaire</div>
+          <div class="meta">Forum d’annonces, échanges de matériel, entraide pour arrivées/départs et événements sur place.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="owners" data-section>
+      <h2>Tableau des copropriétaires</h2>
+      <p class="subtitle">Sections, tantièmes généraux et tantièmes place pour le port.</p>
+      <div class="two-col">
+        <label>Filtrer par section
+          <select id="sectionFilter"></select>
+        </label>
+        <button type="button" class="btn-ghost" onclick="downloadCoproCsv()">📊 Exporter la liste</button>
+      </div>
+      <table class="table" id="ownersTable"></table>
+    </section>
+
+    <section class="section" id="demandes" data-section>
+      <div class="admin-bar">
+        <div>
+          <h2>Demande d'information</h2>
+          <p class="subtitle">Questions copropriétaires, signalements ou besoins logistiques. Sauvegarde automatique toutes les 30 secondes et à chaque modification.</p>
+        </div>
+        <button type="button" class="btn-ghost" onclick="resetDraft()">Réinitialiser le brouillon</button>
+      </div>
+      <form id="requestForm">
+        <div class="two-col">
+          <label>Nom et prénom
+            <input name="name" required placeholder="Votre nom" />
+          </label>
+          <label>Email
+            <input name="email" type="email" required placeholder="vous@example.com" />
+          </label>
+        </div>
+        <div class="two-col">
+          <label>Téléphone
+            <input name="phone" required placeholder="+33..." />
+          </label>
+          <label>Lot concerné
+            <select name="lot" id="lotSelect" required></select>
+          </label>
+        </div>
+        <label>Message
+          <textarea name="message" placeholder="Précisez vos besoins, incidents, questions sur l’île." required></textarea>
+        </label>
+        <button class="btn-primary" type="submit">Envoyer la demande</button>
+        <div id="draftStatus" class="meta"></div>
+      </form>
+    </section>
+
+    <section id="adminPanel" class="section hidden">
+      <div class="admin-bar">
+        <h2>Administration TALASSA</h2>
+        <button type="button" class="btn-ghost" onclick="logout()">Se déconnecter</button>
+      </div>
+      <div class="subtitle">Consulter et éditer toutes les demandes envoyées par les copropriétaires. Tout est sauvegardé localement et reste accessible hors connexion après authentification.</div>
+
+      <h3>Demandes reçues</h3>
+      <div class="section" style="padding:12px; background: rgba(255,255,255,0.8);">
+        <table class="table" id="requestsTable"></table>
+      </div>
+    </section>
+
+    <section class="section" id="reglement">
+      <h2>Règlement de copropriété</h2>
+      <p class="subtitle">Fixe la destination des parties privatives et communes, et les conditions de leur jouissance.</p>
+      <ul class="meta">
+        <li>Pas de bruit après 00h (respect du voisinage et de la faune locale).</li>
+        <li>Animaux autorisés s’ils ne troublent pas la tranquillité.</li>
+        <li>Utilisation du port réservée aux résidents (1 place par cabanon).</li>
+        <li>Plage et ponton : usage collectif, interdiction de privatiser des zones.</li>
+        <li>Terrain de beach-volley & golf : créneaux partagés affichés sur place.</li>
+        <li>Propreté : chaque résident veille à la propreté des lieux communs.</li>
+        <li>Interdiction de feu de camp ou barbecue hors zones prévues.</li>
+        <li>Formation sensibilisation sur la préservation de la faune.</li>
+        <li>Formation premiers secours pour les copropriétaires.</li>
+        <li>Espace privatif d’une partie d’eau (partie commune) pour quelques lots.</li>
+      </ul>
+      <div class="chips">
+        <div class="chip">Présentation orale : 28 novembre</div>
+        <div class="chip">Copro physiquement : lieu à confirmer</div>
+        <div class="chip">EDD & règlement : niveau 5/6</div>
+        <div class="chip">Comité : composition en cours</div>
+      </div>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="btn-ghost" onclick="downloadReglement()">📥 Exporter le règlement (PDF)</button>
+        <button type="button" class="btn-primary" onclick="downloadCoproCsv()">📊 Exporter copro (CSV)</button>
+      </div>
+    </section>
+
+    <section class="section" id="faq" data-section>
+      <h2>Questions fréquentes</h2>
+      <div class="accordion" id="faqAccordion"></div>
     </section>
   </div>
   <div id="toast" class="toast"></div>
