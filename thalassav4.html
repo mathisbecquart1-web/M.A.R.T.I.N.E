@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résidence Thalassa · Copropriété Île aux Bahamas</title>
+  <style>
+    :root {
+      --blue: #0f7bff;
+      --purple: #8245ff;
+      --green: #12b886;
+      --amber: #f59f00;
+      --red: #f03e3e;
+      --bg: #eef4ff;
+      --text: #0f172a;
+      --muted: #4b5563;
+      --card: rgba(255, 255, 255, 0.9);
+      --shadow: 0 18px 40px rgba(15, 27, 45, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 18% 20%, #d7e8ff 0, #b2d4ff 25%, #7fb3ff 55%, #3a6cf6 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 18px 72px;
+      display: grid;
+      gap: 18px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      padding-bottom: 10px;
+      backdrop-filter: blur(14px);
+    }
+
+    .nav {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 18px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: var(--shadow);
+      flex-wrap: wrap;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: inherit;
+      padding: 8px 10px;
+      border-radius: 10px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .nav-links a:hover { background: rgba(15, 123, 255, 0.08); color: var(--text); }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--blue);
+    }
+
+    .brand .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .nav-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    button {
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      border-radius: 12px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: white;
+      padding: 12px 16px;
+      box-shadow: 0 12px 30px rgba(15, 123, 255, 0.3);
+    }
+
+    .btn-ghost {
+      background: rgba(15, 123, 255, 0.08);
+      color: var(--blue);
+      padding: 11px 14px;
+      border: 1px solid rgba(15, 123, 255, 0.18);
+    }
+
+    button:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+
+    .grid { display: grid; gap: 18px; }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(255, 255, 255, 0.9));
+      padding: 26px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 16px;
+    }
+
+    .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: start; }
+
+    .hero h1 { margin: 0; font-size: clamp(30px, 5vw, 44px); color: var(--text); }
+    .hero p { margin: 6px 0 10px; color: var(--muted); line-height: 1.6; }
+
+    .section {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow: var(--shadow);
+    }
+
+    .section h2 { margin: 0 0 10px; color: var(--text); }
+    .section .subtitle { color: var(--muted); margin-bottom: 12px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 4px; }
+    .chip {
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      color: var(--muted);
+    }
+
+    .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill-box { background: rgba(15, 123, 255, 0.06); color: var(--text); padding: 8px 10px; border-radius: 10px; }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0,0,0,0.04);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 12px 26px rgba(0,0,0,0.08);
+      display: grid;
+      gap: 10px;
+    }
+
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .kpi {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 6px;
+    }
+    .kpi .label { color: var(--muted); font-size: 13px; }
+    .kpi .value { font-size: 22px; font-weight: 800; color: var(--text); }
+
+    .tab-wrapper { margin: 12px 0 0; }
+    .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+    .tab {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.05);
+      background: rgba(255,255,255,0.8);
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .tab.active { background: linear-gradient(135deg, rgba(15,123,255,0.1), rgba(130,69,255,0.12)); color: var(--text); border-color: rgba(15,123,255,0.22); }
+
+    .tab-panels { margin-top: 12px; }
+    .tab-panel { display: none; background: rgba(255,255,255,0.88); border-radius: 14px; padding: 14px; border: 1px solid rgba(0,0,0,0.04); box-shadow: var(--shadow); }
+    .tab-panel.active { display: grid; gap: 10px; }
+
+    .accordion { border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; overflow: hidden; }
+    .accordion-item + .accordion-item { border-top: 1px solid rgba(0,0,0,0.05); }
+    .accordion-header { padding: 12px 14px; background: rgba(255,255,255,0.85); display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 700; }
+    .accordion-content { padding: 0 14px 14px; display: none; color: var(--muted); line-height: 1.5; }
+    .accordion-item.open .accordion-content { display: block; }
+
+    .badge-soft { padding: 6px 10px; border-radius: 10px; background: rgba(15,123,255,0.08); color: var(--blue); font-weight: 700; }
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .card-sm { background: rgba(255,255,255,0.9); border-radius: 12px; padding: 12px; border: 1px solid rgba(0,0,0,0.05); box-shadow: var(--shadow); display: grid; gap: 6px; }
+    .flag { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; }
+
+    form { display: grid; gap: 14px; }
+    label { display: grid; gap: 6px; font-weight: 700; color: var(--text); }
+    input, select, textarea {
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      box-shadow: inset 0 2px 6px rgba(15, 27, 45, 0.04);
+    }
+    textarea { min-height: 110px; resize: vertical; }
+
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { text-align: left; padding: 10px 8px; }
+    .table th { color: var(--muted); font-weight: 700; font-size: 13px; }
+    .table tr { background: rgba(255, 255, 255, 0.7); border-radius: 10px; }
+    .table tr + tr td { border-top: 1px solid rgba(0, 0, 0, 0.05); }
+    .table td input, .table td select, .table td textarea { width: 100%; font-size: 14px; }
+    .table-foot { font-weight: 800; color: var(--text); }
+
+    .admin-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 0.2s ease;
+      z-index: 50;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 720px) {
+      .nav { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="nav">
+        <div class="brand">
+          <div class="pill">Île aux Bahamas</div>
+          <div>Résidence Thalassa</div>
+        </div>
+        <div class="nav-links">
+          <a href="#hero">Accueil</a>
+          <a href="#charte">Charte</a>
+          <a href="#tabs">Onglets</a>
+          <a href="#services">Services</a>
+          <a href="#formations">Formations</a>
+          <a href="#ag2025">Dernière AG</a>
+          <a href="#copro">Vie de copro</a>
+          <a href="#owners">Copropriétaires</a>
+          <a href="#demandes">Demandes</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div class="nav-actions">
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Règlement</button>
+          <button type="button" class="btn-primary" onclick="openAdmin()">🔐 Admin TALASSA</button>
+        </div>
+      </div>
+    </header>
+
+    <section id="hero" class="hero split">
+      <div>
+        <h1>Cabanons sur pilotis · copropriété privée</h1>
+        <p>Plage, ponton, terrains de beach-volley et golf, port privatif : la résidence Thalassa est pensée pour les copropriétaires uniquement. Toutes les actions sont accessibles via des onglets dédiés et des boutons cliquables pour un site complet et interactif.</p>
+        <div class="chips">
+          <div class="chip">Ponton / plage / port privatif</div>
+          <div class="chip">Terrain de beach-volley & golf</div>
+          <div class="chip">Respect de la faune · silence après 00h</div>
+          <div class="chip">Docs & PV toujours accessibles</div>
+        </div>
+        <div class="pill-list">
+          <span class="pill-box">Pas de réservation · pas de statut disponible/indisponible</span>
+          <span class="pill-box">Accès admin sécurisé (TALASSA / TALASSAVIVEZLEREVE)</span>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+          <button type="button" class="btn-primary" onclick="document.getElementById('demandes').scrollIntoView({behavior:'smooth'})">📨 Envoyer une demande</button>
+          <button type="button" class="btn-ghost" onclick="document.getElementById('ag2025').scrollIntoView({behavior:'smooth'})">🧾 Voir le PV 2025</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="flag">📊 Synthèse rapide</div>
+        <div class="kpis" id="kpiRow"></div>
+        <div class="chips">
+          <div class="chip">AG : 12 mars 2025 — 10 000 / 10 000 tantièmes</div>
+          <div class="chip">Port : 1 place par cabanon (25)</div>
+          <div class="chip">PV & règlement téléchargeables</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="charte" class="section split">
+      <div>
+        <h2>Charte des parties communes</h2>
+        <p class="subtitle">Fixe les règles relatives à l’administration et la jouissance des espaces : ponton, plage, terrains de beach-volley/golf, port privatif (1 place par cabanon).</p>
+        <div class="grid">
+          <div class="card-sm">
+            <div class="flag">🌊 Espaces partagés</div>
+            <div class="meta">Plage & ponton en usage collectif, aucune privatisation. Port réservé aux résidents, badge sécurisé.</div>
+          </div>
+          <div class="card-sm">
+            <div class="flag">🌿 Respect & quiétude</div>
+            <div class="meta">Pas de bruit après 00h, éclairage doux, animaux autorisés s’ils ne troublent pas la tranquillité.</div>
+          </div>
+          <div class="card-sm">
+            <div class="flag">🏐 Sports</div>
+            <div class="meta">Terrains de beach-volley & golf : créneaux partagés affichés, sans réservation ni statut de lot.</div>
+          </div>
+          <div class="card-sm">
+            <div class="flag">🔥 Sécurité & propreté</div>
+            <div class="meta">Propreté collective, interdiction de feu de camp/barbecue hors zones prévues.</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="flag">🆕 Nouvelles options copro</div>
+        <div class="meta">• Formation sensibilisation préservation de la faune.
+• Formation premiers secours sur site.
+• Espace privatif d’une partie d’eau (partie commune) pour certains lots.
+• Affichage des tantièmes généraux et des tantièmes place pour le port.</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📥 Exporter règlement</button>
+          <button type="button" class="btn-primary" onclick="downloadCoproCsv()">📊 Exporter tableau copro</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="tabs" class="section">
+      <h2>Onglets interactifs</h2>
+      <p class="subtitle">Navigation rapide : accès, services copro, vie de l’île, documents officiels, formations et règles communes.</p>
+      <div class="tab-wrapper">
+        <div class="tabs" id="tabsNav"></div>
+        <div class="tab-panels" id="tabsPanels"></div>
+      </div>
+    </section>
+
+    <section class="section" id="services">
+      <h2>Services sur site et confort quotidien</h2>
+      <p class="subtitle">Grille complète pour un site digne d’un vrai resort copropriétaire.</p>
+      <div class="grid-cards" id="servicesGrid"></div>
+    </section>
+
+    <section class="section" id="formations">
+      <h2>Formations & prévention</h2>
+      <p class="subtitle">Programmes dédiés aux copropriétaires, accessibles hors connexion.</p>
+      <div class="grid-cards">
+        <div class="card-sm"><div class="flag">🦜 Sensibilisation faune</div><div class="meta">Ateliers mensuels sur la protection de la faune locale et le respect des zones calmes.</div></div>
+        <div class="card-sm"><div class="flag">⛑️ Premiers secours</div><div class="meta">Sessions de premiers secours et utilisation du défibrillateur de l’île.</div></div>
+        <div class="card-sm"><div class="flag">🌊 Parcelles d’eau</div><div class="meta">Briefs dédiés aux lots disposant d’un espace privatif d’eau (partie commune).</div></div>
+        <div class="card-sm"><div class="flag">🧾 Règlement animé</div><div class="meta">Lecture guidée des règles clés : bruit, animaux, port, propreté, incendie.</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="agenda">
+      <h2>Agenda & jalons</h2>
+      <p class="subtitle">Toutes les étapes pour la présentation orale du 28 novembre et le suivi de la copropriété.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🎤 Présentation orale</div>
+          <div class="meta">28 novembre · Copro physiquement</div>
+          <div class="badge-soft">Salle & lieu confirmés une semaine avant</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📑 Règlement</div>
+          <div class="meta">Niveau 5/6 · EDD et composition inclus</div>
+          <div class="badge-soft">Téléchargeable, mis à jour à chaque révision</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🛥️ Parties communes</div>
+          <div class="meta">Ponton, plage, port privatif, terrains sportifs</div>
+          <div class="badge-soft">Définition & conditions de jouissance</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📌 Lieu</div>
+          <div class="meta">Île aux Bahamas · Résidence Thalassa</div>
+          <div class="badge-soft">Accès bateau + aérien détaillé dans les onglets</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ag2025">
+      <h2>Dernière Assemblée Générale · 12 mars 2025</h2>
+      <p class="subtitle">Procès-verbal complet de l’AG des copropriétaires — Île du Levant, salle polyvalente.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🧾 Composition du bureau</div>
+          <div class="meta">Président : M. DUPOND · Scrutateur : Mme FLAMENT · Secrétaire : Mme PETIT</div>
+          <div class="badge-soft">Ouverture : 17h15 · 10 000 / 10 000 tantièmes</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">📋 Ordre du jour</div>
+          <div class="meta">Détermination des destinations privatives et communes, conditions de jouissance, règles d’administration.</div>
+          <div class="meta">Lieu : Île du Levant · Port privatif et salle polyvalente.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">✅ Résolution adoptée</div>
+          <div class="meta">Autorisation de pratiquer le naturisme sur la parcelle d’eau privative de chaque copropriétaire (Article 24).</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">❌ Résolutions rejetées</div>
+          <div class="meta">1) Naturisme dans toutes les parties communes.</div>
+          <div class="meta">2) Naturisme entre 00h00 et 06h00 dans les parties communes.</div>
+          <div class="meta">3) Naturisme sur une zone commune dédiée en bord de mer.</div>
+        </div>
+      </div>
+      <div class="section" style="margin-top:14px; background: rgba(255,255,255,0.85);">
+        <div class="admin-bar">
+          <div>
+            <div class="flag">📝 Procès-verbal détaillé</div>
+            <div class="meta">Texte intégral pour archivage et consultation hors connexion.</div>
+          </div>
+          <button type="button" class="btn-ghost" onclick="downloadReglement()">📄 Télécharger règlement & PV</button>
+        </div>
+        <div class="meta" style="white-space: pre-line; line-height: 1.6; margin-top: 10px;">
+PROCÈS-VERBAL DE L’ASSEMBLÉE GÉNÉRALE DES COPROPRIÉTAIRES
+Résidence TALASSA · Île du Levant — 12 mars 2025, 17h00
+Les copropriétaires de la Résidence TALASSA, régulièrement convoqués par le syndic, se sont réunis en Assemblée Générale dans la salle polyvalente de l’île. La feuille de présence, émargée par les copropriétaires présents et les mandataires, a permis de constater que les copropriétaires présents, représentés ou votants par correspondance totalisent 10 000 / 10 000 tantièmes.
+
+COMPOSITION DU BUREAU
+Président de séance : M. DUPOND
+Scrutateur : Mme FLAMENT
+Secrétaire : Mme PETIT
+La séance est ouverte à 17h15.
+
+LISTE DES COPROPRIÉTAIRES ET TANTIÈMES
+(Tableau fourni par le syndicat — voir section Copropriétaires.)
+
+RÉSOLUTIONS
+RÉSOLUTION 1 — Autorisation du naturisme dans les parties communes
+Majorité requise : Article 25 (tantièmes généraux)
+Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU.
+Résultat : La résolution est rejetée.
+
+RÉSOLUTION 2 — Autorisation du naturisme dans les parties communes entre 00h00 et 06h00
+Majorité requise : Article 25 (tantièmes généraux)
+Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU.
+Résultat : La résolution est rejetée.
+
+RÉSOLUTION 3 — Autorisation du naturisme sur une zone dédiée des parties communes
+Majorité requise : Article 25 (tantièmes généraux)
+Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU.
+Résultat : La résolution est rejetée.
+
+RÉSOLUTION 4 — Autorisation de pratiquer le naturisme sur la parcelle d’eau privative de chaque copropriétaire
+Majorité requise : Article 24 (tantièmes généraux)
+Chaque lot dispose, selon le règlement de copropriété, d’une parcelle d’eau privative permettant des usages maritimes individuels. Il est proposé d’autoriser explicitement la pratique du naturisme dans ces espaces.
+Ont voté contre : Mme SOLOU uniquement.
+Ont voté pour : Tous les autres copropriétaires.
+Résultat : La résolution est adoptée à la majorité.
+
+CLÔTURE DE SÉANCE
+Plus aucune question n’étant posée, la séance est levée à 19h05.
+Président de séance : M. DUPOND
+Secrétaire : Mme PETIT
+Scrutateur : Mme FLAMENT
+Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="copro">
+      <h2>Options & services pour copropriétaires</h2>
+      <p class="subtitle">Des outils concrets pour la vie sur l’île, l’entretien des cabanons et la coordination entre copropriétaires.</p>
+      <div class="grid-cards">
+        <div class="card-sm">
+          <div class="flag">🛠️ Maintenance express</div>
+          <div class="meta">Déclarez incidents techniques, déclenchez une intervention, suivez le statut en temps réel.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🧺 Conciergerie ménage</div>
+          <div class="meta">Planning partagé de ménage des cabanons, rotation hebdomadaire et kit de nettoyage fourni.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🗂️ Documents copro</div>
+          <div class="meta">Règlement, EDD, composition du bureau, comptes rendus et PV d’AG accessibles hors connexion.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🛟 Port & sécurité</div>
+          <div class="meta">Badges numériques, suivi des autorisations, rappel des consignes et de l’utilisation du port privatif.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🏐 Sports & loisirs</div>
+          <div class="meta">Tableau de créneaux partagé pour le beach-volley et le golf, sans réservation obligatoire.</div>
+        </div>
+        <div class="card-sm">
+          <div class="flag">🤝 Vie communautaire</div>
+          <div class="meta">Forum d’annonces, échanges de matériel, entraide pour arrivées/départs et événements sur place.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="owners">
+      <div class="admin-bar">
+        <div>
+          <h2>Copropriétaires & tantièmes</h2>
+          <p class="subtitle">Tableau interactif pour consulter les 25 cabanons (T4) et leurs tantièmes généraux et place.</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <select id="sectionFilter" aria-label="Filtrer par section"></select>
+          <button type="button" class="btn-ghost" onclick="downloadCoproCsv()">⬇️ Exporter CSV</button>
+        </div>
+      </div>
+      <div class="section" style="padding:12px; background: rgba(255,255,255,0.8);">
+        <table class="table" id="ownersTable"></table>
+      </div>
+    </section>
+
+    <section class="section" id="demandes">
+      <div class="admin-bar">
+        <div>
+          <h2>Demande d'information</h2>
+          <p class="subtitle">Questions copropriétaires, signalements ou besoins logistiques. Sauvegarde automatique toutes les 30 secondes et à chaque modification.</p>
+        </div>
+        <button type="button" class="btn-ghost" onclick="resetDraft()">Réinitialiser le brouillon</button>
+      </div>
+      <form id="requestForm">
+        <div class="two-col">
+          <label>Nom et prénom
+            <input name="name" required placeholder="Votre nom" />
+          </label>
+          <label>Email
+            <input name="email" type="email" required placeholder="vous@example.com" />
+          </label>
+        </div>
+        <div class="two-col">
+          <label>Téléphone
+            <input name="phone" required placeholder="+33..." />
+          </label>
+          <label>Lot concerné
+            <select name="lot" id="lotSelect" required></select>
+          </label>
+        </div>
+        <label>Message
+          <textarea name="message" placeholder="Précisez vos besoins, incidents, questions sur l’île." required></textarea>
+        </label>
+        <button class="btn-primary" type="submit">Envoyer la demande</button>
+        <div id="draftStatus" class="meta"></div>
+      </form>
+    </section>
+
+    <section class="section" id="reglement">
+      <h2>Règlement de copropriété</h2>
+      <p class="subtitle">Fixe la destination des parties privatives et communes, et les conditions de leur jouissance.</p>
+      <ul class="meta">
+        <li>Pas de bruit après 00h (respect du voisinage et de la faune locale).</li>
+        <li>Animaux autorisés s’ils ne troublent pas la tranquillité.</li>
+        <li>Utilisation du port réservée aux résidents (1 place par cabanon).</li>
+        <li>Plage et ponton : usage collectif, interdiction de privatiser des zones.</li>
+        <li>Terrain de beach-volley & golf : créneaux partagés affichés sur place.</li>
+        <li>Propreté : chaque résident veille à la propreté des lieux communs.</li>
+        <li>Interdiction de feu de camp ou barbecue hors zones prévues.</li>
+        <li>Formation sensibilisation sur la préservation de la faune.</li>
+        <li>Formation premiers secours pour les copropriétaires.</li>
+        <li>Espace privatif d’une partie d’eau (partie commune) pour quelques lots.</li>
+      </ul>
+      <div class="chips">
+        <div class="chip">Présentation orale : 28 novembre</div>
+        <div class="chip">Copro physiquement : lieu à confirmer</div>
+        <div class="chip">EDD & règlement : niveau 5/6</div>
+        <div class="chip">Comité : composition en cours</div>
+      </div>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="btn-ghost" onclick="downloadReglement()">📥 Exporter le règlement (PDF)</button>
+        <button type="button" class="btn-primary" onclick="downloadCoproCsv()">📊 Exporter copro (CSV)</button>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <h2>Questions fréquentes</h2>
+      <div class="accordion" id="faqAccordion"></div>
+    </section>
+
+    <section id="adminPanel" class="section hidden">
+      <div class="admin-bar">
+        <h2>Administration TALASSA</h2>
+        <button type="button" class="btn-ghost" onclick="logout()">Se déconnecter</button>
+      </div>
+      <div class="subtitle">Consulter et éditer toutes les demandes envoyées par les copropriétaires. Tout est sauvegardé localement et reste accessible hors connexion après authentification.</div>
+
+      <h3>Demandes reçues</h3>
+      <div class="section" style="padding:12px; background: rgba(255,255,255,0.8);">
+        <table class="table" id="requestsTable"></table>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const coproprietaires = [
+      { nom: 'Mr DUPOND', lot: 1, section: 'A', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mr DUPIRE', lot: 2, section: 'A', nature: 'T4', tantiemes: 400, place: 422 },
+      { nom: 'Mme LEGRAND', lot: 3, section: 'A', nature: 'T4', tantiemes: 400, place: 30 },
+      { nom: 'Mme FLAMENT', lot: 4, section: 'A', nature: 'T4', tantiemes: 400, place: 456 },
+      { nom: 'Mr ROY', lot: 5, section: 'A', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mr DUBON', lot: 6, section: 'B', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mme PETIT', lot: 7, section: 'B', nature: 'T4', tantiemes: 400, place: 590 },
+      { nom: 'Mr BOUCHER', lot: 8, section: 'B', nature: 'T4', tantiemes: 400, place: 430 },
+      { nom: 'Mr MARCHAND', lot: 9, section: 'B', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mme LEGRAND', lot: 10, section: 'B', nature: 'T4', tantiemes: 400, place: 444 },
+      { nom: 'Mme VALET', lot: 11, section: 'C', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mme PASZKIEWICZ', lot: 12, section: 'C', nature: 'T4', tantiemes: 400, place: 999 },
+      { nom: 'Mr LAMBLIN', lot: 13, section: 'C', nature: 'T4', tantiemes: 400, place: 444 },
+      { nom: 'Mme BOURNISIEN', lot: 14, section: 'C', nature: 'T4', tantiemes: 400, place: 444 },
+      { nom: 'Mr DRANCOURT HENOCH', lot: 15, section: 'C', nature: 'T4', tantiemes: 400, place: 444 },
+      { nom: 'Mme CAPIAUX', lot: 16, section: 'D', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mr BECQUART', lot: 17, section: 'D', nature: 'T4', tantiemes: 400, place: 555 },
+      { nom: 'Mme DEHAENE', lot: 18, section: 'D', nature: 'T4', tantiemes: 400, place: 600 },
+      { nom: 'Mr VIVIER', lot: 19, section: 'D', nature: 'T4', tantiemes: 400, place: 677 },
+      { nom: 'Mme SPINA', lot: 20, section: 'D', nature: 'T4', tantiemes: 400, place: 999 },
+      { nom: 'Mme SOLOU', lot: 21, section: 'E', nature: 'T4', tantiemes: 400, place: 444 },
+      { nom: 'Mme MAILLART', lot: 22, section: 'E', nature: 'T4', tantiemes: 400, place: 888 },
+      { nom: 'Mr GRABAR', lot: 23, section: 'E', nature: 'T4', tantiemes: 400, place: 888 },
+      { nom: 'Mr BERNARD', lot: 24, section: 'E', nature: 'T4', tantiemes: 400, place: 0 },
+      { nom: 'Mme RICCHAUD', lot: 25, section: 'E', nature: 'T4', tantiemes: 400, place: 246 }
+    ];
+
+    const reqKey = 'thalassa_requests_v3';
+    const draftKey = 'thalassa_draft_v3';
+    const lotNames = coproprietaires.map(c => `Lot ${c.lot} — ${c.nom} (Section ${c.section} · ${c.nature})`);
+    let isAdmin = false;
+
+    const tabDefinitions = [
+      { id: 'lieu', titre: 'Lieu & accès', points: [
+        'Île aux Bahamas, cabanons sur pilotis avec plage et ponton',
+        'Navettes bateau programmées · station d’accueil sécurisée',
+        'Accueil bagagerie, conciergerie et maintenance sur place',
+        'Bornes électriques et zones techniques dédiées'
+      ]},
+      { id: 'communs', titre: 'Parties communes', points: [
+        'Ponton, plage, terrains de beach-volley et golf en usage collectif',
+        'Port réservé aux résidents : 1 place par cabanon, badges sécurisés',
+        'Espace privatif d’une partie d’eau pour certains lots (voir tableau copro)',
+        'Propreté partagée, incendie encadré, aucun feu libre'
+      ]},
+      { id: 'regles', titre: 'Règles de vie', points: [
+        'Silence après 00h, respect de la faune locale',
+        'Animaux autorisés s’ils ne troublent pas la tranquillité',
+        'Terrains sportifs : créneaux partagés affichés sur place',
+        'Aucune logique de réservation ni statut disponible/indisponible des lots'
+      ]},
+      { id: 'docs', titre: 'Documents & AG', points: [
+        'Règlement de copropriété et EDD (niveau 5/6)',
+        'PV complet de l’AG du 12 mars 2025',
+        'Composition du bureau et liste des tantièmes par lot',
+        'Exports PDF/CSV accessibles hors connexion'
+      ]},
+      { id: 'services-copro', titre: 'Services copropriétaires', points: [
+        'Conciergerie propriétaires (maintenance, ménage, équipements)',
+        'Suivi des travaux, incidents et tableaux d’affichage partagés',
+        'Clés numériques, badges port, kit d’accueil copropriétaire'
+      ]},
+      { id: 'formations-tab', titre: 'Formations', points: [
+        'Sensibilisation préservation de la faune',
+        'Premiers secours sur site',
+        'Parcelles d’eau privatives : bonnes pratiques',
+        'Lecture guidée du règlement'
+      ]}
+    ];
+
+    const services = [
+      { icon: '🏝️', titre: 'Accès plage & ponton', texte: 'Pass prioritaire pour les résidents, surveillance et éclairage doux nocturne.' },
+      { icon: '⛵', titre: 'Port privatif', texte: 'Place dédiée par cabanon, badges sécurisés, assistance amarrage.' },
+      { icon: '🏐', titre: 'Sports & loisirs', texte: 'Terrains en créneaux partagés (tableau affiché), sans principe de réservation.' },
+      { icon: '🧹', titre: 'Propreté & maintenance', texte: 'Équipe de ménage tournante, suivi des interventions et planification visible.' },
+      { icon: '🦜', titre: 'Respect de la faune', texte: 'Silence après minuit, éclairage basse intensité, indicateurs “quiétude”.' },
+      { icon: '🛰️', titre: 'Connectivité', texte: 'Wifi maillé, sauvegarde locale des demandes et des documents pour usage hors connexion.' },
+      { icon: '🛟', titre: 'Sécurité', texte: 'Vidéosurveillance discrète, numéros d’urgence et défibrillateur signalés.' },
+      { icon: '🤝', titre: 'Communauté', texte: 'Espace d’annonces internes, entraide et partage d’équipements entre copropriétaires.' }
+    ];
+
+    const faq = [
+      { q: 'Comment accéder à la résidence ?', a: 'Par navette bateau dédiée (port privatif) ou par l’aéroport voisin avec transfert organisé par la conciergerie.' },
+      { q: 'Puis-je venir avec des animaux ?', a: 'Oui, s’ils ne troublent pas la tranquillité. Les promenades sont conseillées en dehors des zones calmes après 20h.' },
+      { q: 'Comment s’organisent les terrains de sport ?', a: 'Créneaux affichés sur tableau partagé dans l’onglet Sports & Loisirs, sans réservation ni statut de lot.' },
+      { q: 'Les demandes copro sont-elles publiques ?', a: 'Non. Seuls les administrateurs connectés (TALASSA / TALASSAVIVEZLEREVE) peuvent consulter et éditer les demandes.' },
+      { q: 'Où trouver les documents officiels ?', a: 'Dans la section Documents et via le bouton de téléchargement du règlement et du PV.' },
+      { q: 'Existe-t-il des formations ?', a: 'Oui : sensibilisation faune, premiers secours, brief sur les parcelles d’eau privatives.' }
+    ];
+
+    function populateLotOptions() {
+      const sel = document.getElementById('lotSelect');
+      sel.innerHTML = '<option value="">Sélectionner un lot</option>' + lotNames.map(l => `<option value="${l}">${l}</option>`).join('');
+    }
+
+    function populateSectionFilter() {
+      const select = document.getElementById('sectionFilter');
+      const sections = ['Tous', ...new Set(coproprietaires.map(c => c.section))];
+      select.innerHTML = sections.map(s => `<option value="${s}">${s === 'Tous' ? 'Toutes les sections' : 'Section ' + s}</option>`).join('');
+      select.addEventListener('change', renderOwners);
+    }
+
+    function renderOwners() {
+      const table = document.getElementById('ownersTable');
+      const filter = document.getElementById('sectionFilter').value;
+      const rows = coproprietaires.filter(c => filter === 'Tous' || c.section === filter);
+      const totalGen = rows.reduce((a, c) => a + c.tantiemes, 0);
+      const totalPlace = rows.reduce((a, c) => a + c.place, 0);
+      table.innerHTML = `
+        <tr>
+          <th>Lot</th><th>Propriétaire</th><th>Section</th><th>Nature</th><th>Tantièmes généraux</th><th>Tantièmes place</th>
+        </tr>
+        ${rows.map(c => `
+          <tr>
+            <td>Lot ${c.lot}</td>
+            <td>${c.nom}</td>
+            <td>${c.section}</td>
+            <td>${c.nature}</td>
+            <td>${c.tantiemes}</td>
+            <td>${c.place}</td>
+          </tr>`).join('')}
+        <tr class="table-foot">
+          <td colspan="4">Totaux (${filter === 'Tous' ? 'ensemble' : 'Section ' + filter})</td>
+          <td>${totalGen}</td>
+          <td>${totalPlace}</td>
+        </tr>
+      `;
+    }
+
+    function downloadCoproCsv() {
+      const header = 'Lot;Propriétaire;Section;Nature;Tantièmes généraux;Tantièmes place';
+      const lines = coproprietaires.map(c => `${c.lot};${c.nom};${c.section};${c.nature};${c.tantiemes};${c.place}`);
+      const content = [header, ...lines, 'Total;;;' + totalTantiemes() + ';' + totalPlaces()].join('\n');
+      const blob = new Blob([content], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Coproprietaires_Thalassa.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('Tableau copropriétaires exporté.');
+    }
+
+    function totalTantiemes() { return coproprietaires.reduce((a, c) => a + c.tantiemes, 0); }
+    function totalPlaces() { return coproprietaires.reduce((a, c) => a + c.place, 0); }
+
+    function loadRequests() {
+      return JSON.parse(localStorage.getItem(reqKey) || '[]');
+    }
+    function saveRequests(reqs) { localStorage.setItem(reqKey, JSON.stringify(reqs)); }
+
+    function submitRequest(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = Object.fromEntries(new FormData(form).entries());
+      const requests = loadRequests();
+      requests.push({ ...data, statut: 'Nouvelle', id: crypto.randomUUID(), date: new Date().toISOString() });
+      saveRequests(requests);
+      localStorage.removeItem(draftKey);
+      form.reset();
+      updateDraftStatus('Demande enregistrée et envoyée au gestionnaire.');
+      toast('Demande envoyée. Elle est visible par l\'administrateur uniquement.');
+      renderRequests();
+      updateKpis();
+    }
+
+    function renderRequests() {
+      if (!isAdmin) return;
+      const table = document.getElementById('requestsTable');
+      const reqs = loadRequests();
+      if (!reqs.length) {
+        table.innerHTML = '<tr><td class="meta">Aucune demande pour le moment.</td></tr>';
+        return;
+      }
+      table.innerHTML = `
+        <tr>
+          <th>Nom</th><th>Email</th><th>Téléphone</th><th>Lot</th><th>Message</th><th>Statut</th>
+        </tr>
+      ` + reqs.map(r => `
+        <tr>
+          <td><input value="${r.name || ''}" data-id="${r.id}" data-field="name" /></td>
+          <td><input value="${r.email || ''}" data-id="${r.id}" data-field="email" /></td>
+          <td><input value="${r.phone || ''}" data-id="${r.id}" data-field="phone" /></td>
+          <td><input value="${r.lot || ''}" data-id="${r.id}" data-field="lot" /></td>
+          <td><textarea data-id="${r.id}" data-field="message">${r.message || ''}</textarea></td>
+          <td>
+            <select data-id="${r.id}" data-field="statut">
+              ${['Nouvelle','En cours','Clôturée'].map(s => `<option ${s===r.statut?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </td>
+        </tr>
+      `).join('');
+      table.querySelectorAll('input, textarea, select').forEach(el => el.addEventListener('change', editRequest));
+    }
+
+    function updateKpis() {
+      const reqs = loadRequests();
+      const uniqueSections = new Set(coproprietaires.map(c => c.section));
+      document.getElementById('kpiRow').innerHTML = `
+        <div class="kpi"><div class="label">Cabanons</div><div class="value">${coproprietaires.length}</div></div>
+        <div class="kpi"><div class="label">Sections</div><div class="value">${uniqueSections.size}</div></div>
+        <div class="kpi"><div class="label">Tantièmes généraux</div><div class="value">${totalTantiemes()}</div></div>
+        <div class="kpi"><div class="label">Demandes reçues</div><div class="value">${reqs.length}</div></div>
+      `;
+    }
+
+    function renderTabs() {
+      const nav = document.getElementById('tabsNav');
+      const panels = document.getElementById('tabsPanels');
+      nav.innerHTML = tabDefinitions.map((t, i) => `<button class="tab ${i===0?'active':''}" data-tab="${t.id}">${t.titre}</button>`).join('');
+      panels.innerHTML = tabDefinitions.map((t, i) => `
+        <div class="tab-panel ${i===0?'active':''}" data-tab="${t.id}">
+          ${t.points.map(p => `<div class="meta">• ${p}</div>`).join('')}
+        </div>
+      `).join('');
+      nav.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tab)));
+    }
+
+    function setTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.dataset.tab === tabId));
+    }
+
+    function renderServices() {
+      const grid = document.getElementById('servicesGrid');
+      grid.innerHTML = services.map(s => `
+        <div class="card-sm">
+          <div class="flag">${s.icon} ${s.titre}</div>
+          <div class="meta">${s.texte}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderFaq() {
+      const wrap = document.getElementById('faqAccordion');
+      wrap.innerHTML = faq.map((f, i) => `
+        <div class="accordion-item ${i===0?'open':''}">
+          <div class="accordion-header">${f.q}<span>${i===0?'-':'+'}</span></div>
+          <div class="accordion-content">${f.a}</div>
+        </div>
+      `).join('');
+      wrap.querySelectorAll('.accordion-item').forEach(item => {
+        item.querySelector('.accordion-header').addEventListener('click', () => {
+          const open = item.classList.toggle('open');
+          item.querySelector('span').textContent = open ? '-' : '+';
+        });
+      });
+    }
+
+    function editRequest(e) {
+      const { id, field } = e.target.dataset;
+      const reqs = loadRequests();
+      const idx = reqs.findIndex(r => r.id === id);
+      if (idx === -1) return;
+      reqs[idx][field] = e.target.value;
+      saveRequests(reqs);
+      toast('Demande mise à jour et publiée hors connexion.');
+    }
+
+    function downloadReglement() {
+      const regles = [
+        'Pas de bruit après 00h (respect du voisinage et de la faune locale).',
+        'Animaux autorisés s’ils ne troublent pas la tranquillité.',
+        'Utilisation du port réservée aux résidents (1 place par cabanon).',
+        'Plage et ponton : usage collectif, interdiction de privatiser des zones.',
+        'Terrain de beach-volley & golf : créneaux partagés affichés sur place.',
+        'Propreté : chaque résident veille à la propreté des lieux communs.',
+        'Interdiction de feu de camp ou barbecue hors zones prévues.',
+        'Formation sensibilisation sur la préservation de la faune.',
+        'Formation premiers secours.',
+        'Espace privatif d’une partie d’eau (partie commune) pour quelques lots.'
+      ];
+      const coproLines = coproprietaires.map(c => `Lot ${c.lot} — ${c.nom} — Section ${c.section} — ${c.nature} — Tantièmes généraux ${c.tantiemes} — Tantièmes place ${c.place}`);
+      const content = [
+        'Résidence Thalassa — Île aux Bahamas, cabanons sur pilotis',
+        'Parties communes : ponton, plage, terrain de beach-volley/golf, port (place de bateau privative).',
+        'Fixe les règles relatives à l’administration des parties communes.',
+        '',
+        'RÈGLES PRINCIPALES',
+        ...regles,
+        '',
+        'FORMATIONS',
+        '- Sensibilisation faune locale',
+        '- Premiers secours',
+        '- Brief parcelles d’eau privatives',
+        '',
+        'TABLEAU COPROPRIÉTAIRES',
+        ...coproLines,
+        `Total tantièmes généraux : ${totalTantiemes()}`,
+        `Total tantièmes place : ${totalPlaces()}`,
+        '',
+        'AG 12 mars 2025 : 10 000 / 10 000 tantièmes. Naturisme parties communes rejeté (3 résolutions). Naturisme sur parcelle d’eau privative adopté (Article 24). Bureau : Dupond / Flament / Petit.',
+        'Dates clés : présentation orale le 28 novembre (copro physiquement, composition, règlement niveau 5/6, EDD, lieu).'
+      ].join('\n');
+      const blob = new Blob([content], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Reglement_Residence_Thalassa.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('Règlement PDF téléchargé.');
+    }
+
+    function saveDraft() {
+      const form = document.getElementById('requestForm');
+      const data = Object.fromEntries(new FormData(form).entries());
+      localStorage.setItem(draftKey, JSON.stringify({ data, date: new Date().toISOString() }));
+      updateDraftStatus('Brouillon sauvegardé.');
+    }
+
+    function restoreDraft() {
+      const saved = JSON.parse(localStorage.getItem(draftKey) || 'null');
+      if (!saved) return;
+      const form = document.getElementById('requestForm');
+      Object.entries(saved.data).forEach(([k, v]) => { if (form[k]) form[k].value = v; });
+      updateDraftStatus(`Brouillon restauré (${new Date(saved.date).toLocaleTimeString()}).`);
+    }
+
+    function resetDraft() {
+      document.getElementById('requestForm').reset();
+      localStorage.removeItem(draftKey);
+      updateDraftStatus('Brouillon réinitialisé.');
+    }
+
+    function updateDraftStatus(text) {
+      document.getElementById('draftStatus').textContent = text;
+    }
+
+    function toast(message) {
+      const t = document.getElementById('toast');
+      t.textContent = message;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    function openAdmin() {
+      const login = prompt('Identifiant administrateur');
+      const pwd = login ? prompt('Mot de passe') : '';
+      if (login === 'TALASSA' && pwd === 'TALASSAVIVEZLEREVE') {
+        isAdmin = true;
+        document.getElementById('adminPanel').classList.remove('hidden');
+        renderRequests();
+        toast('Connexion réussie.');
+      } else {
+        alert('Identifiants incorrects. Accès refusé.');
+      }
+    }
+
+    function logout() {
+      isAdmin = false;
+      document.getElementById('adminPanel').classList.add('hidden');
+      toast('Vous êtes déconnecté.');
+    }
+
+    document.getElementById('requestForm').addEventListener('submit', submitRequest);
+    document.getElementById('requestForm').addEventListener('input', () => { saveDraft(); });
+    setInterval(saveDraft, 30000);
+
+    populateLotOptions();
+    populateSectionFilter();
+    renderOwners();
+    restoreDraft();
+    renderTabs();
+    renderServices();
+    renderFaq();
+    updateKpis();
+  </script>
+</body>
+</html>
