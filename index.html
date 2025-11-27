@@ -84,9 +84,34 @@
     .small { font-size: 14px; }
     .footer-note { text-align: center; color: var(--muted); font-size: 13px; margin-top: 22px; }
 
-    .image-control { display: grid; gap: 8px; }
-    .image-control img { border-radius: 12px; width: 100%; max-height: 160px; object-fit: cover; border: 1px solid rgba(0,0,0,0.08); }
-    .image-control small { color: var(--muted); }
+    .drop-zone {
+      border: 1px dashed rgba(0,0,0,0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background: rgba(255,255,255,0.8);
+    }
+    .drop-zone:hover { border-color: var(--purple); }
+    .drop-zone.dragging { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(15, 123, 255, 0.2); }
+    .drop-zone img { width: 100%; display: block; object-fit: cover; max-height: 320px; }
+    .drop-zone .hint {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      padding: 8px 10px;
+      background: rgba(0,0,0,0.55);
+      color: white;
+      border-radius: 10px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .inline-controls { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-top: 10px; }
+    .inline-controls input[type="url"] { margin: 0; }
 
     .view { display: none; gap: 18px; }
     .view.active { display: grid; }
@@ -132,8 +157,14 @@
           <div class="card">
             <h3>Où ?</h3>
             <p class="muted small">Au cœur des Bahamas, la Résidence THALASSA s’ouvre sur l’océan et sur des jardins luxuriants.</p>
-            <div class="card" style="padding: 0; overflow: hidden;">
-              <img data-image-key="accueil-map" src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80" alt="Illustration des Bahamas sur une carte du monde" style="width: 100%; display: block; object-fit: cover; max-height: 320px;">
+            <div class="drop-zone" data-drop-target data-image-key="accueil-map">
+              <img data-image-key="accueil-map" data-image-preview="accueil-map" src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80" alt="Illustration des Bahamas sur une carte du monde">
+              <div class="hint">Glissez votre photo ici ou cliquez pour importer</div>
+              <input type="file" accept="image/*" aria-label="Importer un visuel" style="display:none;">
+              <div class="inline-controls">
+                <input type="url" placeholder="Coller une URL (optionnel)" aria-label="URL de l’image">
+                <button class="button secondary" type="button" data-reset-image="accueil-map">Réinitialiser</button>
+              </div>
             </div>
           </div>
           <div class="card">
@@ -147,11 +178,6 @@
             <p class="muted small">✨ En clair, c’est le luxe à l’état pur... Un lieu si rare que l’on ne l’oublie jamais.</p>
           </div>
         </section>
-        <div class="card">
-          <h3>Personnaliser les visuels</h3>
-          <p class="muted small">Ajoutez vos propres photos (URL ou fichier). Elles restent sauvegardées dans ce navigateur et se rechargent automatiquement.</p>
-          <div id="image-controls" class="grid two"></div>
-        </div>
         <div class="card">
           <h3>Sur ce site pour les copropriétaires il y a :</h3>
           <ul class="list">
@@ -479,62 +505,75 @@
         });
       };
 
-      const controls = document.querySelector('#image-controls');
-      if (controls) {
-        const config = [
-          { key: 'accueil-map', label: 'Visuel "Où ?"', hint: 'Image affichée à côté de la question "Où ?".' }
-        ];
+      const handleFile = (key, file, urlInput, fileInput) => {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          saveAndApply(key, reader.result);
+          if (urlInput) urlInput.value = '';
+          if (fileInput) fileInput.value = '';
+        };
+        reader.readAsDataURL(file);
+      };
 
-        controls.innerHTML = '';
-        config.forEach(item => {
-          const wrapper = document.createElement('div');
-          wrapper.className = 'image-control';
-          wrapper.innerHTML = `
-            <strong>${item.label}</strong>
-            <small>${item.hint}</small>
-            <img data-image-preview="${item.key}" alt="Prévisualisation ${item.label}">
-            <label class="small">URL personnalisée</label>
-            <input type="url" placeholder="https://..." aria-label="URL pour ${item.label}">
-            <label class="small">Ou importer un fichier</label>
-            <input type="file" accept="image/*" aria-label="Importer un fichier pour ${item.label}">
-            <button class="button secondary" type="button">Réinitialiser</button>
-          `;
-          controls.appendChild(wrapper);
+      document.querySelectorAll('[data-drop-target]').forEach(zone => {
+        const key = zone.dataset.imageKey;
+        const urlInput = zone.querySelector('input[type="url"]');
+        const fileInput = zone.querySelector('input[type="file"]');
+        const resetBtn = zone.querySelector('[data-reset-image]');
 
-          const urlInput = wrapper.querySelector('input[type="url"]');
-          const fileInput = wrapper.querySelector('input[type="file"]');
-          const resetBtn = wrapper.querySelector('button');
+        const storedSrc = savedImages[key]?.src || '';
+        if (urlInput && storedSrc.startsWith('http')) urlInput.value = storedSrc;
 
-          const storedSrc = savedImages[item.key]?.src || '';
-          urlInput.value = storedSrc && storedSrc.startsWith('http') ? storedSrc : '';
+        const stop = (e) => e.stopPropagation();
+        urlInput?.addEventListener('click', stop);
+        urlInput?.addEventListener('keydown', stop);
+        resetBtn?.addEventListener('click', stop);
 
-          urlInput.addEventListener('change', () => {
-            const value = urlInput.value.trim();
-            if (!value) {
-              saveAndApply(item.key, null);
-              return;
-            }
-            saveAndApply(item.key, value);
-          });
+        const handleDrop = (e) => {
+          e.preventDefault();
+          zone.classList.remove('dragging');
+          const [file] = e.dataTransfer?.files || [];
+          if (file) {
+            handleFile(key, file, urlInput, fileInput);
+            return;
+          }
+          const droppedUrl = (e.dataTransfer?.getData('text/uri-list') || e.dataTransfer?.getData('text/plain') || '').trim();
+          if (droppedUrl) {
+            if (urlInput) urlInput.value = droppedUrl;
+            saveAndApply(key, droppedUrl);
+          }
+        };
 
-          fileInput.addEventListener('change', () => {
-            const file = fileInput.files?.[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-              saveAndApply(item.key, reader.result);
-              urlInput.value = '';
-            };
-            reader.readAsDataURL(file);
-          });
-
-          resetBtn.addEventListener('click', () => {
-            urlInput.value = '';
-            fileInput.value = '';
-            saveAndApply(item.key, null);
+        ['dragenter', 'dragover'].forEach(eventName => {
+          zone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            zone.classList.add('dragging');
           });
         });
-      }
+        ['dragleave', 'drop'].forEach(eventName => {
+          zone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            zone.classList.remove('dragging');
+          });
+        });
+        zone.addEventListener('drop', handleDrop);
+
+        zone.addEventListener('click', () => fileInput?.click());
+
+        fileInput?.addEventListener('change', () => handleFile(key, fileInput.files?.[0], urlInput, fileInput));
+
+        urlInput?.addEventListener('change', () => {
+          const value = urlInput.value.trim();
+          saveAndApply(key, value || null);
+        });
+
+        resetBtn?.addEventListener('click', () => {
+          if (urlInput) urlInput.value = '';
+          if (fileInput) fileInput.value = '';
+          saveAndApply(key, null);
+        });
+      });
 
       Object.keys(imageDefaults).forEach(applyImage);
     }
