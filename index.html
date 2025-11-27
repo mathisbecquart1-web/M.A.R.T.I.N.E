@@ -8,19 +8,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        /* Style global : typographie, palette et ambiance "site de rêve" */
+        /* Style global : palette inspirée du site Bahamas.com, ambiance "voyage premium" */
         :root {
-            --primary: #0ea5e9;
-            --primary-deep: #0c4a6e;
-            --primary-light: #e0f7ff;
-            --accent: #f97316;
-            --background: #f6fbff;
+            --primary: #008c9c;           /* bleu lagon proche Bahamas */
+            --primary-deep: #006775;       /* variante plus profonde */
+            --primary-light: #e8f6f8;      /* fond clair pour cartes */
+            --accent: #f5a524;             /* accent sable/soleil */
+            --background: #f4f6f8;         /* gris clair type site éditorial */
             --card: #ffffff;
-            --text: #0b172a;
-            --muted: #5b6472;
-            --border: #e5eef6;
-            --shadow: 0 18px 50px rgba(12, 74, 110, 0.14);
-            --glass: rgba(255, 255, 255, 0.7);
+            --text: #0f1c2e;
+            --muted: #5f6b7a;
+            --border: #d9e2ec;
+            --shadow: 0 12px 30px rgba(0, 89, 103, 0.12);
+            --glass: rgba(255, 255, 255, 0.92);
         }
 
         * { box-sizing: border-box; }
@@ -28,24 +28,10 @@
         body {
             margin: 0;
             font-family: "Manrope", "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at 15% 20%, rgba(14,165,233,0.22), transparent 28%),
-                        radial-gradient(circle at 85% 15%, rgba(249,115,22,0.14), transparent 25%),
-                        linear-gradient(180deg, #f8fbff 0%, #eef6ff 60%, #f8fbff 100%);
+            background: var(--background);
             color: var(--text);
             line-height: 1.6;
-            position: relative;
             overflow-x: hidden;
-        }
-
-        body::before {
-            /* halo doux pour rappeler une île au soleil */
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.9), transparent 32%),
-                        radial-gradient(circle at 90% 0%, rgba(14,165,233,0.12), transparent 30%);
-            pointer-events: none;
-            z-index: 0;
         }
 
         .container {
@@ -53,130 +39,30 @@
             margin: 0 auto;
         }
 
-        header.hero {
-            background: linear-gradient(120deg, #0b1224 0%, #0f4c75 40%, #0ea5e9 100%);
-            color: #fff;
-            padding: 54px 0 36px;
-            position: relative;
-            overflow: hidden;
-            isolation: isolate;
-        }
+        header.hero { display: none; }
 
-        header.hero::after,
-        header.hero::before {
-            content: "";
-            position: absolute;
-            width: 360px;
-            height: 360px;
-            border-radius: 50%;
-            filter: blur(110px);
-            opacity: 0.55;
-            z-index: 0;
-        }
-
-        header.hero::before { background: #22d3ee; inset: -60px auto auto -120px; }
-        header.hero::after { background: #f97316; inset: auto -120px -120px auto; }
-
-        .hero-grid {
-            position: relative;
-            z-index: 1;
-            display: grid;
-            grid-template-columns: 1.05fr 0.95fr;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .eyebrow {
-            text-transform: uppercase;
-            letter-spacing: 0.14em;
-            font-size: 12px;
-            opacity: 0.78;
-            margin-bottom: 10px;
-        }
-
-        h1 { font-family: "Playfair Display", "Times New Roman", serif; }
-
-        header h1 {
-            margin: 0 0 10px;
-            font-size: clamp(28px, 4.4vw, 40px);
-            letter-spacing: 0.01em;
-        }
-
-        header p {
-            margin: 0 0 18px;
-            color: rgba(255, 255, 255, 0.9);
-            max-width: 620px;
-        }
-
-        .hero-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .hero-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 18px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-card::after {
-            content: "Lagons & Sérénité";
-            position: absolute;
-            inset: auto 12px 12px auto;
-            font-size: 12px;
-            color: rgba(255,255,255,0.7);
-        }
-
-        .hero-card h3 { margin: 0 0 6px; color: #fff; }
-        .hero-card p { margin: 0; color: rgba(255, 255, 255, 0.9); }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .stat {
-            background: #fff;
-            border-radius: 14px;
-            padding: 14px 16px;
-            color: var(--text);
-            box-shadow: var(--shadow);
-        }
-
-        .stat .label { color: var(--muted); font-size: 13px; }
-        .stat .value { font-weight: 800; font-size: 18px; margin-top: 4px; }
-
+        /* Barre supérieure inspirée des sites éditoriaux de voyage */
         .top-nav {
             position: sticky;
             top: 0;
             z-index: 20;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(18px);
-            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
-            border-bottom: 1px solid rgba(14, 165, 233, 0.15);
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border-bottom: 1px solid var(--border);
         }
 
         .nav-inner {
             display: grid;
             grid-template-columns: auto 1fr auto;
             align-items: center;
-            gap: 14px;
-            padding: 14px 0;
+            gap: 18px;
+            padding: 12px 0;
         }
 
         .brand {
             font-weight: 800;
-            color: var(--primary);
-            letter-spacing: 0.05em;
+            color: var(--primary-deep);
+            letter-spacing: 0.06em;
             text-transform: uppercase;
         }
 
@@ -188,31 +74,160 @@
         }
 
         .nav-links button {
-            border: 1px solid rgba(14,165,233,0.35);
-            background: linear-gradient(120deg, rgba(255,255,255,0.9), rgba(224,247,255,0.8));
+            border: 1px solid var(--border);
+            background: #fff;
             color: var(--primary-deep);
             padding: 10px 14px;
-            border-radius: 999px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 6px 16px rgba(12, 74, 110, 0.08);
         }
 
         .nav-links button.active {
-            background: linear-gradient(120deg, #0ea5e9, #22d3ee);
+            background: var(--primary);
             color: #fff;
-            border-color: transparent;
-            box-shadow: 0 12px 28px rgba(14, 165, 233, 0.35);
+            border-color: var(--primary);
+            box-shadow: 0 10px 24px rgba(0, 140, 156, 0.25);
         }
 
         .nav-links button:hover { transform: translateY(-1px); }
 
         .nav-actions { display: flex; gap: 8px; align-items: center; }
 
-        main { padding: 28px 0 40px; position: relative; z-index: 1; }
+        main { padding: 24px 0 40px; position: relative; z-index: 1; }
+
+        /* Héro façon page de résultats Bahamas.com */
+        .listing-hero {
+            background: linear-gradient(180deg, #fff 0%, #f7f9fb 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 32px 0 10px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-size: 12px;
+            color: var(--primary-deep);
+            margin-bottom: 8px;
+        }
+
+        h1 { font-family: "Playfair Display", "Times New Roman", serif; }
+
+        header h1 {
+            margin: 0 0 10px;
+            font-size: clamp(28px, 4.2vw, 40px);
+            letter-spacing: 0.01em;
+            color: var(--text);
+        }
+
+        header p { margin: 0 0 16px; color: var(--muted); max-width: 640px; }
+
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+
+        .hero-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::after {
+            content: "Lagons & Sérénité";
+            position: absolute;
+            inset: auto 12px 12px auto;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .hero-card h3 { margin: 0 0 8px; color: var(--text); }
+        .hero-card p { margin: 0; color: var(--muted); }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat {
+            background: var(--primary-light);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .stat .label { color: var(--muted); font-size: 13px; }
+        .stat .value { font-weight: 800; font-size: 18px; margin-top: 4px; }
+
+        .search-inline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .hero-visual {
+            display: grid;
+            gap: 14px;
+        }
+
+        .hero-image {
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            min-height: 220px;
+            background: linear-gradient(160deg, rgba(0,140,156,0.12), rgba(0,140,156,0.04)),
+                        url('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1200&q=80') center/cover;
+        }
+
+        .hero-image::after {
+            content: "Île aux Bahamas";
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.55);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        .filter-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-card h4 { margin: 0 0 8px; }
+        .filter-card .small-text { margin-bottom: 8px; display: block; }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .amenities { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+        .amenities label { font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; }
 
         .section { display: none; }
         .section.active { display: block; }
@@ -229,13 +244,12 @@
         h3 { margin-top: 0; }
 
         .card {
-            background: var(--glass);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 16px;
-            padding: 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
             margin-bottom: 22px;
             box-shadow: var(--shadow);
-            backdrop-filter: blur(6px);
         }
 
         label {
@@ -259,37 +273,37 @@
         }
 
         .btn-primary {
-            background: linear-gradient(120deg, #0ea5e9, #22d3ee);
+            background: var(--primary);
             color: #fff;
             border: 1px solid var(--primary);
             padding: 10px 16px;
             border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 12px 28px rgba(14, 165, 233, 0.3);
+            box-shadow: 0 10px 20px rgba(0, 140, 156, 0.22);
             transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgba(14,165,233,0.35); }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 26px rgba(0,140,156,0.28); }
 
         .btn-primary:active { transform: translateY(0); }
 
         .btn-outline {
             background: #fff;
-            color: var(--primary);
-            border: 1px solid var(--primary);
+            color: var(--primary-deep);
+            border: 1px solid var(--border);
             padding: 10px 16px;
             border-radius: 10px;
             cursor: pointer;
         }
 
         .btn-danger {
-            background: linear-gradient(120deg, #ef4444, #dc2626);
+            background: #d92d20;
             color: #fff;
             border: none;
             padding: 10px 16px;
             border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 12px 24px rgba(220, 38, 38, 0.3);
+            box-shadow: 0 10px 20px rgba(217, 45, 32, 0.25);
         }
 
         table {
@@ -402,17 +416,15 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 16px;
-            margin: -32px auto 24px;
-            position: relative;
-            z-index: 2;
+            margin: 0 auto 24px;
         }
 
         .dream-card {
             padding: 18px;
-            border-radius: 18px;
-            background: linear-gradient(160deg, #ffffff, #ecfeff);
-            border: 1px solid rgba(14, 165, 233, 0.25);
-            box-shadow: 0 14px 32px rgba(12, 74, 110, 0.12);
+            border-radius: 14px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
         }
 
         .dream-card h4 { margin: 8px 0 6px; }
@@ -431,7 +443,7 @@
         .section-lede p { margin: 0; color: var(--muted); }
 
         .footer {
-            background: linear-gradient(120deg, #0b1224, #0f2844);
+            background: #0f1c2e;
             color: #e5e7eb;
             padding: 20px 0;
             margin-top: 32px;
@@ -447,71 +459,6 @@
     </style>
     </head>
     <body>
-        <!-- En-tête héro : donne un aspect "site web" avec un bandeau visuel -->
-        <header class="hero">
-            <div class="container hero-grid">
-                <div>
-                    <div class="eyebrow">Espace résidents</div>
-                    <div class="chip">Site de rêve · Île aux Bahamas</div>
-                    <h1>Résidence Thalassa — cabanons sur pilotis</h1>
-                    <p>Un mini-site élégant pour vivre la vie insulaire : raconter la copropriété, feuilleter le règlement, suivre les assemblées, rêver des lots et déposer les demandes au syndic en toute sérénité.</p>
-                    <ul style="margin: 0 0 10px 18px; color: rgba(255,255,255,0.86);">
-                        <li>Navigation fluide façon SPA, sans rechargement</li>
-                        <li>Vos données et photos sont gardées au chaud dans le navigateur</li>
-                        <li>Boutons d'accès rapide vers présentation et demandes</li>
-                    </ul>
-                    <div class="hero-actions">
-                        <button class="btn-primary nav-btn" data-target="presentation">Accéder à la présentation</button>
-                        <button class="btn-primary nav-btn" data-target="demandes">Déposer une demande</button>
-                    </div>
-                </div>
-                <div class="hero-card">
-                    <h3>Carte d'identité rapide</h3>
-                    <p class="small-text" style="color: rgba(255,255,255,0.82);">Remplissez les champs, tout est conservé en localStorage.</p>
-                    <div class="stat-grid">
-                        <div class="stat">
-                            <div class="label">Nom</div>
-                            <div class="value" id="statNom">—</div>
-                        </div>
-                        <div class="stat">
-                            <div class="label">Adresse</div>
-                            <div class="value" id="statAdresse">—</div>
-                        </div>
-                        <div class="stat">
-                            <div class="label">Lots</div>
-                            <div class="value" id="statLots">—</div>
-                        </div>
-                        <div class="stat">
-                            <div class="label">Construction</div>
-                            <div class="value" id="statAnnee">—</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Cartes d'ambiance pour renforcer l'effet "site internet" -->
-        <section class="container dream-panels">
-            <div class="dream-card">
-                <div class="chip">Vivre sur l'eau</div>
-                <h4>Lagons turquoise & cabanons</h4>
-                <p>Présentez la Résidence Thalassa comme une destination : nom, adresse, description idyllique.</p>
-                <button class="btn-outline nav-btn" data-target="presentation">Rédiger la présentation</button>
-            </div>
-            <div class="dream-card">
-                <div class="chip">Organisation</div>
-                <h4>Règlement & AG stylés</h4>
-                <p>Ajoutez vos articles, vos PV et vos décisions pour garder le suivi des assemblées.</p>
-                <button class="btn-outline nav-btn" data-target="ag">Accéder aux AG</button>
-            </div>
-            <div class="dream-card">
-                <div class="chip">Conciergerie</div>
-                <h4>Demandes au syndic</h4>
-                <p>Un tableau net pour suivre les demandes et préparer la prochaine AG sans stress.</p>
-                <button class="btn-outline nav-btn" data-target="demandes">Voir le suivi</button>
-            </div>
-        </section>
-
         <!-- Barre de navigation sticky pour piloter les sections SPA -->
         <div class="top-nav">
             <div class="container nav-inner">
@@ -531,6 +478,125 @@
                 </div>
             </div>
         </div>
+
+        <!-- En-tête héro remis en page façon Bahamas.com -->
+        <header class="listing-hero">
+            <div class="container hero-grid">
+                <div>
+                    <div class="eyebrow">Bahamas · Résidence Thalassa</div>
+                    <div class="chip">Île aux Bahamas · Cabanons sur pilotis</div>
+                    <h1>Trouvez votre expérience à la Résidence Thalassa</h1>
+                    <p>Un site clair pour présenter la copropriété, parcourir le règlement, suivre les AG et gérer les demandes au syndic, avec la sobriété d'un portail voyage.</p>
+                    <div class="search-inline">
+                        <div>
+                            <label>Nom</label>
+                            <input type="text" placeholder="Résidence Thalassa" value="Résidence Thalassa">
+                        </div>
+                        <div>
+                            <label>Section</label>
+                            <select class="nav-select">
+                                <option value="presentation" selected>Présentation</option>
+                                <option value="reglement">Règlement</option>
+                                <option value="ag">Assemblées générales</option>
+                                <option value="edd">EDD</option>
+                                <option value="lots">Lots</option>
+                                <option value="communs">Parties communes</option>
+                                <option value="syndic">Syndic & agenda</option>
+                                <option value="demandes">Demandes</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Type de contenu</label>
+                            <select>
+                                <option>Informations</option>
+                                <option>Documents</option>
+                                <option>Images</option>
+                                <option>Demandes</option>
+                            </select>
+                        </div>
+                        <div style="align-self: end;">
+                            <button class="btn-primary nav-btn" data-target="presentation">Lancer la visite</button>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn-primary nav-btn" data-target="presentation">Accéder à la présentation</button>
+                        <button class="btn-primary nav-btn" data-target="demandes">Déposer une demande</button>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-image" aria-hidden="true"></div>
+                    <div class="filter-card">
+                        <h4>Précisez votre recherche</h4>
+                        <span class="small-text">Affinez comme sur un site de réservation : vos choix peuvent guider la navigation.</span>
+                        <div class="filter-grid">
+                            <div>
+                                <label for="filterNom">Nom</label>
+                                <input id="filterNom" type="text" placeholder="Nom du lot ou de la page">
+                            </div>
+                            <div>
+                                <label for="filterIle">Sélectionnez une île</label>
+                                <select id="filterIle">
+                                    <option>Île principale</option>
+                                    <option>Lagune Nord</option>
+                                    <option>Lagune Sud</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="amenities">
+                            <label><input type="checkbox"> Accès plage</label>
+                            <label><input type="checkbox"> Port privé</label>
+                            <label><input type="checkbox"> Beach volley</label>
+                            <label><input type="checkbox"> Golf</label>
+                            <label><input type="checkbox"> Espace bien-être</label>
+                        </div>
+                    </div>
+                    <div class="hero-card">
+                        <h3>Carte d'identité</h3>
+                        <p class="small-text">Les données saisies alimentent aussi ces repères clés.</p>
+                        <div class="stat-grid">
+                            <div class="stat">
+                                <div class="label">Nom</div>
+                                <div class="value" id="statNom">—</div>
+                            </div>
+                            <div class="stat">
+                                <div class="label">Adresse</div>
+                                <div class="value" id="statAdresse">—</div>
+                            </div>
+                            <div class="stat">
+                                <div class="label">Lots</div>
+                                <div class="value" id="statLots">—</div>
+                            </div>
+                            <div class="stat">
+                                <div class="label">Construction</div>
+                                <div class="value" id="statAnnee">—</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Cartes d'ambiance pour renforcer l'effet "site internet" -->
+        <section class="container dream-panels">
+            <div class="dream-card">
+                <div class="chip">Inspiration</div>
+                <h4>Lagons turquoise & cabanons</h4>
+                <p>Présentez la Résidence Thalassa comme une destination : nom, adresse, description idyllique.</p>
+                <button class="btn-outline nav-btn" data-target="presentation">Rédiger la présentation</button>
+            </div>
+            <div class="dream-card">
+                <div class="chip">Organisation</div>
+                <h4>Règlement & AG structurés</h4>
+                <p>Ajoutez vos articles, vos PV et vos décisions pour garder le suivi des assemblées.</p>
+                <button class="btn-outline nav-btn" data-target="ag">Accéder aux AG</button>
+            </div>
+            <div class="dream-card">
+                <div class="chip">Conciergerie</div>
+                <h4>Demandes au syndic</h4>
+                <p>Un tableau net pour suivre les demandes et préparer la prochaine AG sans stress.</p>
+                <button class="btn-outline nav-btn" data-target="demandes">Voir le suivi</button>
+            </div>
+        </section>
 
         <main class="container">
             <!-- SECTION 1 : Présentation -->
@@ -1080,14 +1146,24 @@ Les occupants devront veiller à ce que la tranquillité de l’île ne soit en 
         // Navigation SPA : afficher / masquer les sections
         const navButtons = document.querySelectorAll('.nav-btn');
         const sections = document.querySelectorAll('.section');
+        const navSelect = document.querySelector('.nav-select');
+
+        function showSection(target) {
+            navButtons.forEach(b => b.classList.toggle('active', b.dataset.target === target));
+            sections.forEach(sec => sec.classList.toggle('active', sec.id === target));
+            if (navSelect) navSelect.value = target;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         navButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const target = btn.dataset.target;
-                navButtons.forEach(b => b.classList.toggle('active', b.dataset.target === target));
-                sections.forEach(sec => sec.classList.toggle('active', sec.id === target));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
+            btn.addEventListener('click', () => showSection(btn.dataset.target));
         });
+
+        if (navSelect) {
+            navSelect.addEventListener('change', (e) => {
+                showSection(e.target.value);
+            });
+        }
 
         // ---------------------------
         // 1) Présentation de la copropriété
