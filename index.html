@@ -488,50 +488,48 @@
         savedImages = {};
       }
 
-      const applyImage = (key, directSrc) => {
-        const current = directSrc || savedImages[key]?.src || imageDefaults[key];
-        document.querySelectorAll(`[data-image-key="${key}"], [data-image-preview="${key}"]`).forEach(img => {
-          if (current) img.src = current;
-        });
-      };
-
-      const saveAndApply = (key, src) => {
+      const persist = (key, src) => {
         if (src) {
           savedImages[key] = { src };
         } else {
           delete savedImages[key];
         }
-        try {
-          localStorage.setItem(imageStorageKey, JSON.stringify(savedImages));
-        } catch (e) {
-          // ignore quota errors silently
-        }
-        applyImage(key);
-      };
-
-      const fileToDataUrl = (key, file, urlInput, fileInput) => {
-        if (!file) return;
-        const tempUrl = URL.createObjectURL(file);
-        applyImage(key, tempUrl);
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          saveAndApply(key, reader.result);
-          URL.revokeObjectURL(tempUrl);
-          if (urlInput) urlInput.value = '';
-          if (fileInput) fileInput.value = '';
-        };
-        reader.readAsDataURL(file);
+        try { localStorage.setItem(imageStorageKey, JSON.stringify(savedImages)); } catch (e) {}
       };
 
       document.querySelectorAll('[data-drop-target]').forEach(zone => {
         const key = zone.dataset.imageKey;
+        const preview = zone.querySelector(`[data-image-preview="${key}"]`);
         const urlInput = zone.querySelector('input[type="url"]');
         const fileInput = zone.querySelector('input[type="file"]');
         const resetBtn = zone.querySelector('[data-reset-image]');
 
-        const storedSrc = savedImages[key]?.src || '';
-        if (urlInput && storedSrc.startsWith('http')) urlInput.value = storedSrc;
+        const setPreview = (src) => {
+          if (preview && src) preview.src = src;
+        };
+
+        const applyFromStore = () => {
+          const current = savedImages[key]?.src || imageDefaults[key];
+          setPreview(current);
+          if (urlInput) urlInput.value = current?.startsWith('http') ? current : '';
+        };
+
+        applyFromStore();
+
+        const handleFile = (file) => {
+          if (!file) return;
+          const tempUrl = URL.createObjectURL(file);
+          setPreview(tempUrl);
+          const reader = new FileReader();
+          reader.onload = () => {
+            persist(key, reader.result);
+            applyFromStore();
+            URL.revokeObjectURL(tempUrl);
+            if (urlInput) urlInput.value = '';
+            if (fileInput) fileInput.value = '';
+          };
+          reader.readAsDataURL(file);
+        };
 
         const stop = (e) => e.stopPropagation();
         urlInput?.addEventListener('click', stop);
@@ -543,13 +541,13 @@
           zone.classList.remove('dragging');
           const [file] = e.dataTransfer?.files || [];
           if (file) {
-            fileToDataUrl(key, file, urlInput, fileInput);
+            handleFile(file);
             return;
           }
           const droppedUrl = (e.dataTransfer?.getData('text/uri-list') || e.dataTransfer?.getData('text/plain') || '').trim();
           if (droppedUrl) {
-            if (urlInput) urlInput.value = droppedUrl;
-            saveAndApply(key, droppedUrl);
+            persist(key, droppedUrl);
+            applyFromStore();
           }
         };
 
@@ -569,21 +567,26 @@
 
         zone.addEventListener('click', () => fileInput?.click());
 
-        fileInput?.addEventListener('change', () => fileToDataUrl(key, fileInput.files?.[0], urlInput, fileInput));
+        fileInput?.addEventListener('change', () => handleFile(fileInput.files?.[0]));
 
         urlInput?.addEventListener('change', () => {
           const value = urlInput.value.trim();
-          saveAndApply(key, value || null);
+          if (!value) {
+            persist(key, null);
+            applyFromStore();
+            return;
+          }
+          persist(key, value);
+          applyFromStore();
         });
 
         resetBtn?.addEventListener('click', () => {
           if (urlInput) urlInput.value = '';
           if (fileInput) fileInput.value = '';
-          saveAndApply(key, null);
+          persist(key, null);
+          applyFromStore();
         });
       });
-
-      Object.keys(imageDefaults).forEach(applyImage);
     }
 
     function init() {
