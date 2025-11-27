@@ -1,1 +1,1145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini site de copropriété</title>
+    <style>
+        /* Style global : typographie simple et mise en page responsive */
+        :root {
+            --primary: #2f80ed;
+            --background: #f5f7fb;
+            --card: #ffffff;
+            --text: #1f2933;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+        }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        header {
+            background: var(--card);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: calc(100vh - 70px);
+        }
+
+        nav {
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 16px;
+            position: sticky;
+            top: 70px;
+            align-self: start;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav li {
+            margin-bottom: 8px;
+        }
+
+        nav button {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            text-align: left;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+
+        nav button.active, nav button:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        main {
+            padding: 24px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f2f5fb;
+        }
+
+        .accordion {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .accordion-item {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .accordion button {
+            width: 100%;
+            background: #fff;
+            border: none;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .accordion .content {
+            display: none;
+            padding: 12px;
+            background: #f9fafb;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .thumbs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .thumbs img {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .status-select {
+            min-width: 120px;
+        }
+
+        .small-text {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+            nav {
+                position: relative;
+                height: auto;
+                top: 0;
+            }
+            .layout main {
+                padding-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="flex-between">
+            <h1>Tableau de bord de copropriété</h1>
+            <button id="resetData" class="btn-danger">Réinitialiser les données</button>
+        </div>
+        <p class="small-text">SPA 100% front : naviguez dans le menu, saisissez vos informations et elles seront sauvegardées automatiquement dans le navigateur.</p>
+    </header>
+
+    <div class="layout">
+        <!-- Menu de navigation (SPA) -->
+        <nav>
+            <ul>
+                <li><button class="nav-btn active" data-target="presentation">1) Présentation</button></li>
+                <li><button class="nav-btn" data-target="reglement">2) Règlement</button></li>
+                <li><button class="nav-btn" data-target="ag">3) Historique AG</button></li>
+                <li><button class="nav-btn" data-target="edd">4) État descriptif</button></li>
+                <li><button class="nav-btn" data-target="lots">5) Lots détaillés</button></li>
+                <li><button class="nav-btn" data-target="communs">6) Parties communes</button></li>
+                <li><button class="nav-btn" data-target="syndic">7) Syndic & agenda</button></li>
+                <li><button class="nav-btn" data-target="demandes">8) Demandes</button></li>
+            </ul>
+        </nav>
+
+        <main>
+            <!-- SECTION 1 : Présentation -->
+            <section id="presentation" class="section active">
+                <div class="card">
+                    <h2>Présentation de la copropriété</h2>
+                    <p class="small-text">Renseignez ici le descriptif général de la résidence. Les champs ci-dessous sont enregistrés en localStorage.</p>
+                    <form id="presentationForm">
+                        <label for="nomCopro">Nom de la copropriété</label>
+                        <input type="text" id="nomCopro" placeholder="Ex : Résidence Les Jardins" required>
+
+                        <label for="adresseCopro">Adresse</label>
+                        <input type="text" id="adresseCopro" placeholder="Ex : 12 avenue de la République, 75000 Paris" required>
+
+                        <label for="nbLots">Nombre de lots</label>
+                        <input type="number" id="nbLots" min="0" placeholder="Ex : 45" required>
+
+                        <label for="anneeConstruction">Année de construction</label>
+                        <input type="number" id="anneeConstruction" min="1800" max="2100" placeholder="Ex : 1998">
+
+                        <label for="descriptionCopro">Description libre</label>
+                        <textarea id="descriptionCopro" placeholder="Texte de présentation, environnement, équipements, etc."></textarea>
+
+                        <label for="presentationImages">Importer des images (multiple)</label>
+                        <input type="file" id="presentationImages" accept="image/*" multiple>
+                        <div class="small-text">Les vignettes ci-dessous sont conservées en localStorage (dans la limite de votre navigateur).</div>
+                        <div id="presentationThumbs" class="thumbs"></div>
+
+                        <button class="btn-primary" type="submit">Enregistrer la présentation</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>Résumé</h3>
+                    <div id="presentationResume">
+                        <p><strong>Nom :</strong> <span data-field="nom"></span></p>
+                        <p><strong>Adresse :</strong> <span data-field="adresse"></span></p>
+                        <p><strong>Nombre de lots :</strong> <span data-field="lots"></span></p>
+                        <p><strong>Année :</strong> <span data-field="annee"></span></p>
+                        <p><strong>Description :</strong></p>
+                        <p data-field="description"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2 : Règlement -->
+            <section id="reglement" class="section">
+                <div class="card">
+                    <h2>Règlement de copropriété</h2>
+                    <form id="reglementForm">
+                        <label for="reglementTexte">Texte général / extraits</label>
+                        <textarea id="reglementTexte" placeholder="Collez ici des passages importants du règlement."></textarea>
+                        <button class="btn-primary" type="submit">Enregistrer le règlement</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>Articles du règlement</h3>
+                    <form id="articleForm">
+                        <label for="articleNumero">Numéro d'article</label>
+                        <input type="text" id="articleNumero" placeholder="Ex : Article 5" required>
+
+                        <label for="articleTitre">Titre</label>
+                        <input type="text" id="articleTitre" placeholder="Ex : Jouissance des parties communes" required>
+
+                        <label for="articleTexte">Texte</label>
+                        <textarea id="articleTexte" placeholder="Détail de l'article" required></textarea>
+
+                        <button class="btn-primary" type="submit">Ajouter l'article</button>
+                    </form>
+                    <div id="articlesAccordion" class="accordion"></div>
+                </div>
+            </section>
+
+            <!-- SECTION 3 : Historique AG -->
+            <section id="ag" class="section">
+                <div class="card">
+                    <h2>Historique des assemblées générales</h2>
+                    <form id="agForm">
+                        <label for="agDate">Date de l'AG</label>
+                        <input type="date" id="agDate" required>
+
+                        <label for="agType">Type</label>
+                        <select id="agType">
+                            <option value="Ordinaire">Ordinaire</option>
+                            <option value="Extraordinaire">Extraordinaire</option>
+                        </select>
+
+                        <label for="agDecisions">Principales décisions</label>
+                        <textarea id="agDecisions" placeholder="Résumé des points principaux"></textarea>
+
+                        <label for="agPV">Lien PV / référence</label>
+                        <input type="text" id="agPV" placeholder="URL ou mention interne">
+
+                        <button class="btn-primary" type="submit">Ajouter l'AG</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>Tableau des AG</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Décisions</th>
+                                <th>Lien PV</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTION 4 : EDD -->
+            <section id="edd" class="section">
+                <div class="card">
+                    <h2>État descriptif de division (EDD)</h2>
+                    <form id="eddForm">
+                        <label for="eddNumero">Numéro de lot</label>
+                        <input type="text" id="eddNumero" required>
+
+                        <label for="eddBatiment">Bâtiment / Escalier</label>
+                        <input type="text" id="eddBatiment" placeholder="Ex : Bâtiment A, Escalier 2">
+
+                        <label for="eddEtage">Étage</label>
+                        <input type="text" id="eddEtage" placeholder="Ex : RDC, 2e">
+
+                        <label for="eddDescription">Description</label>
+                        <input type="text" id="eddDescription" placeholder="Appartement T3, Cave, Parking...">
+
+                        <label for="eddTantiemes">Tantièmes généraux</label>
+                        <input type="text" id="eddTantiemes" placeholder="Ex : 145/10000">
+
+                        <button class="btn-primary" type="submit">Ajouter / Mettre à jour</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>Lots enregistrés</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Lot</th>
+                                <th>Bâtiment / Escalier</th>
+                                <th>Étage</th>
+                                <th>Description</th>
+                                <th>Tantièmes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eddTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTION 5 : Présentation détaillée des lots -->
+            <section id="lots" class="section">
+                <div class="card">
+                    <h2>Présentation détaillée des lots</h2>
+                    <div class="search-row">
+                        <input type="text" id="lotSearch" placeholder="Filtrer par numéro ou type...">
+                    </div>
+                    <form id="lotForm">
+                        <input type="hidden" id="lotIndex">
+                        <label for="lotNumero">Numéro de lot</label>
+                        <input type="text" id="lotNumero" required>
+
+                        <label for="lotType">Type</label>
+                        <input type="text" id="lotType" placeholder="Appartement, parking, cave..." required>
+
+                        <label for="lotSurface">Surface</label>
+                        <input type="text" id="lotSurface" placeholder="Ex : 68 m²">
+
+                        <label for="lotUsage">Usage</label>
+                        <input type="text" id="lotUsage" placeholder="Habitation, commerce, bureau...">
+
+                        <label for="lotInfos">Informations diverses</label>
+                        <textarea id="lotInfos" placeholder="Exposition, étage, commentaires"></textarea>
+
+                        <label for="lotImages">Images (multiple)</label>
+                        <input type="file" id="lotImages" accept="image/*" multiple>
+                        <div id="lotImagePreview" class="thumbs"></div>
+
+                        <button class="btn-primary" type="submit">Enregistrer le lot</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>Liste des lots</h3>
+                    <div id="lotList" class="grid"></div>
+                </div>
+            </section>
+
+            <!-- SECTION 6 : Parties communes -->
+            <section id="communs" class="section">
+                <div class="card">
+                    <h2>Parties communes et parties à usage privatif</h2>
+                    <div class="grid">
+                        <div>
+                            <h4>Parties communes</h4>
+                            <form id="communeForm">
+                                <label for="communeNom">Nom</label>
+                                <input type="text" id="communeNom" placeholder="Hall, toiture, jardin..." required>
+
+                                <label for="communeDesc">Description</label>
+                                <textarea id="communeDesc" placeholder="Détails, état, spécificités"></textarea>
+
+                                <button class="btn-primary" type="submit">Ajouter</button>
+                            </form>
+                            <ul id="communesList"></ul>
+                        </div>
+                        <div>
+                            <h4>Parties communes à usage privatif</h4>
+                            <form id="privatifForm">
+                                <label for="privatifNom">Nom</label>
+                                <input type="text" id="privatifNom" placeholder="Jardin privatif, terrasse exclusive..." required>
+
+                                <label for="privatifDesc">Description</label>
+                                <textarea id="privatifDesc" placeholder="Détails, conditions d'usage"></textarea>
+
+                                <label for="privatifLot">Lot concerné</label>
+                                <input type="text" id="privatifLot" placeholder="Numéro de lot">
+
+                                <button class="btn-primary" type="submit">Ajouter</button>
+                            </form>
+                            <ul id="privatifList"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Illustration des parties communes</h3>
+                    <label for="communeImage">Ajouter une image</label>
+                    <input type="file" id="communeImage" accept="image/*">
+                    <div id="communeImagePreview" class="thumbs"></div>
+                    <p class="small-text">Importez une photo des parties communes (hall, jardin...). L'aperçu reste disponible après rechargement.</p>
+                </div>
+            </section>
+
+            <!-- SECTION 7 : Syndic & Agenda -->
+            <section id="syndic" class="section">
+                <div class="card">
+                    <h2>Coordonnées du syndic</h2>
+                    <form id="syndicForm">
+                        <label for="syndicNom">Nom du syndic</label>
+                        <input type="text" id="syndicNom" placeholder="Ex : Cabinet Martin">
+
+                        <label for="syndicAdresse">Adresse</label>
+                        <input type="text" id="syndicAdresse" placeholder="Adresse complète">
+
+                        <label for="syndicTel">Téléphone</label>
+                        <input type="tel" id="syndicTel" placeholder="Ex : 01 23 45 67 89">
+
+                        <label for="syndicEmail">Email</label>
+                        <input type="email" id="syndicEmail" placeholder="contact@exemple.fr">
+
+                        <label for="syndicHoraires">Horaires d'ouverture</label>
+                        <textarea id="syndicHoraires" placeholder="Ex : Lun-Ven 9h-12h / 14h-18h"></textarea>
+
+                        <button class="btn-primary" type="submit">Enregistrer les coordonnées</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>Calendrier événementiel</h3>
+                    <form id="eventForm">
+                        <label for="eventDate">Date</label>
+                        <input type="date" id="eventDate" required>
+
+                        <label for="eventTitre">Titre</label>
+                        <input type="text" id="eventTitre" placeholder="AG annuelle, réunion..." required>
+
+                        <label for="eventDesc">Description</label>
+                        <textarea id="eventDesc" placeholder="Détails de l'événement"></textarea>
+
+                        <button class="btn-primary" type="submit">Ajouter l'événement</button>
+                    </form>
+                    <ul id="eventList"></ul>
+                </div>
+            </section>
+
+            <!-- SECTION 8 : Demandes copropriétaires -->
+            <section id="demandes" class="section">
+                <div class="card">
+                    <h2>Demandes des copropriétaires</h2>
+                    <form id="demandeForm">
+                        <label for="demandeLot">Numéro de lot</label>
+                        <input type="text" id="demandeLot" required>
+
+                        <label for="demandeNom">Nom du copropriétaire</label>
+                        <input type="text" id="demandeNom" required>
+
+                        <label for="demandeType">Type de demande</label>
+                        <select id="demandeType">
+                            <option value="Travaux">Travaux</option>
+                            <option value="Règlement">Question règlement</option>
+                            <option value="Technique">Problème technique</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+
+                        <label for="demandeDesc">Description détaillée</label>
+                        <textarea id="demandeDesc" required></textarea>
+
+                        <label for="demandePriorite">Priorité</label>
+                        <select id="demandePriorite">
+                            <option value="Basse">Basse</option>
+                            <option value="Normale" selected>Normale</option>
+                            <option value="Haute">Haute</option>
+                        </select>
+
+                        <button class="btn-primary" type="submit">Ajouter la demande</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>Suivi des demandes</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Lot</th>
+                                <th>Nom</th>
+                                <th>Type</th>
+                                <th>Résumé</th>
+                                <th>Priorité</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody id="demandeTable"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Utilitaires de gestion du stockage local avec un préfixe pour éviter les collisions
+        const storage = {
+            get: (key, fallback) => {
+                try {
+                    const raw = localStorage.getItem(key);
+                    return raw ? JSON.parse(raw) : fallback;
+                } catch (e) {
+                    console.warn("Lecture localStorage impossible", e);
+                    return fallback;
+                }
+            },
+            set: (key, value) => {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                } catch (e) {
+                    alert("Stockage plein ou interdit : vos données ne sont pas enregistrées.");
+                    console.error(e);
+                }
+            },
+            clearAll: () => localStorage.clear()
+        };
+
+        // Navigation SPA : afficher / masquer les sections
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('.section');
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                navButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const target = btn.dataset.target;
+                sections.forEach(sec => sec.classList.toggle('active', sec.id === target));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // ---------------------------
+        // 1) Présentation de la copropriété
+        // ---------------------------
+        const presentationForm = document.getElementById('presentationForm');
+        const presentationThumbs = document.getElementById('presentationThumbs');
+        let presentationImages = storage.get('presentationImages', []);
+
+        const presentationData = storage.get('presentationData', {
+            nom: '',
+            adresse: '',
+            lots: '',
+            annee: '',
+            description: ''
+        });
+
+        function renderPresentation() {
+            const resume = document.getElementById('presentationResume');
+            resume.querySelector('[data-field="nom"]').textContent = presentationData.nom || '—';
+            resume.querySelector('[data-field="adresse"]').textContent = presentationData.adresse || '—';
+            resume.querySelector('[data-field="lots"]').textContent = presentationData.lots || '—';
+            resume.querySelector('[data-field="annee"]').textContent = presentationData.annee || '—';
+            resume.querySelector('[data-field="description"]').textContent = presentationData.description || 'Aucun texte pour le moment.';
+            presentationForm.nomCopro.value = presentationData.nom;
+            presentationForm.adresseCopro.value = presentationData.adresse;
+            presentationForm.nbLots.value = presentationData.lots;
+            presentationForm.anneeConstruction.value = presentationData.annee;
+            presentationForm.descriptionCopro.value = presentationData.description;
+            renderThumbs(presentationThumbs, presentationImages);
+        }
+
+        function renderThumbs(container, files) {
+            container.innerHTML = '';
+            files.forEach(file => {
+                const img = document.createElement('img');
+                img.src = file.data;
+                img.alt = file.name;
+                container.appendChild(img);
+            });
+        }
+
+        document.getElementById('presentationImages').addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    presentationImages.push({ name: file.name, data: reader.result });
+                    storage.set('presentationImages', presentationImages);
+                    renderThumbs(presentationThumbs, presentationImages);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        presentationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            presentationData.nom = presentationForm.nomCopro.value;
+            presentationData.adresse = presentationForm.adresseCopro.value;
+            presentationData.lots = presentationForm.nbLots.value;
+            presentationData.annee = presentationForm.anneeConstruction.value;
+            presentationData.description = presentationForm.descriptionCopro.value;
+            storage.set('presentationData', presentationData);
+            renderPresentation();
+        });
+
+        // ---------------------------
+        // 2) Règlement
+        // ---------------------------
+        const reglementForm = document.getElementById('reglementForm');
+        const reglementTexte = document.getElementById('reglementTexte');
+        const articleForm = document.getElementById('articleForm');
+        const articlesAccordion = document.getElementById('articlesAccordion');
+        let reglementContent = storage.get('reglementContent', '');
+        let articles = storage.get('reglementArticles', []);
+
+        function renderArticles() {
+            articlesAccordion.innerHTML = '';
+            if (!articles.length) {
+                articlesAccordion.innerHTML = '<p class="small-text" style="padding:12px;">Aucun article pour le moment.</p>';
+                return;
+            }
+            articles.forEach((a, index) => {
+                const item = document.createElement('div');
+                item.className = 'accordion-item';
+                item.innerHTML = `
+                    <button type="button" data-index="${index}">${a.numero} - ${a.titre}</button>
+                    <div class="content"><p>${a.texte}</p></div>
+                `;
+                articlesAccordion.appendChild(item);
+            });
+        }
+
+        reglementTexte.value = reglementContent;
+        reglementForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            reglementContent = reglementTexte.value;
+            storage.set('reglementContent', reglementContent);
+        });
+
+        articleForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newArticle = {
+                numero: articleForm.articleNumero.value,
+                titre: articleForm.articleTitre.value,
+                texte: articleForm.articleTexte.value
+            };
+            articles.push(newArticle);
+            storage.set('reglementArticles', articles);
+            articleForm.reset();
+            renderArticles();
+        });
+
+        articlesAccordion.addEventListener('click', (e) => {
+            if (e.target.tagName.toLowerCase() === 'button') {
+                const content = e.target.nextElementSibling;
+                content.style.display = content.style.display === 'block' ? 'none' : 'block';
+            }
+        });
+
+        // ---------------------------
+        // 3) Historique des AG
+        // ---------------------------
+        const agForm = document.getElementById('agForm');
+        const agTable = document.getElementById('agTable');
+        let agList = storage.get('agList', []);
+
+        function renderAG() {
+            agTable.innerHTML = '';
+            agList.forEach(ag => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${ag.date || '—'}</td>
+                    <td>${ag.type}</td>
+                    <td>${ag.decisions}</td>
+                    <td>${ag.pv}</td>
+                `;
+                agTable.appendChild(tr);
+            });
+        }
+
+        agForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            agList.push({
+                date: agForm.agDate.value,
+                type: agForm.agType.value,
+                decisions: agForm.agDecisions.value,
+                pv: agForm.agPV.value
+            });
+            storage.set('agList', agList);
+            agForm.reset();
+            renderAG();
+        });
+
+        // ---------------------------
+        // 4) État descriptif de division (EDD)
+        // ---------------------------
+        const eddForm = document.getElementById('eddForm');
+        const eddTable = document.getElementById('eddTable');
+        let eddLots = storage.get('eddLots', []);
+
+        function renderEdd() {
+            eddTable.innerHTML = '';
+            eddLots.forEach(lot => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${lot.numero}</td>
+                    <td>${lot.batiment || '-'}</td>
+                    <td>${lot.etage || '-'}</td>
+                    <td>${lot.description || '-'}</td>
+                    <td>${lot.tantiemes || '-'}</td>
+                `;
+                eddTable.appendChild(tr);
+            });
+        }
+
+        eddForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const data = {
+                numero: eddForm.eddNumero.value,
+                batiment: eddForm.eddBatiment.value,
+                etage: eddForm.eddEtage.value,
+                description: eddForm.eddDescription.value,
+                tantiemes: eddForm.eddTantiemes.value
+            };
+            // Remplace si même numéro déjà présent
+            const existingIndex = eddLots.findIndex(l => l.numero === data.numero);
+            if (existingIndex >= 0) {
+                eddLots[existingIndex] = data;
+            } else {
+                eddLots.push(data);
+            }
+            storage.set('eddLots', eddLots);
+            eddForm.reset();
+            renderEdd();
+        });
+
+        // ---------------------------
+        // 5) Lots détaillés
+        // ---------------------------
+        const lotForm = document.getElementById('lotForm');
+        const lotList = document.getElementById('lotList');
+        const lotSearch = document.getElementById('lotSearch');
+        const lotImagesInput = document.getElementById('lotImages');
+        const lotImagePreview = document.getElementById('lotImagePreview');
+        let lotsDetails = storage.get('lotsDetails', []);
+        let tempLotImages = [];
+
+        function renderLotImages() {
+            renderThumbs(lotImagePreview, tempLotImages);
+        }
+
+        lotImagesInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            tempLotImages = [];
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    tempLotImages.push({ name: file.name, data: reader.result });
+                    renderLotImages();
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function renderLots(filter = '') {
+            lotList.innerHTML = '';
+            const filtered = lotsDetails.filter(lot => {
+                const text = `${lot.numero} ${lot.type}`.toLowerCase();
+                return text.includes(filter.toLowerCase());
+            });
+            if (!filtered.length) {
+                lotList.innerHTML = '<p class="small-text">Aucun lot correspondant.</p>';
+                return;
+            }
+            filtered.forEach((lot, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                const imagesHTML = (lot.images || []).map(img => `<img src="${img.data}" alt="${img.name}" style="width:100%;max-width:180px;border-radius:8px;border:1px solid var(--border);">`).join('');
+                card.innerHTML = `
+                    <div class="flex-between">
+                        <h4>Lot ${lot.numero}</h4>
+                        <span class="badge">${lot.type}</span>
+                    </div>
+                    <p><strong>Surface :</strong> ${lot.surface || '—'}</p>
+                    <p><strong>Usage :</strong> ${lot.usage || '—'}</p>
+                    <p><strong>Infos :</strong> ${lot.infos || '—'}</p>
+                    <div class="thumbs">${imagesHTML || '<span class="small-text">Pas d\'image</span>'}</div>
+                    <button class="btn-primary" data-edit="${index}">Modifier</button>
+                `;
+                lotList.appendChild(card);
+            });
+        }
+
+        lotForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const lotData = {
+                numero: lotForm.lotNumero.value,
+                type: lotForm.lotType.value,
+                surface: lotForm.lotSurface.value,
+                usage: lotForm.lotUsage.value,
+                infos: lotForm.lotInfos.value,
+                images: tempLotImages.length ? tempLotImages : (lotForm.lotIndex.value ? lotsDetails[lotForm.lotIndex.value].images : [])
+            };
+            const index = lotForm.lotIndex.value;
+            if (index !== '') {
+                lotsDetails[index] = lotData;
+            } else {
+                lotsDetails.push(lotData);
+            }
+            storage.set('lotsDetails', lotsDetails);
+            lotForm.reset();
+            lotForm.lotIndex.value = '';
+            tempLotImages = [];
+            renderLotImages();
+            renderLots(lotSearch.value);
+        });
+
+        lotList.addEventListener('click', (e) => {
+            if (e.target.dataset.edit !== undefined) {
+                const idx = e.target.dataset.edit;
+                const lot = lotsDetails[idx];
+                lotForm.lotIndex.value = idx;
+                lotForm.lotNumero.value = lot.numero;
+                lotForm.lotType.value = lot.type;
+                lotForm.lotSurface.value = lot.surface;
+                lotForm.lotUsage.value = lot.usage;
+                lotForm.lotInfos.value = lot.infos;
+                tempLotImages = lot.images || [];
+                renderLotImages();
+                lotImagesInput.value = '';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        lotSearch.addEventListener('input', (e) => {
+            renderLots(e.target.value);
+        });
+
+        // ---------------------------
+        // 6) Parties communes
+        // ---------------------------
+        const communeForm = document.getElementById('communeForm');
+        const privatifForm = document.getElementById('privatifForm');
+        const communesList = document.getElementById('communesList');
+        const privatifList = document.getElementById('privatifList');
+        const communeImageInput = document.getElementById('communeImage');
+        const communeImagePreview = document.getElementById('communeImagePreview');
+        let communes = storage.get('communes', []);
+        let privatives = storage.get('privatives', []);
+        let communeImage = storage.get('communeImage', null);
+
+        function renderList(listEl, items, withLot = false) {
+            listEl.innerHTML = '';
+            if (!items.length) {
+                listEl.innerHTML = '<li class="small-text">Aucun élément.</li>';
+                return;
+            }
+            items.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${item.nom}</strong> - ${item.desc || ''} ${withLot ? `(Lot ${item.lot || '-'})` : ''}`;
+                listEl.appendChild(li);
+            });
+        }
+
+        function renderCommuneImage() {
+            communeImagePreview.innerHTML = '';
+            if (!communeImage) return;
+            const img = document.createElement('img');
+            img.src = communeImage.data;
+            img.alt = communeImage.name;
+            communeImagePreview.appendChild(img);
+        }
+
+        communeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            communes.push({ nom: communeForm.communeNom.value, desc: communeForm.communeDesc.value });
+            storage.set('communes', communes);
+            communeForm.reset();
+            renderList(communesList, communes);
+        });
+
+        privatifForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            privatives.push({ nom: privatifForm.privatifNom.value, desc: privatifForm.privatifDesc.value, lot: privatifForm.privatifLot.value });
+            storage.set('privatives', privatives);
+            privatifForm.reset();
+            renderList(privatifList, privatives, true);
+        });
+
+        communeImageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                communeImage = { name: file.name, data: reader.result };
+                storage.set('communeImage', communeImage);
+                renderCommuneImage();
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // ---------------------------
+        // 7) Coordonnées syndic & agenda
+        // ---------------------------
+        const syndicForm = document.getElementById('syndicForm');
+        const eventForm = document.getElementById('eventForm');
+        const eventList = document.getElementById('eventList');
+        const syndicData = storage.get('syndicData', {
+            nom: '', adresse: '', tel: '', email: '', horaires: ''
+        });
+        let events = storage.get('events', []);
+
+        function renderSyndic() {
+            syndicForm.syndicNom.value = syndicData.nom;
+            syndicForm.syndicAdresse.value = syndicData.adresse;
+            syndicForm.syndicTel.value = syndicData.tel;
+            syndicForm.syndicEmail.value = syndicData.email;
+            syndicForm.syndicHoraires.value = syndicData.horaires;
+        }
+
+        function renderEvents() {
+            eventList.innerHTML = '';
+            if (!events.length) {
+                eventList.innerHTML = '<li class="small-text">Aucun événement planifié.</li>';
+                return;
+            }
+            const sorted = [...events].sort((a, b) => a.date.localeCompare(b.date));
+            sorted.forEach(ev => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${ev.date}</strong> - ${ev.titre}<br><span class="small-text">${ev.desc}</span>`;
+                eventList.appendChild(li);
+            });
+        }
+
+        syndicForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            syndicData.nom = syndicForm.syndicNom.value;
+            syndicData.adresse = syndicForm.syndicAdresse.value;
+            syndicData.tel = syndicForm.syndicTel.value;
+            syndicData.email = syndicForm.syndicEmail.value;
+            syndicData.horaires = syndicForm.syndicHoraires.value;
+            storage.set('syndicData', syndicData);
+        });
+
+        eventForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            events.push({ date: eventForm.eventDate.value, titre: eventForm.eventTitre.value, desc: eventForm.eventDesc.value });
+            storage.set('events', events);
+            eventForm.reset();
+            renderEvents();
+        });
+
+        // ---------------------------
+        // 8) Demandes des copropriétaires
+        // ---------------------------
+        const demandeForm = document.getElementById('demandeForm');
+        const demandeTable = document.getElementById('demandeTable');
+        let demandes = storage.get('demandes', []);
+
+        function renderDemandes() {
+            demandeTable.innerHTML = '';
+            demandes.forEach((d, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${d.date}</td>
+                    <td>${d.lot}</td>
+                    <td>${d.nom}</td>
+                    <td>${d.type}</td>
+                    <td>${d.desc}</td>
+                    <td>${d.priorite}</td>
+                    <td>
+                        <select class="status-select" data-index="${index}">
+                            <option ${d.statut === 'En attente' ? 'selected' : ''}>En attente</option>
+                            <option ${d.statut === 'En cours' ? 'selected' : ''}>En cours</option>
+                            <option ${d.statut === 'Traité' ? 'selected' : ''}>Traité</option>
+                        </select>
+                    </td>
+                `;
+                demandeTable.appendChild(tr);
+            });
+        }
+
+        demandeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const now = new Date().toISOString().split('T')[0];
+            demandes.push({
+                date: now,
+                lot: demandeForm.demandeLot.value,
+                nom: demandeForm.demandeNom.value,
+                type: demandeForm.demandeType.value,
+                desc: demandeForm.demandeDesc.value,
+                priorite: demandeForm.demandePriorite.value,
+                statut: 'En attente'
+            });
+            storage.set('demandes', demandes);
+            demandeForm.reset();
+            renderDemandes();
+        });
+
+        demandeTable.addEventListener('change', (e) => {
+            if (e.target.matches('select[data-index]')) {
+                const idx = e.target.dataset.index;
+                demandes[idx].statut = e.target.value;
+                storage.set('demandes', demandes);
+            }
+        });
+
+        // ---------------------------
+        // Réinitialisation globale
+        // ---------------------------
+        document.getElementById('resetData').addEventListener('click', () => {
+            if (confirm('Effacer toutes les données enregistrées ?')) {
+                storage.clearAll();
+                location.reload();
+            }
+        });
+
+        // ---------------------------
+        // Initialisation au chargement
+        // ---------------------------
+        function init() {
+            renderPresentation();
+            renderArticles();
+            renderAG();
+            renderEdd();
+            renderLots();
+            renderList(communesList, communes);
+            renderList(privatifList, privatives, true);
+            renderCommuneImage();
+            renderSyndic();
+            renderEvents();
+            renderDemandes();
+        }
+
+        init();
+    </script>
+</body>
+</html>
