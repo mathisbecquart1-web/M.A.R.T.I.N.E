@@ -31,7 +31,6 @@
 
     body.theme-accueil { background: radial-gradient(circle at 18% 20%, #d7e8ff 0, #b2d4ff 25%, #7fb3ff 55%, #3a6cf6 100%); }
     body.theme-charte { background: radial-gradient(circle at 20% 16%, #f2e7ff 0, #d8c4ff 30%, #b39bff 60%, #5e3dbf 100%); }
-    body.theme-onglets { background: radial-gradient(circle at 12% 28%, #e5f8ff 0, #c3ecff 30%, #8fd5ff 60%, #3b9dd9 100%); }
     body.theme-services { background: radial-gradient(circle at 16% 18%, #e7fff6 0, #c0f5df 32%, #91e6c8 60%, #3abf8d 100%); }
     body.theme-formations { background: radial-gradient(circle at 18% 24%, #fff5e0 0, #ffdba0 30%, #ffb347 60%, #f59f00 100%); }
     body.theme-ag { background: radial-gradient(circle at 20% 18%, #ffe9e9 0, #ffc9c9 30%, #ff9b9b 60%, #f03e3e 100%); }
@@ -56,6 +55,8 @@
     .nav-links a:hover { background: rgba(15, 27, 45, 0.08); }
     .nav-links a.active { background: var(--text); color: white; box-shadow: 0 8px 20px rgba(0,0,0,0.18); }
 
+    .save-indicator { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 12px; background: rgba(15, 27, 45, 0.06); color: var(--muted); font-weight: 700; font-size: 12px; }
+
     .card { background: var(--card); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.5); }
     .hero { display: grid; gap: 12px; }
     h1, h2, h3 { margin: 0; }
@@ -74,6 +75,9 @@
     .table { width: 100%; border-collapse: collapse; }
     .table th, .table td { padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.06); text-align: left; }
 
+    [contenteditable="true"] { cursor: text; }
+    [contenteditable="true"]:focus { outline: 2px solid rgba(15,123,255,0.18); border-radius: 6px; }
+
     .faq-item { border: 1px solid rgba(0,0,0,0.06); border-radius: 12px; padding: 12px; background: rgba(255,255,255,0.9); }
     .faq-item summary { cursor: pointer; font-weight: 700; color: var(--text); }
 
@@ -84,6 +88,78 @@
     .muted { color: var(--muted); }
     .small { font-size: 14px; }
     .footer-note { text-align: center; color: var(--muted); font-size: 13px; margin-top: 22px; }
+
+    .drop-zone { 
+      border: 1px dashed rgba(0,0,0,0.2);
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background: rgba(255,255,255,0.8);
+    }
+    .drop-zone:hover { border-color: var(--purple); }
+    .drop-zone.dragging { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(15, 123, 255, 0.2); }
+    .drop-zone .image-viewport {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      height: 320px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(240,245,255,0.9));
+    }
+    .drop-zone img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 50%;
+      cursor: grab;
+      user-select: none;
+    }
+    .drop-zone.panning img { cursor: grabbing; }
+    .drop-zone .hint,
+    .drop-zone .inline-controls {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+    .drop-zone:hover .hint,
+    .drop-zone:focus-within .hint,
+    .drop-zone.dragging .hint,
+    .drop-zone:hover .inline-controls,
+    .drop-zone:focus-within .inline-controls,
+    .drop-zone.dragging .inline-controls { opacity: 1; pointer-events: auto; }
+    .drop-zone .hint { 
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      padding: 8px 10px;
+      background: rgba(0,0,0,0.55);
+      color: white;
+      border-radius: 10px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .inline-controls { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-top: 10px; }
+    .inline-controls input[type="url"] { margin: 0; }
+
+    .drop-zone.map-drop .image-viewport { height: 440px; }
+
+    .pv-card { display: grid; gap: 16px; }
+    .pv-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .pv-meta .meta { background: rgba(0,0,0,0.04); border-radius: 12px; padding: 10px 12px; display: grid; gap: 4px; }
+    .pv-meta .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 800; }
+    .pv-meta .value { font-weight: 700; color: var(--text); }
+    .pv-block { background: rgba(255,255,255,0.75); border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.4); }
+    .pv-block h4 { margin-bottom: 8px; font-size: 16px; }
+    .pv-block p { margin: 0; }
+    .pv-resolutions { display: grid; gap: 12px; }
+    .pv-resolution { border: 1px solid rgba(240, 62, 62, 0.2); background: linear-gradient(135deg, rgba(255, 233, 233, 0.6), rgba(255, 255, 255, 0.9)); border-radius: 12px; padding: 12px 14px; }
+    .pv-resolution strong { color: var(--text); }
+    .pv-resolution em { color: var(--red); font-style: normal; font-weight: 700; }
 
     .view { display: none; gap: 18px; }
     .view.active { display: grid; }
@@ -102,233 +178,382 @@
         <div class="brand">Résidence Thalassa <span class="pill">Portail</span></div>
         <div class="nav-links">
           <a href="#accueil" data-section="accueil" data-theme="accueil">Accueil</a>
-          <a href="#charte" data-section="charte" data-theme="charte">Charte</a>
-          <a href="#onglets" data-section="onglets" data-theme="onglets">Onglets</a>
-          <a href="#services" data-section="services" data-theme="services">Services</a>
-          <a href="#formations" data-section="formations" data-theme="formations">Formations</a>
-          <a href="#ag2025" data-section="ag2025" data-theme="ag">AG 2025</a>
-          <a href="#vie-copro" data-section="vie-copro" data-theme="copro">Vie de copro</a>
-          <a href="#coproprietaires" data-section="coproprietaires" data-theme="owners">Copropriétaires</a>
+          <a href="#charte" data-section="charte" data-theme="charte">Règlement de copropriété</a>
+          <a href="#services" data-section="services" data-theme="services">Historique AG</a>
+          <a href="#formations" data-section="formations" data-theme="formations">EDD</a>
+          <a href="#ag2025" data-section="ag2025" data-theme="ag">Détails lots</a>
+          <a href="#vie-copro" data-section="vie-copro" data-theme="copro">Parties communes</a>
+          <a href="#coproprietaires" data-section="coproprietaires" data-theme="owners">Coordonnées du syndic</a>
           <a href="#demandes" data-section="demandes" data-theme="demandes">Demandes</a>
           <a href="#faq" data-section="faq" data-theme="faq">FAQ</a>
         </div>
+        <div class="save-indicator">Sauvegarde auto · <span data-last-saved>En cours…</span></div>
       </nav>
     </header>
 
     <main>
       <section id="accueil" class="view active">
         <div class="card hero">
-          <span class="badge">Bienvenue</span>
-          <h1>Portail tout-en-un dans un seul HTML</h1>
-          <p class="muted">Cliquez sur un onglet pour afficher uniquement la page voulue : chaque vue remplace la précédente tout en conservant le même bandeau.</p>
+          <span class="badge" data-editable="badge-bienvenue">Bienvenue</span>
+          <h1 data-editable="h1-accueil">La Résidence THALASSA ️ c’est quoi ?</h1>
+          <p class="muted" data-editable="intro-accueil">C’est bien plus qu’une simple copropriété : c’est un style de vie, une invitation permanente au calme, au soleil et au luxe 💸.</p>
           <div class="grid two">
-            <a class="button" data-section-trigger="services" href="#services">Découvrir les services</a>
+            <a class="button" data-section-trigger="services" href="#services">Voir l’historique AG</a>
             <a class="button secondary" data-section-trigger="demandes" href="#demandes">Suivre mes demandes</a>
           </div>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Navigation instantanée</h3>
-            <p class="muted small">Chaque lien charge sa section dédiée sans changer de fichier. Le thème de couleur s'adapte automatiquement.</p>
+            <h3 data-editable="ou-titre">Où ?</h3>
+            <p class="muted small" data-editable="ou-texte">Au cœur des Bahamas, la Résidence THALASSA s’ouvre sur l’océan et sur des jardins luxuriants.</p>
+            <div class="drop-zone" data-drop-target data-image-key="accueil-map">
+              <div class="image-viewport" data-image-viewport>
+                <img data-image-key="accueil-map" data-image-preview="accueil-map" src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80" alt="Illustration des Bahamas sur une carte du monde">
+              </div>
+              <div class="hint">Glissez votre photo ici ou cliquez pour importer</div>
+              <input type="file" accept="image/*" aria-label="Importer un visuel" style="display:none;">
+              <div class="inline-controls">
+                <input type="url" placeholder="Coller une URL (optionnel)" aria-label="URL de l’image">
+                <button class="button secondary" type="button" data-reset-image="accueil-map">Réinitialiser</button>
+              </div>
+            </div>
           </div>
           <div class="card">
-            <h3>Expérience fluide</h3>
-            <p class="muted small">Tout est embarqué ici : textes, formulaires, FAQ et suivi des demandes. Aucun autre fichier nécessaire.</p>
+            <h3 data-editable="cadre-titre">Un cadre unique</h3>
+            <ul class="list" data-editable="cadre-list">
+              <li>🌊 Un environnement juste unique.</li>
+              <li>🏡 Des logements d’exception.</li>
+              <li>⛳️ Avec des parties communes à couper le souffle.</li>
+              <li>‍♀️ Un lieu pour se ressourcer.</li>
+            </ul>
+            <p class="muted small" data-editable="cadre-note">✨ En clair, c’est le luxe à l’état pur... Un lieu si rare que l’on ne l’oublie jamais.</p>
           </div>
         </section>
-        <div class="footer-note">Portail Thalassa — tout-en-un</div>
+        <div class="card">
+          <h3 data-editable="contenus-titre">Sur ce site pour les copropriétaires il y a :</h3>
+          <ul class="list" data-editable="contenus-list">
+            <li>Le règlementaire de copropriété</li>
+            <li>L’Assemblée générale</li>
+            <li>L’EDD</li>
+            <li>Présentation des lots</li>
+            <li>Présentation de nos parties communes</li>
+            <li>Les coordonnées du syndic</li>
+            <li>Des demandes de copropriété</li>
+          </ul>
+        </div>
+        <div class="footer-note" data-editable="footer">Portail Thalassa — le luxe à l’état pur</div>
       </section>
 
       <section id="charte" class="view">
         <div class="card hero">
-          <span class="badge">Charte</span>
-          <h1>Charte de bon voisinage</h1>
-          <p class="muted">Respect, convivialité et entretien collectif : trois axes pour vivre ensemble sereinement.</p>
+          <span class="badge" data-editable="badge-reglement">Règlement</span>
+          <h1 data-editable="titre-reglement">Règlement de la Copropriété Thalassa</h1>
+          <p class="muted" data-editable="intro-reglement">Les occupants veilleront à préserver en toutes circonstances la tranquillité de l’île. Ils sont responsables de leur propre comportement ainsi que de celui des membres de leur famille, de leurs invités et des personnes à leur service.</p>
         </div>
-        <section class="grid two">
-          <div class="card">
-            <h3>Respect des espaces communs</h3>
-            <ul class="list">
-              <li>Silence après 22h et information préalable pour tout chantier.</li>
-              <li>Propreté des halls, ascenseurs et locaux vélo.</li>
-              <li>Tri sélectif et évacuation des encombrants programmée.</li>
-            </ul>
-          </div>
-          <div class="card">
-            <h3>Communication</h3>
-            <ul class="list">
-              <li>Utiliser le panneau d'affichage numérique pour prévenir des travaux.</li>
-              <li>Remonter les incidents via l'onglet Demandes.</li>
-              <li>Participer aux réunions trimestrielles pour les décisions clés.</li>
-            </ul>
-          </div>
-        </section>
-      </section>
-
-      <section id="onglets" class="view">
-        <div class="card hero">
-          <span class="badge">Onglets</span>
-          <h1>Vue d'ensemble des rubriques</h1>
-          <p class="muted">Chaque rubrique a son ambiance et ses cartes dédiées. Cliquez dans le bandeau pour y accéder instantanément.</p>
+        <div class="card">
+          <h3 data-editable="reglement-corpo-titre">Règlement complet</h3>
+          <p class="muted small" data-editable="reglement-corpo-accroche">Chacun devra respecter les règles suivantes, établies afin de garantir l’ordre et de maintenir de bonnes relations de voisinage.</p>
+          <ol class="list" data-editable="reglement-corpo-liste">
+            <li><strong>Formations obligatoires</strong><br>Pour résider au sein de la copropriété Thalassa, chaque copropriétaire doit suivre deux formations obligatoires : la formation SPF (Sensibilisation à la Préservation de la Faune) et la formation PS (Premiers Secours).</li>
+            <li><strong>Utilisation des parties communes</strong><br>Les usagers peuvent profiter librement des parties communes, conformément à leur destination, sans gêner les autres occupants. Il est strictement interdit d’y entreposer ou d’y laisser séjourner tout objet, notamment bicyclettes, poussettes, sacs d’ordures ménagères ou autres.</li>
+            <li><strong>Plages et espaces naturels</strong><br>Les plages sont à usage collectif : aucune privatisation de zone n’est autorisée. Les feux de camp et barbecues sont interdits en dehors des espaces spécifiquement prévus. Certains copropriétaires bénéficient, pour des lots déterminés, d’un accès privatif à une portion du plan d’eau. Il est formellement interdit de s’y baigner si cette zone ne vous appartient pas.</li>
+            <li><strong>Bruit et respect de la tranquillité</strong><br>Tout bruit ou tapage, de quelque nature que ce soit, après 00h00, est formellement interdit afin de préserver la tranquillité des résidents et celle de la faune locale. Les contrevenants s’exposent à d’éventuelles poursuites conformément aux articles 479, 480 et 482 du Code pénal.</li>
+            <li><strong>Animaux domestiques</strong><br>Les animaux domestiques sont autorisés sur l’île, sous réserve qu’ils ne causent aucun désordre ni salissure dans les parties communes et qu’ils ne gênent pas les autres occupants. Les chiens doivent être tenus en laisse en tout temps.</li>
+            <li><strong>Bateaux et navigation</strong><br>L’arrêt et le stationnement des bateaux sont autorisés uniquement sur les emplacements prévus à cet effet sur le port. Ces emplacements sont réservés aux résidents.</li>
+            <li><strong>Gestion des déchets</strong><br>Il est strictement interdit de jeter dans l’eau des mégots de cigarette ou tout autre déchet. Les déchets alimentaires doivent être placés dans des sacs plastiques avant d’être déposés dans les conteneurs adaptés. Aucun dépôt ne doit être laissé au pied des conteneurs. Un ramassage hebdomadaire est assuré chaque lundi par les bateaux-poubelles afin de prévenir les nuisances olfactives.</li>
+            <li><strong>Installations sportives</strong><br>Les terrains de beach-volley et de golf doivent être réservés au préalable sur le site internet afin d’éviter tout conflit entre copropriétaires.</li>
+            <li><strong>Locations</strong><br>En cas de location, le copropriétaire doit communiquer ce règlement à son locataire et l’annexer au contrat de location.</li>
+            <li><strong>Naturisme</strong><br>Le naturisme est autorisé uniquement sur la parcelle d’eau privative de chaque copropriétaire.</li>
+          </ol>
         </div>
-        <section class="grid three">
-          <div class="card"><h3>Services</h3><p class="muted small">Prestataires, maintenance et réservations.</p></div>
-          <div class="card"><h3>Formations</h3><p class="muted small">Parcours pour le conseil syndical et les résidents.</p></div>
-          <div class="card"><h3>AG 2025</h3><p class="muted small">Ordre du jour, votes et documents clés.</p></div>
-          <div class="card"><h3>Vie de copro</h3><p class="muted small">Événements, convivialité et espaces partagés.</p></div>
-          <div class="card"><h3>Copropriétaires</h3><p class="muted small">Contacts, lots et répartition des charges.</p></div>
-          <div class="card"><h3>Demandes</h3><p class="muted small">Incidents, suivi et clôture des tickets.</p></div>
-        </section>
       </section>
 
       <section id="services" class="view">
         <div class="card hero">
-          <span class="badge">Services</span>
-          <h1>Prestataires, équipements et maintenance</h1>
-          <p class="muted">Ascenseurs, chauffage, nettoyage, espaces verts et sécurité technique rassemblés ici.</p>
+          <span class="badge" data-editable="badge-ag">Historique AG</span>
+          <h1 data-editable="titre-ag">Assemblée Générale du 12 mars 2025</h1>
+          <p class="muted" data-editable="intro-ag">Procès-verbal complet de la dernière assemblée générale de la Résidence TALASSA.</p>
         </div>
-        <section class="grid two">
-          <div class="card">
-            <h3>Prestations suivies</h3>
-            <ul class="list">
-              <li>Ascenseurs · Société Lifty — tél. 01 23 45 67 89</li>
-              <li>Chauffage · Calorim — tél. 01 44 55 66 77</li>
-              <li>Nettoyage · Clean&Co — tél. 01 77 88 99 00</li>
-              <li>Espaces verts · VertAzur — tél. 01 11 22 33 44</li>
+        <div class="card pv-card">
+          <div class="pv-block">
+            <h3 data-editable="ag-pv-titre">PROCÈS-VERBAL DE L’ASSEMBLÉE GÉNÉRALE DES COPROPRIÉTAIRES</h3>
+            <p class="muted small" data-editable="ag-pv-synthese">Résidence TALASSA — Île du Levant — 12 mars 2025, 17h00. Les copropriétaires de la résidence, régulièrement convoqués par le syndic, se sont réunis en Assemblée Générale dans la salle polyvalente de l’île. La feuille de présence, émargée par les copropriétaires présents et les mandataires, a permis de constater que les copropriétaires présents, représentés ou votants par correspondance totalisent 10 000 / 10 000 tantièmes.</p>
+          </div>
+
+          <div class="pv-meta">
+            <div class="meta">
+              <div class="label">Résidence</div>
+              <div class="value" data-editable="ag-meta-residence">TALASSA — Île du Levant</div>
+            </div>
+            <div class="meta">
+              <div class="label">Date & heure</div>
+              <div class="value" data-editable="ag-meta-date">12 mars 2025 — 17h00 (ouverture de séance à 17h15)</div>
+            </div>
+            <div class="meta">
+              <div class="label">Lieu</div>
+              <div class="value" data-editable="ag-meta-lieu">Salle polyvalente de l’île</div>
+            </div>
+            <div class="meta">
+              <div class="label">Quorum constaté</div>
+              <div class="value" data-editable="ag-meta-quorum">10 000 / 10 000 tantièmes (présents, représentés ou par correspondance)</div>
+            </div>
+          </div>
+
+          <div class="pv-block">
+            <h4 data-editable="ag-bureau-titre">COMPOSITION DU BUREAU</h4>
+            <ul class="list" data-editable="ag-bureau-liste">
+              <li>Président de séance : M. DUPOND</li>
+              <li>Scrutateur : Mme FLAMENT</li>
+              <li>Secrétaire : Mme PETIT</li>
+              <li>La séance est ouverte à 17h15.</li>
             </ul>
           </div>
-          <div class="card">
-            <h3>Points de vigilance</h3>
-            <ul class="list">
-              <li>Test mensuel des alarmes incendie et mises à jour des plans d'évacuation.</li>
-              <li>Contrat d'entretien chaudière revu au 1er juin, gain énergétique estimé à 8%.</li>
-              <li>Réserves de produits ménagers écologiques pour les parties communes.</li>
-            </ul>
+
+          <div class="pv-block">
+            <h4 data-editable="ag-listes-titre">LISTE DES COPROPRIÉTAIRES ET TANTIÈMES</h4>
+            <p class="muted small" data-editable="ag-listes-texte">Tableau fourni par le syndicat — voir document annexe.</p>
           </div>
-        </section>
-        <div class="card">
-          <h3>Réservations et accès</h3>
-          <p class="muted small">Salle commune et local vélo accessibles via QR code temporaire. Planifiez vos passages pour limiter les conflits d'usage.</p>
+
+          <div class="pv-block">
+            <h4 data-editable="ag-resolutions-titre">RÉSOLUTIONS</h4>
+            <div class="pv-resolutions">
+              <div class="pv-resolution" data-editable="ag-resolution-1">
+                <strong>RÉSOLUTION 1 — Autorisation du naturisme dans les parties communes</strong><br>
+                Majorité requise : Article 25 (tantièmes généraux). Après présentation de la demande visant à autoriser la pratique du naturisme dans l’ensemble des parties communes de la résidence, l’Assemblée procède au vote. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. <em>Résultat : La résolution est rejetée.</em>
+              </div>
+              <div class="pv-resolution" data-editable="ag-resolution-2">
+                <strong>RÉSOLUTION 2 — Autorisation du naturisme dans les parties communes entre 00h00 et 06h00</strong><br>
+                Majorité requise : Article 25 (tantièmes généraux). Il est proposé d’autoriser le naturisme dans les parties communes durant une plage restreinte : de minuit à 6 heures. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. <em>Résultat : La résolution est rejetée.</em>
+              </div>
+              <div class="pv-resolution" data-editable="ag-resolution-3">
+                <strong>RÉSOLUTION 3 — Autorisation du naturisme sur une zone dédiée des parties communes</strong><br>
+                Majorité requise : Article 25 (tantièmes généraux). L’Assemblée examine la possibilité d’aménager une zone réservée au naturisme, située en bord de mer et identifiée sur le plan de la copropriété. Ont voté contre : Mme LEGRAND, M. LAMBLIN, M. VIVIER, Mme SOLOU. <em>Résultat : La résolution est rejetée.</em>
+              </div>
+              <div class="pv-resolution" data-editable="ag-resolution-4">
+                <strong>RÉSOLUTION 4 — Autorisation de pratiquer le naturisme sur la parcelle d’eau privative de chaque copropriétaire</strong><br>
+                Majorité requise : Article 24 (tantièmes généraux). Chaque lot dispose, selon le règlement de copropriété, d’une parcelle d’eau privative permettant des usages maritimes individuels. Il est proposé d’autoriser explicitement la pratique du naturisme dans ces espaces. Ont voté contre : Mme SOLOU uniquement. Ont voté pour : tous les autres copropriétaires. <em>Résultat : La résolution est adoptée à la majorité.</em>
+              </div>
+            </div>
+          </div>
+
+          <div class="pv-block">
+            <h4 data-editable="ag-cloture-titre">CLÔTURE DE SÉANCE</h4>
+            <p class="muted small" data-editable="ag-cloture-texte">Plus aucune question n’étant posée, la séance est levée à 19h05.</p>
+            <p class="muted small" data-editable="ag-signataires-texte">Président de séance : M. DUPOND · Secrétaire : Mme PETIT · Scrutateur : Mme FLAMENT. Procès-verbal certifié conforme par le syndic de la Résidence TALASSA.</p>
+          </div>
         </div>
       </section>
 
       <section id="formations" class="view">
         <div class="card hero">
-          <span class="badge">Formations</span>
-          <h1>Se former à la gestion de copropriété</h1>
-          <p class="muted">Modules courts pour comprendre les charges, la sécurité et l'animation de la résidence.</p>
+          <span class="badge" data-editable="badge-edd">EDD</span>
+          <h1 data-editable="titre-edd">État Descriptif de Division</h1>
+          <p class="muted" data-editable="intro-edd">Références utiles sur la composition des lots, les tantièmes et les règles d'usage associées.</p>
         </div>
-        <section class="grid two">
+        <section class="grid">
           <div class="card">
-            <h3>Programme</h3>
-            <ul class="list">
-              <li>Budget & charges : lire un relevé, anticiper les travaux.</li>
-              <li>Sécurité : plans d'évacuation, défibrillateur, alarmes.</li>
-              <li>Communication : compte-rendus, affichage, e-mailings.</li>
-            </ul>
-          </div>
-          <div class="card">
-            <h3>Modalités</h3>
-            <p class="muted small">Sessions mensuelles (1h) animées par le conseil syndical. Inscription via l'onglet Demandes.</p>
+            <h3 data-editable="edd-table-titre">Tableau des lots et tantièmes</h3>
+            <p class="muted small" data-editable="edd-table-intro">Matrice complète et modifiable des copropriétaires, des lots et des tantièmes généraux ou de places.</p>
+            <div data-editable="edd-table" class="table-wrapper">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Copropriétaires</th>
+                    <th>N° de lot</th>
+                    <th>Section</th>
+                    <th>Nature du local</th>
+                    <th>Tantièmes généraux</th>
+                    <th>Tantièmes place</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Mr DUPOND</td><td>Lot 1</td><td>A</td><td>T4</td><td>400</td><td>0</td></tr>
+                  <tr><td>Mr DUPIRE</td><td>Lot 2</td><td>A</td><td>T4</td><td>400</td><td>422</td></tr>
+                  <tr><td>Mme LEGRAND</td><td>Lot 3</td><td>A</td><td>T4</td><td>400</td><td>30</td></tr>
+                  <tr><td>Mme FLAMENT</td><td>Lot 4</td><td>A</td><td>T4</td><td>400</td><td>456</td></tr>
+                  <tr><td>Mr ROY</td><td>Lot 5</td><td>A</td><td>T4</td><td>400</td><td>0</td></tr>
+                  <tr><td>Mr DUBON</td><td>Lot 6</td><td>B</td><td>T4</td><td>400</td><td>0</td></tr>
+                  <tr><td>Mme PETIT</td><td>Lot 7</td><td>B</td><td>T4</td><td>400</td><td>590</td></tr>
+                  <tr><td>Mr BOUCHER</td><td>Lot 8</td><td>B</td><td>T4</td><td>400</td><td>430</td></tr>
+                  <tr><td>Mr MARCHAND</td><td>Lot 9</td><td>B</td><td>T4</td><td>400</td><td>0</td></tr>
+                  <tr><td>Mme LEGRAND</td><td>Lot 10</td><td>B</td><td>T4</td><td>400</td><td>444</td></tr>
+                  <tr><td>Mme VALET</td><td>Lot 11</td><td>C</td><td>T4</td><td>400</td><td>0</td></tr>
+                  <tr><td>Mme PASZKIEWICZ</td><td>Lot 12</td><td>C</td><td>T4</td><td>400</td><td>999</td></tr>
+                  <tr><td>Mr LAMBLIN</td><td>Lot 13</td><td>C</td><td>T4</td><td>400</td><td>444</td></tr>
+                  <tr><td>Mme BOURNISIEN</td><td>Lot 14</td><td>C</td><td>T4</td><td>400</td><td>444</td></tr>
+                  <tr><td>Mr DRANCOURT HENOCH</td><td>Lot 15</td><td>C</td><td>T4</td><td>400</td><td>444</td></tr>
+                  <tr><td>Mme CAPIAUX</td><td>Lot 16</td><td>D</td><td>T4</td><td>400</td><td>0</td></tr>
+                  <tr><td>Mr BECQUART</td><td>Lot 17</td><td>D</td><td>T4</td><td>400</td><td>555</td></tr>
+                  <tr><td>Mme DEHAENE</td><td>Lot 18</td><td>D</td><td>T4</td><td>400</td><td>600</td></tr>
+                  <tr><td>Mr VIVIER</td><td>Lot 19</td><td>D</td><td>T4</td><td>400</td><td>677</td></tr>
+                  <tr><td>Mme SPINA</td><td>Lot 20</td><td>D</td><td>T4</td><td>400</td><td>999</td></tr>
+                  <tr><td>Mme SOLOU</td><td>Lot 21</td><td>E</td><td>T4</td><td>400</td><td>444</td></tr>
+                  <tr><td>Mme MAILLART</td><td>Lot 22</td><td>E</td><td>T4</td><td>400</td><td>888</td></tr>
+                  <tr><td>Mr GRABAR</td><td>Lot 23</td><td>E</td><td>T4</td><td>400</td><td>888</td></tr>
+                  <tr><td>Mr BERNARD</td><td>Lot 24</td><td>E</td><td>T4</td><td>400</td><td>0</td></tr>
+                  <tr><td>Mme RICCHAUD</td><td>Lot 25</td><td>E</td><td>T4</td><td>400</td><td>246</td></tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th colspan="4">Total</th>
+                    <th>10 000</th>
+                    <th>10 000</th>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
           </div>
         </section>
       </section>
 
       <section id="ag2025" class="view">
         <div class="card hero">
-          <span class="badge">Assemblée Générale</span>
-          <h1>AG 2025 · préparation</h1>
-          <p class="muted">Ordre du jour prévisionnel, budgets, devis et travaux prioritaires.</p>
+          <span class="badge" data-editable="badge-lots">Lots</span>
+          <h1 data-editable="titre-lots">Détails des lots</h1>
+          <p class="muted" data-editable="intro-lots">Informations clés sur chaque lot, charges associées et contacts dédiés.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Points clés</h3>
-            <ul class="list">
-              <li>Vote rénovation cage d'escalier (devis en cours).</li>
-              <li>Renouvellement contrat d'entretien ascenseurs.</li>
-              <li>Budget prévisionnel 2025 avec baisse ciblée de 5%.</li>
+            <h3 data-editable="lots-points-titre">Points clés</h3>
+            <ul class="list" data-editable="lots-points-list">
+              <li>Surface, tantièmes et affectations pour chaque lot.</li>
+              <li>Récapitulatif des travaux réalisés ou votés par lot.</li>
+              <li>Contacts privilégiés pour les questions relatives au lot.</li>
             </ul>
           </div>
           <div class="card">
-            <h3>Documents</h3>
-            <p class="muted small">Procurations, rapports et devis seront ajoutés ici dès validation.</p>
+            <h3 data-editable="lots-docs-titre">Documents</h3>
+            <p class="muted small" data-editable="lots-docs-texte">Plans, attestations et relevés seront déposés ici au fur et à mesure.</p>
+          </div>
+        </section>
+        <section class="card">
+          <h3 data-editable="lots-galerie-titre">Galerie des lots</h3>
+          <p class="muted small" data-editable="lots-galerie-texte">Ajoutez jusqu’à trois visuels représentatifs des lots et décrivez-les.</p>
+          <div class="grid three">
+            <div class="card">
+              <div class="drop-zone" data-drop-target data-image-key="lots-visuel-1">
+                <div class="image-viewport" data-image-viewport>
+                  <img data-image-key="lots-visuel-1" data-image-preview="lots-visuel-1" src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80" alt="Visuel du lot 1">
+                </div>
+                <div class="hint">Glissez votre photo ici ou cliquez pour importer</div>
+                <input type="file" accept="image/*" aria-label="Importer un visuel" style="display:none;">
+                <div class="inline-controls">
+                  <input type="url" placeholder="Coller une URL (optionnel)" aria-label="URL de l’image">
+                  <button class="button secondary" type="button" data-reset-image="lots-visuel-1">Réinitialiser</button>
+                </div>
+              </div>
+              <p class="muted small" data-editable="lots-visuel-1-desc">Description du visuel 1.</p>
+            </div>
+            <div class="card">
+              <div class="drop-zone" data-drop-target data-image-key="lots-visuel-2">
+                <div class="image-viewport" data-image-viewport>
+                  <img data-image-key="lots-visuel-2" data-image-preview="lots-visuel-2" src="https://images.unsplash.com/photo-1495433324511-bf8e92934d90?auto=format&fit=crop&w=900&q=80" alt="Visuel du lot 2">
+                </div>
+                <div class="hint">Glissez votre photo ici ou cliquez pour importer</div>
+                <input type="file" accept="image/*" aria-label="Importer un visuel" style="display:none;">
+                <div class="inline-controls">
+                  <input type="url" placeholder="Coller une URL (optionnel)" aria-label="URL de l’image">
+                  <button class="button secondary" type="button" data-reset-image="lots-visuel-2">Réinitialiser</button>
+                </div>
+              </div>
+              <p class="muted small" data-editable="lots-visuel-2-desc">Description du visuel 2.</p>
+            </div>
+            <div class="card">
+              <div class="drop-zone" data-drop-target data-image-key="lots-visuel-3">
+                <div class="image-viewport" data-image-viewport>
+                  <img data-image-key="lots-visuel-3" data-image-preview="lots-visuel-3" src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80" alt="Visuel du lot 3">
+                </div>
+                <div class="hint">Glissez votre photo ici ou cliquez pour importer</div>
+                <input type="file" accept="image/*" aria-label="Importer un visuel" style="display:none;">
+                <div class="inline-controls">
+                  <input type="url" placeholder="Coller une URL (optionnel)" aria-label="URL de l’image">
+                  <button class="button secondary" type="button" data-reset-image="lots-visuel-3">Réinitialiser</button>
+                </div>
+              </div>
+              <p class="muted small" data-editable="lots-visuel-3-desc">Description du visuel 3.</p>
+            </div>
           </div>
         </section>
       </section>
 
       <section id="vie-copro" class="view">
         <div class="card hero">
-          <span class="badge">Vie de copro</span>
-          <h1>Moments conviviaux</h1>
-          <p class="muted">Pot d'accueil trimestriel, troc de plantes et ateliers bricolage pour mieux se connaître.</p>
+          <span class="badge" data-editable="badge-communs">Parties communes</span>
+          <h1 data-editable="titre-communs">Gestion des espaces partagés</h1>
+          <p class="muted" data-editable="intro-communs">Les parties communes rassemblent la vie insulaire : ponton, plage, terrains de beach-volley et de golf, et le port avec les places de bateau privatives.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Événements à venir</h3>
-            <ul class="list">
-              <li>Atelier compostage — samedi 15 juin.</li>
-              <li>Nettoyage participatif de la cour — dimanche 7 juillet.</li>
-              <li>Troc livres & jeux — samedi 21 septembre.</li>
-            </ul>
+            <h3 data-editable="communs-carte-titre">Carte des parties communes</h3>
+            <div class="drop-zone map-drop" data-drop-target data-image-key="communs-map">
+              <div class="image-viewport" data-image-viewport>
+                <img data-image-key="communs-map" data-image-preview="communs-map" src="https://images.unsplash.com/photo-1505764706515-aa95265c5abc?auto=format&fit=crop&w=1400&q=80" alt="Carte des parties communes">
+              </div>
+              <div class="hint">Glissez la carte de l’île ou cliquez pour importer</div>
+              <input type="file" accept="image/*" aria-label="Importer la carte" style="display:none;">
+              <div class="inline-controls">
+                <input type="url" placeholder="Coller une URL (optionnel)" aria-label="URL de la carte">
+                <button class="button secondary" type="button" data-reset-image="communs-map">Réinitialiser</button>
+              </div>
+            </div>
+            <p class="muted small" data-editable="communs-carte-legende">Importez une grande image de l’île : le recadrage est libre pour centrer le port, le ponton ou les plages.</p>
           </div>
           <div class="card">
-            <h3>Espaces partagés</h3>
-            <p class="muted small">Salle commune sur réservation, local vélo sécurisé, coins verts pour jardinières collaboratives.</p>
+            <h3 data-editable="communs-equip-titre">Équipements et usages</h3>
+            <p class="muted" data-editable="communs-equip-texte">Les parties communes regroupent le ponton principal, la plage, les terrains de beach-volley et de golf, ainsi que le port où chaque place de bateau privative est identifiée. Elles sont accessibles à tous dans le respect du règlement et des créneaux de maintenance.</p>
+            <ul class="list" data-editable="communs-equip-list">
+              <li>Ponton & plage : accès libre, propreté et calme attendus.</li>
+              <li>Beach-volley & golf : pensez à réserver vos créneaux.</li>
+              <li>Port : stationnement sur la place attribuée à votre lot.</li>
+            </ul>
           </div>
         </section>
       </section>
 
       <section id="coproprietaires" class="view">
         <div class="card hero">
-          <span class="badge">Copropriétaires</span>
-          <h1>Contacts et répartition</h1>
-          <p class="muted">Référents par bâtiment et répartition indicative des charges.</p>
+          <span class="badge" data-editable="badge-syndic">Syndic</span>
+          <h1 data-editable="titre-syndic">Coordonnées du syndic</h1>
+          <p class="muted" data-editable="intro-syndic">Contacts directs, horaires et canaux pour joindre le syndic ou déposer un document.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Référents</h3>
-            <ul class="list">
-              <li>Bâtiment A — Julie Martin</li>
-              <li>Bâtiment B — Karim Haddad</li>
-              <li>Bâtiment C — Anaïs Leroy</li>
+            <h3 data-editable="syndic-contact-titre">Contact principal</h3>
+            <ul class="list" data-editable="syndic-contact-list">
+              <li>Syndic : Cabinet Océane Gestion</li>
+              <li>Téléphone : 01 55 66 77 88</li>
+              <li>Email : contact@oceane-gestion.fr</li>
             </ul>
           </div>
           <div class="card">
-            <h3>Charges (aperçu)</h3>
-            <table class="table">
-              <thead><tr><th>Poste</th><th>%</th></tr></thead>
-              <tbody>
-                <tr><td>Ascenseurs</td><td>22%</td></tr>
-                <tr><td>Chauffage</td><td>28%</td></tr>
-                <tr><td>Espaces verts</td><td>12%</td></tr>
-              </tbody>
-            </table>
+            <h3 data-editable="syndic-permanences-titre">Permanences</h3>
+            <p class="muted small" data-editable="syndic-permanences-texte">Accueil téléphonique du lundi au vendredi, 9h-12h30 / 14h-17h. Dépôt de documents sur rendez-vous ou via l'onglet Demandes.</p>
           </div>
         </section>
       </section>
 
       <section id="demandes" class="view">
         <div class="card hero">
-          <span class="badge">Demandes</span>
-          <h1>Incidents & questions</h1>
-          <p class="muted">Soumettez vos demandes, suivez-les et marquez-les comme traitées : tout reste stocké localement sur votre navigateur.</p>
+          <span class="badge" data-editable="badge-demandes">Demandes</span>
+          <h1 data-editable="titre-demandes">Incidents & questions</h1>
+          <p class="muted" data-editable="intro-demandes">Soumettez vos demandes, suivez-les et marquez-les comme traitées : tout reste stocké localement sur votre navigateur.</p>
         </div>
         <section class="grid two">
           <div class="card">
-            <h3>Nouvelle demande</h3>
+            <h3 data-editable="demandes-form-titre">Nouvelle demande</h3>
             <form id="demande-form">
-              <input name="nom" type="text" placeholder="Nom" required />
-              <select name="type">
+              <input name="nom" type="text" placeholder="Nom" required data-persist="demande-nom" />
+              <select name="type" data-persist="demande-type">
                 <option value="Incident">Incident</option>
                 <option value="Question">Question</option>
                 <option value="Suggestion">Suggestion</option>
               </select>
-              <textarea name="message" placeholder="Décrivez votre demande" required></textarea>
+              <textarea name="message" placeholder="Décrivez votre demande" required data-persist="demande-message"></textarea>
               <button class="button" type="submit">Enregistrer</button>
             </form>
           </div>
           <div class="card">
-            <h3>Suivi</h3>
+            <h3 data-editable="demandes-suivi-titre">Suivi</h3>
             <div id="demande-list" class="grid"></div>
           </div>
         </section>
@@ -336,22 +561,47 @@
 
       <section id="faq" class="view">
         <div class="card hero">
-          <span class="badge">FAQ</span>
-          <h1>Questions fréquentes</h1>
-          <p class="muted">Consultez les réponses clés ou ouvrez une demande si besoin.</p>
+          <span class="badge" data-editable="badge-faq">FAQ</span>
+          <h1 data-editable="titre-faq">Questions fréquentes</h1>
+          <p class="muted" data-editable="intro-faq">Consultez les réponses clés ou ouvrez une demande si besoin.</p>
         </div>
         <section class="grid">
+          <p class="muted small" data-editable="faq-preface">FAQ – Île de copropriété</p>
           <details class="faq-item" open>
-            <summary>Comment accéder au local vélo ?</summary>
-            <p class="muted small">Demandez un QR code temporaire via l'onglet Demandes.</p>
+            <summary data-editable="faq1-question">Comment sont importées les différentes ressources alimentaires ou utilitaires ?</summary>
+            <p class="muted small" data-editable="faq1-reponse">Les ressources arrivent chaque matin à 6h au port principal. Les marchands, rémunérés par la copropriété, restent sur place toute la journée. Le marché ferme à 18h.</p>
           </details>
           <details class="faq-item">
-            <summary>Qui prévenir en cas de fuite ?</summary>
-            <p class="muted small">Signalez-le immédiatement dans Demandes et appelez le référent du bâtiment.</p>
+            <summary data-editable="faq2-question">Y a-t-il des navettes bateau qui desservent les îles aux alentours ?</summary>
+            <p class="muted small" data-editable="faq2-reponse">Oui, une navette communautaire assure des allers-retours. Les horaires sont affichés au port et dans le hall d'accueil.</p>
           </details>
           <details class="faq-item">
-            <summary>Où trouver les comptes-rendus ?</summary>
-            <p class="muted small">Ils seront publiés dans la section AG 2025 après validation.</p>
+            <summary data-editable="faq3-question">À quelle fréquence sont organisées les Assemblées Générales ?</summary>
+            <p class="muted small" data-editable="faq3-reponse">Les Assemblées Générales ordinaires ont lieu une fois par an. Des assemblées extraordinaires peuvent être convoquées si besoin.</p>
+          </details>
+          <details class="faq-item">
+            <summary data-editable="faq4-question">Comment se déplace-t-on sur l’île ?</summary>
+            <p class="muted small" data-editable="faq4-reponse">Des voiturettes de golf électriques rechargeables sont mises à disposition. L'île est piétonne en dehors de ces véhicules.</p>
+          </details>
+          <details class="faq-item">
+            <summary data-editable="faq5-question">Comment fonctionne la gestion des déchets sur l’île ?</summary>
+            <p class="muted small" data-editable="faq5-reponse">Chaque zone dispose de points de collecte triés. Une barge vient deux fois par jour récupérer les déchets et les acheminer vers le continent.</p>
+          </details>
+          <details class="faq-item">
+            <summary data-editable="faq6-question">Y a-t-il une sécurité ou une surveillance sur l’île ?</summary>
+            <p class="muted small" data-editable="faq6-reponse">Une équipe de gardiens assure la surveillance 24h/24, avec des rondes régulières et un poste d'accueil au port principal.</p>
+          </details>
+          <details class="faq-item">
+            <summary data-editable="faq7-question">L’île dispose-t-elle d’un service médical ?</summary>
+            <p class="muted small" data-editable="faq7-reponse">Un petit cabinet médical est disponible pour les urgences mineures. Une navette médicale peut intervenir pour un transfert rapide en cas de besoin sérieux.</p>
+          </details>
+          <details class="faq-item">
+            <summary data-editable="faq8-question">Où peuvent se garer les voiturettes de golf ?</summary>
+            <p class="muted small" data-editable="faq8-reponse">Chaque lot possède sa place privative. Des parkings communs sont situés près du port, du terrain de golf et de la plage sud.</p>
+          </details>
+          <details class="faq-item">
+            <summary data-editable="faq9-question">L’île dispose-t-elle d’un service technique pour l’entretien et les réparations ?</summary>
+            <p class="muted small" data-editable="faq9-reponse">Une équipe technique est présente chaque jour de 7h à 19h pour les installations communes. Pour les maisons individuelles, les demandes passent par l'espace résident.</p>
           </details>
         </section>
       </section>
@@ -363,6 +613,83 @@
     const links = Array.from(document.querySelectorAll('[data-section]'));
     const triggers = Array.from(document.querySelectorAll('[data-section-trigger]'));
 
+    const snapshotStorageKey = 'thalassa-snapshot';
+    const editableStorageKey = 'thalassa-editable';
+    const draftStorageKey = 'thalassa-drafts';
+    const sectionStorageKey = 'thalassa-last-section';
+    const imageStorageKey = 'thalassa-images';
+    const demandeStorageKey = 'thalassa-demandes';
+
+    const loadJSON = (key, fallback) => {
+      try { return JSON.parse(localStorage.getItem(key)) || JSON.parse(sessionStorage.getItem(key)) || fallback; }
+      catch (e) {
+        try { return JSON.parse(sessionStorage.getItem(key)) || fallback; }
+        catch (err) { return fallback; }
+      }
+    };
+
+    const saveJSON = (key, value) => {
+      const payload = JSON.stringify(value);
+      try { localStorage.setItem(key, payload); } catch (e) {
+        try { sessionStorage.setItem(key, payload); } catch (_) {}
+      }
+    };
+
+    const snapshot = loadJSON(snapshotStorageKey, null);
+    const pickStore = (snapKey, legacyKey, fallback) => {
+      if (snapshot && snapshot[snapKey] !== undefined) return snapshot[snapKey];
+      const legacy = loadJSON(legacyKey, undefined);
+      return legacy !== undefined ? legacy : fallback;
+    };
+
+    let editableStore = pickStore('editable', editableStorageKey, {});
+    let draftStore = pickStore('drafts', draftStorageKey, {});
+    let savedImages = pickStore('images', imageStorageKey, {});
+    let demandeRows = pickStore('demandes', demandeStorageKey, []);
+    let lastSection = snapshot?.lastSection || null;
+    let lastSavedAt = snapshot?.savedAt || null;
+    let lastSavedDisplay = null;
+
+    const updateSaveBadge = () => {
+      if (!lastSavedDisplay) return;
+      if (!lastSavedAt) {
+        lastSavedDisplay.textContent = 'Jamais';
+        return;
+      }
+      try {
+        const date = new Date(lastSavedAt);
+        lastSavedDisplay.textContent = date.toLocaleString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
+      } catch (e) {
+        lastSavedDisplay.textContent = lastSavedAt;
+      }
+    };
+
+    const commitSnapshot = (reason = 'auto') => {
+      const payload = {
+        editable: editableStore,
+        drafts: draftStore,
+        images: savedImages,
+        demandes: demandeRows,
+        lastSection,
+        savedAt: new Date().toISOString(),
+        reason
+      };
+      lastSavedAt = payload.savedAt;
+      saveJSON(snapshotStorageKey, payload);
+      updateSaveBadge();
+    };
+
+    const imageDefaults = {
+      'accueil-map': {
+        src: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80',
+        pos: { x: 50, y: 50 }
+      },
+      'communs-map': {
+        src: 'https://images.unsplash.com/photo-1505764706515-aa95265c5abc?auto=format&fit=crop&w=1400&q=80',
+        pos: { x: 50, y: 50 }
+      }
+    };
+
     function showSection(id) {
       const target = document.getElementById(id) || sections[0];
       const link = links.find(l => l.dataset.section === target.id);
@@ -371,6 +698,9 @@
       document.body.className = `theme-${link?.dataset.theme || 'accueil'}`;
       history.replaceState({}, '', `#${target.id}`);
       window.scrollTo({ top: 0, behavior: 'instant' });
+      lastSection = target.id;
+      try { localStorage.setItem(sectionStorageKey, target.id); } catch (e) {}
+      commitSnapshot('section-change');
     }
 
     links.forEach(link => {
@@ -387,6 +717,58 @@
       });
     });
 
+    function initEditableContent() {
+      document.querySelectorAll('[data-editable]').forEach(el => {
+        const key = el.dataset.editable;
+        if (!key) return;
+        if (editableStore[key] !== undefined) {
+          el.innerHTML = editableStore[key];
+        }
+        el.setAttribute('contenteditable', 'true');
+        el.addEventListener('input', () => {
+          editableStore[key] = el.innerHTML;
+          saveJSON(editableStorageKey, editableStore);
+          commitSnapshot('content-edit');
+        });
+      });
+    }
+
+    function initFormDrafts() {
+      const persist = (key, value) => {
+        if (value === '' || value === null || value === undefined) delete draftStore[key];
+        else draftStore[key] = value;
+        saveJSON(draftStorageKey, draftStore);
+        commitSnapshot('draft-update');
+      };
+
+      document.querySelectorAll('[data-persist]').forEach(input => {
+        const key = input.dataset.persist;
+        if (!key) return;
+        const saved = draftStore[key];
+        if (saved !== undefined) {
+          if (input.type === 'checkbox' || input.type === 'radio') {
+            input.checked = !!saved;
+          } else {
+            input.value = saved;
+          }
+        }
+        const update = () => {
+          const value = (input.type === 'checkbox' || input.type === 'radio') ? input.checked : input.value;
+          persist(key, value);
+        };
+        input.addEventListener('input', update);
+        input.addEventListener('change', update);
+      });
+
+      return {
+        clear: (keys = []) => {
+          keys.forEach(k => delete draftStore[k]);
+          saveJSON(draftStorageKey, draftStore);
+          commitSnapshot('draft-clear');
+        }
+      };
+    }
+
     function initFaq() {
       document.querySelectorAll('.faq-item').forEach(item => {
         const summary = item.querySelector('summary');
@@ -398,21 +780,20 @@
       });
     }
 
-    function initDemandes() {
+    function initDemandes(draftManager) {
       const form = document.querySelector('#demande-form');
       const list = document.querySelector('#demande-list');
       if (!form || !list) return;
 
-      const storageKey = 'thalassa-demandes';
-      const rows = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      if (!Array.isArray(demandeRows)) demandeRows = [];
 
       const render = () => {
         list.innerHTML = '';
-        if (!rows.length) {
+        if (!demandeRows.length) {
           list.innerHTML = '<p class="muted small">Aucune demande pour le moment.</p>';
           return;
         }
-        rows.forEach((row, index) => {
+        demandeRows.forEach((row, index) => {
           const div = document.createElement('div');
           div.className = 'card';
           div.innerHTML = `<strong>${row.nom}</strong> — ${row.type}<br><span class="muted small">${row.message}</span>`;
@@ -420,8 +801,9 @@
           btn.className = 'button secondary';
           btn.textContent = 'Marquer comme traité';
           btn.addEventListener('click', () => {
-            rows.splice(index, 1);
-            localStorage.setItem(storageKey, JSON.stringify(rows));
+            demandeRows.splice(index, 1);
+            saveJSON(demandeStorageKey, demandeRows);
+            commitSnapshot('demande-close');
             render();
           });
           div.appendChild(btn);
@@ -437,19 +819,305 @@
         const type = form.type.value;
         const message = form.message.value.trim();
         if (!nom || !message) return;
-        rows.push({ nom, type, message });
-        localStorage.setItem(storageKey, JSON.stringify(rows));
+        demandeRows.push({ nom, type, message });
+        saveJSON(demandeStorageKey, demandeRows);
+        commitSnapshot('demande-add');
         form.reset();
+        draftManager?.clear(['demande-nom', 'demande-type', 'demande-message']);
         render();
       });
     }
 
+    function initImages() {
+      const MAX_SIZE = 1400;
+      const compressImage = (file) => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result;
+          const img = new Image();
+          img.onload = () => {
+            try {
+              const canvas = document.createElement('canvas');
+              const ratio = Math.min(1, MAX_SIZE / Math.max(img.width, img.height));
+              canvas.width = Math.max(1, Math.round(img.width * ratio));
+              canvas.height = Math.max(1, Math.round(img.height * ratio));
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              resolve(canvas.toDataURL('image/jpeg', 0.9));
+            } catch (err) {
+              resolve(base64);
+            }
+          };
+          img.onerror = () => resolve(base64);
+          img.src = base64;
+        };
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+      });
+      const clamp = (v, min = 0, max = 100) => Math.min(Math.max(Number(v) || 0, min), max);
+
+      const persist = (key, updates) => {
+        const next = { ...(savedImages[key] || {}) };
+        if (Object.prototype.hasOwnProperty.call(updates, 'src')) {
+          if (updates.src) next.src = updates.src; else delete next.src;
+        }
+        if (updates.pos) {
+          next.pos = { x: clamp(updates.pos.x, 0, 100), y: clamp(updates.pos.y, 0, 100) };
+        }
+        if (!next.src && !next.pos) {
+          delete savedImages[key];
+        } else {
+          savedImages[key] = next;
+        }
+        saveJSON(imageStorageKey, savedImages);
+        commitSnapshot('image-update');
+      };
+
+      document.querySelectorAll('[data-drop-target]').forEach(zone => {
+        const key = zone.dataset.imageKey;
+        const preview = zone.querySelector(`[data-image-preview="${key}"]`);
+        const viewport = zone.querySelector('[data-image-viewport]');
+        const urlInput = zone.querySelector('input[type="url"]');
+        const fileInput = zone.querySelector('input[type="file"]');
+        const resetBtn = zone.querySelector('[data-reset-image]');
+
+        const applyPosition = (pos) => {
+          const safe = { x: clamp(pos?.x ?? 50), y: clamp(pos?.y ?? 50) };
+          if (preview) {
+            preview.style.objectPosition = `${safe.x}% ${safe.y}%`;
+            preview.dataset.x = safe.x;
+            preview.dataset.y = safe.y;
+          }
+          return safe;
+        };
+
+        const state = () => {
+          const defaults = imageDefaults[key] || {};
+          const saved = savedImages[key] || {};
+          return {
+            src: saved.src || defaults.src,
+            pos: {
+              x: saved.pos?.x ?? defaults.pos?.x ?? 50,
+              y: saved.pos?.y ?? defaults.pos?.y ?? 50
+            }
+          };
+        };
+
+        const setPreview = (src) => {
+          if (preview && src) preview.src = src;
+        };
+
+        const applyFromStore = () => {
+          const current = state();
+          setPreview(current.src);
+          applyPosition(current.pos);
+          if (urlInput) urlInput.value = current.src?.startsWith('http') ? current.src : '';
+        };
+
+        applyFromStore();
+
+        const handleFile = async (file) => {
+          if (!file) return;
+          const tempUrl = URL.createObjectURL(file);
+          setPreview(tempUrl);
+          applyPosition({ x: 50, y: 50 });
+          const compressed = await compressImage(file);
+          if (!compressed) {
+            applyFromStore();
+            URL.revokeObjectURL(tempUrl);
+            if (fileInput) fileInput.value = '';
+            return;
+          }
+          const src = compressed;
+          persist(key, { src, pos: { x: 50, y: 50 } });
+          applyFromStore();
+          URL.revokeObjectURL(tempUrl);
+          if (urlInput) urlInput.value = '';
+          if (fileInput) fileInput.value = '';
+        };
+
+        const stop = (e) => e.stopPropagation();
+        urlInput?.addEventListener('click', stop);
+        urlInput?.addEventListener('keydown', stop);
+        resetBtn?.addEventListener('click', stop);
+
+        const handleDrop = (e) => {
+          e.preventDefault();
+          zone.classList.remove('dragging');
+          const [file] = e.dataTransfer?.files || [];
+          if (file) {
+            handleFile(file);
+            return;
+          }
+          const droppedUrl = (e.dataTransfer?.getData('text/uri-list') || e.dataTransfer?.getData('text/plain') || '').trim();
+          if (droppedUrl) {
+            persist(key, { src: droppedUrl, pos: { x: 50, y: 50 } });
+            applyFromStore();
+          }
+        };
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+          zone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            zone.classList.add('dragging');
+          });
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+          zone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            zone.classList.remove('dragging');
+          });
+        });
+        zone.addEventListener('drop', handleDrop);
+
+        let panCandidate = null;
+        let isPanning = false;
+        let suppressClick = false;
+
+        const updatePan = (clientX, clientY) => {
+          if (!panCandidate || !isPanning) return;
+          const nextPos = {
+            x: clamp(panCandidate.x + ((clientX - panCandidate.startX) / panCandidate.width) * 100),
+            y: clamp(panCandidate.y + ((clientY - panCandidate.startY) / panCandidate.height) * 100)
+          };
+          applyPosition(nextPos);
+        };
+
+        const finishPan = () => {
+          if (isPanning && preview) {
+            persist(key, { pos: { x: Number(preview.dataset.x) || 50, y: Number(preview.dataset.y) || 50 } });
+          }
+          isPanning = false;
+          panCandidate = null;
+          zone.classList.remove('panning');
+          setTimeout(() => { suppressClick = false; }, 0);
+        };
+
+        const handleMouseMove = (e) => {
+          if (!panCandidate) return;
+          const distance = Math.hypot(e.clientX - panCandidate.startX, e.clientY - panCandidate.startY);
+          if (!isPanning && distance > 4) {
+            isPanning = true;
+            suppressClick = true;
+            zone.classList.add('panning');
+          }
+          if (isPanning) {
+            e.preventDefault();
+            updatePan(e.clientX, e.clientY);
+          }
+        };
+
+        const handleMouseUp = () => {
+          window.removeEventListener('mousemove', handleMouseMove);
+          window.removeEventListener('mouseup', handleMouseUp);
+          finishPan();
+        };
+
+        const handleMouseDown = (e) => {
+          if (e.button !== 0 || !viewport) return;
+          const rect = viewport.getBoundingClientRect();
+          panCandidate = {
+            startX: e.clientX,
+            startY: e.clientY,
+            x: Number(preview?.dataset.x) || 50,
+            y: Number(preview?.dataset.y) || 50,
+            width: rect.width || 1,
+            height: rect.height || 1
+          };
+          window.addEventListener('mousemove', handleMouseMove);
+          window.addEventListener('mouseup', handleMouseUp);
+        };
+
+        const handleTouchMove = (e) => {
+          const touch = e.touches?.[0];
+          if (!touch) return;
+          if (panCandidate && !isPanning) {
+            const distance = Math.hypot(touch.clientX - panCandidate.startX, touch.clientY - panCandidate.startY);
+            if (distance > 4) {
+              isPanning = true;
+              suppressClick = true;
+              zone.classList.add('panning');
+            }
+          }
+          if (isPanning) {
+            e.preventDefault();
+            updatePan(touch.clientX, touch.clientY);
+          }
+        };
+
+        const handleTouchEnd = () => {
+          window.removeEventListener('touchmove', handleTouchMove);
+          window.removeEventListener('touchend', handleTouchEnd);
+          finishPan();
+        };
+
+        const handleTouchStart = (e) => {
+          const touch = e.touches?.[0];
+          if (!touch || !viewport) return;
+          const rect = viewport.getBoundingClientRect();
+          panCandidate = {
+            startX: touch.clientX,
+            startY: touch.clientY,
+            x: Number(preview?.dataset.x) || 50,
+            y: Number(preview?.dataset.y) || 50,
+            width: rect.width || 1,
+            height: rect.height || 1
+          };
+          window.addEventListener('touchmove', handleTouchMove, { passive: false });
+          window.addEventListener('touchend', handleTouchEnd);
+        };
+
+        preview?.addEventListener('mousedown', handleMouseDown);
+        preview?.addEventListener('touchstart', handleTouchStart, { passive: false });
+
+        zone.addEventListener('click', (e) => {
+          if (suppressClick || isPanning) {
+            e.preventDefault();
+            return;
+          }
+          fileInput?.click();
+        });
+
+        fileInput?.addEventListener('change', () => handleFile(fileInput.files?.[0]));
+
+        urlInput?.addEventListener('change', () => {
+          const value = urlInput.value.trim();
+          if (!value) {
+            persist(key, { src: null, pos: { x: 50, y: 50 } });
+            applyFromStore();
+            return;
+          }
+          persist(key, { src: value, pos: { x: 50, y: 50 } });
+          applyFromStore();
+        });
+
+        resetBtn?.addEventListener('click', () => {
+          if (urlInput) urlInput.value = '';
+          if (fileInput) fileInput.value = '';
+          persist(key, { src: null, pos: { x: 50, y: 50 } });
+          applyFromStore();
+        });
+      });
+    }
+
     function init() {
+      lastSavedDisplay = document.querySelector('[data-last-saved]');
+      updateSaveBadge();
+      saveJSON(editableStorageKey, editableStore);
+      saveJSON(draftStorageKey, draftStore);
+      saveJSON(imageStorageKey, savedImages);
+      saveJSON(demandeStorageKey, demandeRows);
+
+      initEditableContent();
+      const draftManager = initFormDrafts();
       initFaq();
-      initDemandes();
+      initDemandes(draftManager);
+      initImages();
       const hash = location.hash.replace('#','');
-      showSection(hash || links[0].dataset.section);
+      const storedSection = localStorage.getItem(sectionStorageKey) || lastSection;
+      showSection(hash || storedSection || links[0].dataset.section);
       window.addEventListener('hashchange', () => showSection(location.hash.replace('#','') || links[0].dataset.section));
+      commitSnapshot('init-sync');
     }
 
     document.addEventListener('DOMContentLoaded', init);
