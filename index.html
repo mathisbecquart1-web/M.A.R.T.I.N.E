@@ -4029,9 +4029,11 @@
             didDrag: false,
             scrollContainer: null,
             autoScrollVelocity: 0,
-            autoScrollFrame: null
+            autoScrollFrame: null,
+            pendingClickEvent: null
         };
         let suppressRowClickSelection = false;
+        let skipNextClickSelection = false;
         let bulkEditTab = null;
         let missions = [];
         let missionNotebook = [];
@@ -5981,26 +5983,20 @@ return;
                 if (event.target.closest('input, textarea, select, button')) return;
 
                 event.preventDefault();
-                const selection = getRowSelectionSet(tabName);
-
                 dragSelectionState.active = true;
                 dragSelectionState.tab = tabName;
                 dragSelectionState.anchorRow = row;
                 dragSelectionState.baseSelection = (event.ctrlKey || event.metaKey)
-                    ? new Set(selection)
+                    ? new Set(getRowSelectionSet(tabName))
                     : new Set();
                 dragSelectionState.didDrag = false;
                 dragSelectionState.scrollContainer = row.closest('.table-container');
-
-                selection.clear();
-                dragSelectionState.baseSelection.forEach(id => selection.add(id));
-                if (row.dataset.rowId) {
-                    selection.add(row.dataset.rowId);
-                }
-                refreshRowSelections(tabName);
-                updateBulkSelectionInfo(tabName);
+                dragSelectionState.pendingClickEvent = {
+                    ctrlKey: event.ctrlKey,
+                    metaKey: event.metaKey,
+                    shiftKey: event.shiftKey
+                };
                 suppressRowClickSelection = true;
-                setTimeout(() => suppressRowClickSelection = false, 0);
 
                 document.addEventListener('mouseup', endRowDragSelection, { once: true });
                 document.addEventListener('mousemove', handleDragSelectionMouseMove);
@@ -6023,6 +6019,7 @@ return;
 
                 if (anchorIndex !== currentIndex) {
                     dragSelectionState.didDrag = true;
+                    dragSelectionState.pendingClickEvent = null;
                 }
 
                 const selection = getRowSelectionSet(tabName);
@@ -6053,18 +6050,24 @@ return;
         function endRowDragSelection() {
             try {
                 if (!dragSelectionState.active) return;
+                const { didDrag, anchorRow, tab, pendingClickEvent } = dragSelectionState;
 
-                if (dragSelectionState.didDrag) {
-                    suppressRowClickSelection = true;
-                    setTimeout(() => suppressRowClickSelection = false, 0);
+                if (!didDrag && anchorRow && tab) {
+                    skipNextClickSelection = true;
+                    suppressRowClickSelection = false;
+                    handleRowSelection(pendingClickEvent || { ctrlKey: false, metaKey: false }, anchorRow, tab);
+                } else if (didDrag) {
+                    skipNextClickSelection = true;
                 }
 
+                suppressRowClickSelection = false;
                 dragSelectionState.active = false;
                 dragSelectionState.tab = null;
                 dragSelectionState.anchorRow = null;
                 dragSelectionState.baseSelection = new Set();
                 dragSelectionState.didDrag = false;
                 dragSelectionState.scrollContainer = null;
+                dragSelectionState.pendingClickEvent = null;
                 stopDragAutoScroll();
                 document.removeEventListener('mousemove', handleDragSelectionMouseMove);
             } catch (error) {
@@ -6075,6 +6078,10 @@ return;
         function handleRowSelection(event, row, tabName) {
             try {
                 if (suppressRowClickSelection) return;
+                if (skipNextClickSelection) {
+                    skipNextClickSelection = false;
+                    return;
+                }
 
                 const rowId = row.dataset.rowId;
                 if (!rowId) return;
