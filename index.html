@@ -2860,6 +2860,7 @@
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('verifbaux')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('verifbaux')">📊 Exporter Excel</button>
                 <button class="btn btn-excel" onclick="exportSelectionToExcel('verifbaux')">📤 Exporter la sélection</button>
+                <button class="btn btn-secondary" onclick="correctRegionCells('verifbaux')">🧹 Corriger les régions</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('verifbaux')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('verifbaux')">🗑️ Effacer tout</button>
             </div>
@@ -2947,6 +2948,7 @@
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('pni')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('pni')">📊 Exporter Excel</button>
                 <button class="btn btn-excel" onclick="exportSelectionToExcel('pni')">📤 Exporter la sélection</button>
+                <button class="btn btn-secondary" onclick="correctRegionCells('pni')">🧹 Corriger les régions</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('pni')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('pni')">🗑️ Effacer tout</button>
             </div>
@@ -3979,8 +3981,15 @@
                 values: ['Changement locataire', 'Modification bail', 'Avenant', 'Renouvellement', 'Autre'],
                 message: 'Type de modification non reconnu',
                 type: 'flexible'
+            },
+            'Région': {
+                values: ['ROUEN', 'LILLE', 'AMIENS'],
+                message: 'Région doit être ROUEN, LILLE ou AMIENS',
+                type: 'strict'
             }
         };
+
+        const allowedRegions = ['ROUEN', 'LILLE', 'AMIENS'];
 
         // Variables globales
         let rowCounters = {};
@@ -4764,9 +4773,14 @@
             return `${lastWord}${firstWord}`.toUpperCase();
         }
 
+        function normalizeRegionName(rawValue) {
+            const upperValue = (rawValue || '').toString().toUpperCase();
+            return allowedRegions.find(region => upperValue.includes(region)) || '';
+        }
+
         function cleanCellValue(value, columnName) {
             if (!value && value !== 0) return '';
-            
+
             let cleanValue = value.toString().trim();
             
             if (columnName && (columnName.toLowerCase().includes('date'))) {
@@ -4803,8 +4817,11 @@
                 if (cleanValue === 'ENCOURS' || cleanValue === 'EN_COURS') {
                     cleanValue = 'EN COURS';
                 }
+            } else if (columnName && (columnName.toLowerCase().includes('région') || columnName.toLowerCase().includes('region'))) {
+                const normalized = normalizeRegionName(cleanValue);
+                cleanValue = normalized || cleanValue.toUpperCase();
             }
-            
+
             return cleanValue;
         }
 
@@ -6259,6 +6276,59 @@ return;
             } catch (error) {
                 console.error('Erreur recalcul surfaces:', error);
                 showNotification('❌ Erreur lors du recalcul des surfaces', 'error');
+            }
+        }
+
+        function correctRegionCells(tabName) {
+            try {
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                const columns = tabConfigs[tabName]?.columns || [];
+                const regionIndex = columns.indexOf('Région');
+
+                if (!tbody || regionIndex === -1) {
+                    showNotification('ℹ️ Aucune colonne Région à corriger', 'info');
+                    return;
+                }
+
+                const rows = tbody.querySelectorAll('tr');
+                let normalizedCount = 0;
+                let clearedCount = 0;
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const regionInput = inputs[regionIndex];
+                    if (!regionInput) return;
+
+                    const currentValue = regionInput.value || '';
+                    const normalized = normalizeRegionName(currentValue);
+
+                    if (normalized) {
+                        if (regionInput.value !== normalized) {
+                            regionInput.value = normalized;
+                            normalizedCount++;
+                        }
+                    } else if (currentValue.trim() !== '') {
+                        regionInput.value = '';
+                        clearedCount++;
+                    }
+
+                    validateInputInRealTime(regionInput, 'Région', tabName);
+                });
+
+                if (normalizedCount || clearedCount) {
+                    updateStats(tabName);
+                    queueSaveAllData();
+                    logActivity(`Régions corrigées dans ${getTabDisplayName(tabName)}`, 'info');
+                    const details = [];
+                    if (normalizedCount) details.push(`${normalizedCount} normalisation(s)`);
+                    if (clearedCount) details.push(`${clearedCount} valeur(s) vidée(s)`);
+                    showNotification(`🧹 Correction des régions : ${details.join(', ')}`);
+                } else {
+                    showNotification('ℹ️ Aucune correction de région nécessaire', 'info');
+                }
+            } catch (error) {
+                console.error('Erreur correction régions:', error);
+                showNotification('❌ Erreur lors de la correction des régions', 'error');
             }
         }
 
