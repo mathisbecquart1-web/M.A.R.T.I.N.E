@@ -2268,6 +2268,7 @@
                 <button class="btn btn-primary" onclick="addRow('creation')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('creation')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('creation')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('creation')">📤 Exporter la sélection</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('creation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('creation')">🗑️ Effacer tout</button>
             </div>
@@ -2388,6 +2389,7 @@
                 <button class="btn btn-primary" onclick="addRow('modification')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('modification')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modification')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('modification')">📤 Exporter la sélection</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('modification')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modification')">🗑️ Effacer tout</button>
             </div>
@@ -2508,6 +2510,7 @@
                 <button class="btn btn-primary" onclick="addRow('resiliation')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('resiliation')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('resiliation')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('resiliation')">📤 Exporter la sélection</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('resiliation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('resiliation')">🗑️ Effacer tout</button>
             </div>
@@ -2626,6 +2629,7 @@
                 <button class="btn btn-primary" onclick="addRow('autremodif')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('autremodif')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('autremodif')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('autremodif')">📤 Exporter la sélection</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('autremodif')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('autremodif')">🗑️ Effacer tout</button>
             </div>
@@ -2741,6 +2745,7 @@
                 <button class="btn btn-primary" onclick="addRow('modifsurface')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('modifsurface')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modifsurface')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('modifsurface')">📤 Exporter la sélection</button>
                 <button class="btn btn-warning" onclick="recalculateAllSurfaces()">🔄 Recalculer toutes les différences</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('modifsurface')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modifsurface')">🗑️ Effacer tout</button>
@@ -2854,6 +2859,7 @@
                 <button class="btn btn-primary" onclick="addRow('verifbaux')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('verifbaux')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('verifbaux')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('verifbaux')">📤 Exporter la sélection</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('verifbaux')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('verifbaux')">🗑️ Effacer tout</button>
             </div>
@@ -2940,6 +2946,7 @@
                 <button class="btn btn-primary" onclick="addRow('pni')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('pni')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('pni')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('pni')">📤 Exporter la sélection</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('pni')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('pni')">🗑️ Effacer tout</button>
             </div>
@@ -3105,7 +3112,9 @@
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('baserg')">✏️ Mise à jour RG en masse</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('baseut')">✏️ Mise à jour UT en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('baserg')">📊 Exporter Base RG</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('baserg')">📤 Exporter la sélection RG</button>
                 <button class="btn btn-excel" onclick="exportToExcel('baseut')">📊 Exporter Base UT</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('baseut')">📤 Exporter la sélection UT</button>
                 <button class="btn btn-warning" onclick="validateAllRGCodes()">🔍 Vérifier codes RG dans tous les onglets</button>
                 <button class="btn btn-success" onclick="buildRGDatabase()">🔄 Reconstruire index RG</button>
                 <button class="btn btn-success" onclick="buildUTDatabase()">🔄 Reconstruire index UT</button>
@@ -11660,6 +11669,65 @@ return;
             }
         }
 
+        // 📤 EXPORT DE LA SÉLECTION
+        function exportSelectionToExcel(tabName) {
+            try {
+                if (!window.XLSX) {
+                    showNotification('❌ Bibliothèque Excel non disponible', 'error');
+                    return;
+                }
+
+                const selection = getRowSelectionSet(tabName);
+                if (!selection.size) {
+                    showNotification('ℹ️ Aucune ligne sélectionnée', 'info');
+                    return;
+                }
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                const columns = tabConfigs[tabName]?.columns || [];
+                const selectedRows = Array.from(tbody.querySelectorAll('tr')).filter(row => selection.has(row.dataset.rowId));
+
+                if (selectedRows.length === 0) {
+                    showNotification('❌ Sélection introuvable dans le tableau', 'error');
+                    return;
+                }
+
+                const wsData = [columns];
+
+                selectedRows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const rowData = [];
+                    inputs.forEach(input => {
+                        rowData.push(input.value || '');
+                    });
+                    if (rowData.some(cell => cell.trim() !== '')) {
+                        wsData.push(rowData);
+                    }
+                });
+
+                if (wsData.length <= 1) {
+                    showNotification('❌ Aucune donnée valide à exporter dans la sélection', 'error');
+                    return;
+                }
+
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, `${getTabDisplayName(tabName)}_selection`.substring(0, 31));
+
+                const fileName = `MARTINE_${getTabDisplayName(tabName).replace(/\s+/g, '_')}_selection_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+
+                showNotification(`📤 Export de la sélection réussi: ${fileName}`);
+                logActivity(`Export sélection Excel de ${getTabDisplayName(tabName)}`, 'success');
+
+            } catch (error) {
+                console.error('Erreur export sélection Excel:', error);
+                showNotification('❌ Erreur lors de l\'export de la sélection', 'error');
+            }
+        }
+
         // 📊 EXPORT EXCEL COMPLET
         function exportToExcel(tabName) {
             try {
@@ -12468,6 +12536,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addRow = addRow;
         window.deleteRow = deleteRow;
         window.deleteSelectedRows = deleteSelectedRows;
+        window.exportSelectionToExcel = exportSelectionToExcel;
         window.exportToExcel = exportToExcel;
         window.exportAllToExcel = exportAllToExcel;
         window.exportStatsReport = exportStatsReport;
