@@ -3081,6 +3081,9 @@
                             <th>Horodatage</th>
                             <th>Mois</th>
                             <th>Date Traitement</th>
+                            <th>Traité</th>
+                            <th>Commentaire</th>
+                            <th style="width: 50px;">Action</th>
                             <th>Code Bail</th>
                             <th>Libelle Bail</th>
                             <th>Etat du Bail</th>
@@ -3118,9 +3121,6 @@
                             <th>Surface Locative UTBAT</th>
                             <th>Code UT</th>
                             <th>Nom UT</th>
-                            <th>Traité</th>
-                            <th>Commentaire</th>
-                            <th style="width: 50px;">Action</th>
                         </tr>
                     </thead>
                     <tbody id="misequaliteTableBody"></tbody>
@@ -4067,17 +4067,18 @@
             },
             misequalite: {
                 columns: [
-                    'Horodatage', 'Mois', 'Date Traitement', 'Code Bail', 'Libelle Bail', 'Etat du Bail', 'Debut Bail', 'Fin Bail',
+                    'Horodatage', 'Mois', 'Date Traitement', 'Traité', 'Commentaire', 'Code Bail', 'Libelle Bail', 'Etat du Bail', 'Debut Bail', 'Fin Bail',
                     'Resiliation Bail', 'Code UTBAT', 'Surface Occupee Bail', 'Surface Proratisee', 'SA Donneur', 'BU Donneur',
                     'Division Donneur', 'Code RG Donneur', 'Nom RG Donneur', 'Code Tiers Donneur', 'Nom Tiers Donneur',
                     'SA Occupant', 'BU Occupant', 'Division Occupant', 'Code RG Occupant', 'Nom RG Occupant', 'Code Tiers Occupant',
                     'Nom Tiers Occupant', 'Axe Local', 'Code Contexte', 'Proprietaire Juridique UTBAT En Cours',
                     'Proprietaire Interne UTBAT En Cours', 'Dernier Proprietaire Juridique UTBAT', 'Dernier Proprietaire Interne UTBAT',
                     'Nature Bien Batiment', 'Portefeuille UTBAT', 'Entite Regionale UTBAT', 'Code Emploi UTBAT',
-                    'Surface Developpee UTBAT', 'Surface Locative UTBAT', 'Code UT', 'Nom UT', 'Traité', 'Commentaire'
+                    'Surface Developpee UTBAT', 'Surface Locative UTBAT', 'Code UT', 'Nom UT'
                 ],
                 displayName: 'Mise en qualité',
-                icon: '🧹'
+                icon: '🧹',
+                actionAfterColumn: 'Commentaire'
             },
             baserg: {
                 columns: ['Code RG', 'Nom de RG', 'Utilisations', 'Dernière utilisation'],
@@ -4696,6 +4697,15 @@
                     let dataStartIndex = hasHeaders ? 1 : 0;
                     processedData.headers = hasHeaders ? firstRow : expectedColumns.slice(0, firstRow.length);
 
+                    const isCompactQualityImport = tabName === 'misequalite'
+                        && processedData.headers.length > 0
+                        && !processedData.headers.some(h => (h || '').toString().toLowerCase().includes('horodatage'))
+                        && processedData.headers[0].toString().toLowerCase().includes('code bail');
+
+                    if (isCompactQualityImport) {
+                        processedData.headers = expectedColumns.slice();
+                    }
+
                     const totalRows = rawData.length - dataStartIndex;
                     const batchSize = 200;
                     let currentIndex = dataStartIndex;
@@ -4716,8 +4726,20 @@
                                 hasWarnings: false
                             };
 
-                            for (let j = 0; j < Math.max(rawRow.length, expectedColumns.length); j++) {
-                                const cellValue = j < rawRow.length ? rawRow[j] : '';
+                            let effectiveRow = rawRow;
+                            if (isCompactQualityImport) {
+                                const codeBailIndex = expectedColumns.indexOf('Code Bail');
+                                const leading = codeBailIndex >= 0 ? codeBailIndex : 0;
+                                const trailing = Math.max(0, expectedColumns.length - (leading + rawRow.length));
+                                effectiveRow = [
+                                    ...Array(leading).fill(''),
+                                    ...rawRow,
+                                    ...Array(trailing).fill('')
+                                ];
+                            }
+
+                            for (let j = 0; j < Math.max(effectiveRow.length, expectedColumns.length); j++) {
+                                const cellValue = j < effectiveRow.length ? effectiveRow[j] : '';
                                 const columnName = j < processedData.headers.length ? processedData.headers[j] : '';
                                 const expectedColumn = j < expectedColumns.length ? expectedColumns[j] : '';
 
@@ -5927,10 +5949,33 @@ return;
             }
         }
 
+        function createActionCell(row, tabName) {
+            const actionCell = document.createElement('td');
+
+            if (tabName === 'verifbaux') {
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = '📋 PNI';
+                copyBtn.title = 'Copier vers PNI';
+                copyBtn.onclick = () => copyVerifRowToPNI(row);
+                actionCell.appendChild(copyBtn);
+            }
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '🗑️';
+            deleteBtn.onclick = () => deleteRow(row, tabName);
+            actionCell.appendChild(deleteBtn);
+
+            return actionCell;
+        }
+
         function buildRowElement(tabName, data = [], options = {}) {
             const { skipValidation = false } = options;
             const columns = tabConfigs[tabName]?.columns || [];
             const rowNum = ++rowCounters[tabName];
+            const actionAfterColumn = tabConfigs[tabName]?.actionAfterColumn || null;
+            let actionInserted = false;
 
             const row = document.createElement('tr');
             const rowId = options.rowId || generateUniqueId();
@@ -6052,27 +6097,20 @@ return;
 
                 cell.appendChild(input);
                 row.appendChild(cell);
+
+                if (!actionInserted && actionAfterColumn && column === actionAfterColumn) {
+                    row.appendChild(createActionCell(row, tabName));
+                    actionInserted = true;
+                }
             });
 
             if (tabName === 'misequalite') {
                 ensureMiseQualiteDefaults(row);
             }
 
-            const actionCell = document.createElement('td');
-            if (tabName === 'verifbaux') {
-                const copyBtn = document.createElement('button');
-                copyBtn.className = 'copy-btn';
-                copyBtn.textContent = '📋 PNI';
-                copyBtn.title = 'Copier vers PNI';
-                copyBtn.onclick = () => copyVerifRowToPNI(row);
-                actionCell.appendChild(copyBtn);
+            if (!actionInserted) {
+                row.appendChild(createActionCell(row, tabName));
             }
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-btn';
-            deleteBtn.textContent = '🗑️';
-            deleteBtn.onclick = () => deleteRow(row, tabName);
-            actionCell.appendChild(deleteBtn);
-            row.appendChild(actionCell);
 
             applyIntelligentRGFill(row, tabName);
             applyIntelligentUTFill(row, tabName);
