@@ -951,6 +951,20 @@
             white-space: nowrap;
         }
 
+        th.draggable-column {
+            cursor: grab;
+            user-select: none;
+        }
+
+        th.dragging-column {
+            opacity: 0.75;
+        }
+
+        th.drag-target {
+            outline: 2px dashed #ffcf33;
+            outline-offset: -4px;
+        }
+
         td {
             padding: 12px;
             border-bottom: 1px solid #eee;
@@ -4152,12 +4166,14 @@
         };
 
         const allowedRegions = ['ROUEN', 'LILLE', 'AMIENS'];
+        const columnStorageKey = 'martine_v17_column_orders';
 
         // Variables globales
         let rowCounters = {};
         let rgDatabase = {};
         let utDatabase = {};
         let columnSuggestions = {};
+        let columnDragState = { fromIndex: null };
         let currentPreviewData = null;
         let currentTabForPreview = null;
         let searchResults = [];
@@ -5947,6 +5963,265 @@ return;
             if (timestampIndex >= 0 && inputs[timestampIndex] && !inputs[timestampIndex].value) {
                 inputs[timestampIndex].value = formatQualityTimestamp();
             }
+        }
+
+        function getStoredColumnPreferences() {
+            try {
+                const raw = localStorage.getItem(columnStorageKey);
+                return raw ? JSON.parse(raw) : {};
+            } catch (error) {
+                console.error('Erreur lecture préférences colonnes:', error);
+                return {};
+            }
+        }
+
+        function saveColumnPreferences(tabName, columns, actionAfterColumn = null) {
+            try {
+                const prefs = getStoredColumnPreferences();
+                prefs[tabName] = {
+                    columns: Array.isArray(columns) ? [...columns] : [],
+                    actionAfterColumn: actionAfterColumn || null
+                };
+                localStorage.setItem(columnStorageKey, JSON.stringify(prefs));
+            } catch (error) {
+                console.error('Erreur sauvegarde ordre colonnes:', error);
+            }
+        }
+
+        function restoreColumnPreferences() {
+            try {
+                const prefs = getStoredColumnPreferences();
+                Object.keys(prefs).forEach(tabName => {
+                    if (!tabConfigs[tabName]) return;
+                    const { columns = [], actionAfterColumn = null } = prefs[tabName];
+                    if (Array.isArray(columns) && columns.length === tabConfigs[tabName].columns.length) {
+                        tabConfigs[tabName].columns = columns;
+                    }
+                    tabConfigs[tabName].actionAfterColumn = actionAfterColumn || null;
+                });
+            } catch (error) {
+                console.error('Erreur restauration préférences colonnes:', error);
+            }
+        }
+
+        function updateColumnConfigFromHeader(tabName) {
+            try {
+                const table = document.getElementById(`${tabName}Table`);
+                const headerRow = table?.querySelector('thead tr');
+                if (!table || !headerRow || !tabConfigs[tabName]) return;
+
+                const headers = Array.from(headerRow.children);
+                const columns = [];
+                let actionAfterColumn = null;
+
+                headers.forEach((th, index) => {
+                    if (index === 0) return;
+                    const label = th.textContent.trim();
+                    if (label.toLowerCase() === 'action') {
+                        const previousHeader = headers[index - 1];
+                        const previousLabel = previousHeader?.textContent.trim();
+                        if (previousLabel && previousLabel.toLowerCase() !== 'action' && previousLabel !== '#') {
+                            actionAfterColumn = previousLabel;
+                        } else {
+                            actionAfterColumn = null;
+                        }
+                        return;
+                    }
+
+                    columns.push(label);
+                    th.dataset.columnKey = label;
+                });
+
+                tabConfigs[tabName].columns = columns;
+                tabConfigs[tabName].actionAfterColumn = actionAfterColumn;
+                saveColumnPreferences(tabName, columns, actionAfterColumn);
+            } catch (error) {
+                console.error('Erreur mise à jour ordre colonnes:', error);
+            }
+        }
+
+        function applyColumnLayout(tabName) {
+            try {
+                const table = document.getElementById(`${tabName}Table`);
+                const headerRow = table?.querySelector('thead tr');
+                const body = document.getElementById(`${tabName}TableBody`);
+                if (!table || !headerRow || !body) return;
+
+                const headers = Array.from(headerRow.children);
+                const headerMap = new Map();
+                headers.forEach((th, idx) => headerMap.set(th.textContent.trim(), { th, idx }));
+
+                const numberHeader = headers[0];
+                const actionHeader = headers.find(th => th.textContent.trim().toLowerCase() === 'action');
+                const orderedHeaders = [numberHeader];
+
+                (tabConfigs[tabName]?.columns || []).forEach(col => {
+                    const entry = headerMap.get(col);
+                    if (entry && !orderedHeaders.includes(entry.th)) {
+                        orderedHeaders.push(entry.th);
+                    }
+                });
+
+                if (actionHeader) {
+                    const afterColumn = tabConfigs[tabName]?.actionAfterColumn;
+                    const insertIndex = afterColumn
+                        ? orderedHeaders.findIndex(th => th.textContent.trim() === afterColumn) + 1
+                        : orderedHeaders.length;
+                    orderedHeaders.splice(Math.max(insertIndex, 1), 0, actionHeader);
+                }
+
+                headers.forEach(th => {
+                    if (!orderedHeaders.includes(th)) {
+                        orderedHeaders.push(th);
+                    }
+                });
+
+                headerRow.innerHTML = '';
+                orderedHeaders.forEach(th => headerRow.appendChild(th));
+
+                Array.from(body.rows).forEach(row => {
+                    const cells = Array.from(row.children);
+                    const cellMap = new Map();
+                    headers.forEach((th, idx) => cellMap.set(th.textContent.trim(), cells[idx]));
+
+                    const orderedCells = [];
+                    orderedHeaders.forEach(th => {
+                        const cell = cellMap.get(th.textContent.trim());
+                        if (cell) {
+                            orderedCells.push(cell);
+                        }
+                    });
+
+                    row.innerHTML = '';
+                    orderedCells.forEach(cell => row.appendChild(cell));
+                });
+
+                setupColumnDragAndDrop(tabName);
+            } catch (error) {
+                console.error('Erreur application ordre colonnes:', error);
+            }
+        }
+
+        function applyAllColumnLayouts() {
+            Object.keys(tabConfigs).forEach(tabName => applyColumnLayout(tabName));
+        }
+
+        function getHeaderIndex(th) {
+            if (!th || !th.parentElement) return -1;
+            return Array.from(th.parentElement.children).indexOf(th);
+        }
+
+        function handleColumnDragStart(event, tabName) {
+            const th = event.target.closest('th');
+            if (!th) return;
+            const index = getHeaderIndex(th);
+            if (index === 0) return;
+
+            columnDragState.fromIndex = index;
+            th.classList.add('dragging-column');
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleColumnDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleColumnDragEnter(event) {
+            const th = event.target.closest('th');
+            if (!th || getHeaderIndex(th) === 0) return;
+            th.classList.add('drag-target');
+        }
+
+        function handleColumnDragLeave(event) {
+            const th = event.target.closest('th');
+            if (th) {
+                th.classList.remove('drag-target');
+            }
+        }
+
+        function resetColumnDragVisuals() {
+            document.querySelectorAll('th.dragging-column, th.drag-target').forEach(th => {
+                th.classList.remove('dragging-column', 'drag-target');
+            });
+        }
+
+        function handleColumnDrop(event, tabName) {
+            event.preventDefault();
+            const targetTh = event.target.closest('th');
+            if (!targetTh) return;
+
+            const targetIndex = getHeaderIndex(targetTh);
+            if (columnDragState.fromIndex === null || columnDragState.fromIndex === targetIndex || targetIndex === 0) {
+                resetColumnDragVisuals();
+                return;
+            }
+
+            applyColumnReorder(tabName, columnDragState.fromIndex, targetIndex);
+            resetColumnDragVisuals();
+            columnDragState.fromIndex = null;
+        }
+
+        function handleColumnDragEnd() {
+            resetColumnDragVisuals();
+            columnDragState.fromIndex = null;
+        }
+
+        function applyColumnReorder(tabName, fromIndex, toIndex) {
+            try {
+                const table = document.getElementById(`${tabName}Table`);
+                const headerRow = table?.querySelector('thead tr');
+                const body = document.getElementById(`${tabName}TableBody`);
+                if (!table || !headerRow || !body) return;
+
+                if (fromIndex === toIndex || fromIndex === 0 || toIndex === 0) return;
+
+                const headers = Array.from(headerRow.children);
+                const referenceHeader = headers[toIndex];
+                headerRow.insertBefore(headers[fromIndex], toIndex > fromIndex ? referenceHeader.nextSibling : referenceHeader);
+
+                Array.from(body.rows).forEach(row => {
+                    const cells = Array.from(row.children);
+                    const referenceCell = cells[toIndex];
+                    row.insertBefore(cells[fromIndex], toIndex > fromIndex ? referenceCell.nextSibling : referenceCell);
+                });
+
+                updateColumnConfigFromHeader(tabName);
+                logActivity(`Colonnes réorganisées dans ${getTabDisplayName(tabName)}`, 'info');
+                queueSaveAllData();
+            } catch (error) {
+                console.error('Erreur réorganisation colonnes:', error);
+            }
+        }
+
+        function setupColumnDragAndDrop(tabName) {
+            try {
+                const table = document.getElementById(`${tabName}Table`);
+                const headerRow = table?.querySelector('thead tr');
+                if (!table || !headerRow) return;
+
+                const headers = Array.from(headerRow.children);
+                headers.forEach((th, index) => {
+                    if (index === 0) return;
+                    if (th.dataset.dragEnabled === 'true') return;
+
+                    th.dataset.dragEnabled = 'true';
+                    th.classList.add('draggable-column');
+                    th.draggable = true;
+                    th.addEventListener('dragstart', (event) => handleColumnDragStart(event, tabName));
+                    th.addEventListener('dragover', handleColumnDragOver);
+                    th.addEventListener('dragenter', handleColumnDragEnter);
+                    th.addEventListener('dragleave', handleColumnDragLeave);
+                    th.addEventListener('drop', (event) => handleColumnDrop(event, tabName));
+                    th.addEventListener('dragend', handleColumnDragEnd);
+                });
+            } catch (error) {
+                console.error('Erreur configuration du glisser-déposer colonnes:', error);
+            }
+        }
+
+        function setupAllColumnDragAndDrop() {
+            Object.keys(tabConfigs).forEach(tabName => setupColumnDragAndDrop(tabName));
         }
 
         function createActionCell(row, tabName) {
@@ -12526,6 +12801,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     missions: missions,
                     missionNotebook: missionNotebook,
                     activityLog: activityLog,
+                    columnOrders: getStoredColumnPreferences(),
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -12606,6 +12882,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     missions: missions,
                     missionNotebook: missionNotebook,
                     activityLog: activityLog,
+                    columnOrders: getStoredColumnPreferences(),
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -12725,6 +13002,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 return acc;
             }, {});
 
+            if (data.columnOrders) {
+                Object.keys(data.columnOrders).forEach(tabName => {
+                    if (!tabConfigs[tabName]) return;
+                    const { columns = [], actionAfterColumn = null } = data.columnOrders[tabName] || {};
+                    if (Array.isArray(columns) && columns.length === tabConfigs[tabName].columns.length) {
+                        tabConfigs[tabName].columns = columns;
+                    }
+                    tabConfigs[tabName].actionAfterColumn = actionAfterColumn || null;
+                    saveColumnPreferences(tabName, tabConfigs[tabName].columns, tabConfigs[tabName].actionAfterColumn);
+                });
+            }
+
             if (data.rowCounters) {
                 Object.keys(data.rowCounters).forEach(tabName => {
                     if (typeof data.rowCounters[tabName] === 'number') {
@@ -12838,6 +13127,8 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMissionList();
             renderMissionNotebook();
             renderMissionCalendar();
+            applyAllColumnLayouts();
+            setupAllColumnDragAndDrop();
             rebuildColumnSuggestions();
             queueSaveAllData();
         }
@@ -12877,7 +13168,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 🔧 INITIALISATION COMPLÈTE
         function initializeApp() {
             try {
+                restoreColumnPreferences();
                 loadAllData();
+                applyAllColumnLayouts();
                 populateMiseQualiteMonths();
                 filterMiseQualiteByMonth();
                 refreshRGSuggestions();
@@ -12896,11 +13189,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 resetMissionFocus();
                 renderMissionList();
                 renderMissionCalendar();
+                setupAllColumnDragAndDrop();
 
                 showNotification('🚀 MARTINE - Tous onglets fonctionnels', 'success');
                 showSaveStatus('💾 Application prête - Auto-sauvegarde activée');
                 logActivity('Application MARTINE initialisée', 'success');
-                
+
             } catch (error) {
                 console.error('Erreur initialisation:', error);
                 showNotification('❌ Erreur lors de l\'initialisation', 'error');
