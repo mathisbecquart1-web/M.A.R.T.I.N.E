@@ -2999,6 +2999,148 @@
             </div>
         </div>
 
+        <!-- ONGLET MISE EN QUALITÉ -->
+        <div id="misequalite" class="tab-content">
+            <!-- FILTRES -->
+            <div class="filters-section">
+                <h4>🧹 Préparation mensuelle</h4>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Mois de travail</label>
+                        <select id="misequaliteMonthSelector" onchange="filterMiseQualiteByMonth()"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Recherche rapide</label>
+                        <input type="text" id="filterMisequaliteSearch" placeholder="Filtrer le tableau..." oninput="filterTable('misequalite')">
+                    </div>
+                    <div class="filter-group">
+                        <label>Traité ?</label>
+                        <select id="filterMisequaliteStatus" onchange="filterTable('misequalite')">
+                            <option value="">Tous</option>
+                            <option value="oui">Traités</option>
+                            <option value="non">En attente</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMPORT/EXPORT -->
+            <div class="import-export-section">
+                <h4>📥 Imports mensuels</h4>
+                <div class="import-methods">
+                    <div class="import-method">
+                        <h5>📁 Import fichier Excel</h5>
+                        <p>Sélectionnez le mois cible puis importez l'export mensuel.</p>
+                        <div class="file-drop-zone">
+                            <input type="file" class="file-input-hidden" id="fileInputMisequalite" accept=".xlsx,.xls,.csv" onchange="handleFileImport('misequalite', this)">
+                            <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
+                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
+                            <div style="color: #666; font-size: 14px;">Normalisation automatique et horodatage</div>
+                        </div>
+                    </div>
+
+                    <div class="import-method">
+                        <h5>📋 Copier-Coller Excel</h5>
+                        <p>Collez un extrait mensuel directement depuis Excel.</p>
+                        <button class="btn btn-primary" onclick="togglePasteArea('misequalite')">📋 Ouvrir zone de collage</button>
+
+                        <div class="paste-area" id="pasteAreaMisequalite">
+                            <h5 style="margin-bottom: 15px; color: #2c3e50;">📋 Zone de collage Excel</h5>
+                            <textarea class="paste-textarea" id="pasteTextareaMisequalite"
+                                      placeholder="Collez vos données Excel ici..."></textarea>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-primary" onclick="analyzePastedData('misequalite')">🔍 Analyser et prévisualiser</button>
+                                <button class="btn btn-danger" onclick="togglePasteArea('misequalite')">❌ Annuler</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTRÔLES -->
+            <div class="controls">
+                <button class="btn btn-primary" onclick="addRow('misequalite')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('misequalite')">✏️ Mise à jour en masse</button>
+                <button class="btn btn-excel" onclick="exportToExcel('misequalite')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('misequalite')">📤 Exporter la sélection</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('misequalite')">🗑️ Supprimer sélection</button>
+                <button class="btn btn-danger" onclick="clearAll('misequalite')">🗑️ Effacer tout</button>
+            </div>
+
+            <!-- TABLEAU -->
+            <div class="table-container">
+                <table id="misequaliteTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th>Horodatage</th>
+                            <th>Mois</th>
+                            <th>Date Traitement</th>
+                            <th>Code Bail</th>
+                            <th>Libelle Bail</th>
+                            <th>Etat du Bail</th>
+                            <th>Debut Bail</th>
+                            <th>Fin Bail</th>
+                            <th>Resiliation Bail</th>
+                            <th>Code UTBAT</th>
+                            <th>Surface Occupee Bail</th>
+                            <th>Surface Proratisee</th>
+                            <th>SA Donneur</th>
+                            <th>BU Donneur</th>
+                            <th>Division Donneur</th>
+                            <th>Code RG Donneur</th>
+                            <th>Nom RG Donneur</th>
+                            <th>Code Tiers Donneur</th>
+                            <th>Nom Tiers Donneur</th>
+                            <th>SA Occupant</th>
+                            <th>BU Occupant</th>
+                            <th>Division Occupant</th>
+                            <th>Code RG Occupant</th>
+                            <th>Nom RG Occupant</th>
+                            <th>Code Tiers Occupant</th>
+                            <th>Nom Tiers Occupant</th>
+                            <th>Axe Local</th>
+                            <th>Code Contexte</th>
+                            <th>Proprietaire Juridique UTBAT En Cours</th>
+                            <th>Proprietaire Interne UTBAT En Cours</th>
+                            <th>Dernier Proprietaire Juridique UTBAT</th>
+                            <th>Dernier Proprietaire Interne UTBAT</th>
+                            <th>Nature Bien Batiment</th>
+                            <th>Portefeuille UTBAT</th>
+                            <th>Entite Regionale UTBAT</th>
+                            <th>Code Emploi UTBAT</th>
+                            <th>Surface Developpee UTBAT</th>
+                            <th>Surface Locative UTBAT</th>
+                            <th>Code UT</th>
+                            <th>Nom UT</th>
+                            <th>Traité</th>
+                            <th>Commentaire</th>
+                            <th style="width: 50px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="misequaliteTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- STATISTIQUES -->
+            <div class="stats">
+                <div class="stats-item">📊 Total: <span id="misequaliteTotalRows">0</span></div>
+                <div class="stats-item">✅ Traités: <span id="misequaliteProcessedRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'misequalite')">
+                    <div class="stat-header">
+                        <span class="stat-toggle" aria-hidden="true">▸</span>
+                        <div class="stat-main">⏳ En attente: <span id="misequalitePendingRows">0</span></div>
+                    </div>
+                    <span class="stat-hint">Cliquer pour ouvrir la prochaine ligne en attente</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('misequalite');">📍 Aller aux en attente</button>
+                    </div>
+                    <div class="pending-list" id="misequalitePendingList"></div>
+                </div>
+                <div class="stats-item">📈 Taux: <span id="misequaliteCompletionRate">0%</span></div>
+            </div>
+        </div>
+
         <!-- ONGLET BASE RG & UT -->
         <div id="baserg" class="tab-content">
             <datalist id="rgDatalist"></datalist>
@@ -3917,6 +4059,20 @@
                 columns: ['GA', 'UT-BAT', 'RG', 'Numéro Bail', 'État', 'Lieu', 'Nom du Bâtiment', 'Région', 'Commentaire', 'Traité'],
                 displayName: 'PNI',
                 icon: '🧾'
+            },
+            misequalite: {
+                columns: [
+                    'Horodatage', 'Mois', 'Date Traitement', 'Code Bail', 'Libelle Bail', 'Etat du Bail', 'Debut Bail', 'Fin Bail',
+                    'Resiliation Bail', 'Code UTBAT', 'Surface Occupee Bail', 'Surface Proratisee', 'SA Donneur', 'BU Donneur',
+                    'Division Donneur', 'Code RG Donneur', 'Nom RG Donneur', 'Code Tiers Donneur', 'Nom Tiers Donneur',
+                    'SA Occupant', 'BU Occupant', 'Division Occupant', 'Code RG Occupant', 'Nom RG Occupant', 'Code Tiers Occupant',
+                    'Nom Tiers Occupant', 'Axe Local', 'Code Contexte', 'Proprietaire Juridique UTBAT En Cours',
+                    'Proprietaire Interne UTBAT En Cours', 'Dernier Proprietaire Juridique UTBAT', 'Dernier Proprietaire Interne UTBAT',
+                    'Nature Bien Batiment', 'Portefeuille UTBAT', 'Entite Regionale UTBAT', 'Code Emploi UTBAT',
+                    'Surface Developpee UTBAT', 'Surface Locative UTBAT', 'Code UT', 'Nom UT', 'Traité', 'Commentaire'
+                ],
+                displayName: 'Mise en qualité',
+                icon: '🧹'
             },
             baserg: {
                 columns: ['Code RG', 'Nom de RG', 'Utilisations', 'Dernière utilisation'],
@@ -5723,6 +5879,49 @@ return;
             return field;
         }
 
+        function getMiseQualiteMonth() {
+            const selector = document.getElementById('misequaliteMonthSelector');
+            return selector?.value || formatMonthKey();
+        }
+
+        function stampMiseQualiteRow(row) {
+            const columns = tabConfigs['misequalite']?.columns || [];
+            if (!columns.length || !row) return;
+            const inputs = row.querySelectorAll('input, textarea, select');
+            const timestampIndex = columns.indexOf('Horodatage');
+            const monthIndex = columns.indexOf('Mois');
+            const dateTraitementIndex = columns.indexOf('Date Traitement');
+
+            if (timestampIndex >= 0 && inputs[timestampIndex]) {
+                inputs[timestampIndex].value = formatQualityTimestamp();
+            }
+
+            if (monthIndex >= 0 && inputs[monthIndex] && !inputs[monthIndex].value) {
+                inputs[monthIndex].value = getMiseQualiteMonth();
+            }
+
+            if (dateTraitementIndex >= 0 && inputs[dateTraitementIndex] && !inputs[dateTraitementIndex].value) {
+                inputs[dateTraitementIndex].value = formatDateKey(new Date());
+            }
+        }
+
+        function ensureMiseQualiteDefaults(row) {
+            const columns = tabConfigs['misequalite']?.columns || [];
+            if (!columns.length || !row || row.dataset.tab !== 'misequalite') return;
+
+            const inputs = row.querySelectorAll('input, textarea, select');
+            const monthIndex = columns.indexOf('Mois');
+            const timestampIndex = columns.indexOf('Horodatage');
+
+            if (monthIndex >= 0 && inputs[monthIndex] && !inputs[monthIndex].value) {
+                inputs[monthIndex].value = getMiseQualiteMonth();
+            }
+
+            if (timestampIndex >= 0 && inputs[timestampIndex] && !inputs[timestampIndex].value) {
+                inputs[timestampIndex].value = formatQualityTimestamp();
+            }
+        }
+
         function buildRowElement(tabName, data = [], options = {}) {
             const { skipValidation = false } = options;
             const columns = tabConfigs[tabName]?.columns || [];
@@ -5817,6 +6016,26 @@ return;
                     autoResizeField(input);
                     applySmartSuggestion(input, column);
                     validateInputInRealTime(input, column, tabName);
+                    if (tabName === 'misequalite') {
+                        const inputs = row.querySelectorAll('input, textarea, select');
+                        const timestampIndex = columns.indexOf('Horodatage');
+                        const moisIndex = columns.indexOf('Mois');
+                        const dateTraitementIndex = columns.indexOf('Date Traitement');
+
+                        if (timestampIndex >= 0 && inputs[timestampIndex]) {
+                            inputs[timestampIndex].value = formatQualityTimestamp();
+                        }
+
+                        if (moisIndex >= 0 && inputs[moisIndex] && !inputs[moisIndex].value) {
+                            inputs[moisIndex].value = getMiseQualiteMonth();
+                        }
+
+                        if (column === 'Traité' && input.value.toLowerCase() === 'oui' && dateTraitementIndex >= 0 && inputs[dateTraitementIndex]) {
+                            inputs[dateTraitementIndex].value = formatDateKey(new Date());
+                        } else if (column !== 'Horodatage' && dateTraitementIndex >= 0 && inputs[dateTraitementIndex] && !inputs[dateTraitementIndex].value) {
+                            inputs[dateTraitementIndex].value = formatDateKey(new Date());
+                        }
+                    }
                     queueSaveAllData();
                     queueStatsUpdate(tabName);
                 });
@@ -5829,6 +6048,10 @@ return;
                 cell.appendChild(input);
                 row.appendChild(cell);
             });
+
+            if (tabName === 'misequalite') {
+                ensureMiseQualiteDefaults(row);
+            }
 
             const actionCell = document.createElement('td');
             if (tabName === 'verifbaux') {
@@ -5866,6 +6089,9 @@ return;
                 }
 
                 updateStats(tabName);
+                if (tabName === 'misequalite') {
+                    filterMiseQualiteByMonth();
+                }
                 if (tabName === 'baserg') {
                     updateRGDatabase();
                 } else if (tabName === 'baseut') {
@@ -5906,6 +6132,9 @@ return;
 
                 if (!skipStats) {
                     updateStats(tabName);
+                    if (tabName === 'misequalite') {
+                        filterMiseQualiteByMonth();
+                    }
                     if (tabName === 'baserg') {
                         updateRGDatabase();
                     } else if (tabName === 'baseut') {
@@ -6400,6 +6629,28 @@ return;
                     document.getElementById(`${tabName}ProcessedRows`).textContent = treated;
                     document.getElementById(`${tabName}PendingRows`).textContent = pendingRows;
 
+                    const completionRate = total > 0 ? Math.round((treated / total) * 100) : 0;
+                    document.getElementById(`${tabName}CompletionRate`).textContent = completionRate + '%';
+
+                } else if (tabName === 'misequalite') {
+                    let treated = 0;
+
+                    rows.forEach(row => {
+                        const inputs = row.querySelectorAll('input, textarea, select');
+                        const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
+                        const traiteInput = inputs[traiteIndex];
+                        const traite = traiteInput ? traiteInput.value.toLowerCase() : '';
+
+                        if (traite === 'oui') {
+                            treated++;
+                        }
+                    });
+
+                    const pendingRows = Math.max(total - treated, 0);
+
+                    document.getElementById(`${tabName}TotalRows`).textContent = total;
+                    document.getElementById(`${tabName}ProcessedRows`).textContent = treated;
+                    document.getElementById(`${tabName}PendingRows`).textContent = pendingRows;
                     const completionRate = total > 0 ? Math.round((treated / total) * 100) : 0;
                     document.getElementById(`${tabName}CompletionRate`).textContent = completionRate + '%';
 
@@ -8724,6 +8975,14 @@ return;
             return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         }
 
+        function formatMonthKey(date = new Date()) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function formatQualityTimestamp(date = new Date()) {
+            return date.toLocaleString('fr-FR');
+        }
+
         function syncMissionInputs() {
             const dateInput = document.getElementById('missionFocusDate');
             const monthInput = document.getElementById('missionMonthPicker');
@@ -9374,21 +9633,38 @@ return;
                 rows.forEach(row => {
                     let showRow = true;
                     const inputs = row.querySelectorAll('input, textarea, select');
-                    
+
                     Object.keys(filters).forEach(filterName => {
                         const filterValue = filters[filterName].toLowerCase();
                         if (!filterValue) return;
-                        
+
+                        if (filterName === 'Search') {
+                            const rowText = Array.from(inputs).map(i => i.value.toLowerCase()).join(' ');
+                            if (!rowText.includes(filterValue)) {
+                                showRow = false;
+                            }
+                            return;
+                        }
+
+                        if (filterName === 'Status' && tabName === 'misequalite') {
+                            const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
+                            const traiteValue = inputs[traiteIndex]?.value.toLowerCase() || '';
+                            if (filterValue !== traiteValue) {
+                                showRow = false;
+                            }
+                            return;
+                        }
+
                         const columnIndex = getColumnIndex(tabName, filterName);
                         if (columnIndex >= 0 && columnIndex < inputs.length) {
                             const cellValue = inputs[columnIndex].value.toLowerCase();
-                            
+
                             if (filterName.includes('Date')) {
                                 if (!filterDateRange(cellValue, filterValue, filterName)) {
                                     showRow = false;
                                 }
                             } else if (filterName === 'Status') {
-                                const hasDateTraitement = inputs[tabConfigs[tabName].columns.indexOf('Date Traitement')] && 
+                                const hasDateTraitement = inputs[tabConfigs[tabName].columns.indexOf('Date Traitement')] &&
                                                          inputs[tabConfigs[tabName].columns.indexOf('Date Traitement')].value;
                                 const isProcessed = hasDateTraitement ? 'traite' : 'attente';
                                 if (filterValue !== isProcessed) {
@@ -9401,7 +9677,7 @@ return;
                             }
                         }
                     });
-                    
+
                     row.style.display = showRow ? '' : 'none';
                 });
                 
@@ -9444,6 +9720,40 @@ return;
             
             const columnName = columnMap[filterName];
             return columnName ? columns.indexOf(columnName) : -1;
+        }
+
+        function filterMiseQualiteByMonth() {
+            const tbody = document.getElementById('misequaliteTableBody');
+            if (!tbody) return;
+
+            const selectedMonth = getMiseQualiteMonth();
+            const columns = tabConfigs['misequalite']?.columns || [];
+            const monthIndex = columns.indexOf('Mois');
+
+            tbody.querySelectorAll('tr').forEach(row => {
+                const inputs = row.querySelectorAll('input, textarea, select');
+                const monthValue = inputs[monthIndex]?.value || '';
+                row.style.display = !selectedMonth || monthValue === selectedMonth ? '' : 'none';
+            });
+        }
+
+        function populateMiseQualiteMonths() {
+            const selector = document.getElementById('misequaliteMonthSelector');
+            if (!selector) return;
+
+            const now = new Date();
+            selector.innerHTML = '';
+
+            for (let i = 0; i < 12; i++) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const value = formatMonthKey(date);
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+                selector.appendChild(option);
+            }
+
+            selector.value = formatMonthKey(now);
         }
 
         function filterDateRange(cellValue, filterValue, filterType) {
@@ -12525,6 +12835,8 @@ document.addEventListener('DOMContentLoaded', () => {
         function initializeApp() {
             try {
                 loadAllData();
+                populateMiseQualiteMonths();
+                filterMiseQualiteByMonth();
                 refreshRGSuggestions();
                 renderTaskExcelCells();
 
