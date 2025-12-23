@@ -928,9 +928,15 @@
         }
 
         table {
-            width: 100%;
+            width: max-content;
+            min-width: 100%;
             border-collapse: collapse;
             font-size: 14px;
+        }
+
+        th,
+        td {
+            white-space: nowrap;
         }
 
         th {
@@ -942,16 +948,28 @@
             position: sticky;
             top: 0;
             z-index: 10;
-            word-break: break-word;
-            white-space: normal;
+            white-space: nowrap;
+        }
+
+        th.draggable-column {
+            cursor: grab;
+            user-select: none;
+        }
+
+        th.dragging-column {
+            opacity: 0.75;
+        }
+
+        th.drag-target {
+            outline: 2px dashed #ffcf33;
+            outline-offset: -4px;
         }
 
         td {
             padding: 12px;
             border-bottom: 1px solid #eee;
             vertical-align: top;
-            word-break: break-word;
-            white-space: normal;
+            white-space: nowrap;
         }
 
         tr:hover {
@@ -2184,6 +2202,7 @@
         <button class="tab" onclick="switchTab('modifsurface')">📐 Modification surface</button>
         <button class="tab" onclick="switchTab('verifbaux')">✅ Vérification baux</button>
         <button class="tab" onclick="switchTab('pni')">🧾 PNI</button>
+        <button class="tab" onclick="switchTab('misequalite')">🧹 Mise en qualité</button>
         <button class="tab" onclick="switchTab('baserg')">🗂️ Base RG & UT</button>
         <button class="tab" onclick="switchTab('missions')">🗓️ Missions</button>
         <button class="tab" onclick="switchTab('taches')">📝 Tâches à faire</button>
@@ -2268,6 +2287,7 @@
                 <button class="btn btn-primary" onclick="addRow('creation')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('creation')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('creation')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('creation')">📤 Exporter la sélection</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('creation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('creation')">🗑️ Effacer tout</button>
             </div>
@@ -2388,6 +2408,7 @@
                 <button class="btn btn-primary" onclick="addRow('modification')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('modification')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modification')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('modification')">📤 Exporter la sélection</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('modification')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modification')">🗑️ Effacer tout</button>
             </div>
@@ -2508,6 +2529,7 @@
                 <button class="btn btn-primary" onclick="addRow('resiliation')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('resiliation')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('resiliation')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('resiliation')">📤 Exporter la sélection</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('resiliation')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('resiliation')">🗑️ Effacer tout</button>
             </div>
@@ -2626,6 +2648,7 @@
                 <button class="btn btn-primary" onclick="addRow('autremodif')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('autremodif')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('autremodif')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('autremodif')">📤 Exporter la sélection</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('autremodif')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('autremodif')">🗑️ Effacer tout</button>
             </div>
@@ -2741,6 +2764,7 @@
                 <button class="btn btn-primary" onclick="addRow('modifsurface')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('modifsurface')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('modifsurface')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('modifsurface')">📤 Exporter la sélection</button>
                 <button class="btn btn-warning" onclick="recalculateAllSurfaces()">🔄 Recalculer toutes les différences</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('modifsurface')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('modifsurface')">🗑️ Effacer tout</button>
@@ -2854,6 +2878,8 @@
                 <button class="btn btn-primary" onclick="addRow('verifbaux')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('verifbaux')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('verifbaux')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('verifbaux')">📤 Exporter la sélection</button>
+                <button class="btn btn-secondary" onclick="correctRegionCells('verifbaux')">🧹 Corriger les régions</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('verifbaux')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('verifbaux')">🗑️ Effacer tout</button>
             </div>
@@ -2940,6 +2966,8 @@
                 <button class="btn btn-primary" onclick="addRow('pni')">➕ Ajouter ligne</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('pni')">✏️ Mise à jour en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('pni')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('pni')">📤 Exporter la sélection</button>
+                <button class="btn btn-secondary" onclick="correctRegionCells('pni')">🧹 Corriger les régions</button>
                 <button class="btn btn-danger" onclick="deleteSelectedRows('pni')">🗑️ Supprimer sélection</button>
                 <button class="btn btn-danger" onclick="clearAll('pni')">🗑️ Effacer tout</button>
             </div>
@@ -2987,6 +3015,148 @@
                 </div>
                 <div class="stats-item">📈 Taux de validation: <span id="pniValidationRate">0%</span></div>
                 <div class="stats-item">📈 Taux de traitement: <span id="pniCompletionRate">0%</span></div>
+            </div>
+        </div>
+
+        <!-- ONGLET MISE EN QUALITÉ -->
+        <div id="misequalite" class="tab-content">
+            <!-- FILTRES -->
+            <div class="filters-section">
+                <h4>🧹 Préparation mensuelle</h4>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Mois de travail</label>
+                        <select id="misequaliteMonthSelector" onchange="filterMiseQualiteByMonth()"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Recherche rapide</label>
+                        <input type="text" id="filterMisequaliteSearch" placeholder="Filtrer le tableau..." oninput="filterTable('misequalite')">
+                    </div>
+                    <div class="filter-group">
+                        <label>Traité ?</label>
+                        <select id="filterMisequaliteStatus" onchange="filterTable('misequalite')">
+                            <option value="">Tous</option>
+                            <option value="oui">Traités</option>
+                            <option value="non">En attente</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMPORT/EXPORT -->
+            <div class="import-export-section">
+                <h4>📥 Imports mensuels</h4>
+                <div class="import-methods">
+                    <div class="import-method">
+                        <h5>📁 Import fichier Excel</h5>
+                        <p>Sélectionnez le mois cible puis importez l'export mensuel.</p>
+                        <div class="file-drop-zone">
+                            <input type="file" class="file-input-hidden" id="fileInputMisequalite" accept=".xlsx,.xls,.csv" onchange="handleFileImport('misequalite', this)">
+                            <div style="font-size: 48px; color: #667eea; margin-bottom: 15px;">📁</div>
+                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Cliquez ou glissez votre fichier</div>
+                            <div style="color: #666; font-size: 14px;">Normalisation automatique et horodatage</div>
+                        </div>
+                    </div>
+
+                    <div class="import-method">
+                        <h5>📋 Copier-Coller Excel</h5>
+                        <p>Collez un extrait mensuel directement depuis Excel.</p>
+                        <button class="btn btn-primary" onclick="togglePasteArea('misequalite')">📋 Ouvrir zone de collage</button>
+
+                        <div class="paste-area" id="pasteAreaMisequalite">
+                            <h5 style="margin-bottom: 15px; color: #2c3e50;">📋 Zone de collage Excel</h5>
+                            <textarea class="paste-textarea" id="pasteTextareaMisequalite"
+                                      placeholder="Collez vos données Excel ici..."></textarea>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-primary" onclick="analyzePastedData('misequalite')">🔍 Analyser et prévisualiser</button>
+                                <button class="btn btn-danger" onclick="togglePasteArea('misequalite')">❌ Annuler</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTRÔLES -->
+            <div class="controls">
+                <button class="btn btn-primary" onclick="addRow('misequalite')">➕ Ajouter ligne</button>
+                <button class="btn btn-secondary" onclick="openBulkUpdateModal('misequalite')">✏️ Mise à jour en masse</button>
+                <button class="btn btn-excel" onclick="exportToExcel('misequalite')">📊 Exporter Excel</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('misequalite')">📤 Exporter la sélection</button>
+                <button class="btn btn-danger" onclick="deleteSelectedRows('misequalite')">🗑️ Supprimer sélection</button>
+                <button class="btn btn-danger" onclick="clearAll('misequalite')">🗑️ Effacer tout</button>
+            </div>
+
+            <!-- TABLEAU -->
+            <div class="table-container">
+                <table id="misequaliteTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th>Horodatage</th>
+                            <th>Mois</th>
+                            <th>Date Traitement</th>
+                            <th>Traité</th>
+                            <th>Commentaire</th>
+                            <th style="width: 50px;">Action</th>
+                            <th>Code Bail</th>
+                            <th>Libelle Bail</th>
+                            <th>Etat du Bail</th>
+                            <th>Debut Bail</th>
+                            <th>Fin Bail</th>
+                            <th>Resiliation Bail</th>
+                            <th>Code UTBAT</th>
+                            <th>Surface Occupee Bail</th>
+                            <th>Surface Proratisee</th>
+                            <th>SA Donneur</th>
+                            <th>BU Donneur</th>
+                            <th>Division Donneur</th>
+                            <th>Code RG Donneur</th>
+                            <th>Nom RG Donneur</th>
+                            <th>Code Tiers Donneur</th>
+                            <th>Nom Tiers Donneur</th>
+                            <th>SA Occupant</th>
+                            <th>BU Occupant</th>
+                            <th>Division Occupant</th>
+                            <th>Code RG Occupant</th>
+                            <th>Nom RG Occupant</th>
+                            <th>Code Tiers Occupant</th>
+                            <th>Nom Tiers Occupant</th>
+                            <th>Axe Local</th>
+                            <th>Code Contexte</th>
+                            <th>Proprietaire Juridique UTBAT En Cours</th>
+                            <th>Proprietaire Interne UTBAT En Cours</th>
+                            <th>Dernier Proprietaire Juridique UTBAT</th>
+                            <th>Dernier Proprietaire Interne UTBAT</th>
+                            <th>Nature Bien Batiment</th>
+                            <th>Portefeuille UTBAT</th>
+                            <th>Entite Regionale UTBAT</th>
+                            <th>Code Emploi UTBAT</th>
+                            <th>Surface Developpee UTBAT</th>
+                            <th>Surface Locative UTBAT</th>
+                            <th>Code UT</th>
+                            <th>Nom UT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="misequaliteTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- STATISTIQUES -->
+            <div class="stats">
+                <div class="stats-item">📊 Total: <span id="misequaliteTotalRows">0</span></div>
+                <div class="stats-item">✅ Traités: <span id="misequaliteProcessedRows">0</span></div>
+                <div class="stats-item pending-expand" onclick="togglePendingStat(this, 'misequalite')">
+                    <div class="stat-header">
+                        <span class="stat-toggle" aria-hidden="true">▸</span>
+                        <div class="stat-main">⏳ En attente: <span id="misequalitePendingRows">0</span></div>
+                    </div>
+                    <span class="stat-hint">Cliquer pour ouvrir la prochaine ligne en attente</span>
+                    <div class="stat-actions">
+                        <button class="btn btn-secondary btn-compact" onclick="event.stopPropagation(); goToNextPending('misequalite');">📍 Aller aux en attente</button>
+                    </div>
+                    <div class="pending-list" id="misequalitePendingList"></div>
+                </div>
+                <div class="stats-item">📈 Taux: <span id="misequaliteCompletionRate">0%</span></div>
             </div>
         </div>
 
@@ -3105,7 +3275,9 @@
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('baserg')">✏️ Mise à jour RG en masse</button>
                 <button class="btn btn-secondary" onclick="openBulkUpdateModal('baseut')">✏️ Mise à jour UT en masse</button>
                 <button class="btn btn-excel" onclick="exportToExcel('baserg')">📊 Exporter Base RG</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('baserg')">📤 Exporter la sélection RG</button>
                 <button class="btn btn-excel" onclick="exportToExcel('baseut')">📊 Exporter Base UT</button>
+                <button class="btn btn-excel" onclick="exportSelectionToExcel('baseut')">📤 Exporter la sélection UT</button>
                 <button class="btn btn-warning" onclick="validateAllRGCodes()">🔍 Vérifier codes RG dans tous les onglets</button>
                 <button class="btn btn-success" onclick="buildRGDatabase()">🔄 Reconstruire index RG</button>
                 <button class="btn btn-success" onclick="buildUTDatabase()">🔄 Reconstruire index UT</button>
@@ -3907,6 +4079,21 @@
                 displayName: 'PNI',
                 icon: '🧾'
             },
+            misequalite: {
+                columns: [
+                    'Horodatage', 'Mois', 'Date Traitement', 'Traité', 'Commentaire', 'Code Bail', 'Libelle Bail', 'Etat du Bail', 'Debut Bail', 'Fin Bail',
+                    'Resiliation Bail', 'Code UTBAT', 'Surface Occupee Bail', 'Surface Proratisee', 'SA Donneur', 'BU Donneur',
+                    'Division Donneur', 'Code RG Donneur', 'Nom RG Donneur', 'Code Tiers Donneur', 'Nom Tiers Donneur',
+                    'SA Occupant', 'BU Occupant', 'Division Occupant', 'Code RG Occupant', 'Nom RG Occupant', 'Code Tiers Occupant',
+                    'Nom Tiers Occupant', 'Axe Local', 'Code Contexte', 'Proprietaire Juridique UTBAT En Cours',
+                    'Proprietaire Interne UTBAT En Cours', 'Dernier Proprietaire Juridique UTBAT', 'Dernier Proprietaire Interne UTBAT',
+                    'Nature Bien Batiment', 'Portefeuille UTBAT', 'Entite Regionale UTBAT', 'Code Emploi UTBAT',
+                    'Surface Developpee UTBAT', 'Surface Locative UTBAT', 'Code UT', 'Nom UT'
+                ],
+                displayName: 'Mise en qualité',
+                icon: '🧹',
+                actionAfterColumn: 'Commentaire'
+            },
             baserg: {
                 columns: ['Code RG', 'Nom de RG', 'Utilisations', 'Dernière utilisation'],
                 displayName: 'Base RG & UT',
@@ -3970,14 +4157,23 @@
                 values: ['Changement locataire', 'Modification bail', 'Avenant', 'Renouvellement', 'Autre'],
                 message: 'Type de modification non reconnu',
                 type: 'flexible'
+            },
+            'Région': {
+                values: ['ROUEN', 'LILLE', 'AMIENS'],
+                message: 'Région doit être ROUEN, LILLE ou AMIENS',
+                type: 'strict'
             }
         };
+
+        const allowedRegions = ['ROUEN', 'LILLE', 'AMIENS'];
+        const columnStorageKey = 'martine_v17_column_orders';
 
         // Variables globales
         let rowCounters = {};
         let rgDatabase = {};
         let utDatabase = {};
         let columnSuggestions = {};
+        let columnDragState = { fromIndex: null };
         let currentPreviewData = null;
         let currentTabForPreview = null;
         let searchResults = [];
@@ -4020,9 +4216,11 @@
             didDrag: false,
             scrollContainer: null,
             autoScrollVelocity: 0,
-            autoScrollFrame: null
+            autoScrollFrame: null,
+            pendingClickEvent: null
         };
         let suppressRowClickSelection = false;
+        let skipNextClickSelection = false;
         let bulkEditTab = null;
         let missions = [];
         let missionNotebook = [];
@@ -4515,6 +4713,15 @@
                     let dataStartIndex = hasHeaders ? 1 : 0;
                     processedData.headers = hasHeaders ? firstRow : expectedColumns.slice(0, firstRow.length);
 
+                    const isCompactQualityImport = tabName === 'misequalite'
+                        && processedData.headers.length > 0
+                        && !processedData.headers.some(h => (h || '').toString().toLowerCase().includes('horodatage'))
+                        && processedData.headers[0].toString().toLowerCase().includes('code bail');
+
+                    if (isCompactQualityImport) {
+                        processedData.headers = expectedColumns.slice();
+                    }
+
                     const totalRows = rawData.length - dataStartIndex;
                     const batchSize = 200;
                     let currentIndex = dataStartIndex;
@@ -4535,8 +4742,20 @@
                                 hasWarnings: false
                             };
 
-                            for (let j = 0; j < Math.max(rawRow.length, expectedColumns.length); j++) {
-                                const cellValue = j < rawRow.length ? rawRow[j] : '';
+                            let effectiveRow = rawRow;
+                            if (isCompactQualityImport) {
+                                const codeBailIndex = expectedColumns.indexOf('Code Bail');
+                                const leading = codeBailIndex >= 0 ? codeBailIndex : 0;
+                                const trailing = Math.max(0, expectedColumns.length - (leading + rawRow.length));
+                                effectiveRow = [
+                                    ...Array(leading).fill(''),
+                                    ...rawRow,
+                                    ...Array(trailing).fill('')
+                                ];
+                            }
+
+                            for (let j = 0; j < Math.max(effectiveRow.length, expectedColumns.length); j++) {
+                                const cellValue = j < effectiveRow.length ? effectiveRow[j] : '';
                                 const columnName = j < processedData.headers.length ? processedData.headers[j] : '';
                                 const expectedColumn = j < expectedColumns.length ? expectedColumns[j] : '';
 
@@ -4753,9 +4972,14 @@
             return `${lastWord}${firstWord}`.toUpperCase();
         }
 
+        function normalizeRegionName(rawValue) {
+            const upperValue = (rawValue || '').toString().toUpperCase();
+            return allowedRegions.find(region => upperValue.includes(region)) || '';
+        }
+
         function cleanCellValue(value, columnName) {
             if (!value && value !== 0) return '';
-            
+
             let cleanValue = value.toString().trim();
             
             if (columnName && (columnName.toLowerCase().includes('date'))) {
@@ -4792,8 +5016,11 @@
                 if (cleanValue === 'ENCOURS' || cleanValue === 'EN_COURS') {
                     cleanValue = 'EN COURS';
                 }
+            } else if (columnName && (columnName.toLowerCase().includes('région') || columnName.toLowerCase().includes('region'))) {
+                const normalized = normalizeRegionName(cleanValue);
+                cleanValue = normalized || cleanValue.toUpperCase();
             }
-            
+
             return cleanValue;
         }
 
@@ -5695,10 +5922,335 @@ return;
             return field;
         }
 
+        function getMiseQualiteMonth() {
+            const selector = document.getElementById('misequaliteMonthSelector');
+            return selector?.value || formatMonthKey();
+        }
+
+        function stampMiseQualiteRow(row) {
+            const columns = tabConfigs['misequalite']?.columns || [];
+            if (!columns.length || !row) return;
+            const inputs = row.querySelectorAll('input, textarea, select');
+            const timestampIndex = columns.indexOf('Horodatage');
+            const monthIndex = columns.indexOf('Mois');
+            const dateTraitementIndex = columns.indexOf('Date Traitement');
+
+            if (timestampIndex >= 0 && inputs[timestampIndex]) {
+                inputs[timestampIndex].value = formatQualityTimestamp();
+            }
+
+            if (monthIndex >= 0 && inputs[monthIndex] && !inputs[monthIndex].value) {
+                inputs[monthIndex].value = getMiseQualiteMonth();
+            }
+
+            if (dateTraitementIndex >= 0 && inputs[dateTraitementIndex] && !inputs[dateTraitementIndex].value) {
+                inputs[dateTraitementIndex].value = formatDateKey(new Date());
+            }
+        }
+
+        function ensureMiseQualiteDefaults(row) {
+            const columns = tabConfigs['misequalite']?.columns || [];
+            if (!columns.length || !row || row.dataset.tab !== 'misequalite') return;
+
+            const inputs = row.querySelectorAll('input, textarea, select');
+            const monthIndex = columns.indexOf('Mois');
+            const timestampIndex = columns.indexOf('Horodatage');
+
+            if (monthIndex >= 0 && inputs[monthIndex] && !inputs[monthIndex].value) {
+                inputs[monthIndex].value = getMiseQualiteMonth();
+            }
+
+            if (timestampIndex >= 0 && inputs[timestampIndex] && !inputs[timestampIndex].value) {
+                inputs[timestampIndex].value = formatQualityTimestamp();
+            }
+        }
+
+        function getStoredColumnPreferences() {
+            try {
+                const raw = localStorage.getItem(columnStorageKey);
+                return raw ? JSON.parse(raw) : {};
+            } catch (error) {
+                console.error('Erreur lecture préférences colonnes:', error);
+                return {};
+            }
+        }
+
+        function saveColumnPreferences(tabName, columns, actionAfterColumn = null) {
+            try {
+                const prefs = getStoredColumnPreferences();
+                prefs[tabName] = {
+                    columns: Array.isArray(columns) ? [...columns] : [],
+                    actionAfterColumn: actionAfterColumn || null
+                };
+                localStorage.setItem(columnStorageKey, JSON.stringify(prefs));
+            } catch (error) {
+                console.error('Erreur sauvegarde ordre colonnes:', error);
+            }
+        }
+
+        function restoreColumnPreferences() {
+            try {
+                const prefs = getStoredColumnPreferences();
+                Object.keys(prefs).forEach(tabName => {
+                    if (!tabConfigs[tabName]) return;
+                    const { columns = [], actionAfterColumn = null } = prefs[tabName];
+                    if (Array.isArray(columns) && columns.length === tabConfigs[tabName].columns.length) {
+                        tabConfigs[tabName].columns = columns;
+                    }
+                    tabConfigs[tabName].actionAfterColumn = actionAfterColumn || null;
+                });
+            } catch (error) {
+                console.error('Erreur restauration préférences colonnes:', error);
+            }
+        }
+
+        function updateColumnConfigFromHeader(tabName) {
+            try {
+                const table = document.getElementById(`${tabName}Table`);
+                const headerRow = table?.querySelector('thead tr');
+                if (!table || !headerRow || !tabConfigs[tabName]) return;
+
+                const headers = Array.from(headerRow.children);
+                const columns = [];
+                let actionAfterColumn = null;
+
+                headers.forEach((th, index) => {
+                    if (index === 0) return;
+                    const label = th.textContent.trim();
+                    if (label.toLowerCase() === 'action') {
+                        const previousHeader = headers[index - 1];
+                        const previousLabel = previousHeader?.textContent.trim();
+                        if (previousLabel && previousLabel.toLowerCase() !== 'action' && previousLabel !== '#') {
+                            actionAfterColumn = previousLabel;
+                        } else {
+                            actionAfterColumn = null;
+                        }
+                        return;
+                    }
+
+                    columns.push(label);
+                    th.dataset.columnKey = label;
+                });
+
+                tabConfigs[tabName].columns = columns;
+                tabConfigs[tabName].actionAfterColumn = actionAfterColumn;
+                saveColumnPreferences(tabName, columns, actionAfterColumn);
+            } catch (error) {
+                console.error('Erreur mise à jour ordre colonnes:', error);
+            }
+        }
+
+        function applyColumnLayout(tabName) {
+            try {
+                const table = document.getElementById(`${tabName}Table`);
+                const headerRow = table?.querySelector('thead tr');
+                const body = document.getElementById(`${tabName}TableBody`);
+                if (!table || !headerRow || !body) return;
+
+                const headers = Array.from(headerRow.children);
+                const headerMap = new Map();
+                headers.forEach((th, idx) => headerMap.set(th.textContent.trim(), { th, idx }));
+
+                const numberHeader = headers[0];
+                const actionHeader = headers.find(th => th.textContent.trim().toLowerCase() === 'action');
+                const orderedHeaders = [numberHeader];
+
+                (tabConfigs[tabName]?.columns || []).forEach(col => {
+                    const entry = headerMap.get(col);
+                    if (entry && !orderedHeaders.includes(entry.th)) {
+                        orderedHeaders.push(entry.th);
+                    }
+                });
+
+                if (actionHeader) {
+                    const afterColumn = tabConfigs[tabName]?.actionAfterColumn;
+                    const insertIndex = afterColumn
+                        ? orderedHeaders.findIndex(th => th.textContent.trim() === afterColumn) + 1
+                        : orderedHeaders.length;
+                    orderedHeaders.splice(Math.max(insertIndex, 1), 0, actionHeader);
+                }
+
+                headers.forEach(th => {
+                    if (!orderedHeaders.includes(th)) {
+                        orderedHeaders.push(th);
+                    }
+                });
+
+                headerRow.innerHTML = '';
+                orderedHeaders.forEach(th => headerRow.appendChild(th));
+
+                Array.from(body.rows).forEach(row => {
+                    const cells = Array.from(row.children);
+                    const cellMap = new Map();
+                    headers.forEach((th, idx) => cellMap.set(th.textContent.trim(), cells[idx]));
+
+                    const orderedCells = [];
+                    orderedHeaders.forEach(th => {
+                        const cell = cellMap.get(th.textContent.trim());
+                        if (cell) {
+                            orderedCells.push(cell);
+                        }
+                    });
+
+                    row.innerHTML = '';
+                    orderedCells.forEach(cell => row.appendChild(cell));
+                });
+
+                setupColumnDragAndDrop(tabName);
+            } catch (error) {
+                console.error('Erreur application ordre colonnes:', error);
+            }
+        }
+
+        function applyAllColumnLayouts() {
+            Object.keys(tabConfigs).forEach(tabName => applyColumnLayout(tabName));
+        }
+
+        function getHeaderIndex(th) {
+            if (!th || !th.parentElement) return -1;
+            return Array.from(th.parentElement.children).indexOf(th);
+        }
+
+        function handleColumnDragStart(event, tabName) {
+            const th = event.target.closest('th');
+            if (!th) return;
+            const index = getHeaderIndex(th);
+            if (index === 0) return;
+
+            columnDragState.fromIndex = index;
+            th.classList.add('dragging-column');
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleColumnDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleColumnDragEnter(event) {
+            const th = event.target.closest('th');
+            if (!th || getHeaderIndex(th) === 0) return;
+            th.classList.add('drag-target');
+        }
+
+        function handleColumnDragLeave(event) {
+            const th = event.target.closest('th');
+            if (th) {
+                th.classList.remove('drag-target');
+            }
+        }
+
+        function resetColumnDragVisuals() {
+            document.querySelectorAll('th.dragging-column, th.drag-target').forEach(th => {
+                th.classList.remove('dragging-column', 'drag-target');
+            });
+        }
+
+        function handleColumnDrop(event, tabName) {
+            event.preventDefault();
+            const targetTh = event.target.closest('th');
+            if (!targetTh) return;
+
+            const targetIndex = getHeaderIndex(targetTh);
+            if (columnDragState.fromIndex === null || columnDragState.fromIndex === targetIndex || targetIndex === 0) {
+                resetColumnDragVisuals();
+                return;
+            }
+
+            applyColumnReorder(tabName, columnDragState.fromIndex, targetIndex);
+            resetColumnDragVisuals();
+            columnDragState.fromIndex = null;
+        }
+
+        function handleColumnDragEnd() {
+            resetColumnDragVisuals();
+            columnDragState.fromIndex = null;
+        }
+
+        function applyColumnReorder(tabName, fromIndex, toIndex) {
+            try {
+                const table = document.getElementById(`${tabName}Table`);
+                const headerRow = table?.querySelector('thead tr');
+                const body = document.getElementById(`${tabName}TableBody`);
+                if (!table || !headerRow || !body) return;
+
+                if (fromIndex === toIndex || fromIndex === 0 || toIndex === 0) return;
+
+                const headers = Array.from(headerRow.children);
+                const referenceHeader = headers[toIndex];
+                headerRow.insertBefore(headers[fromIndex], toIndex > fromIndex ? referenceHeader.nextSibling : referenceHeader);
+
+                Array.from(body.rows).forEach(row => {
+                    const cells = Array.from(row.children);
+                    const referenceCell = cells[toIndex];
+                    row.insertBefore(cells[fromIndex], toIndex > fromIndex ? referenceCell.nextSibling : referenceCell);
+                });
+
+                updateColumnConfigFromHeader(tabName);
+                logActivity(`Colonnes réorganisées dans ${getTabDisplayName(tabName)}`, 'info');
+                queueSaveAllData();
+            } catch (error) {
+                console.error('Erreur réorganisation colonnes:', error);
+            }
+        }
+
+        function setupColumnDragAndDrop(tabName) {
+            try {
+                const table = document.getElementById(`${tabName}Table`);
+                const headerRow = table?.querySelector('thead tr');
+                if (!table || !headerRow) return;
+
+                const headers = Array.from(headerRow.children);
+                headers.forEach((th, index) => {
+                    if (index === 0) return;
+                    if (th.dataset.dragEnabled === 'true') return;
+
+                    th.dataset.dragEnabled = 'true';
+                    th.classList.add('draggable-column');
+                    th.draggable = true;
+                    th.addEventListener('dragstart', (event) => handleColumnDragStart(event, tabName));
+                    th.addEventListener('dragover', handleColumnDragOver);
+                    th.addEventListener('dragenter', handleColumnDragEnter);
+                    th.addEventListener('dragleave', handleColumnDragLeave);
+                    th.addEventListener('drop', (event) => handleColumnDrop(event, tabName));
+                    th.addEventListener('dragend', handleColumnDragEnd);
+                });
+            } catch (error) {
+                console.error('Erreur configuration du glisser-déposer colonnes:', error);
+            }
+        }
+
+        function setupAllColumnDragAndDrop() {
+            Object.keys(tabConfigs).forEach(tabName => setupColumnDragAndDrop(tabName));
+        }
+
+        function createActionCell(row, tabName) {
+            const actionCell = document.createElement('td');
+
+            if (tabName === 'verifbaux') {
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = '📋 PNI';
+                copyBtn.title = 'Copier vers PNI';
+                copyBtn.onclick = () => copyVerifRowToPNI(row);
+                actionCell.appendChild(copyBtn);
+            }
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '🗑️';
+            deleteBtn.onclick = () => deleteRow(row, tabName);
+            actionCell.appendChild(deleteBtn);
+
+            return actionCell;
+        }
+
         function buildRowElement(tabName, data = [], options = {}) {
             const { skipValidation = false } = options;
             const columns = tabConfigs[tabName]?.columns || [];
             const rowNum = ++rowCounters[tabName];
+            const actionAfterColumn = tabConfigs[tabName]?.actionAfterColumn || null;
+            let actionInserted = false;
 
             const row = document.createElement('tr');
             const rowId = options.rowId || generateUniqueId();
@@ -5789,6 +6341,26 @@ return;
                     autoResizeField(input);
                     applySmartSuggestion(input, column);
                     validateInputInRealTime(input, column, tabName);
+                    if (tabName === 'misequalite') {
+                        const inputs = row.querySelectorAll('input, textarea, select');
+                        const timestampIndex = columns.indexOf('Horodatage');
+                        const moisIndex = columns.indexOf('Mois');
+                        const dateTraitementIndex = columns.indexOf('Date Traitement');
+
+                        if (timestampIndex >= 0 && inputs[timestampIndex]) {
+                            inputs[timestampIndex].value = formatQualityTimestamp();
+                        }
+
+                        if (moisIndex >= 0 && inputs[moisIndex] && !inputs[moisIndex].value) {
+                            inputs[moisIndex].value = getMiseQualiteMonth();
+                        }
+
+                        if (column === 'Traité' && input.value.toLowerCase() === 'oui' && dateTraitementIndex >= 0 && inputs[dateTraitementIndex]) {
+                            inputs[dateTraitementIndex].value = formatDateKey(new Date());
+                        } else if (column !== 'Horodatage' && dateTraitementIndex >= 0 && inputs[dateTraitementIndex] && !inputs[dateTraitementIndex].value) {
+                            inputs[dateTraitementIndex].value = formatDateKey(new Date());
+                        }
+                    }
                     queueSaveAllData();
                     queueStatsUpdate(tabName);
                 });
@@ -5800,23 +6372,20 @@ return;
 
                 cell.appendChild(input);
                 row.appendChild(cell);
+
+                if (!actionInserted && actionAfterColumn && column === actionAfterColumn) {
+                    row.appendChild(createActionCell(row, tabName));
+                    actionInserted = true;
+                }
             });
 
-            const actionCell = document.createElement('td');
-            if (tabName === 'verifbaux') {
-                const copyBtn = document.createElement('button');
-                copyBtn.className = 'copy-btn';
-                copyBtn.textContent = '📋 PNI';
-                copyBtn.title = 'Copier vers PNI';
-                copyBtn.onclick = () => copyVerifRowToPNI(row);
-                actionCell.appendChild(copyBtn);
+            if (tabName === 'misequalite') {
+                ensureMiseQualiteDefaults(row);
             }
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-btn';
-            deleteBtn.textContent = '🗑️';
-            deleteBtn.onclick = () => deleteRow(row, tabName);
-            actionCell.appendChild(deleteBtn);
-            row.appendChild(actionCell);
+
+            if (!actionInserted) {
+                row.appendChild(createActionCell(row, tabName));
+            }
 
             applyIntelligentRGFill(row, tabName);
             applyIntelligentUTFill(row, tabName);
@@ -5838,6 +6407,9 @@ return;
                 }
 
                 updateStats(tabName);
+                if (tabName === 'misequalite') {
+                    filterMiseQualiteByMonth();
+                }
                 if (tabName === 'baserg') {
                     updateRGDatabase();
                 } else if (tabName === 'baseut') {
@@ -5878,6 +6450,9 @@ return;
 
                 if (!skipStats) {
                     updateStats(tabName);
+                    if (tabName === 'misequalite') {
+                        filterMiseQualiteByMonth();
+                    }
                     if (tabName === 'baserg') {
                         updateRGDatabase();
                     } else if (tabName === 'baseut') {
@@ -5972,26 +6547,20 @@ return;
                 if (event.target.closest('input, textarea, select, button')) return;
 
                 event.preventDefault();
-                const selection = getRowSelectionSet(tabName);
-
                 dragSelectionState.active = true;
                 dragSelectionState.tab = tabName;
                 dragSelectionState.anchorRow = row;
                 dragSelectionState.baseSelection = (event.ctrlKey || event.metaKey)
-                    ? new Set(selection)
+                    ? new Set(getRowSelectionSet(tabName))
                     : new Set();
                 dragSelectionState.didDrag = false;
                 dragSelectionState.scrollContainer = row.closest('.table-container');
-
-                selection.clear();
-                dragSelectionState.baseSelection.forEach(id => selection.add(id));
-                if (row.dataset.rowId) {
-                    selection.add(row.dataset.rowId);
-                }
-                refreshRowSelections(tabName);
-                updateBulkSelectionInfo(tabName);
+                dragSelectionState.pendingClickEvent = {
+                    ctrlKey: event.ctrlKey,
+                    metaKey: event.metaKey,
+                    shiftKey: event.shiftKey
+                };
                 suppressRowClickSelection = true;
-                setTimeout(() => suppressRowClickSelection = false, 0);
 
                 document.addEventListener('mouseup', endRowDragSelection, { once: true });
                 document.addEventListener('mousemove', handleDragSelectionMouseMove);
@@ -6014,6 +6583,7 @@ return;
 
                 if (anchorIndex !== currentIndex) {
                     dragSelectionState.didDrag = true;
+                    dragSelectionState.pendingClickEvent = null;
                 }
 
                 const selection = getRowSelectionSet(tabName);
@@ -6044,18 +6614,24 @@ return;
         function endRowDragSelection() {
             try {
                 if (!dragSelectionState.active) return;
+                const { didDrag, anchorRow, tab, pendingClickEvent } = dragSelectionState;
 
-                if (dragSelectionState.didDrag) {
-                    suppressRowClickSelection = true;
-                    setTimeout(() => suppressRowClickSelection = false, 0);
+                if (!didDrag && anchorRow && tab) {
+                    skipNextClickSelection = true;
+                    suppressRowClickSelection = false;
+                    handleRowSelection(pendingClickEvent || { ctrlKey: false, metaKey: false }, anchorRow, tab);
+                } else if (didDrag) {
+                    skipNextClickSelection = true;
                 }
 
+                suppressRowClickSelection = false;
                 dragSelectionState.active = false;
                 dragSelectionState.tab = null;
                 dragSelectionState.anchorRow = null;
                 dragSelectionState.baseSelection = new Set();
                 dragSelectionState.didDrag = false;
                 dragSelectionState.scrollContainer = null;
+                dragSelectionState.pendingClickEvent = null;
                 stopDragAutoScroll();
                 document.removeEventListener('mousemove', handleDragSelectionMouseMove);
             } catch (error) {
@@ -6066,6 +6642,10 @@ return;
         function handleRowSelection(event, row, tabName) {
             try {
                 if (suppressRowClickSelection) return;
+                if (skipNextClickSelection) {
+                    skipNextClickSelection = false;
+                    return;
+                }
 
                 const rowId = row.dataset.rowId;
                 if (!rowId) return;
@@ -6246,6 +6826,59 @@ return;
             }
         }
 
+        function correctRegionCells(tabName) {
+            try {
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                const columns = tabConfigs[tabName]?.columns || [];
+                const regionIndex = columns.indexOf('Région');
+
+                if (!tbody || regionIndex === -1) {
+                    showNotification('ℹ️ Aucune colonne Région à corriger', 'info');
+                    return;
+                }
+
+                const rows = tbody.querySelectorAll('tr');
+                let normalizedCount = 0;
+                let clearedCount = 0;
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const regionInput = inputs[regionIndex];
+                    if (!regionInput) return;
+
+                    const currentValue = regionInput.value || '';
+                    const normalized = normalizeRegionName(currentValue);
+
+                    if (normalized) {
+                        if (regionInput.value !== normalized) {
+                            regionInput.value = normalized;
+                            normalizedCount++;
+                        }
+                    } else if (currentValue.trim() !== '') {
+                        regionInput.value = '';
+                        clearedCount++;
+                    }
+
+                    validateInputInRealTime(regionInput, 'Région', tabName);
+                });
+
+                if (normalizedCount || clearedCount) {
+                    updateStats(tabName);
+                    queueSaveAllData();
+                    logActivity(`Régions corrigées dans ${getTabDisplayName(tabName)}`, 'info');
+                    const details = [];
+                    if (normalizedCount) details.push(`${normalizedCount} normalisation(s)`);
+                    if (clearedCount) details.push(`${clearedCount} valeur(s) vidée(s)`);
+                    showNotification(`🧹 Correction des régions : ${details.join(', ')}`);
+                } else {
+                    showNotification('ℹ️ Aucune correction de région nécessaire', 'info');
+                }
+            } catch (error) {
+                console.error('Erreur correction régions:', error);
+                showNotification('❌ Erreur lors de la correction des régions', 'error');
+            }
+        }
+
         // 📊 STATISTIQUES COMPLÈTES
         function updateStats(tabName) {
             try {
@@ -6314,6 +6947,28 @@ return;
                     document.getElementById(`${tabName}ProcessedRows`).textContent = treated;
                     document.getElementById(`${tabName}PendingRows`).textContent = pendingRows;
 
+                    const completionRate = total > 0 ? Math.round((treated / total) * 100) : 0;
+                    document.getElementById(`${tabName}CompletionRate`).textContent = completionRate + '%';
+
+                } else if (tabName === 'misequalite') {
+                    let treated = 0;
+
+                    rows.forEach(row => {
+                        const inputs = row.querySelectorAll('input, textarea, select');
+                        const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
+                        const traiteInput = inputs[traiteIndex];
+                        const traite = traiteInput ? traiteInput.value.toLowerCase() : '';
+
+                        if (traite === 'oui') {
+                            treated++;
+                        }
+                    });
+
+                    const pendingRows = Math.max(total - treated, 0);
+
+                    document.getElementById(`${tabName}TotalRows`).textContent = total;
+                    document.getElementById(`${tabName}ProcessedRows`).textContent = treated;
+                    document.getElementById(`${tabName}PendingRows`).textContent = pendingRows;
                     const completionRate = total > 0 ? Math.round((treated / total) * 100) : 0;
                     document.getElementById(`${tabName}CompletionRate`).textContent = completionRate + '%';
 
@@ -8638,6 +9293,14 @@ return;
             return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         }
 
+        function formatMonthKey(date = new Date()) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function formatQualityTimestamp(date = new Date()) {
+            return date.toLocaleString('fr-FR');
+        }
+
         function syncMissionInputs() {
             const dateInput = document.getElementById('missionFocusDate');
             const monthInput = document.getElementById('missionMonthPicker');
@@ -9288,21 +9951,38 @@ return;
                 rows.forEach(row => {
                     let showRow = true;
                     const inputs = row.querySelectorAll('input, textarea, select');
-                    
+
                     Object.keys(filters).forEach(filterName => {
                         const filterValue = filters[filterName].toLowerCase();
                         if (!filterValue) return;
-                        
+
+                        if (filterName === 'Search') {
+                            const rowText = Array.from(inputs).map(i => i.value.toLowerCase()).join(' ');
+                            if (!rowText.includes(filterValue)) {
+                                showRow = false;
+                            }
+                            return;
+                        }
+
+                        if (filterName === 'Status' && tabName === 'misequalite') {
+                            const traiteIndex = tabConfigs[tabName].columns.indexOf('Traité');
+                            const traiteValue = inputs[traiteIndex]?.value.toLowerCase() || '';
+                            if (filterValue !== traiteValue) {
+                                showRow = false;
+                            }
+                            return;
+                        }
+
                         const columnIndex = getColumnIndex(tabName, filterName);
                         if (columnIndex >= 0 && columnIndex < inputs.length) {
                             const cellValue = inputs[columnIndex].value.toLowerCase();
-                            
+
                             if (filterName.includes('Date')) {
                                 if (!filterDateRange(cellValue, filterValue, filterName)) {
                                     showRow = false;
                                 }
                             } else if (filterName === 'Status') {
-                                const hasDateTraitement = inputs[tabConfigs[tabName].columns.indexOf('Date Traitement')] && 
+                                const hasDateTraitement = inputs[tabConfigs[tabName].columns.indexOf('Date Traitement')] &&
                                                          inputs[tabConfigs[tabName].columns.indexOf('Date Traitement')].value;
                                 const isProcessed = hasDateTraitement ? 'traite' : 'attente';
                                 if (filterValue !== isProcessed) {
@@ -9315,7 +9995,7 @@ return;
                             }
                         }
                     });
-                    
+
                     row.style.display = showRow ? '' : 'none';
                 });
                 
@@ -9358,6 +10038,40 @@ return;
             
             const columnName = columnMap[filterName];
             return columnName ? columns.indexOf(columnName) : -1;
+        }
+
+        function filterMiseQualiteByMonth() {
+            const tbody = document.getElementById('misequaliteTableBody');
+            if (!tbody) return;
+
+            const selectedMonth = getMiseQualiteMonth();
+            const columns = tabConfigs['misequalite']?.columns || [];
+            const monthIndex = columns.indexOf('Mois');
+
+            tbody.querySelectorAll('tr').forEach(row => {
+                const inputs = row.querySelectorAll('input, textarea, select');
+                const monthValue = inputs[monthIndex]?.value || '';
+                row.style.display = !selectedMonth || monthValue === selectedMonth ? '' : 'none';
+            });
+        }
+
+        function populateMiseQualiteMonths() {
+            const selector = document.getElementById('misequaliteMonthSelector');
+            if (!selector) return;
+
+            const now = new Date();
+            selector.innerHTML = '';
+
+            for (let i = 0; i < 12; i++) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const value = formatMonthKey(date);
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+                selector.appendChild(option);
+            }
+
+            selector.value = formatMonthKey(now);
         }
 
         function filterDateRange(cellValue, filterValue, filterType) {
@@ -11660,6 +12374,65 @@ return;
             }
         }
 
+        // 📤 EXPORT DE LA SÉLECTION
+        function exportSelectionToExcel(tabName) {
+            try {
+                if (!window.XLSX) {
+                    showNotification('❌ Bibliothèque Excel non disponible', 'error');
+                    return;
+                }
+
+                const selection = getRowSelectionSet(tabName);
+                if (!selection.size) {
+                    showNotification('ℹ️ Aucune ligne sélectionnée', 'info');
+                    return;
+                }
+
+                const tbody = document.getElementById(`${tabName}TableBody`);
+                if (!tbody) return;
+
+                const columns = tabConfigs[tabName]?.columns || [];
+                const selectedRows = Array.from(tbody.querySelectorAll('tr')).filter(row => selection.has(row.dataset.rowId));
+
+                if (selectedRows.length === 0) {
+                    showNotification('❌ Sélection introuvable dans le tableau', 'error');
+                    return;
+                }
+
+                const wsData = [columns];
+
+                selectedRows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, textarea, select');
+                    const rowData = [];
+                    inputs.forEach(input => {
+                        rowData.push(input.value || '');
+                    });
+                    if (rowData.some(cell => cell.trim() !== '')) {
+                        wsData.push(rowData);
+                    }
+                });
+
+                if (wsData.length <= 1) {
+                    showNotification('❌ Aucune donnée valide à exporter dans la sélection', 'error');
+                    return;
+                }
+
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, `${getTabDisplayName(tabName)}_selection`.substring(0, 31));
+
+                const fileName = `MARTINE_${getTabDisplayName(tabName).replace(/\s+/g, '_')}_selection_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+
+                showNotification(`📤 Export de la sélection réussi: ${fileName}`);
+                logActivity(`Export sélection Excel de ${getTabDisplayName(tabName)}`, 'success');
+
+            } catch (error) {
+                console.error('Erreur export sélection Excel:', error);
+                showNotification('❌ Erreur lors de l\'export de la sélection', 'error');
+            }
+        }
+
         // 📊 EXPORT EXCEL COMPLET
         function exportToExcel(tabName) {
             try {
@@ -12028,6 +12801,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     missions: missions,
                     missionNotebook: missionNotebook,
                     activityLog: activityLog,
+                    columnOrders: getStoredColumnPreferences(),
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -12108,6 +12882,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     missions: missions,
                     missionNotebook: missionNotebook,
                     activityLog: activityLog,
+                    columnOrders: getStoredColumnPreferences(),
                     dismissedRGChanges: Array.from(dismissedRGChanges || []),
                     tabsData: {}
                 };
@@ -12227,6 +13002,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 return acc;
             }, {});
 
+            if (data.columnOrders) {
+                Object.keys(data.columnOrders).forEach(tabName => {
+                    if (!tabConfigs[tabName]) return;
+                    const { columns = [], actionAfterColumn = null } = data.columnOrders[tabName] || {};
+                    if (Array.isArray(columns) && columns.length === tabConfigs[tabName].columns.length) {
+                        tabConfigs[tabName].columns = columns;
+                    }
+                    tabConfigs[tabName].actionAfterColumn = actionAfterColumn || null;
+                    saveColumnPreferences(tabName, tabConfigs[tabName].columns, tabConfigs[tabName].actionAfterColumn);
+                });
+            }
+
             if (data.rowCounters) {
                 Object.keys(data.rowCounters).forEach(tabName => {
                     if (typeof data.rowCounters[tabName] === 'number') {
@@ -12340,6 +13127,8 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMissionList();
             renderMissionNotebook();
             renderMissionCalendar();
+            applyAllColumnLayouts();
+            setupAllColumnDragAndDrop();
             rebuildColumnSuggestions();
             queueSaveAllData();
         }
@@ -12379,7 +13168,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // 🔧 INITIALISATION COMPLÈTE
         function initializeApp() {
             try {
+                restoreColumnPreferences();
                 loadAllData();
+                applyAllColumnLayouts();
+                populateMiseQualiteMonths();
+                filterMiseQualiteByMonth();
                 refreshRGSuggestions();
                 renderTaskExcelCells();
 
@@ -12396,11 +13189,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 resetMissionFocus();
                 renderMissionList();
                 renderMissionCalendar();
+                setupAllColumnDragAndDrop();
 
                 showNotification('🚀 MARTINE - Tous onglets fonctionnels', 'success');
                 showSaveStatus('💾 Application prête - Auto-sauvegarde activée');
                 logActivity('Application MARTINE initialisée', 'success');
-                
+
             } catch (error) {
                 console.error('Erreur initialisation:', error);
                 showNotification('❌ Erreur lors de l\'initialisation', 'error');
@@ -12468,6 +13262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addRow = addRow;
         window.deleteRow = deleteRow;
         window.deleteSelectedRows = deleteSelectedRows;
+        window.exportSelectionToExcel = exportSelectionToExcel;
         window.exportToExcel = exportToExcel;
         window.exportAllToExcel = exportAllToExcel;
         window.exportStatsReport = exportStatsReport;
